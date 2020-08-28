@@ -155,30 +155,4 @@ const jellyfish = await core.create(context, cache, {
 
 # Documentation
 
-A module for interacting with cards in the database and cache.
-
-
-* [core](#module_core)
-    * [module.exports](#exp_module_core--module.exports) ⏏
-        * [new module.exports(options)](#new_module_core--module.exports_new)
-
-<a name="exp_module_core--module.exports"></a>
-
-### module.exports ⏏
-**Kind**: Exported class  
-**Summary**: The card cache store  
-**Access**: public  
-<a name="new_module_core--module.exports_new"></a>
-
-#### new module.exports(options)
-
-| Param | Type | Description |
-| --- | --- | --- |
-| options | <code>Object</code> | options |
-| options.namespace | <code>String</code> | will be used as key prefix |
-| options.mock | <code>Boolean</code> | if true uses in memory cache |
-
-**Example**  
-```js
-const cache = new Cache()
-```
+ERROR, Cannot find module.
