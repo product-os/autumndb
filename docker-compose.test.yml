@@ -1,0 +1,27 @@
+version: '2.1'
+
+services:
+  sut:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+      args:
+        NPM_TOKEN: $NPM_TOKEN
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DATABASE=postgres
+      - LOGLEVEL=crit
+      - NODE_ENV=test
+      - POSTGRES_DATABASE=jellyfish
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_USER=docker
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=
+      - REDIS_PORT=6379
+      - CI=1
+      - NPM_TOKEN
+    networks:
+      - internal

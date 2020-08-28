@@ -981,7 +981,7 @@ ava('.query() should query the database using JSON schema', async (test) => {
 		active: true
 	})
 
-	await test.context.backend.upsertElement(test.context.context, {
+	const result2 = await test.context.backend.upsertElement(test.context.context, {
 		type: 'test@1.0.0',
 		slug: test.context.generateRandomSlug(),
 		links: {},
@@ -999,7 +999,7 @@ ava('.query() should query the database using JSON schema', async (test) => {
 		active: true
 	})
 
-	const result2 = await test.context.backend.upsertElement(test.context.context, {
+	const result3 = await test.context.backend.upsertElement(test.context.context, {
 		type: 'example@1.0.0',
 		slug: test.context.generateRandomSlug(),
 		version: '1.0.0',
@@ -1028,7 +1028,18 @@ ava('.query() should query the database using JSON schema', async (test) => {
 				type: 'boolean'
 			},
 			slug: {
-				type: 'string'
+				type: 'string',
+				anyOf: [
+					{
+						const: result1.slug
+					},
+					{
+						const: result2.slug
+					},
+					{
+						const: result3.slug
+					}
+				]
 			},
 			data: {
 				type: 'object',
@@ -1047,7 +1058,7 @@ ava('.query() should query the database using JSON schema', async (test) => {
 		required: [ 'id', 'active', 'slug', 'data', 'type' ]
 	})
 
-	test.deepEqual(_.sortBy(results, 'data.test'), [ result1, result2 ])
+	test.deepEqual(_.sortBy(results, 'data.test'), [ result1, result3 ])
 })
 
 ava('.query() should escape malicious query keys', async (test) => {
@@ -1899,7 +1910,7 @@ ava('.query() should not omit the results of a one-element query if limit is set
 	])
 })
 
-ava('.query() should be able to limit and skip the results', async (test) => {
+ava.serial('.query() should be able to limit and skip the results', async (test) => {
 	const result1 = await test.context.backend.upsertElement(test.context.context, {
 		type: 'card@1.0.0',
 		slug: test.context.generateRandomSlug({
@@ -4595,7 +4606,7 @@ ava('.stream() should throw if the schema is invalid', async (test) => {
 	}))
 })
 
-ava('.upsertElement() should handle multiple parallel insertions on the same slug', async (test) => {
+ava.serial('.upsertElement() should handle multiple parallel insertions on the same slug', async (test) => {
 	const slug = test.context.generateRandomSlug()
 	for (const time of _.range(200)) {
 		const object = {
@@ -4646,7 +4657,7 @@ ava('.upsertElement() should handle multiple parallel insertions on the same slu
 	}
 })
 
-ava('.insertElement() should handle multiple parallel insertions on the same slug', async (test) => {
+ava.serial('.insertElement() should handle multiple parallel insertions on the same slug', async (test) => {
 	const slug = test.context.generateRandomSlug()
 	for (const time of _.range(200)) {
 		const object = {

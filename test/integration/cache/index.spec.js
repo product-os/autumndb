@@ -12,9 +12,9 @@ ava.serial.before(helpers.before)
 
 ava('.set() should be able to retrieve item by id', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test'
+		slug: helpers.generateRandomSlug()
 	}
 
 	await test.context.cache.set('test', element1)
@@ -26,9 +26,9 @@ ava('.set() should be able to retrieve item by id', async (test) => {
 
 ava('.set() should be able to retrieve item by slug', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test'
+		slug: helpers.generateRandomSlug()
 	}
 
 	await test.context.cache.set('test', element1)
@@ -41,9 +41,9 @@ ava('.set() should be able to retrieve item by slug', async (test) => {
 
 ava('.set() should not be able to retrieve item by slug given the wrong version', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test'
+		slug: helpers.generateRandomSlug()
 	}
 
 	await test.context.cache.set('test', element1)
@@ -57,9 +57,9 @@ ava('.set() should not be able to retrieve item by slug given the wrong version'
 
 ava('.setMissingId() should prevent card from being fetched by ID', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test'
+		slug: helpers.generateRandomSlug()
 	}
 
 	await test.context.cache.set('test', element1)
@@ -72,9 +72,9 @@ ava('.setMissingId() should prevent card from being fetched by ID', async (test)
 
 ava('.setMissingSlug() should prevent card from being fetched by slug', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test'
+		slug: helpers.generateRandomSlug()
 	}
 
 	await test.context.cache.set('test', element1)
@@ -89,15 +89,15 @@ ava('.setMissingSlug() should prevent card from being fetched by slug', async (t
 
 ava('.setMissingSlug() should not prevent other versions from being fetched by slug', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test'
+		slug: helpers.generateRandomSlug()
 	}
 
 	const element2 = {
-		id: '9af7cf33-1a29-4f0c-a73b-f6a2b149850c',
+		id: helpers.generateRandomID(),
 		version: '1.0.1',
-		slug: 'test'
+		slug: element1.slug
 	}
 
 	await test.context.cache.set('test', element1)
@@ -118,15 +118,15 @@ ava('.setMissingSlug() should not prevent other versions from being fetched by s
 
 ava('.getById() should get the correct element', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test1'
+		slug: helpers.generateRandomSlug()
 	}
 
 	const element2 = {
-		id: '5a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test2'
+		slug: helpers.generateRandomSlug()
 	}
 
 	await test.context.cache.set('test', element1)
@@ -141,15 +141,15 @@ ava('.getById() should get the correct element', async (test) => {
 
 ava('.getBySlug() should get the correct element', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test1'
+		slug: helpers.generateRandomSlug()
 	}
 
 	const element2 = {
-		id: '5a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test2'
+		slug: helpers.generateRandomSlug()
 	}
 
 	await test.context.cache.set('test', element1)
@@ -166,15 +166,15 @@ ava('.getBySlug() should get the correct element', async (test) => {
 
 ava('.unset() should remove an element from the cache', async (test) => {
 	const element1 = {
-		id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test1'
+		slug: helpers.generateRandomSlug()
 	}
 
 	const element2 = {
-		id: '5a962ad9-20b5-4dd8-a707-bf819593cc84',
+		id: helpers.generateRandomID(),
 		version: '1.0.0',
-		slug: 'test2'
+		slug: helpers.generateRandomSlug()
 	}
 
 	await test.context.cache.set('test', element1)
@@ -186,6 +186,7 @@ ava('.unset() should remove an element from the cache', async (test) => {
 	const el2 = await test.context.cache.getBySlug(
 		'test', element2.slug, element2.version)
 
+	/* eslint-disable no-undefined */
 	test.deepEqual(undefined, el1.element)
 	test.deepEqual(element2, el2.element)
 })
