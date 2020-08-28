@@ -1,0 +1,64 @@
+{
+  "name": "@balena/jellyfish-core",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/product-os/jellyfish-core.git"
+  },
+  "description": "Core library for Jellyfish",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "deplint": {
+    "files": [
+      "lib/**/*.{js}"
+    ],
+    "modules": [
+      "lib"
+    ]
+  },
+  "scripts": {
+    "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes && make lint && make test",
+    "doc": "jsdoc2md --template doc/README.hbs 'lib/**/*.js' > README.md"
+  },
+  "author": "Balena.io. <hello@balena.io>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@balena/jellyfish-assert": "^1.0.2",
+    "@balena/jellyfish-environment": "^2.2.9",
+    "@balena/jellyfish-logger": "0.0.49",
+    "@balena/jellyfish-metrics": "0.0.53",
+    "@balena/jellyfish-uuid": "^1.0.2",
+    "bluebird": "^3.7.2",
+    "debounce-promise": "^3.1.2",
+    "fast-equals": "^2.0.0",
+    "fast-json-patch": "^3.0.0-1",
+    "json-e": "^4.3.0",
+    "json-schema-deref-sync": "^0.13.0",
+    "lodash": "^4.17.20",
+    "pg-format": "^1.0.4",
+    "pg-promise": "^10.6.1",
+    "skhema": "^5.3.3",
+    "traverse": "^0.6.6",
+    "typed-errors": "^1.1.0"
+  },
+  "devDependencies": {
+    "@json-schema-org/tests": "^2.0.0",
+    "ava": "^3.12.1",
+    "catch-uncommitted": "^1.6.2",
+    "depcheck": "^1.2.0",
+    "deplint": "^1.1.2",
+    "eslint": "^7.7.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsdoc": "^30.3.0",
+    "eslint-plugin-lodash": "^7.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jsdoc-to-markdown": "^6.0.1",
+    "shellcheck": "^0.4.4",
+    "uuid": "^8.3.0"
+  }
+}
