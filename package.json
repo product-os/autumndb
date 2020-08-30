@@ -19,7 +19,7 @@
     ]
   },
   "scripts": {
-    "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes && make lint && make test",
+    "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes --exclude=VERSION && make lint && make test-unit",
     "doc": "jsdoc2md --template doc/README.hbs 'lib/**/*.js' > README.md"
   },
   "author": "Balena.io. <hello@balena.io>",
@@ -33,18 +33,20 @@
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
     "fast-equals": "^2.0.0",
-    "fast-json-patch": "^3.0.0-1",
+    "fast-json-patch": "^2.2.1",
     "json-e": "^4.3.0",
-    "json-schema-deref-sync": "^0.13.0",
+    "json-schema-deref-sync": "github:cvent/json-schema-deref-sync#8bdbac1ff3e001a7b459e08229d3aa93f42b5f13",
     "lodash": "^4.17.20",
     "pg-format": "^1.0.4",
     "pg-promise": "^10.6.1",
+    "redis-mock": "^0.51.0",
     "skhema": "^5.3.3",
     "traverse": "^0.6.6",
     "typed-errors": "^1.1.0"
   },
   "devDependencies": {
-    "@json-schema-org/tests": "^2.0.0",
+    "@balena/ci-task-runner": "^0.2.0",
+    "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.12.1",
     "catch-uncommitted": "^1.6.2",
     "depcheck": "^1.2.0",
@@ -60,6 +62,7 @@
     "husky": "^4.2.5",
     "jsdoc-to-markdown": "^6.0.1",
     "lint-staged": "^10.2.13",
+    "redis": "^3.0.2",
     "shellcheck": "^0.4.4",
     "uuid": "^8.3.0"
   },

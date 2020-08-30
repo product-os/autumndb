@@ -30,18 +30,41 @@ ifdef MATCH
 AVA_ARGS += --match $(MATCH)
 endif
 
+LOGLEVEL ?= info
+export LOGLEVEL
+
+DATABASE ?= postgres
+export DATABASE
+POSTGRES_DATABASE ?= jellyfish
+export POSTGRES_DATABASE
+POSTGRES_HOST ?= localhost
+export POSTGRES_HOST
+POSTGRES_PORT ?= 5432
+export POSTGRES_PORT
+POSTGRES_PASSWORD ?=
+export POSTGRES_PASSWORD
+POSTGRES_USER ?= $(shell whoami)
+export POSTGRES_USER
+
+REDIS_PASSWORD ?=
+export REDIS_PASSWORD
+REDIS_PORT ?= 6379
+export REDIS_PORT
+REDIS_HOST ?= localhost
+export REDIS_HOST
+
 # -----------------------------------------------
 # Rules
 # -----------------------------------------------
 
 lint:
-	./node_modules/.bin/eslint --ext .js $(ESLINT_OPTION_FIX) lib
+	./node_modules/.bin/eslint --ext .js $(ESLINT_OPTION_FIX) lib test
 	./scripts/check-filenames.sh
 	./scripts/check-licenses.sh
 	./scripts/check-deployable-lib.sh
-	shellcheck ./scripts/*.sh
-	./node_modules/.bin/deplint
-	./node_modules/.bin/depcheck --ignore-bin-package
+	npx shellcheck ./scripts/*.sh
+	npx deplint
+	npx depcheck --ignore-bin-package --ignores=shellcheck
 
 test:
 	node $(NODE_DEBUG_ARGS) ./node_modules/.bin/ava -v $(AVA_ARGS) $(FILES)

@@ -237,7 +237,7 @@ for (const suite of testSuites) {
 			 * we are from supporting the whole set of tests.
 			 */
 			const avaTest = SUPPORTED_SUITES.includes(suite.name) && IS_POSTGRES
-				? ava : ava.skip
+				? ava.serial : ava.skip
 
 			/*
 			 * Run the test without any modification. We will insert
@@ -329,7 +329,7 @@ for (const suite of testSuites) {
  * Some extra tests not covered by the official JSON Schema test suite.
  */
 
-const avaTest = IS_POSTGRES ? ava : ava.skip
+const avaTest = IS_POSTGRES ? ava.serial : ava.skip
 
 avaTest('injection - should escape malicious query keys', async (test) => {
 	const table = 'malicious_queries_0'

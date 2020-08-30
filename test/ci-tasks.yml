@@ -1,0 +1,12 @@
+tickTimeout: 5
+retryTimeout: 120
+attemptsDefault: 3
+environment:
+  - name: 'AVA_OPTS'
+    value: '--fail-fast'
+tasks:
+  - name: 'integration-tests'
+    description: 'Integration Tests'
+    command: 'make test-integration'
+    cwd: '/usr/src/jellyfish'
+    required: true
