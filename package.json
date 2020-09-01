@@ -48,7 +48,7 @@
   "devDependencies": {
     "@balena/ci-task-runner": "^0.2.1",
     "@balena/jellycheck": "^0.0.6",
-    "@json-schema-org/tests": "^1.0.0",
+    "@json-schema-org/tests": "^2.0.0",
     "ava": "^3.12.1",
     "catch-uncommitted": "^1.6.2",
     "depcheck": "^1.2.0",
