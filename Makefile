@@ -58,11 +58,8 @@ export REDIS_HOST
 # -----------------------------------------------
 
 lint:
-	./node_modules/.bin/eslint --ext .js $(ESLINT_OPTION_FIX) lib test
-	./scripts/check-filenames.sh
-	./scripts/check-licenses.sh
-	./scripts/check-deployable-lib.sh
-	npx shellcheck ./scripts/*.sh
+	npx eslint --ext .js $(ESLINT_OPTION_FIX) lib test
+	npx jellycheck
 	npx deplint
 	npx depcheck --ignore-bin-package --ignores=shellcheck
 

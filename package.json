@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "@balena/ci-task-runner": "^0.2.0",
+    "@balena/jellycheck": "^0.0.5",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.12.1",
     "catch-uncommitted": "^1.6.2",
@@ -63,7 +64,6 @@
     "husky": "^4.2.5",
     "jsdoc-to-markdown": "^6.0.1",
     "lint-staged": "^10.2.13",
-    "shellcheck": "^0.4.4",
     "uuid": "^8.3.0"
   },
   "husky": {
