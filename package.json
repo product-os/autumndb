@@ -28,7 +28,7 @@
     "@balena/jellyfish-assert": "^1.0.6",
     "@balena/jellyfish-environment": "^2.2.16",
     "@balena/jellyfish-logger": "0.0.66",
-    "@balena/jellyfish-metrics": "0.0.66",
+    "@balena/jellyfish-metrics": "0.0.67",
     "@balena/jellyfish-uuid": "^1.0.7",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
@@ -46,7 +46,7 @@
     "typed-errors": "^1.1.0"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.2",
+    "@balena/ci-task-runner": "^0.2.3",
     "@balena/jellycheck": "^0.0.7",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.12.1",
