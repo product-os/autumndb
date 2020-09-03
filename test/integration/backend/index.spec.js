@@ -962,7 +962,7 @@ ava('.query() should correctly take string contraints on the uuid', async (test)
 	test.deepEqual(results, [])
 })
 
-ava('.query() should query the database using JSON schema', async (test) => {
+ava.serial('.query() should query the database using JSON schema', async (test) => {
 	const result1 = await test.context.backend.upsertElement(test.context.context, {
 		type: 'example@1.0.0',
 		slug: test.context.generateRandomSlug(),
@@ -981,7 +981,7 @@ ava('.query() should query the database using JSON schema', async (test) => {
 		active: true
 	})
 
-	const result2 = await test.context.backend.upsertElement(test.context.context, {
+	await test.context.backend.upsertElement(test.context.context, {
 		type: 'test@1.0.0',
 		slug: test.context.generateRandomSlug(),
 		links: {},
@@ -999,7 +999,7 @@ ava('.query() should query the database using JSON schema', async (test) => {
 		active: true
 	})
 
-	const result3 = await test.context.backend.upsertElement(test.context.context, {
+	const result2 = await test.context.backend.upsertElement(test.context.context, {
 		type: 'example@1.0.0',
 		slug: test.context.generateRandomSlug(),
 		version: '1.0.0',
@@ -1028,18 +1028,7 @@ ava('.query() should query the database using JSON schema', async (test) => {
 				type: 'boolean'
 			},
 			slug: {
-				type: 'string',
-				anyOf: [
-					{
-						const: result1.slug
-					},
-					{
-						const: result2.slug
-					},
-					{
-						const: result3.slug
-					}
-				]
+				type: 'string'
 			},
 			data: {
 				type: 'object',
@@ -1058,7 +1047,7 @@ ava('.query() should query the database using JSON schema', async (test) => {
 		required: [ 'id', 'active', 'slug', 'data', 'type' ]
 	})
 
-	test.deepEqual(_.sortBy(results, 'data.test'), [ result1, result3 ])
+	test.deepEqual(_.sortBy(results, 'data.test'), [ result1, result2 ])
 })
 
 ava('.query() should escape malicious query keys', async (test) => {
@@ -4657,7 +4646,7 @@ ava.serial('.upsertElement() should handle multiple parallel insertions on the s
 	}
 })
 
-ava.serial('.insertElement() should handle multiple parallel insertions on the same slug', async (test) => {
+ava('.insertElement() should handle multiple parallel insertions on the same slug', async (test) => {
 	const slug = test.context.generateRandomSlug()
 	for (const time of _.range(200)) {
 		const object = {

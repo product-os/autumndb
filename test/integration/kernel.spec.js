@@ -33,7 +33,7 @@ ava.serial.after(async () => {
 	})
 })
 
-ava.serial('should only expose the required methods', (test) => {
+ava('should only expose the required methods', (test) => {
 	const methods = Object.getOwnPropertyNames(
 		Reflect.getPrototypeOf(context.kernel))
 
@@ -59,7 +59,7 @@ ava.serial('should only expose the required methods', (test) => {
 })
 
 for (const key in CARDS) {
-	ava.serial(`should contain the ${key} card by default`, async (test) => {
+	ava(`should contain the ${key} card by default`, async (test) => {
 		const card = await CARDS[key]
 		card.name = _.isString(card.name) ? card.name : null
 		const element = await context.kernel.getCardBySlug(
@@ -68,7 +68,7 @@ for (const key in CARDS) {
 	})
 }
 
-ava.serial('.patchCardBySlug() should throw an error if the element does not exist', async (test) => {
+ava('.patchCardBySlug() should throw an error if the element does not exist', async (test) => {
 	const slug = `${context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})}@1.0.0`
@@ -86,7 +86,7 @@ ava.serial('.patchCardBySlug() should throw an error if the element does not exi
 	})
 })
 
-ava.serial('.patchCardBySlug() should apply a single operation', async (test) => {
+ava('.patchCardBySlug() should apply a single operation', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -140,7 +140,7 @@ ava.serial('.patchCardBySlug() should apply a single operation', async (test) =>
 	})
 })
 
-ava.serial('.patchCardBySlug() should add an element to an array', async (test) => {
+ava('.patchCardBySlug() should add an element to an array', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -193,7 +193,7 @@ ava.serial('.patchCardBySlug() should add an element to an array', async (test) 
 	})
 })
 
-ava.serial('.patchCardBySlug() should delete a property inside data', async (test) => {
+ava('.patchCardBySlug() should delete a property inside data', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -245,7 +245,7 @@ ava.serial('.patchCardBySlug() should delete a property inside data', async (tes
 	})
 })
 
-ava.serial('.patchCardBySlug() should apply more than one operation', async (test) => {
+ava('.patchCardBySlug() should apply more than one operation', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -308,7 +308,7 @@ ava.serial('.patchCardBySlug() should apply more than one operation', async (tes
 	})
 })
 
-ava.serial('.patchCardBySlug() should not be able to delete an id', async (test) => {
+ava('.patchCardBySlug() should not be able to delete an id', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -342,7 +342,7 @@ ava.serial('.patchCardBySlug() should not be able to delete an id', async (test)
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should not be able to delete a top level property', async (test) => {
+ava('.patchCardBySlug() should not be able to delete a top level property', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -377,7 +377,7 @@ ava.serial('.patchCardBySlug() should not be able to delete a top level property
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should throw given an operation without a path', async (test) => {
+ava('.patchCardBySlug() should throw given an operation without a path', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -405,7 +405,7 @@ ava.serial('.patchCardBySlug() should throw given an operation without a path', 
 	})
 })
 
-ava.serial('.patchCardBySlug() should throw if the patch does not match', async (test) => {
+ava('.patchCardBySlug() should throw if the patch does not match', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -440,7 +440,7 @@ ava.serial('.patchCardBySlug() should throw if the patch does not match', async 
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should throw if adding to non existent property', async (test) => {
+ava('.patchCardBySlug() should throw if adding to non existent property', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -476,7 +476,7 @@ ava.serial('.patchCardBySlug() should throw if adding to non existent property',
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should throw given an invalid operation', async (test) => {
+ava('.patchCardBySlug() should throw given an invalid operation', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -512,7 +512,7 @@ ava.serial('.patchCardBySlug() should throw given an invalid operation', async (
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should not apply half matching patches', async (test) => {
+ava('.patchCardBySlug() should not apply half matching patches', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -553,7 +553,7 @@ ava.serial('.patchCardBySlug() should not apply half matching patches', async (t
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should not break the type schema', async (test) => {
+ava('.patchCardBySlug() should not break the type schema', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'user-john-doe'
 	})
@@ -589,7 +589,7 @@ ava.serial('.patchCardBySlug() should not break the type schema', async (test) =
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should apply a no-op patch', async (test) => {
+ava('.patchCardBySlug() should apply a no-op patch', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -624,7 +624,7 @@ ava.serial('.patchCardBySlug() should apply a no-op patch', async (test) => {
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should apply an empty set of patches', async (test) => {
+ava('.patchCardBySlug() should apply an empty set of patches', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -653,7 +653,7 @@ ava.serial('.patchCardBySlug() should apply an empty set of patches', async (tes
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should ignore changes to read-only properties', async (test) => {
+ava('.patchCardBySlug() should ignore changes to read-only properties', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
 	})
@@ -698,7 +698,7 @@ ava.serial('.patchCardBySlug() should ignore changes to read-only properties', a
 	test.deepEqual(result, card)
 })
 
-ava.serial('.patchCardBySlug() should be able to patch cards hidden to the user', async (test) => {
+ava('.patchCardBySlug() should be able to patch cards hidden to the user', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'user-johndoe'
 	})
@@ -778,7 +778,7 @@ ava.serial('.patchCardBySlug() should be able to patch cards hidden to the user'
 	test.deepEqual(result, userCard)
 })
 
-ava.serial('.patchCardBySlug() should not allow updates in hidden fields', async (test) => {
+ava('.patchCardBySlug() should not allow updates in hidden fields', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'user-johndoe'
 	})
@@ -886,7 +886,7 @@ ava.serial('.patchCardBySlug() should not allow updates in hidden fields', async
 	test.deepEqual(result, userCard)
 })
 
-ava.serial('.patchCardBySlug() should not return the full card', async (test) => {
+ava('.patchCardBySlug() should not return the full card', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'user-johndoe'
 	})
@@ -1002,7 +1002,7 @@ ava.serial('.patchCardBySlug() should not return the full card', async (test) =>
 	})
 })
 
-ava.serial('.patchCardBySlug() should not allow a patch that makes a card inaccessible', async (test) => {
+ava('.patchCardBySlug() should not allow a patch that makes a card inaccessible', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'user-johndoe'
 	})
@@ -1118,7 +1118,7 @@ ava.serial('.patchCardBySlug() should not allow a patch that makes a card inacce
 	test.deepEqual(result, randomCard)
 })
 
-ava.serial('.patchCardBySlug() should not remove inaccessible fields', async (test) => {
+ava('.patchCardBySlug() should not remove inaccessible fields', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'user-johndoe'
 	})
@@ -1227,7 +1227,7 @@ ava.serial('.patchCardBySlug() should not remove inaccessible fields', async (te
 	test.deepEqual(result, userCard)
 })
 
-ava.serial('.patchCardBySlug() should not add an inaccesible field', async (test) => {
+ava('.patchCardBySlug() should not add an inaccesible field', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'user-johndoe'
 	})
@@ -1338,7 +1338,7 @@ ava.serial('.patchCardBySlug() should not add an inaccesible field', async (test
 	test.deepEqual(result, userCard)
 })
 
-ava.serial('.insertCard() should throw an error if the element is not a valid card', async (test) => {
+ava('.insertCard() should throw an error if the element is not a valid card', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		hello: 'world'
 	}), {
@@ -1346,7 +1346,7 @@ ava.serial('.insertCard() should throw an error if the element is not a valid ca
 	})
 })
 
-ava.serial('.insertCard() should throw an error if the element does not adhere to the type', async (test) => {
+ava('.insertCard() should throw an error if the element does not adhere to the type', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: 'action-foo-bar',
 		type: 'action@1.0.0',
@@ -1357,7 +1357,7 @@ ava.serial('.insertCard() should throw an error if the element does not adhere t
 	})
 })
 
-ava.serial('.insertCard() should throw an error if the slug contains @latest', async (test) => {
+ava('.insertCard() should throw an error if the slug contains @latest', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: 'test-1@latest',
@@ -1369,7 +1369,7 @@ ava.serial('.insertCard() should throw an error if the slug contains @latest', a
 	})
 })
 
-ava.serial('.insertCard() should throw an error if the slug contains a version', async (test) => {
+ava('.insertCard() should throw an error if the slug contains a version', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: 'test-1@1.0.0',
@@ -1381,7 +1381,7 @@ ava.serial('.insertCard() should throw an error if the slug contains a version',
 	})
 })
 
-ava.serial('.insertCard() should throw an error if the card type does not exist', async (test) => {
+ava('.insertCard() should throw an error if the card type does not exist', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: 'foo',
 		type: 'foobarbazqux@1.0.0',
@@ -1393,7 +1393,7 @@ ava.serial('.insertCard() should throw an error if the card type does not exist'
 	})
 })
 
-ava.serial('.insertCard() should be able to insert two versions of the same card', async (test) => {
+ava('.insertCard() should be able to insert two versions of the same card', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'hello-world'
 	})
@@ -1436,7 +1436,7 @@ ava.serial('.insertCard() should be able to insert two versions of the same card
 	test.deepEqual(element2, card2)
 })
 
-ava.serial('.insertCard() should be able to insert a card', async (test) => {
+ava('.insertCard() should be able to insert a card', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'hello-world'
 	})
@@ -1453,7 +1453,7 @@ ava.serial('.insertCard() should be able to insert a card', async (test) => {
 	test.deepEqual(element, card)
 })
 
-ava.serial('.insertCard() should be able to set a tag with a colon', async (test) => {
+ava('.insertCard() should be able to set a tag with a colon', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'hello-world'
 	})
@@ -1471,7 +1471,7 @@ ava.serial('.insertCard() should be able to set a tag with a colon', async (test
 	test.deepEqual(element, card)
 })
 
-ava.serial('.insertCard() should be able to set a tag with a space and a slash', async (test) => {
+ava('.insertCard() should be able to set a tag with a space and a slash', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'hello-world'
 	})
@@ -1489,7 +1489,7 @@ ava.serial('.insertCard() should be able to set a tag with a space and a slash',
 	test.deepEqual(element, card)
 })
 
-ava.serial('.insertCard() should use defaults if required keys are missing', async (test) => {
+ava('.insertCard() should use defaults if required keys are missing', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'hello-world'
 	})
@@ -1517,7 +1517,7 @@ ava.serial('.insertCard() should use defaults if required keys are missing', asy
 	})
 })
 
-ava.serial('.insertCard() should throw if the card already exists', async (test) => {
+ava('.insertCard() should throw if the card already exists', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'hello-world'
 	})
@@ -1535,7 +1535,7 @@ ava.serial('.insertCard() should throw if the card already exists', async (test)
 	})
 })
 
-ava.serial('.replaceCard() should replace an element', async (test) => {
+ava('.replaceCard() should replace an element', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foo-bar'
 	})
@@ -1558,7 +1558,7 @@ ava.serial('.replaceCard() should replace an element', async (test) => {
 	test.deepEqual(element, card2)
 })
 
-ava.serial('.insertCard() should be able to create a link between two valid cards', async (test) => {
+ava('.insertCard() should be able to create a link between two valid cards', async (test) => {
 	const card1 = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: context.generateRandomSlug({
 			prefix: 'foo-bar'
@@ -1594,7 +1594,7 @@ ava.serial('.insertCard() should be able to create a link between two valid card
 	test.not(element.data.from, element.data.to)
 })
 
-ava.serial('.insertCard() should be able to create a direction-less link between two valid cards', async (test) => {
+ava('.insertCard() should be able to create a direction-less link between two valid cards', async (test) => {
 	const card1 = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: context.generateRandomSlug({
 			prefix: 'foo-bar'
@@ -1631,7 +1631,7 @@ ava.serial('.insertCard() should be able to create a direction-less link between
 	test.is(element.name, element.data.inverseName)
 })
 
-ava.serial('.insertCard() should be able to create two different links between two valid cards', async (test) => {
+ava('.insertCard() should be able to create two different links between two valid cards', async (test) => {
 	const card1 = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: context.generateRandomSlug({
 			prefix: 'foo-bar'
@@ -1688,7 +1688,7 @@ ava.serial('.insertCard() should be able to create two different links between t
 	test.is(linkCard1.data.to.id, linkCard2.data.to.id)
 })
 
-ava.serial('.insertCard() should not add a link if not inserting a card with a target', async (test) => {
+ava('.insertCard() should not add a link if not inserting a card with a target', async (test) => {
 	const card1 = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: context.generateRandomSlug(),
 		type: 'card@1.0.0',
@@ -1720,7 +1720,7 @@ ava.serial('.insertCard() should not add a link if not inserting a card with a t
 	test.deepEqual(results, [])
 })
 
-ava.serial('.insertCard() read access on a property should not allow to write other properties', async (test) => {
+ava('.insertCard() read access on a property should not allow to write other properties', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'user-johndoe'
 	})
@@ -1826,7 +1826,7 @@ ava.serial('.insertCard() read access on a property should not allow to write ot
 	})
 })
 
-ava.serial('.replaceCard() should not overwrite the "created_at" field when overriding a card', async (test) => {
+ava('.replaceCard() should not overwrite the "created_at" field when overriding a card', async (test) => {
 	const card = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: `card-${uuid()}`,
 		type: 'card@1.0.0'
@@ -1841,7 +1841,7 @@ ava.serial('.replaceCard() should not overwrite the "created_at" field when over
 	test.is(card.created_at, update.created_at)
 })
 
-ava.serial('.replaceCard() should not overwrite the "linked_at" field when overriding a card', async (test) => {
+ava('.replaceCard() should not overwrite the "linked_at" field when overriding a card', async (test) => {
 	const card = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: `card-${uuid()}`,
 		type: 'card@1.0.0'
@@ -1858,7 +1858,7 @@ ava.serial('.replaceCard() should not overwrite the "linked_at" field when overr
 	test.deepEqual(card.linked_at, update.linked_at)
 })
 
-ava.serial('.insertCard() should not be able to set links', async (test) => {
+ava('.insertCard() should not be able to set links', async (test) => {
 	const card = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: `card-${uuid()}`,
@@ -1876,7 +1876,7 @@ ava.serial('.insertCard() should not be able to set links', async (test) => {
 	test.deepEqual(element.links, {})
 })
 
-ava.serial('.replaceCard() should not be able to set links when overriding a card', async (test) => {
+ava('.replaceCard() should not be able to set links when overriding a card', async (test) => {
 	const card = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: `card-${uuid()}`,
 		type: 'card@1.0.0'
@@ -1893,13 +1893,13 @@ ava.serial('.replaceCard() should not be able to set links when overriding a car
 	test.deepEqual(update.links, {})
 })
 
-ava.serial('.getCardBySlug() there should be an admin card', async (test) => {
+ava('.getCardBySlug() there should be an admin card', async (test) => {
 	const card = await context.kernel.getCardBySlug(
 		context.context, context.kernel.sessions.admin, 'user-admin@latest')
 	test.truthy(card)
 })
 
-ava.serial('.getCardById() should find an active card by its id', async (test) => {
+ava('.getCardById() should find an active card by its id', async (test) => {
 	const result = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -1913,7 +1913,7 @@ ava.serial('.getCardById() should find an active card by its id', async (test) =
 	test.deepEqual(card, result)
 })
 
-ava.serial('.getCardById() should find an active card by its id and type', async (test) => {
+ava('.getCardById() should find an active card by its id and type', async (test) => {
 	const result = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -1928,7 +1928,7 @@ ava.serial('.getCardById() should find an active card by its id and type', async
 	test.deepEqual(card, result)
 })
 
-ava.serial('.getCardBySlug() should find an active card by its slug', async (test) => {
+ava('.getCardBySlug() should find an active card by its slug', async (test) => {
 	const result = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -1942,7 +1942,7 @@ ava.serial('.getCardBySlug() should find an active card by its slug', async (tes
 	test.deepEqual(card, result)
 })
 
-ava.serial('.getCardBySlug() should not find an active card by its slug and the wrong version', async (test) => {
+ava('.getCardBySlug() should not find an active card by its slug and the wrong version', async (test) => {
 	await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -1957,14 +1957,14 @@ ava.serial('.getCardBySlug() should not find an active card by its slug and the 
 	test.falsy(card)
 })
 
-ava.serial('.getCardBySlug() should not find an invalid slug when using @latest', async (test) => {
+ava('.getCardBySlug() should not find an invalid slug when using @latest', async (test) => {
 	const card = await context.kernel.getCardBySlug(
 		context.context, context.kernel.sessions.admin, 'foo-bar@latest')
 
 	test.falsy(card)
 })
 
-ava.serial('.getCardBySlug() should find an active card by its slug using @latest', async (test) => {
+ava('.getCardBySlug() should find an active card by its slug using @latest', async (test) => {
 	const result = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -1979,7 +1979,7 @@ ava.serial('.getCardBySlug() should find an active card by its slug using @lates
 	test.deepEqual(card, result)
 })
 
-ava.serial('.getCardBySlug() should find the latest version of a card', async (test) => {
+ava('.getCardBySlug() should find the latest version of a card', async (test) => {
 	const slug = context.generateRandomSlug()
 
 	await context.kernel.insertCard(
@@ -2021,7 +2021,7 @@ ava.serial('.getCardBySlug() should find the latest version of a card', async (t
 	test.deepEqual(element, card2)
 })
 
-ava.serial('.getCardBySlug() should find an active card by its slug and its type', async (test) => {
+ava('.getCardBySlug() should find an active card by its slug and its type', async (test) => {
 	const result = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -2036,7 +2036,7 @@ ava.serial('.getCardBySlug() should find an active card by its slug and its type
 	test.deepEqual(card, result)
 })
 
-ava.serial('.getCardById() should return an inactive card by its id', async (test) => {
+ava('.getCardById() should return an inactive card by its id', async (test) => {
 	const result = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: context.generateRandomSlug(),
 		type: 'card@1.0.0',
@@ -2048,7 +2048,7 @@ ava.serial('.getCardById() should return an inactive card by its id', async (tes
 	test.deepEqual(card, result)
 })
 
-ava.serial('.query() should throw an error given an invalid regex', async (test) => {
+ava('.query() should throw an error given an invalid regex', async (test) => {
 	await test.throwsAsync(context.kernel.query(
 		context.context, context.kernel.sessions.admin, {
 			type: 'object',
@@ -2065,7 +2065,7 @@ ava.serial('.query() should throw an error given an invalid regex', async (test)
 	})
 })
 
-ava.serial('.query() should throw an error given an invalid enum in links', async (test) => {
+ava('.query() should throw an error given an invalid enum in links', async (test) => {
 	await test.throwsAsync(context.kernel.query(
 		context.context, context.kernel.sessions.admin, {
 			$$links: {
@@ -2094,7 +2094,7 @@ ava.serial('.query() should throw an error given an invalid enum in links', asyn
 	})
 })
 
-ava.serial('.query() should throw an error given an invalid enum', async (test) => {
+ava('.query() should throw an error given an invalid enum', async (test) => {
 	await test.throwsAsync(context.kernel.query(
 		context.context, context.kernel.sessions.admin, {
 			type: 'object',
@@ -2111,7 +2111,7 @@ ava.serial('.query() should throw an error given an invalid enum', async (test) 
 	})
 })
 
-ava.serial('.query() should be able to limit the results', async (test) => {
+ava('.query() should be able to limit the results', async (test) => {
 	const ref = uuid()
 	const result1 = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: context.generateRandomSlug(),
@@ -2170,7 +2170,7 @@ ava.serial('.query() should be able to limit the results', async (test) => {
 	test.deepEqual(_.sortBy(results, [ 'data', 'test' ]), [ result1, result2 ])
 })
 
-ava.serial('.query() should be able to skip the results', async (test) => {
+ava('.query() should be able to skip the results', async (test) => {
 	const ref = uuid()
 
 	await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
@@ -2230,7 +2230,7 @@ ava.serial('.query() should be able to skip the results', async (test) => {
 	test.deepEqual(_.sortBy(results, [ 'data', 'test' ]), [ result3 ])
 })
 
-ava.serial('.query() should be able to limit and skip the results', async (test) => {
+ava('.query() should be able to limit and skip the results', async (test) => {
 	const ref = uuid()
 
 	await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
@@ -2291,7 +2291,7 @@ ava.serial('.query() should be able to limit and skip the results', async (test)
 	test.deepEqual(results, [ result2 ])
 })
 
-ava.serial('.query() should be able to sort linked cards', async (test) => {
+ava('.query() should be able to sort linked cards', async (test) => {
 	const parent = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -2395,7 +2395,7 @@ ava.serial('.query() should be able to sort linked cards', async (test) => {
 	)
 })
 
-ava.serial('.query() should be able to skip linked cards', async (test) => {
+ava('.query() should be able to skip linked cards', async (test) => {
 	const parent = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -2498,7 +2498,7 @@ ava.serial('.query() should be able to skip linked cards', async (test) => {
 	)
 })
 
-ava.serial('.query() should be able to limit linked cards', async (test) => {
+ava('.query() should be able to limit linked cards', async (test) => {
 	const parent = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -2601,7 +2601,7 @@ ava.serial('.query() should be able to limit linked cards', async (test) => {
 	)
 })
 
-ava.serial('.query() should be able to skip and limit linked cards', async (test) => {
+ava('.query() should be able to skip and limit linked cards', async (test) => {
 	const parent = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -2705,7 +2705,7 @@ ava.serial('.query() should be able to skip and limit linked cards', async (test
 	)
 })
 
-ava.serial('.query() should return the cards that match a schema', async (test) => {
+ava('.query() should return the cards that match a schema', async (test) => {
 	const result1 = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -2766,7 +2766,7 @@ ava.serial('.query() should return the cards that match a schema', async (test) 
 	])
 })
 
-ava.serial('.query() should work if passing an $id top level property', async (test) => {
+ava('.query() should work if passing an $id top level property', async (test) => {
 	const result1 = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -2828,7 +2828,7 @@ ava.serial('.query() should work if passing an $id top level property', async (t
 	])
 })
 
-ava.serial('.query() should be able to describe a property that starts with $', async (test) => {
+ava('.query() should be able to describe a property that starts with $', async (test) => {
 	const result1 = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -2870,7 +2870,7 @@ ava.serial('.query() should be able to describe a property that starts with $', 
 	test.deepEqual(results, [ result1 ])
 })
 
-ava.serial('.query() should take roles into account', async (test) => {
+ava('.query() should take roles into account', async (test) => {
 	const role = context.generateRandomSlug('foo')
 	const actor = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
@@ -2956,7 +2956,7 @@ ava.serial('.query() should take roles into account', async (test) => {
 	])
 })
 
-ava.serial('.query() should take roles into account when querying for linked cards', async (test) => {
+ava('.query() should take roles into account when querying for linked cards', async (test) => {
 	const role = context.generateRandomSlug('foo')
 	const actor = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
@@ -3073,7 +3073,7 @@ ava.serial('.query() should take roles into account when querying for linked car
 	test.deepEqual(results, [])
 })
 
-ava.serial('.query() should ignore queries to properties not whitelisted by a role', async (test) => {
+ava('.query() should ignore queries to properties not whitelisted by a role', async (test) => {
 	const role = context.generateRandomSlug({
 		prefix: 'foo'
 	})
@@ -3143,7 +3143,7 @@ ava.serial('.query() should ignore queries to properties not whitelisted by a ro
 	])
 })
 
-ava.serial('.query() should ignore $id properties in roles', async (test) => {
+ava('.query() should ignore $id properties in roles', async (test) => {
 	const role = context.generateRandomSlug('foo')
 	const actor = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
@@ -3217,7 +3217,7 @@ ava.serial('.query() should ignore $id properties in roles', async (test) => {
 	])
 })
 
-ava.serial('.query() should ignore queries to disallowed properties with additionalProperties: true', async (test) => {
+ava('.query() should ignore queries to disallowed properties with additionalProperties: true', async (test) => {
 	const role = context.generateRandomSlug('foo')
 	const actor = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
 		slug: context.generateRandomSlug(),
@@ -3408,7 +3408,7 @@ ava.serial('.query() should be able to return both action requests and other car
 	test.deepEqual(_.orderBy(_.map(results, 'id')), _.orderBy([ result1.id, result2.id ]))
 })
 
-ava.serial('.query() should return inactive cards', async (test) => {
+ava('.query() should return inactive cards', async (test) => {
 	const card = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: `${context.generateRandomSlug()}-john-smith`,
@@ -3441,7 +3441,7 @@ ava.serial('.query() should return inactive cards', async (test) => {
 	])
 })
 
-ava.serial('.query() should take a view card with two filters', async (test) => {
+ava('.query() should take a view card with two filters', async (test) => {
 	await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -3527,7 +3527,7 @@ ava.serial('.query() should take a view card with two filters', async (test) => 
 	])
 })
 
-ava.serial('.query() should be able to request all cards (with no properties) linked to a card', async (test) => {
+ava('.query() should be able to request all cards (with no properties) linked to a card', async (test) => {
 	const parent = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -3600,7 +3600,7 @@ ava.serial('.query() should be able to request all cards (with no properties) li
 	])
 })
 
-ava.serial('.query() should get all properties of all cards', async (test) => {
+ava('.query() should get all properties of all cards', async (test) => {
 	const results = await context.kernel.query(
 		context.context, context.kernel.sessions.admin, {
 			type: 'object',
@@ -3782,7 +3782,7 @@ ava.serial('.query() should not consider inactive links', async (test) => {
 	])
 })
 
-ava.serial('.query() should be able to query using links', async (test) => {
+ava('.query() should be able to query using links', async (test) => {
 	const ref = uuid()
 	const parent1 = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
@@ -4021,7 +4021,7 @@ ava.serial('.query() should be able to query using links', async (test) => {
 	])
 })
 
-ava.serial('.query() should be able to query using multiple link types', async (test) => {
+ava('.query() should be able to query using multiple link types', async (test) => {
 	const parent = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -4126,7 +4126,7 @@ ava.serial('.query() should be able to query using multiple link types', async (
 	})
 })
 
-ava.serial('.query() should be able to query $$links inside $$links', async (test) => {
+ava('.query() should be able to query $$links inside $$links', async (test) => {
 	const parent = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug(),
@@ -4276,7 +4276,928 @@ ava.serial('.query() should be able to query $$links inside $$links', async (tes
 	test.deepEqual(results[0].links['is child of'][0].links['is child of'][0].links['believes in'][0].id, santa.id)
 })
 
-ava.serial.cb('.stream() should include data if additionalProperties true', (test) => {
+ava.skip('.query() should be able to query $$links inside an allOf', async (test) => {
+	const office = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker1 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: true
+			}
+		})
+
+	const worker2 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: false
+			}
+		})
+
+	const worker3 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker1.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker1.id,
+					type: worker1.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker2.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker2.id,
+					type: worker2.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker3.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker3.id,
+					type: worker3.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	const results = await context.kernel.query(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			required: [ 'id', 'links' ],
+			allOf: [
+				{
+					$$links: {
+						'works at': {
+							additionalProperties: false,
+							properties: {
+								id: {
+									const: office.id
+								}
+							}
+						}
+					}
+				},
+				{
+					properties: {
+						data: {
+							properties: {
+								isStressed: {
+									const: true
+								}
+							}
+						}
+					}
+				}
+			]
+		}
+	)
+
+	test.deepEqual(results, [
+		{
+			id: worker1.id,
+			links: {
+				'works at': [
+					{
+						id: office.id
+					}
+				]
+			},
+			data: {
+				isStressed: true
+			}
+		}
+	])
+})
+
+ava.serial('.query() should be able to query $$links inside an anyOf', async (test) => {
+	const office = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker1 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: false
+			}
+		})
+
+	const worker2 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: true
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: false
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker1.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker1.id,
+					type: worker1.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	const results = await context.kernel.query(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			required: [ 'id', 'links' ],
+			anyOf: [
+				{
+					$$links: {
+						'works at': {
+							additionalProperties: false,
+							properties: {
+								id: {
+									const: office.id
+								}
+							}
+						}
+					}
+				},
+				{
+					required: [ 'data' ],
+					properties: {
+						data: {
+							required: [ 'isStressed' ],
+							properties: {
+								isStressed: {
+									const: true
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			sortBy: [ 'data', 'isStressed' ]
+		}
+	)
+
+	test.deepEqual(results, [
+		{
+			id: worker1.id,
+			links: {
+				'works at': [
+					{
+						id: office.id
+					}
+				]
+			},
+			data: {
+				isStressed: false
+			}
+		},
+		{
+			id: worker2.id,
+			links: {},
+			data: {
+				isStressed: true
+			}
+		}
+	])
+})
+
+ava('.query() should be able to query $$links inside a contains', async (test) => {
+	const office = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker1 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				stressedDays: [ 1, 3, 5 ]
+			}
+		})
+
+	const worker2 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				stressedDays: [ 1, 2, 4 ]
+			}
+		})
+
+	const worker3 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker1.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker1.id,
+					type: worker1.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker2.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker2.id,
+					type: worker2.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker3.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker3.id,
+					type: worker3.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	const results = await context.kernel.query(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			required: [ 'id', 'links', 'data' ],
+			properties: {
+				data: {
+					required: [ 'stressedDays' ],
+					properties: {
+						stressedDays: {
+							type: 'array',
+							contains: {
+								$$links: {
+									'works at': {
+										additionalProperties: false,
+										properties: {
+											id: {
+												const: office.id
+											}
+										}
+									}
+								},
+								const: 5
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			sortBy: [ 'data', 'stressedDays' ]
+		}
+	)
+
+	test.deepEqual(results, [
+		{
+			id: worker1.id,
+			links: {
+				'works at': [
+					{
+						id: office.id
+					}
+				]
+			},
+			data: {
+				stressedDays: [ 1, 3, 5 ]
+			}
+		}
+	])
+})
+
+ava('.query() should be able to query $$links inside an items', async (test) => {
+	const office = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker1 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				stressedDays: [ 1, 3, 5 ]
+			}
+		})
+
+	const worker2 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				stressedDays: [ 1, 'INVALID DAY', 4 ]
+			}
+		})
+
+	const worker3 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker1.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker1.id,
+					type: worker1.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker2.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker2.id,
+					type: worker2.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker3.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker3.id,
+					type: worker3.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	const results = await context.kernel.query(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			required: [ 'id', 'links', 'data' ],
+			properties: {
+				data: {
+					required: [ 'stressedDays' ],
+					properties: {
+						stressedDays: {
+							type: 'array',
+							items: {
+								$$links: {
+									'works at': {
+										additionalProperties: false,
+										properties: {
+											id: {
+												const: office.id
+											}
+										}
+									}
+								},
+								type: 'integer'
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			sortBy: [ 'data', 'stressedDays' ]
+		}
+	)
+
+	test.deepEqual(results, [
+		{
+			id: worker1.id,
+			links: {
+				'works at': [
+					{
+						id: office.id
+					}
+				]
+			},
+			data: {
+				stressedDays: [ 1, 3, 5 ]
+			}
+		}
+	])
+})
+
+ava('.query() should be able to query $$links inside a not', async (test) => {
+	const office = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker1 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker2 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker1.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker1.id,
+					type: worker1.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	const results = await context.kernel.query(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			required: [ 'links' ],
+			not: {
+				$$links: {
+					'works at': {
+						additionalProperties: false,
+						properties: {
+							id: {
+								const: office.id
+							}
+						}
+					}
+				}
+			},
+			properties: {
+				id: {
+					enum: [ worker1.id, worker2.id ]
+				}
+			}
+		}
+	)
+
+	test.deepEqual(results, [
+		{
+			id: worker2.id,
+			links: {}
+		}
+	])
+})
+
+ava('.query() should be able to query $$links inside a property', async (test) => {
+	const office = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker1 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: true
+			}
+		})
+
+	const worker2 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: false
+			}
+		})
+
+	const worker3 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker1.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker1.id,
+					type: worker1.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker2.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker2.id,
+					type: worker2.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker3.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker3.id,
+					type: worker3.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	const results = await context.kernel.query(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			required: [ 'id', 'links', 'data' ],
+			properties: {
+				data: {
+					required: [ 'isStressed' ],
+					properties: {
+						isStressed: {
+							$$links: {
+								'works at': {
+									additionalProperties: false,
+									properties: {
+										id: {
+											const: office.id
+										}
+									}
+								}
+							},
+							const: true
+						}
+					}
+				}
+			}
+		},
+		{
+			sortBy: [ 'data', 'isStressed' ]
+		}
+	)
+
+	test.deepEqual(results, [
+		{
+			id: worker1.id,
+			links: {
+				'works at': [
+					{
+						id: office.id
+					}
+				]
+			},
+			data: {
+				isStressed: true
+			}
+		}
+	])
+})
+
+ava.skip('.query() should handle the same link type in multiple $$links', async (test) => {
+	const office = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker1 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: true
+			}
+		})
+
+	const worker2 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: false
+			}
+		})
+
+	const worker3 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				isStressed: false
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker1.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker1.id,
+					type: worker1.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker2.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker2.id,
+					type: worker2.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	const results = await context.kernel.query(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			required: [ 'links', 'data' ],
+			properties: {
+				id: {
+					enum: [ worker1.id, worker2.id, worker3.id ]
+				},
+				data: {
+					required: [ 'isStressed' ],
+					properties: {
+						isStressed: {
+							anyOf: [
+								{
+									$$links: {
+										'works at': {
+											additionalProperties: false,
+											properties: {
+												id: {
+													const: office.id
+												}
+											}
+										}
+									},
+									const: true
+								},
+								{
+									not: {
+										$$links: {
+											'works at': true
+										}
+									},
+									const: false
+								}
+							]
+						}
+					}
+				}
+			}
+		},
+		{
+			sortBy: [ 'data', 'isStressed' ]
+		}
+	)
+
+	test.deepEqual(results, [
+		{
+			id: worker3.id,
+			links: {},
+			data: {
+				isStressed: false
+			}
+		},
+		{
+			id: worker1.id,
+			links: {
+				'works at': [
+					{
+						id: office.id
+					}
+				]
+			},
+			data: {
+				isStressed: true
+			}
+		}
+	])
+})
+
+ava.cb('.stream() should include data if additionalProperties true', (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'card'
 	})
@@ -4353,7 +5274,7 @@ ava.serial.cb('.stream() should include data if additionalProperties true', (tes
 	})
 })
 
-ava.serial.cb('.stream() should report back new elements that match a certain slug', (test) => {
+ava.cb('.stream() should report back new elements that match a certain slug', (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'card'
 	})
@@ -4689,7 +5610,7 @@ ava.serial.cb('.stream() should report back action requests', (test) => {
 	}).catch(test.end)
 })
 
-ava.serial.cb('.stream() should close without finding anything', (test) => {
+ava.cb('.stream() should close without finding anything', (test) => {
 	context.kernel.stream(context.context, context.kernel.sessions.admin, {
 		type: 'object',
 		properties: {
@@ -4758,7 +5679,7 @@ ava.serial.cb('.stream() should report back inactive elements', (test) => {
 	}).catch(test.end)
 })
 
-ava.serial.cb('.stream() should be able to resolve links on an update to the base card', (test) => {
+ava.cb('.stream() should be able to resolve links on an update to the base card', (test) => {
 	Bluebird.try(async () => {
 		const slug = context.generateRandomSlug()
 		const card1 = await context.kernel.insertCard(
@@ -4867,7 +5788,7 @@ ava.serial.cb('.stream() should be able to resolve links on an update to the bas
 	}).catch(test.end)
 })
 
-ava.serial.cb('.stream() should be able to resolve links when a new link is added', (test) => {
+ava.cb('.stream() should be able to resolve links when a new link is added', (test) => {
 	Bluebird.try(async () => {
 		const slug = context.generateRandomSlug()
 
@@ -5080,7 +6001,7 @@ ava.cb.skip('.stream() should be able to resolve links on an update to the linke
 	}).catch(test.end)
 })
 
-ava.serial('.stream() should send the unmatch event when a previously matching card does not match anymore', async (test) => {
+ava('.stream() should send the unmatch event when a previously matching card does not match anymore', async (test) => {
 	const slug = context.generateRandomSlug()
 	const stream = await context.kernel.stream(
 		context.context,
@@ -5158,94 +6079,93 @@ ava.serial('.stream() should send the unmatch event when a previously matching c
 	await end
 })
 
-ava.serial('.stream() should send the dataset event on a query request and support the unmatch event for these cards',
-	async (test) => {
-		const slug = context.generateRandomSlug()
-		const card = await context.kernel.insertCard(
-			context.context,
-			context.kernel.sessions.admin,
-			{
-				slug,
-				type: 'card@1.0.0',
-				version: '1.0.0',
-				data: {
-					status: 'open'
-				}
+ava('.stream() should send the dataset event on a query request and support the unmatch event for these cards', async (test) => {
+	const slug = context.generateRandomSlug()
+	const card = await context.kernel.insertCard(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			slug,
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				status: 'open'
 			}
-		)
+		}
+	)
 
-		const stream = await context.kernel.stream(
-			context.context,
-			context.kernel.sessions.admin,
-			{
-				additionalProperties: false,
-				properties: {
-					slug: {
-						const: slug
-					},
-					data: {
-						properties: {
-							status: {
-								const: 'open'
-							}
+	const stream = await context.kernel.stream(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			properties: {
+				slug: {
+					const: slug
+				},
+				data: {
+					properties: {
+						status: {
+							const: 'open'
 						}
 					}
 				}
 			}
-		)
+		}
+	)
 
-		let stage = 0
-		const queryId = await uuid()
+	let stage = 0
+	const queryId = await uuid()
 
-		stream.on('dataset', async (payload) => {
-			test.deepEqual(stage, 0)
-			test.deepEqual(payload, {
-				id: queryId,
-				cards: [ card ]
-			})
-
-			stage = 1
-			await context.kernel.patchCardBySlug(
-				context.context,
-				context.kernel.sessions.admin,
-				`${slug}@1.0.0`, [
-					{
-						op: 'replace',
-						path: '/data/status',
-						value: 'closed'
-					}
-				], {
-					type: 'card@1.0.0'
-				}
-			)
-		})
-
-		stream.on('data', (change) => {
-			test.deepEqual(stage, 1)
-			test.deepEqual(change, {
-				id: card.id,
-				type: 'unmatch',
-				after: null
-			})
-
-			stream.close()
-		})
-
-		stream.emit('query', {
+	stream.on('dataset', async (payload) => {
+		test.deepEqual(stage, 0)
+		test.deepEqual(payload, {
 			id: queryId,
-			schema: {
-				properties: {
-					slug: {
-						const: slug
-					}
-				}
-			}
+			cards: [ card ]
 		})
 
-		await once(stream, 'closed')
+		stage = 1
+		await context.kernel.patchCardBySlug(
+			context.context,
+			context.kernel.sessions.admin,
+			`${slug}@1.0.0`, [
+				{
+					op: 'replace',
+					path: '/data/status',
+					value: 'closed'
+				}
+			], {
+				type: 'card@1.0.0'
+			}
+		)
 	})
 
-ava.serial('.insertCard() should create a user with two email addressses', async (test) => {
+	stream.on('data', (change) => {
+		test.deepEqual(stage, 1)
+		test.deepEqual(change, {
+			id: card.id,
+			type: 'unmatch',
+			after: null
+		})
+
+		stream.close()
+	})
+
+	stream.emit('query', {
+		id: queryId,
+		schema: {
+			properties: {
+				slug: {
+					const: slug
+				}
+			}
+		}
+	})
+
+	await once(stream, 'closed')
+})
+
+ava('.insertCard() should create a user with two email addressses', async (test) => {
 	const card = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug({
@@ -5263,7 +6183,7 @@ ava.serial('.insertCard() should create a user with two email addressses', async
 	test.deepEqual(card.data.email, [ 'johndoe@example.com', 'johndoe@gmail.com' ])
 })
 
-ava.serial('.insertCard() should not create a user with an empty email list', async (test) => {
+ava('.insertCard() should not create a user with an empty email list', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug({
@@ -5281,7 +6201,7 @@ ava.serial('.insertCard() should not create a user with an empty email list', as
 	})
 })
 
-ava.serial('.insertCard() should not create a user with an invalid email', async (test) => {
+ava('.insertCard() should not create a user with an invalid email', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug({
@@ -5299,7 +6219,7 @@ ava.serial('.insertCard() should not create a user with an invalid email', async
 	})
 })
 
-ava.serial('.insertCard() should not create a user with an invalid and a valid email', async (test) => {
+ava('.insertCard() should not create a user with an invalid and a valid email', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug({
@@ -5317,7 +6237,7 @@ ava.serial('.insertCard() should not create a user with an invalid and a valid e
 	})
 })
 
-ava.serial('.insertCard() should not create a user with duplicated emails', async (test) => {
+ava('.insertCard() should not create a user with duplicated emails', async (test) => {
 	await test.throwsAsync(context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
 			slug: context.generateRandomSlug({
