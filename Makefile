@@ -61,7 +61,7 @@ lint:
 	npx eslint --ext .js $(ESLINT_OPTION_FIX) lib test
 	npx jellycheck
 	npx deplint
-	npx depcheck --ignore-bin-package --ignores=shellcheck
+	npx depcheck --ignore-bin-package
 
 test:
 	node $(NODE_DEBUG_ARGS) ./node_modules/.bin/ava -v $(AVA_ARGS) $(FILES)
