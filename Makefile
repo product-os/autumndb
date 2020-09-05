@@ -53,6 +53,9 @@ export REDIS_PORT
 REDIS_HOST ?= localhost
 export REDIS_HOST
 
+FILES ?= "'./test/{unit,integration}/**/*.spec.js'"
+export FILES
+
 # -----------------------------------------------
 # Rules
 # -----------------------------------------------
