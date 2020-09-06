@@ -46,7 +46,7 @@
     "typed-errors": "^1.1.0"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.7",
+    "@balena/ci-task-runner": "^0.2.8",
     "@balena/jellycheck": "^0.0.7",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.12.1",
