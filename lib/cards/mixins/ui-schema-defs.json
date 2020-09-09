@@ -1,0 +1,81 @@
+{
+  "repository": {
+    "ui:widget": "Link",
+    "ui:options": {
+      "blank": true,
+      "href": "https://github.com/${source}"
+    }
+  },
+  "time": {
+    "ui:options": {
+      "dtFormat": "HH:mm"
+    }
+  },
+  "date": {
+    "ui:options": {
+      "dtFormat": "MMM Do, yyyy"
+    }
+  },
+  "dateTime": {
+    "ui:options": {
+      "dtFormat": "MMM Do, yyyy HH:mm"
+    }
+  },
+  "email": {
+    "ui:widget": {
+      "$if": "typeof(source) == \"string\"",
+      "then": "Link",
+      "else": "Array"
+    },
+    "items": {
+      "ui:widget": "Link"
+    }
+  },
+  "badgeList": {
+    "items": {
+      "ui:widget": "Badge"
+    }
+  },
+  "mirrors": {
+    "items": {
+      "ui:widget": "Link",
+      "ui:options": {
+        "blank": true,
+        "href": "${fns.getMirror(source)}"
+      }
+    }
+  },
+  "usernameList": {
+    "ui:options": {
+      "orientation": "horizontal"
+    },
+    "items": {
+      "ui:widget": "Link",
+      "ui:value": "${source[5:]},",
+      "ui:options": {
+        "mr": 1,
+        "href": "https://jel.ly.fish/${source}"
+      }
+    }
+  },
+  "groupList": {
+    "ui:widget": "Txt"
+  },
+  "idOrSlugLink": {
+    "ui:widget": "Link",
+    "ui:options": {
+      "href": "https://jel.ly.fish/${source}"
+    }
+  },
+  "idOrSlugList": {
+    "items": {
+      "$ref": "#/idOrSlugLink"
+    }
+  },
+  "externalUrl": {
+    "ui:widget": "Link",
+    "ui:options": {
+      "blank": true
+    }
+  }
+}
