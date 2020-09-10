@@ -5,6 +5,9 @@
     "type": "git",
     "url": "https://github.com/product-os/jellyfish-core.git"
   },
+  "engines": {
+    "node": ">=12.15.0"
+  },
   "description": "Core library for Jellyfish",
   "main": "lib/index.js",
   "directories": {
