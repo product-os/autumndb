@@ -13,12 +13,12 @@
   },
   "date": {
     "ui:options": {
-      "dtFormat": "MMM Do, yyyy"
+      "dtFormat": "MMM do, yyyy"
     }
   },
   "dateTime": {
     "ui:options": {
-      "dtFormat": "MMM Do, yyyy HH:mm"
+      "dtFormat": "MMM do, yyyy HH:mm"
     }
   },
   "email": {
@@ -27,8 +27,18 @@
       "then": "Link",
       "else": "Array"
     },
+    "ui:options": {
+      "href": {
+        "$if": "typeof(source) == \"string\"",
+        "then": "mailto:${source}",
+        "else": null
+      }
+    },
     "items": {
-      "ui:widget": "Link"
+      "ui:widget": "Link",
+      "ui:options": {
+        "href": "mailto:${source}"
+      }
     }
   },
   "badgeList": {
