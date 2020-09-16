@@ -28,9 +28,9 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.0.11",
+    "@balena/jellyfish-assert": "^1.0.12",
     "@balena/jellyfish-environment": "^2.2.26",
-    "@balena/jellyfish-logger": "0.0.85",
+    "@balena/jellyfish-logger": "0.0.86",
     "@balena/jellyfish-metrics": "0.0.94",
     "@balena/jellyfish-uuid": "^1.0.12",
     "bluebird": "^3.7.2",
