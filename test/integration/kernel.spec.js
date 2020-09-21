@@ -5050,6 +5050,124 @@ ava('.query() should be able to query $$links inside a property', async (test) =
 	])
 })
 
+ava.serial('.query() should not ignore $$links optimized out by constant folding', async (test) => {
+	const office = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	const worker1 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				idx: 0,
+				isWorking: true
+			}
+		})
+
+	const worker2 = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			data: {
+				idx: 1,
+				isWorking: true
+			}
+		})
+
+	await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: `link-${worker1.slug}-works-at-${office.slug}`,
+			type: 'link@1.0.0',
+			version: '1.0.0',
+			name: 'works at',
+			data: {
+				inverseName: 'has worker',
+				from: {
+					id: worker1.id,
+					type: worker1.type
+				},
+				to: {
+					id: office.id,
+					type: office.type
+				}
+			}
+		})
+
+	const results = await context.kernel.query(
+		context.context,
+		context.kernel.sessions.admin,
+		{
+			additionalProperties: false,
+			required: [ 'id', 'links' ],
+			properties: {
+				data: {
+					additionalProperties: false,
+					required: [ 'isWorking' ],
+					properties: {
+						isWorking: {
+							const: true
+						}
+					}
+				}
+			},
+			anyOf: [
+				{
+					not: {
+						anyOf: [
+							{
+								$$links: {
+									'works at': {
+										additionalProperties: false,
+										properties: {
+											id: {
+												const: office.id
+											}
+										}
+									}
+								}
+							},
+							true
+						]
+					}
+				},
+				true
+			]
+		},
+		{
+			sortBy: [ 'data', 'idx' ]
+		}
+	)
+
+	test.deepEqual(results, [
+		{
+			id: worker1.id,
+			links: {
+				'works at': [
+					{
+						id: office.id
+					}
+				]
+			},
+			data: {
+				isWorking: true
+			}
+		},
+		{
+			id: worker2.id,
+			links: {},
+			data: {
+				isWorking: true
+			}
+		}
+	])
+})
+
 ava.skip('.query() should handle the same link type in multiple $$links', async (test) => {
 	const office = await context.kernel.insertCard(
 		context.context, context.kernel.sessions.admin, {
