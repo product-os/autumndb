@@ -29,7 +29,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.0.15",
-    "@balena/jellyfish-environment": "^2.2.32",
+    "@balena/jellyfish-environment": "^2.2.33",
     "@balena/jellyfish-logger": "0.0.101",
     "@balena/jellyfish-metrics": "0.0.112",
     "@balena/jellyfish-uuid": "^1.0.16",
@@ -49,7 +49,7 @@
     "typed-errors": "^1.1.0"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.25",
+    "@balena/ci-task-runner": "^0.2.26",
     "@balena/jellycheck": "^0.0.7",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.13.0",
