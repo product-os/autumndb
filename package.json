@@ -41,7 +41,7 @@
     "json-schema-deref-sync": "github:cvent/json-schema-deref-sync#8bdbac1ff3e001a7b459e08229d3aa93f42b5f13",
     "lodash": "^4.17.20",
     "pg-format": "^1.0.4",
-    "pg-promise": "^10.6.2",
+    "pg-promise": "^10.7.0",
     "redis": "^3.0.2",
     "redis-mock": "^0.52.0",
     "skhema": "^5.3.3",
