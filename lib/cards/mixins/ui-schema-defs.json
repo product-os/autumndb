@@ -1,4 +1,26 @@
 {
+  "reset": {
+    "data": {
+      "ui:title": null,
+      "origin": null,
+      "translateDate": null,
+      "$$localSchema": null
+    },
+    "id": null,
+    "name": null,
+    "slug": null,
+    "type": null,
+    "version": null,
+    "markers": null,
+    "tags": null,
+    "links": null,
+    "linked_at": null,
+    "created_at": null,
+    "updated_at": null,
+    "active": null,
+    "requires": null,
+    "capabilities": null
+  },
   "repository": {
     "ui:widget": "Link",
     "ui:options": {
