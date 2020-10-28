@@ -5,6 +5,7 @@
   "enabledManagers": [
     "npm"
   ],
+  "pruneStaleBranches": false,
   "rangeStrategy": "bump",
   "commitMessagePrefix": "patch:",
   "commitBody": "Change-type: patch",
