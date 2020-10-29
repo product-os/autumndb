@@ -22,10 +22,16 @@
     "capabilities": null
   },
   "single": {
-  	"ui:widget": "Link",
-  	"ui-options": {
-  		"href": "https://jel.ly.fish/${slug}"
-  	}
+    "ui:widget": "List",
+    "ui:options": {
+      "ordered": true
+    },
+    "items": {
+      "ui:widget": "Link",
+      "ui:options": {
+        "href": "https://jel.ly.fish/${source.slug}"
+      }
+    }
   },
   "repository": {
     "ui:widget": "Link",
