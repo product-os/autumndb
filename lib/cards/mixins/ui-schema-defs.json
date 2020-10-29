@@ -21,6 +21,12 @@
     "requires": null,
     "capabilities": null
   },
+  "single": {
+  	"ui:widget": "Link",
+  	"ui-options": {
+  		"href": "https://jel.ly.fish/${slug}"
+  	}
+  },
   "repository": {
     "ui:widget": "Link",
     "ui:options": {
