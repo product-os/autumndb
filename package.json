@@ -38,7 +38,7 @@
     "fast-equals": "^2.0.0",
     "fast-json-patch": "^2.2.1",
     "json-e": "^4.3.0",
-    "json-schema-deref-sync": "github:cvent/json-schema-deref-sync#8bdbac1ff3e001a7b459e08229d3aa93f42b5f13",
+    "json-schema-deref-sync": "^0.14.0",
     "lodash": "^4.17.20",
     "pg-format": "^1.0.4",
     "pg-promise": "^10.7.1",
