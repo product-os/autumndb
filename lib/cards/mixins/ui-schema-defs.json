@@ -13,7 +13,6 @@
     "version": null,
     "markers": null,
     "tags": null,
-    "links": null,
     "linked_at": null,
     "created_at": null,
     "updated_at": null,
@@ -21,15 +20,12 @@
     "requires": null,
     "capabilities": null
   },
-  "single": {
-    "ui:widget": "List",
-    "ui:options": {
-      "ordered": true
-    },
-    "items": {
+  "singleline": {
+    "slug": {
       "ui:widget": "Link",
+      "ui:value": "${source}",
       "ui:options": {
-        "href": "https://jel.ly.fish/${source.slug}"
+        "href": "https://jel.ly.fish/${source}"
       }
     }
   },
