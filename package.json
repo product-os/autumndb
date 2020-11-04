@@ -41,9 +41,9 @@
     "json-schema-deref-sync": "^0.14.0",
     "lodash": "^4.17.20",
     "pg-format": "^1.0.4",
-    "pg-promise": "^10.7.1",
+    "pg-promise": "^10.7.3",
     "redis": "^3.0.2",
-    "redis-mock": "^0.53.0",
+    "redis-mock": "^0.54.0",
     "skhema": "^5.3.3",
     "traverse": "^0.6.6",
     "typed-errors": "^1.1.0"
