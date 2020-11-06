@@ -29,9 +29,9 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.0.22",
-    "@balena/jellyfish-environment": "^2.2.46",
+    "@balena/jellyfish-environment": "^2.2.47",
     "@balena/jellyfish-logger": "0.0.131",
-    "@balena/jellyfish-metrics": "0.0.152",
+    "@balena/jellyfish-metrics": "0.0.153",
     "@balena/jellyfish-uuid": "^1.0.24",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
