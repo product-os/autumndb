@@ -30,6 +30,7 @@ ava('should only expose the required methods', (test) => {
 		'reset',
 		'insertElement',
 		'upsertElement',
+		'patchElement',
 		'getElementById',
 		'getElementBySlug',
 		'getElementsById',

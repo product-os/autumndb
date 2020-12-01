@@ -3,6 +3,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
+/* eslint-disable max-len */
 
 const ava = require('ava')
 const errors = require('../../../../lib/errors')
@@ -10,6 +11,7 @@ const cards = require('../../../../lib/backend/postgres/cards')
 const {
 	v4: uuid
 } = require('uuid')
+const utils = require('../../../../lib/utils')
 
 ava.before((test) => {
 	test.context.context = {
@@ -334,4 +336,247 @@ ava('Should error when a combinator array child does not have "string" as a type
 	} catch (err) {
 		test.pass()
 	}
+})
+
+ava('Should be able to generate patch update statements for JSONB field deletions', (test) => {
+	const before = {
+		id: uuid(),
+		slug: 'test',
+		type: 'test@1.0.0',
+		name: 'test',
+		data: {
+			foo: 'bar',
+			oldString: 'test',
+			oldArray: [
+				'test'
+			],
+			oldObject: {
+				description: 'test'
+			},
+			payload: {
+				bar: 'baz',
+				oldString: 'test',
+				oldArray: [
+					'test'
+				],
+				oldObject: {
+					description: 'test'
+				}
+			}
+		}
+	}
+
+	const after = {
+		id: before.id,
+		slug: 'test',
+		type: 'test@1.0.0',
+		name: 'test',
+		data: {
+			foo: 'bar',
+			payload: {
+				bar: 'baz'
+			}
+		}
+	}
+
+	test.deepEqual(cards.toPatchUpdates(after, utils.getPatchDiff(before, after)), [
+		{
+			text: 'UPDATE cards SET data = data #- \'{"oldString"}\' WHERE id=$1',
+			values: [
+				after.id
+			]
+		},
+		{
+			text: 'UPDATE cards SET data = data #- \'{"oldArray"}\' WHERE id=$1',
+			values: [
+				after.id
+			]
+		},
+		{
+			text: 'UPDATE cards SET data = data #- \'{"oldObject"}\' WHERE id=$1',
+			values: [
+				after.id
+			]
+		},
+		{
+			text: 'UPDATE cards SET data = data #- \'{"payload", "oldString"}\' WHERE id=$1',
+			values: [
+				after.id
+			]
+		},
+		{
+			text: 'UPDATE cards SET data = data #- \'{"payload", "oldArray"}\' WHERE id=$1',
+			values: [
+				after.id
+			]
+		},
+		{
+			text: 'UPDATE cards SET data = data #- \'{"payload", "oldObject"}\' WHERE id=$1',
+			values: [
+				after.id
+			]
+		}
+	])
+})
+
+ava('Should be able to generate patch UPDATE statements for JSONB field additions', (test) => {
+	const before = {
+		id: uuid(),
+		slug: 'test',
+		type: 'test@1.0.0',
+		name: 'test',
+		data: {
+			foo: 'bar',
+			payload: {
+				bar: 'baz'
+			}
+		}
+	}
+
+	const after = {
+		id: before.id,
+		slug: 'test',
+		type: 'test@1.0.0',
+		name: 'test',
+		data: {
+			foo: 'bar',
+			newString: 'test',
+			newArray: [
+				'test'
+			],
+			newObject: {
+				description: 'test'
+			},
+			payload: {
+				bar: 'baz',
+				newString: 'test',
+				newArray: [
+					'test'
+				],
+				newObject: {
+					description: 'test'
+				}
+			}
+		}
+	}
+
+	test.deepEqual(cards.toPatchUpdates(after, utils.getPatchDiff(before, after)), [
+		{
+			text: 'UPDATE cards SET data = data || $1::jsonb WHERE id=$2',
+			values: [
+				'{"payload":{"newObject":{"description":"test"}},"newString":"test","newArray":["test"],"newObject":{"description":"test"}}',
+				after.id
+			]
+		}
+	])
+})
+
+ava('Should be able to generate patch UPDATE statements for field updates', (test) => {
+	const before = {
+		id: uuid(),
+		slug: 'test',
+		type: 'test@1.0.0',
+		name: 'foo',
+		tags: [
+			'foo'
+		],
+		data: {
+			name: 'foo',
+			tags: [
+				'foo'
+			],
+			payload: {
+				name: 'foo',
+				tags: [
+					'foo'
+				]
+			}
+		}
+	}
+
+	const after = {
+		id: before.id,
+		slug: 'test',
+		type: 'test@1.0.0',
+		name: 'bar',
+		tags: [
+			'bar',
+			'baz'
+		],
+		data: {
+			name: 'bar',
+			tags: [
+				'bar',
+				'baz'
+			],
+			payload: {
+				name: 'bar',
+				tags: [
+					'bar',
+					'baz'
+				]
+			}
+		}
+	}
+
+	test.deepEqual(cards.toPatchUpdates(after, utils.getPatchDiff(before, after)), [
+		{
+			text: 'UPDATE cards SET name=$1, tags=$2, data = data || $3::jsonb WHERE id=$4',
+			values: [
+				'bar',
+				[
+					'bar',
+					'baz'
+				],
+				'{"name":"bar","tags":["bar","baz"],"payload":{"tags":["bar","baz"]}}',
+				after.id
+			]
+		}
+	])
+})
+
+ava('Should be able to generate patch UPDATE statements for mixed field changes', (test) => {
+	const before = {
+		id: uuid(),
+		slug: 'test',
+		type: 'test@1.0.0',
+		name: 'foo',
+		data: {
+			name: 'foo',
+			oldArray: [
+				'foo'
+			]
+		}
+	}
+
+	const after = {
+		id: before.id,
+		slug: 'test',
+		type: 'test@1.0.0',
+		name: 'bar',
+		data: {
+			name: 'bar',
+			newArray: [
+				'bar',
+				'baz'
+			]
+		}
+	}
+
+	test.deepEqual(cards.toPatchUpdates(after, utils.getPatchDiff(before, after)), [
+		{
+			text: 'UPDATE cards SET data = data #- \'{"oldArray"}\' WHERE id=$1',
+			values: [
+				after.id
+			]
+		},
+		{
+			text: 'UPDATE cards SET name=$1, data = data || $2::jsonb WHERE id=$3',
+			values: [
+				'bar',
+				'{"name":"bar","newArray":["bar","baz"]}',
+				after.id
+			]
+		}
+	])
 })
