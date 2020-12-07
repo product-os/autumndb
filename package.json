@@ -23,8 +23,7 @@
   },
   "scripts": {
     "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes --exclude=VERSION && make lint && make test-unit",
-    "doc": "jsdoc2md --template doc/README.hbs 'lib/**/*.js' > README.md",
-    "postinstall": "is-ci || husky install"
+    "doc": "jsdoc2md --template doc/README.hbs 'lib/**/*.js' > README.md"
   },
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
@@ -65,7 +64,6 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "husky": "^5.0.4",
-    "is-ci": "^2.0.0",
     "jsdoc-to-markdown": "^6.0.1",
     "lint-staged": "^10.5.3",
     "uuid": "^8.3.1"
