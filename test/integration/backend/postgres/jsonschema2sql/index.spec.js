@@ -1577,3 +1577,44 @@ for (const [ name, testCases ] of Object.entries(reqoptTestCases)) {
 		)
 	}
 }
+
+avaTest('should generate unambiguous aliases for subqueries that can\'t use qualified SQL identifiers',
+	async (test) => {
+		const table = 'unambiguous_alias'
+
+		const schema = {
+			properties: {
+				data: {
+					properties: {
+						tags: {
+							contains: {
+								pattern: 'test'
+							}
+						}
+					}
+				}
+			}
+		}
+
+		const elements = [
+			{
+				slug: 'test-1',
+				type: 'card',
+				data: {
+					tags: [ 'test' ]
+				}
+			}
+		]
+
+		const results = await runner({
+			connection: test.context.connection,
+			database: test.context.database,
+			table,
+			elements,
+			schema
+		})
+
+		test.is(results.length, 1)
+		test.deepEqual(results[0].slug, elements[0].slug)
+	}
+)
