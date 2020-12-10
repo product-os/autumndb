@@ -12,8 +12,8 @@ const helpers = require('./helpers')
 ava.serial.before(helpers.before)
 ava.serial.after(helpers.after)
 
-ava('.getSessionUser() should throw if the session is invalid', async (test) => {
-	await test.throwsAsync(permissionFilter.getSessionUser(
+ava('.getSessionActor() should throw if the session is invalid', async (test) => {
+	await test.throwsAsync(permissionFilter.getSessionActor(
 		test.context.context, test.context.backend, '4a962ad9-20b5-4dd8-a707-bf819593cc84', {
 			user: 'cards',
 			session: 'sessions'
@@ -22,7 +22,7 @@ ava('.getSessionUser() should throw if the session is invalid', async (test) => 
 	})
 })
 
-ava('.getSessionUser() should throw if the session actor is invalid', async (test) => {
+ava('.getSessionActor() should throw if the session actor is invalid', async (test) => {
 	const session = await test.context.kernel.insertCard(test.context.context, test.context.kernel.sessions.admin, {
 		slug: test.context.generateRandomSlug({
 			prefix: 'session'
@@ -34,7 +34,7 @@ ava('.getSessionUser() should throw if the session actor is invalid', async (tes
 		}
 	})
 
-	await test.throwsAsync(permissionFilter.getSessionUser(test.context.context, test.context.backend, session.id, {
+	await test.throwsAsync(permissionFilter.getSessionActor(test.context.context, test.context.backend, session.id, {
 		user: 'cards',
 		session: 'sessions'
 	}), {
@@ -42,7 +42,7 @@ ava('.getSessionUser() should throw if the session actor is invalid', async (tes
 	})
 })
 
-ava('.getSessionUser() should get the session user given the session did not expire', async (test) => {
+ava('.getSessionActor() should get the session user given the session did not expire', async (test) => {
 	const result = await test.context.kernel.insertCard(
 		test.context.context, test.context.kernel.sessions.admin, {
 			slug: test.context.generateRandomSlug({
@@ -72,7 +72,7 @@ ava('.getSessionUser() should get the session user given the session did not exp
 		}
 	})
 
-	const user = await permissionFilter.getSessionUser(test.context.context, test.context.backend, session.id, {
+	const user = await permissionFilter.getSessionActor(test.context.context, test.context.backend, session.id, {
 		user: 'cards',
 		session: 'sessions'
 	})
@@ -82,7 +82,7 @@ ava('.getSessionUser() should get the session user given the session did not exp
 	}, user))
 })
 
-ava('.getSessionUser() should throw if the session expired', async (test) => {
+ava('.getSessionActor() should throw if the session expired', async (test) => {
 	const user = await test.context.kernel.insertCard(
 		test.context.context, test.context.kernel.sessions.admin, {
 			slug: test.context.generateRandomSlug({
@@ -112,7 +112,7 @@ ava('.getSessionUser() should throw if the session expired', async (test) => {
 		}
 	})
 
-	await test.throwsAsync(permissionFilter.getSessionUser(test.context.context, test.context.backend, session.id, {
+	await test.throwsAsync(permissionFilter.getSessionActor(test.context.context, test.context.backend, session.id, {
 		user: 'cards',
 		session: 'sessions'
 	}), {
