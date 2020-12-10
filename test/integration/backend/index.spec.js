@@ -70,9 +70,7 @@ ava('.disconnect() should gracefully close streams', async (test) => {
 })
 
 ava('.getElementsById() should return an empty array given one non-existent element', async (test) => {
-	const result = await test.context.backend.getElementsById(test.context.context, [ '4a962ad9-20b5-4dd8-a707-bf819593cc84' ], {
-		type: 'card@1.0.0'
-	})
+	const result = await test.context.backend.getElementsById(test.context.context, [ '4a962ad9-20b5-4dd8-a707-bf819593cc84' ])
 
 	test.deepEqual(result, [])
 })
@@ -94,9 +92,7 @@ ava('.getElementsById() should return a found element', async (test) => {
 		active: true
 	})
 
-	const result = await test.context.backend.getElementsById(test.context.context, [ element.id ], {
-		type: 'card@1.0.0'
-	})
+	const result = await test.context.backend.getElementsById(test.context.context, [ element.id ])
 
 	test.deepEqual(result, [ element ])
 })
@@ -118,9 +114,7 @@ ava('.getElementsById() should omit not found elements', async (test) => {
 	})
 
 	const result = await test.context.backend.getElementsById(
-		test.context.context, [ element.id, '4a962ad9-20b5-4dd8-a707-bf819593cc84' ], {
-			type: 'card@1.0.0'
-		})
+		test.context.context, [ element.id, '4a962ad9-20b5-4dd8-a707-bf819593cc84' ])
 
 	test.deepEqual(result, [ element ])
 })
@@ -142,28 +136,20 @@ ava('.getElementsById() should get deterministic results', async (test) => {
 	})
 
 	const result1 = await test.context.backend.getElementsById(
-		test.context.context, [ element.id, '4a962ad9-20b5-4dd8-a707-bf819593cc84' ], {
-			type: 'card@1.0.0'
-		})
+		test.context.context, [ element.id, '4a962ad9-20b5-4dd8-a707-bf819593cc84' ])
 
 	const result2 = await test.context.backend.getElementsById(
-		test.context.context, [ element.id, '4a962ad9-20b5-4dd8-a707-bf819593cc84' ], {
-			type: 'card@1.0.0'
-		})
+		test.context.context, [ element.id, '4a962ad9-20b5-4dd8-a707-bf819593cc84' ])
 
 	const result3 = await test.context.backend.getElementsById(
-		test.context.context, [ element.id, '4a962ad9-20b5-4dd8-a707-bf819593cc84' ], {
-			type: 'card@1.0.0'
-		})
+		test.context.context, [ element.id, '4a962ad9-20b5-4dd8-a707-bf819593cc84' ])
 
 	test.deepEqual(result1, result2)
 	test.deepEqual(result2, result3)
 })
 
 ava('.getElementById() should return null if the element id is not present', async (test) => {
-	const result = await test.context.backend.getElementById(test.context.context, test.context.generateRandomID(), {
-		type: 'card@1.0.0'
-	})
+	const result = await test.context.backend.getElementById(test.context.context, test.context.generateRandomID())
 
 	test.deepEqual(result, null)
 })
@@ -185,16 +171,12 @@ ava('.getElementById() should not break the cache if trying to query a valid slu
 	})
 
 	const result1 = await test.context.backend.getElementById(
-		test.context.context, element.slug, {
-			type: 'card@1.0.0'
-		})
+		test.context.context, element.slug)
 
 	test.deepEqual(result1, null)
 
 	const result2 = await test.context.backend.getElementBySlug(
-		test.context.context, `${element.slug}@1.0.0`, {
-			type: 'card@1.0.0'
-		})
+		test.context.context, `${element.slug}@1.0.0`)
 
 	test.deepEqual(result2, element)
 })
@@ -216,25 +198,19 @@ ava('.getElementBySlug() should not break the cache if trying to query a valid i
 	})
 
 	const result1 = await test.context.backend.getElementBySlug(
-		test.context.context, `${element.id}@${element.version}`, {
-			type: 'card@1.0.0'
-		})
+		test.context.context, `${element.id}@${element.version}`)
 
 	test.deepEqual(result1, null)
 
 	const result2 = await test.context.backend.getElementById(
-		test.context.context, element.id, {
-			type: 'card@1.0.0'
-		})
+		test.context.context, element.id)
 
 	test.deepEqual(result2, element)
 })
 
 ava('.getElementBySlug() should return null if the element slug is not present', async (test) => {
 	const result = await test.context.backend.getElementBySlug(
-		test.context.context, `${test.context.generateRandomSlug()}@1.0.0`, {
-			type: 'card@1.0.0'
-		})
+		test.context.context, `${test.context.generateRandomSlug()}@1.0.0`)
 
 	test.deepEqual(result, null)
 })
@@ -256,9 +232,7 @@ ava('.getElementBySlug() should fetch an element given its slug', async (test) =
 	})
 
 	const result = await test.context.backend.getElementBySlug(
-		test.context.context, `${element.slug}@1.0.0`, {
-			type: 'card@1.0.0'
-		})
+		test.context.context, `${element.slug}@1.0.0`)
 
 	test.deepEqual(result, element)
 })
@@ -280,9 +254,7 @@ ava('.getElementBySlug() should return null given the wrong version', async (tes
 	})
 
 	const result = await test.context.backend.getElementBySlug(
-		test.context.context, `${element.slug}@2.0.0`, {
-			type: 'card@1.0.0'
-		})
+		test.context.context, `${element.slug}@2.0.0`)
 
 	test.deepEqual(result, null)
 })
@@ -304,9 +276,7 @@ ava('.getElementBySlug() should fetch an element given the correct version', asy
 	})
 
 	const result = await test.context.backend.getElementBySlug(
-		test.context.context, `${element.slug}@1.0.0`, {
-			type: 'card@1.0.0'
-		})
+		test.context.context, `${element.slug}@1.0.0`)
 
 	test.deepEqual(result, element)
 })
@@ -381,9 +351,7 @@ ava('.insertElement() should insert an element with a non-existent slug', async 
 		type: 'card@1.0.0'
 	})
 
-	const element = await test.context.backend.getElementById(test.context.context, result.id, {
-		type: 'card@1.0.0'
-	})
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
 
 	test.deepEqual(element, result)
 })
@@ -409,9 +377,7 @@ ava('.insertElement() should not insert an element with a user defined id', asyn
 
 	test.not(result.id, id)
 
-	const element = await test.context.backend.getElementById(test.context.context, result.id, {
-		type: 'card@1.0.0'
-	})
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
 
 	test.deepEqual(Object.assign({}, element, {
 		id: result.id
@@ -439,9 +405,7 @@ ava('.insertElement() should insert an element with a non-existent id and slug',
 
 	test.not(result.id, id)
 
-	const element = await test.context.backend.getElementById(test.context.context, result.id, {
-		type: 'card@1.0.0'
-	})
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
 
 	test.deepEqual(Object.assign({}, element, {
 		id: result.id
@@ -672,9 +636,7 @@ ava('.upsertElement() should insert a card with a slug', async (test) => {
 	})
 
 	test.not(result.id, 'example')
-	const element = await test.context.backend.getElementById(test.context.context, result.id, {
-		type: 'card@1.0.0'
-	})
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
 
 	test.deepEqual(element, result)
 })
@@ -712,9 +674,7 @@ ava('.upsertElement() should replace an element given the slug but no id', async
 	})
 
 	test.is(result1.id, result2.id)
-	const element = await test.context.backend.getElementById(test.context.context, result1.id, {
-		type: 'card@1.0.0'
-	})
+	const element = await test.context.backend.getElementById(test.context.context, result1.id)
 
 	test.deepEqual(element, result2)
 })
@@ -738,9 +698,7 @@ ava('.upsertElement() should not let clients pick their own ids', async (test) =
 	})
 
 	test.not(result.id, id)
-	const element = await test.context.backend.getElementById(test.context.context, result.id, {
-		type: 'card@1.0.0'
-	})
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
 
 	test.deepEqual(Object.assign({}, element, {
 		id: result.id
@@ -864,9 +822,7 @@ ava('.upsertElement() should replace an element with an existing id and the slug
 	})
 
 	test.is(result1.id, result2.id)
-	const element = await test.context.backend.getElementById(test.context.context, result1.id, {
-		type: 'card@1.0.0'
-	})
+	const element = await test.context.backend.getElementById(test.context.context, result1.id)
 
 	test.deepEqual(element, result2)
 })
