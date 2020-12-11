@@ -131,27 +131,27 @@ ava('Should be able to find multiple full-text search fields at various depths f
 	const expected = [
 		{
 			path: [ 'name' ],
-			isRootArray: false
+			isArray: false
 		},
 		{
 			path: [ 'tags' ],
-			isRootArray: true
+			isArray: true
 		},
 		{
 			path: [ 'data', 'approvals' ],
-			isRootArray: false
+			isArray: true
 		},
 		{
 			path: [ 'data', 'observations' ],
-			isRootArray: false
+			isArray: false
 		},
 		{
 			path: [ 'data', 'category' ],
-			isRootArray: false
+			isArray: false
 		},
 		{
 			path: [ 'data', 'payload', 'message' ],
-			isRootArray: false
+			isArray: false
 		}
 	]
 

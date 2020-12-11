@@ -4,39 +4,41 @@
  * Proprietary and confidential.
  */
 
-const _ = require('lodash')
 const ava = require('ava')
 const textSearch = require('../../../../../lib/backend/postgres/jsonschema2sql/text-search')
 
 ava('toTSVector should prepare a correct to_tsvector function call for Postgres text fields', (test) => {
-	const table = 'cards'
-	const path = [ 'name' ]
-	const isRootArray = false
-	const result = textSearch.toTSVector(table, path, isRootArray)
+	const path = 'cards.name'
+	const result = textSearch.toTSVector(path, false, false)
 
-	const expected = `to_tsvector('english', ${table}.${_.head(path)})`
+	const expected = `to_tsvector('english', ${path})`
 
 	test.is(result, expected)
 })
 
 ava('toTSVector should prepare a correct to_tsvector function call for Postgres text[] fields', (test) => {
-	const table = 'cards'
-	const path = [ 'tags' ]
-	const isRootArray = true
-	const result = textSearch.toTSVector(table, path, isRootArray)
+	const path = 'cards.tags'
+	const result = textSearch.toTSVector(path, false, true)
 
-	const expected = `to_tsvector('english', immutable_array_to_string(${table}.${_.head(path)}, ' '))`
+	const expected = `to_tsvector('english', immutable_array_to_string(${path}, ' '))`
 
 	test.is(result, expected)
 })
 
-ava('toTSVector should prepare a correct to_tsvector function call for keys inside of data', (test) => {
-	const table = 'cards'
-	const path = [ 'data', 'payload', 'message' ]
-	const isRootArray = false
-	const result = textSearch.toTSVector(table, path, isRootArray)
+ava('toTSVector should prepare a correct to_tsvector function call for JSONB text fields', (test) => {
+	const path = 'cards.data#>\'{"payload", "message"}\''
+	const result = textSearch.toTSVector(path, true, false)
 
-	const expected = `jsonb_to_tsvector('english', ${table}.${path.shift()}#>'{${path.join(',')}}', '["string"]')`
+	const expected = `jsonb_to_tsvector('english', ${path}, '["string"]')`
+
+	test.is(result, expected)
+})
+
+ava('toTSVector should prepare a correct to_tsvector function call for JSONB array fields', (test) => {
+	const path = 'cards.data#>\'{"tags"}\''
+	const result = textSearch.toTSVector(path, true, true)
+
+	const expected = `jsonb_to_tsvector('english', ${path}, '["string"]')`
 
 	test.is(result, expected)
 })
