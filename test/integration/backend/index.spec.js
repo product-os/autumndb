@@ -356,7 +356,7 @@ ava('.insertElement() should insert an element with a non-existent slug', async 
 	test.deepEqual(element, result)
 })
 
-ava('.insertElement() should not insert an element with a user defined id', async (test) => {
+ava('.insertElement() should insert an element with a user defined id', async (test) => {
 	const id = test.context.generateRandomID()
 	const result = await test.context.backend.insertElement(test.context.context, {
 		id,
@@ -375,7 +375,7 @@ ava('.insertElement() should not insert an element with a user defined id', asyn
 		foo: 'bar'
 	})
 
-	test.not(result.id, id)
+	test.is(result.id, id)
 
 	const element = await test.context.backend.getElementById(test.context.context, result.id)
 
@@ -384,35 +384,7 @@ ava('.insertElement() should not insert an element with a user defined id', asyn
 	}), result)
 })
 
-ava('.insertElement() should insert an element with a non-existent id and slug', async (test) => {
-	const id = test.context.generateRandomID()
-	const result = await test.context.backend.insertElement(test.context.context, {
-		id,
-		active: true,
-		version: '1.0.0',
-		links: {},
-		tags: [],
-		data: {},
-		markers: [],
-		requires: [],
-		capabilities: [],
-		linked_at: {},
-		created_at: new Date().toISOString(),
-		slug: test.context.generateRandomSlug(),
-		type: 'card@1.0.0',
-		foo: 'bar'
-	})
-
-	test.not(result.id, id)
-
-	const element = await test.context.backend.getElementById(test.context.context, result.id)
-
-	test.deepEqual(Object.assign({}, element, {
-		id: result.id
-	}), result)
-})
-
-ava('.insertElement() should not re-use the id when inserting an element with an existent id', async (test) => {
+ava('.insertElement() should fail to insert an element with an existent id', async (test) => {
 	const result1 = await test.context.backend.insertElement(test.context.context, {
 		slug: test.context.generateRandomSlug(),
 		active: true,
@@ -429,7 +401,7 @@ ava('.insertElement() should not re-use the id when inserting an element with an
 		foo: 'bar'
 	})
 
-	const result2 = await test.context.backend.insertElement(test.context.context, {
+	await test.throwsAsync(test.context.backend.insertElement(test.context.context, {
 		id: result1.id,
 		slug: test.context.generateRandomSlug(),
 		version: '1.0.0',
@@ -444,9 +416,9 @@ ava('.insertElement() should not re-use the id when inserting an element with an
 		active: true,
 		type: 'card@1.0.0',
 		foo: 'baz'
+	}), {
+		instanceOf: errors.JellyfishElementAlreadyExists
 	})
-
-	test.not(result1.id, result2.id)
 })
 
 ava('.insertElement() should fail to insert an element with an existent slug', async (test) => {
@@ -482,44 +454,6 @@ ava('.insertElement() should fail to insert an element with an existent slug', a
 	}), {
 		instanceOf: errors.JellyfishElementAlreadyExists
 	})
-})
-
-ava('.insertElement() should not re-use ids when inserting an' +
-	' element with an existent id but non-existent slug', async (test) => {
-	const result1 = await test.context.backend.insertElement(test.context.context, {
-		slug: test.context.generateRandomSlug(),
-		active: true,
-		version: '1.0.0',
-		links: {},
-		tags: [],
-		markers: [],
-		requires: [],
-		data: {},
-		capabilities: [],
-		linked_at: {},
-		created_at: new Date().toISOString(),
-		type: 'card@1.0.0',
-		foo: 'bar'
-	})
-
-	const result2 = await test.context.backend.insertElement(test.context.context, {
-		id: result1.id,
-		slug: test.context.generateRandomSlug(),
-		version: '1.0.0',
-		tags: [],
-		links: {},
-		markers: [],
-		data: {},
-		requires: [],
-		capabilities: [],
-		linked_at: {},
-		created_at: new Date().toISOString(),
-		active: true,
-		type: 'card@1.0.0',
-		foo: 'baz'
-	})
-
-	test.not(result2.id, result1.id)
 })
 
 ava('.insertElement() should fail to insert an element with a non-existent id but existent slug', async (test) => {
@@ -567,8 +501,9 @@ ava('.upsertElement() should not be able to change a slug', async (test) => {
 	const result1 = await test.context.backend.upsertElement(test.context.context, {
 		type: 'card@1.0.0',
 		slug: slug1,
-		data: {},
-		hello: 'world',
+		data: {
+			hello: 'world'
+		},
 		linked_at: {},
 		links: {},
 		version: '1.0.0',
@@ -580,25 +515,25 @@ ava('.upsertElement() should not be able to change a slug', async (test) => {
 		active: true
 	})
 
-	const result2 = await test.context.backend.upsertElement(test.context.context, {
-		id: result1.id,
-		type: 'card@1.0.0',
-		slug: test.context.generateRandomSlug(),
-		links: {},
-		hello: 'world',
-		linked_at: {},
-		version: '1.0.0',
-		tags: [],
-		markers: [],
-		data: {},
-		requires: [],
-		capabilities: [],
-		created_at: new Date().toISOString(),
-		active: true
-	})
-
-	test.not(result1.id, result2.id)
-	test.is(result1.slug, slug1)
+	await test.throwsAsync(
+		test.context.backend.upsertElement(test.context.context, {
+			id: result1.id,
+			type: 'card@1.0.0',
+			slug: test.context.generateRandomSlug(),
+			links: {},
+			linked_at: {},
+			version: '1.0.0',
+			tags: [],
+			markers: [],
+			data: {
+				hello: 'world2'
+			},
+			requires: [],
+			capabilities: [],
+			created_at: new Date().toISOString(),
+			active: true
+		})
+	)
 })
 
 ava('.upsertElement() should not insert an element without a type', async (test) => {
@@ -679,7 +614,7 @@ ava('.upsertElement() should replace an element given the slug but no id', async
 	test.deepEqual(element, result2)
 })
 
-ava('.upsertElement() should not let clients pick their own ids', async (test) => {
+ava('.upsertElement() should let clients pick their own ids', async (test) => {
 	const id = test.context.generateRandomID()
 	const result = await test.context.backend.upsertElement(test.context.context, {
 		id,
@@ -697,7 +632,7 @@ ava('.upsertElement() should not let clients pick their own ids', async (test) =
 		created_at: new Date().toISOString()
 	})
 
-	test.not(result.id, id)
+	test.is(result.id, id)
 	const element = await test.context.backend.getElementById(test.context.context, result.id)
 
 	test.deepEqual(Object.assign({}, element, {
@@ -3978,6 +3913,7 @@ ava('.query() should omit a result if a link does not match', async (test) => {
 })
 
 ava.cb('.stream() should report back new elements that match a certain type', (test) => {
+	const randString = test.context.generateRandomSlug()
 	test.context.backend.stream(test.context.context, {
 		type: {},
 		data: {}
@@ -3994,7 +3930,8 @@ ava.cb('.stream() should report back new elements that match a certain type', (t
 				required: [ 'test' ],
 				properties: {
 					test: {
-						type: 'number'
+						type: 'string',
+						const: randString
 					}
 				}
 			}
@@ -4006,7 +3943,7 @@ ava.cb('.stream() should report back new elements that match a certain type', (t
 			test.deepEqual(change.after, {
 				type: 'foo@1.0.0',
 				data: {
-					test: 1
+					test: randString
 				}
 			})
 
@@ -4042,7 +3979,7 @@ ava.cb('.stream() should report back new elements that match a certain type', (t
 				active: true,
 				slug: test.context.generateRandomSlug(),
 				data: {
-					test: 1
+					test: randString
 				}
 			}),
 			test.context.backend.insertElement(test.context.context, {
@@ -4059,7 +3996,7 @@ ava.cb('.stream() should report back new elements that match a certain type', (t
 				active: true,
 				slug: test.context.generateRandomSlug(),
 				data: {
-					test: 3
+					test: randString
 				}
 			})
 		])
