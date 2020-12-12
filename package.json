@@ -24,7 +24,7 @@
   "scripts": {
     "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes --exclude=VERSION && make lint && make test-unit",
     "doc": "jsdoc2md --template doc/README.hbs 'lib/**/*.js' > README.md",
-    "postinstall": "if [[ -z \"$CI\" && -d \".git\" ]]; then husky install; fi"
+    "postinstall": "if [ -z \"$CI\" ] && [ -d \".git\" ]; then husky install; fi"
   },
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
