@@ -13,6 +13,13 @@ const {
 const pgp = require('../../../../../lib/backend/postgres/pg-promise')
 const streams = require('../../../../../lib/backend/postgres/streams')
 const environment = require('@balena/jellyfish-environment')
+const PostgresBackend = require('../../../../../lib/backend/postgres/index')
+
+ava.serial.before((test) => {
+	test.context.backend = new PostgresBackend(null, null, {
+		database: 'test'
+	})
+})
 
 ava.serial.beforeEach(async (test) => {
 	const id = uuid()
@@ -70,18 +77,18 @@ ava.serial.afterEach(async (test) => {
 
 ava('should be able to setup and teardown', async (test) => {
 	await test.notThrowsAsync(async () => {
-		const client = await streams.start(
-			null, test.context.connection, test.context.table, test.context.triggerColumns)
+		const client = await streams.start(test.context.context,
+			test.context.backend, test.context.connection, test.context.table, test.context.triggerColumns)
 		await client.close()
 	})
 })
 
 ava('should be able to create two instances on the same connection', async (test) => {
 	await test.notThrowsAsync(async () => {
-		const client1 = await streams.start(
-			null, test.context.connection, test.context.table, test.context.triggerColumns)
-		const client2 = await streams.start(
-			null, test.context.connection, test.context.table, test.context.triggerColumns)
+		const client1 = await streams.start(test.context.context,
+			test.context.backend, test.context.connection, test.context.table, test.context.triggerColumns)
+		const client2 = await streams.start(test.context.context,
+			test.context.backend, test.context.connection, test.context.table, test.context.triggerColumns)
 		await client1.close()
 		await client2.close()
 	})
@@ -92,10 +99,10 @@ ava('should be able to create two instances different connections', async (test)
 	const connection2 = await test.context.createConnection()
 
 	await test.notThrowsAsync(async () => {
-		const client1 = await streams.start(
-			null, connection1, test.context.table, test.context.triggerColumns)
-		const client2 = await streams.start(
-			null, connection2, test.context.table, test.context.triggerColumns)
+		const client1 = await streams.start(test.context.context,
+			test.context.backend, connection1, test.context.table, test.context.triggerColumns)
+		const client2 = await streams.start(test.context.context,
+			test.context.backend, connection2, test.context.table, test.context.triggerColumns)
 		await client1.close()
 		await client2.close()
 	})
@@ -108,8 +115,8 @@ ava('should survive parallel setups', async (test) => {
 	const run = async () => {
 		await Bluebird.delay(_.random(0, 1000))
 		const connection = await test.context.createConnection()
-		const client = await streams.start(
-			null, connection, test.context.table, test.context.triggerColumns)
+		const client = await streams.start(test.context.context,
+			test.context.backend, connection, test.context.table, test.context.triggerColumns)
 		await Bluebird.delay(_.random(0, 1000))
 		await client.close()
 		await Bluebird.delay(_.random(0, 1000))
@@ -144,4 +151,25 @@ ava('should survive parallel setups', async (test) => {
 			run()
 		])
 	})
+})
+
+ava('should automatically reconnect on disconnect', async (test) => {
+	// Set up backend, which comes with its own stream client
+	const backend = new PostgresBackend(null, null, {
+		user: environment.postgres.user,
+		database: test.context.database,
+		password: environment.postgres.password,
+		host: environment.postgres.host,
+		port: environment.postgres.port
+	})
+	await backend.connect(test.context.context)
+
+	// Disconnect client from database without using streams.close(),
+	// simulating an unexpected client end event.
+	await backend.streamClient.connection.client.end()
+
+	// Use the stream client to query database, after giving a little time to reconnect.
+	await Bluebird.delay(backend.connectRetryDelay)
+	const result = await backend.streamClient.connection.client.query(`SELECT id FROM ${test.context.table} LIMIT 1`)
+	test.truthy(result)
 })
