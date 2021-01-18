@@ -29,11 +29,11 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.0.50",
+    "@balena/jellyfish-assert": "^1.0.51",
     "@balena/jellyfish-environment": "^2.3.23",
     "@balena/jellyfish-logger": "0.0.203",
     "@balena/jellyfish-metrics": "0.1.16",
-    "@balena/jellyfish-uuid": "^1.0.54",
+    "@balena/jellyfish-uuid": "^1.0.55",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
     "fast-equals": "^2.0.0",
@@ -50,7 +50,7 @@
     "typed-errors": "^1.1.0"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.78",
+    "@balena/ci-task-runner": "^0.2.79",
     "@balena/jellycheck": "^0.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.15.0",
@@ -60,7 +60,7 @@
     "eslint": "^7.18.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsdoc": "^31.0.6",
+    "eslint-plugin-jsdoc": "^31.0.7",
     "eslint-plugin-lodash": "^7.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
