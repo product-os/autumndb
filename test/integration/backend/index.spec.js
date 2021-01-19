@@ -30,6 +30,8 @@ ava('should only expose the required methods', (test) => {
 		'reset',
 		'insertElement',
 		'upsertElement',
+		'withTransaction',
+		'withSerializableTransaction',
 		'getElementById',
 		'getElementBySlug',
 		'getElementsById',
