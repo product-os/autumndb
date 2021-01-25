@@ -42,7 +42,7 @@ ava('.getSessionActor() should throw if the session actor is invalid', async (te
 	})
 })
 
-ava('.getSessionActor() should get the session user given the session did not expire', async (test) => {
+ava('.getSessionActor() should get the session user and scope given the session did not expire', async (test) => {
 	const result = await test.context.kernel.insertCard(
 		test.context.context, test.context.kernel.sessions.admin, {
 			slug: test.context.generateRandomSlug({
@@ -59,6 +59,19 @@ ava('.getSessionActor() should get the session user given the session did not ex
 
 	const date = new Date()
 	date.setDate(date.getDate() + 1)
+	const sessionScope = {
+		type: 'object',
+		properties: {
+			type: {
+				anyOf: [
+					{
+						type: 'string',
+						const: 'message@1.0.0'
+					}
+				]
+			}
+		}
+	}
 
 	const session = await test.context.kernel.insertCard(test.context.context, test.context.kernel.sessions.admin, {
 		slug: test.context.generateRandomSlug({
@@ -68,18 +81,23 @@ ava('.getSessionActor() should get the session user given the session did not ex
 		version: '1.0.0',
 		data: {
 			actor: result.id,
-			expiration: date.toISOString()
+			expiration: date.toISOString(),
+			scope: sessionScope
 		}
 	})
 
-	const user = await permissionFilter.getSessionActor(test.context.context, test.context.backend, session.id, {
+	const {
+		actor,
+		scope
+	} = await permissionFilter.getSessionActor(test.context.context, test.context.backend, session.id, {
 		user: 'cards',
 		session: 'sessions'
 	})
 
-	test.deepEqual(user, Object.assign({
+	test.deepEqual(actor, Object.assign({
 		id: result.id
-	}, user))
+	}, actor))
+	test.deepEqual(scope, sessionScope)
 })
 
 ava('.getSessionActor() should throw if the session expired', async (test) => {
