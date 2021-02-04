@@ -9,7 +9,8 @@
   ],
   "force": {
     "constraints": {
-      "node": "< 15.0.0"
+      "node": "< 15.0.0",
+      "npm": "< 7.0.0"
     }
   },
   "pruneStaleBranches": false,
@@ -26,7 +27,7 @@
   "packageRules": [
     {
       "groupName": "non-major",
-      "updateTypes": [
+      "matchUpdateTypes": [
         "minor",
         "patch"
       ],
