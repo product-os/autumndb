@@ -5315,6 +5315,66 @@ ava.skip('.query() should handle the same link type in multiple $$links', async 
 	])
 })
 
+ava('.query() should filter results based on session scope', async (test) => {
+	// Insert cards to query for.
+	const foo = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+	const bar = await context.kernel.insertCard(
+		context.context, context.kernel.sessions.admin, {
+			slug: context.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0'
+		})
+
+	// Create scoped session for admin user.
+	const adminSession = await context.kernel.getCardById(context.context,
+		context.kernel.sessions.admin, context.kernel.sessions.admin)
+	const scopedSession = await context.kernel.insertCard(context.context, context.kernel.sessions.admin, {
+		slug: context.generateRandomSlug({
+			prefix: 'session'
+		}),
+		type: 'session@1.0.0',
+		version: '1.0.0',
+		data: {
+			actor: adminSession.data.actor,
+			scope: {
+				type: 'object',
+				properties: {
+					slug: {
+						type: 'string',
+						const: foo.slug
+					}
+				}
+			}
+		}
+	})
+
+	// Query with both scoped and non-scoped sessions.
+	const query = {
+		type: 'object',
+		additionalProperties: true,
+		required: [ 'slug' ],
+		properties: {
+			slug: {
+				type: 'string',
+				enum: [ foo.slug, bar.slug ]
+			}
+		}
+	}
+
+	test.deepEqual(await context.kernel.query(context.context, context.kernel.sessions.admin, query), [
+		foo,
+		bar
+	])
+	test.deepEqual(await context.kernel.query(context.context, scopedSession.id, query), [
+		foo
+	])
+})
+
 ava.cb('.stream() should include data if additionalProperties true', (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'card'
