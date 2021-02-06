@@ -1,40 +1,5 @@
 {
   "extends": [
-    "config:base",
-    "docker:enableMajor"
-  ],
-  "enabledManagers": [
-    "npm",
-    "dockerfile"
-  ],
-  "force": {
-    "constraints": {
-      "node": "< 15.0.0",
-      "npm": "< 7.0.0"
-    }
-  },
-  "pruneStaleBranches": false,
-  "rangeStrategy": "bump",
-  "commitMessagePrefix": "patch:",
-  "commitBody": "Change-type: patch",
-  "prHourlyLimit": 0,
-  "labels": [
-    "dependencies"
-  ],
-  "ignoreDeps": [
-    "node"
-  ],
-  "packageRules": [
-    {
-      "groupName": "non-major",
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "automerge": true
-    }
-  ],
-  "encrypted": {
-    "npmToken": "peBcYwDKQZ82d8VTsWGlzTaDjw9DbGCpxdKyyZxXR0MnXWKfGicW86UtWruQfHPdEOYylsbMvl6W6QR4HSBLiABaYZCI7MGShtsjRPEcb5m5lwadXZ+iK+xdJQnKMHFkNJxY2RhhdOczwkOXTOyYsDwHCPB0kCfGf0uPECs053vUleSM2haCbjLsRNX5xsR/uhHtkF8R/hEIXtO5fRXrl7o9yUFa4gyjZFVtb5KSScCNA+NowUYARxcNArZntqiKGBFb8AIOf7KBxDw8TSoX8i/2GNQXktnDriWMciV9L+Cn+o2un+YM5/mMVrwEF65U/QcnkhwxxG2tyOOUXRIsnA=="
-  }
+    "github>product-os/jellyfish-renovate-config"
+  ]
 }
