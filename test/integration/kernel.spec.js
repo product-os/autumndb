@@ -5366,13 +5366,21 @@ ava('.query() should filter results based on session scope', async (test) => {
 		}
 	}
 
-	test.deepEqual(await context.kernel.query(context.context, context.kernel.sessions.admin, query), [
-		foo,
-		bar
-	])
-	test.deepEqual(await context.kernel.query(context.context, scopedSession.id, query), [
-		foo
-	])
+	const fullResults = await context.kernel.query(context.context, context.kernel.sessions.admin, query)
+	const scopedResults = await context.kernel.query(context.context, scopedSession.id, query)
+
+	test.truthy(_.some(fullResults, {
+		slug: foo.slug
+	}))
+	test.truthy(_.some(fullResults, {
+		slug: bar.slug
+	}))
+	test.truthy(_.some(scopedResults, {
+		slug: foo.slug
+	}))
+	test.falsy(_.some(scopedResults, {
+		slug: bar.slug
+	}))
 })
 
 ava.cb('.stream() should include data if additionalProperties true', (test) => {
