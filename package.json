@@ -29,10 +29,10 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.0.56",
+    "@balena/jellyfish-assert": "^1.0.57",
     "@balena/jellyfish-environment": "^2.4.6",
     "@balena/jellyfish-logger": "^1.0.10",
-    "@balena/jellyfish-metrics": "^0.1.66",
+    "@balena/jellyfish-metrics": "^0.1.67",
     "@balena/jellyfish-uuid": "^1.0.60",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
