@@ -1,0 +1,13 @@
+- commits:
+    - subject: Rename changelog.yml for nested changelogs
+      hash: aedfb49fe211fee98d185479fc8d60510d8e9ba3
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.0.6
+  date: 2021-02-20T08:13:31.897Z
