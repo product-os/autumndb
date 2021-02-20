@@ -40,7 +40,7 @@
     "fast-json-patch": "^2.2.1",
     "json-e": "^4.3.0",
     "json-schema-deref-sync": "^0.14.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "pg-format": "^1.0.4",
     "pg-promise": "^10.9.2",
     "redis": "^3.0.2",
