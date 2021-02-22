@@ -30,7 +30,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.0.59",
-    "@balena/jellyfish-environment": "^2.4.16",
+    "@balena/jellyfish-environment": "^2.4.17",
     "@balena/jellyfish-logger": "^1.0.29",
     "@balena/jellyfish-metrics": "^0.1.93",
     "@balena/jellyfish-uuid": "^1.0.63",
@@ -64,7 +64,7 @@
     "eslint-plugin-lodash": "^7.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
-    "husky": "^5.1.0",
+    "husky": "^5.1.1",
     "jsdoc-to-markdown": "^6.0.1",
     "lint-staged": "^10.5.4",
     "uuid": "^8.3.2"
