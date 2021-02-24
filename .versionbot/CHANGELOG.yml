@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update balena/open-balena-base Docker tag to v11.1.0'
+      hash: 794c536eaf7530c1019787dfc8c7a77e1ba5025b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.0.25
+  date: 2021-02-24T16:21:01.296Z
+- commits:
     - subject: Update jsonschema2sql date-time regex to match timestamp column format
       hash: 3ba08bc9d13d6c13515e42876f5d3069addad775
       body: ''
