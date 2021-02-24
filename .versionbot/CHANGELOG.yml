@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove references to old TEXT date columns
+      hash: ec0c3dd0cc161280d0a13d4f872b91804e370901
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.0.27
+  date: 2021-02-24T23:23:02.459Z
+- commits:
     - subject: 'patch: Update resinci/jellyfish-test Docker tag to v1.3.39'
       hash: 2a2d47e36a888d6969af087d2b2e5dc45bf05c8e
       body: ''
