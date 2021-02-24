@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update jsonschema2sql date-time regex to match timestamp column format
+      hash: 3ba08bc9d13d6c13515e42876f5d3069addad775
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.0.24
+  date: 2021-02-24T02:31:58.113Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: d2aa6345a204166342fb8559f32b80f23bd4eb12
       body: ''
