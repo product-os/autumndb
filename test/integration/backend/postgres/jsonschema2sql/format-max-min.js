@@ -20,20 +20,36 @@ module.exports = {
 			},
 			tests: [
 				{
-					description: 'data that is < is valid',
+					description: 'data that is < is valid (Z format)',
 					data: '2018-08-08T00:00:00.000Z',
 					valid: true
 				},
 				{
-					description: 'data that is <= is valid',
+					description: 'data that is <= is valid (Z format)',
 					data: '2019-08-08T00:00:00.000Z',
 					valid: true
 				},
 				{
-					description: 'data that is > is invalid',
+					description: 'data that is > is invalid (Z format)',
 					data: '2020-08-08T00:00:00.000Z',
 					valid: false
+				},
+				{
+					description: 'data that is < is valid (Postgres timestamp format)',
+					data: '2018-08-08 00:00:00.000+00',
+					valid: true
+				},
+				{
+					description: 'data that is <= is valid (Postgres timestamp format)',
+					data: '2019-08-08 00:00:00.000+00',
+					valid: true
+				},
+				{
+					description: 'data that is > is invalid (Postgres timestamp format)',
+					data: '2020-08-08 00:00:00.000+00',
+					valid: false
 				}
+
 			]
 		},
 		{
@@ -44,20 +60,36 @@ module.exports = {
 			},
 			tests: [
 				{
-					description: 'data that is > is valid',
+					description: 'data that is > is valid (Z format)',
 					data: '2020-08-08T00:00:00.000Z',
 					valid: true
 				},
 				{
-					description: 'data that is >= is valid',
+					description: 'data that is >= is valid (Z format)',
 					data: '2019-08-08T00:00:00.000Z',
 					valid: true
 				},
 				{
-					description: 'data that is < is invalid',
+					description: 'data that is < is invalid (Z format)',
 					data: '2018-08-08T00:00:00.000Z',
 					valid: false
+				},
+				{
+					description: 'data that is > is valid (Postgres timestamp format)',
+					data: '2020-08-08 00:00:00.000+00',
+					valid: true
+				},
+				{
+					description: 'data that is >= is valid (Postgres timestamp format)',
+					data: '2019-08-08 00:00:00.000+00',
+					valid: true
+				},
+				{
+					description: 'data that is < is invalid (Postgres timestamp format)',
+					data: '2018-08-08 00:00:00.000+00',
+					valid: false
 				}
+
 			]
 		}
 	]
