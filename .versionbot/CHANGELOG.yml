@@ -1,4 +1,17 @@
 - commits:
+    - subject: Temporarily remove version columns from trigger targets
+      hash: 0b304fe28db848e244ff44515295b07aa4258b07
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.1.2
+  date: 2021-02-25T23:43:38.729Z
+- commits:
     - subject: Only attempt to create fulltext search index if it doesnt exist
       hash: 563c7aa0df8b30eed0547ffa43bd0c656c712845
       body: ''
