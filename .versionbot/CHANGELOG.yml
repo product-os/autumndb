@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add fullTextSearch index to user's first and last name
+      hash: 9805651b6c500a61e5ceb1380612387fc1f152cb
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.1.0
+  date: 2021-02-25T03:33:22.704Z
+- commits:
     - subject: Remove references to old TEXT date columns
       hash: ec0c3dd0cc161280d0a13d4f872b91804e370901
       body: ''
