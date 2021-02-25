@@ -1,4 +1,17 @@
 - commits:
+    - subject: Only attempt to create fulltext search index if it doesnt exist
+      hash: 563c7aa0df8b30eed0547ffa43bd0c656c712845
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.1.1
+  date: 2021-02-25T04:46:02.224Z
+- commits:
     - subject: Add fullTextSearch index to user's first and last name
       hash: 9805651b6c500a61e5ceb1380612387fc1f152cb
       body: ''
