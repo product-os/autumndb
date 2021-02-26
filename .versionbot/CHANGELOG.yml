@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-uuid to ^1.0.64'
+      hash: 9ac87bed469bd63edf444cd05ab7a7006ef6012f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.1.3
+  date: 2021-02-26T05:44:40.903Z
+- commits:
     - subject: Temporarily remove version columns from trigger targets
       hash: 0b304fe28db848e244ff44515295b07aa4258b07
       body: ''
