@@ -1,4 +1,23 @@
 - commits:
+    - subject: Remove fullTextSearch index on user slug
+      hash: 6afc2f4eca1f9825f4fdbc52d085713d17c38562
+      body: >
+        This index was added recently to facilitate searching for users by slug
+        in a full text search query. But this isn't very sensible as it requires
+        the user to include the `user-` prefix in the search term - which they
+        will never (want to) do! So I'm removing the fullTextSearch index and
+        the CreateView lens will manually search for the user by slug using a
+        regex search.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.2.0
+  date: 2021-03-01T08:48:11.653Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 04114a92beff255ac09ff8e4e76757c6bccf721f
       body: ''
