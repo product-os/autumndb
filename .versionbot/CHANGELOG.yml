@@ -1,4 +1,19 @@
 - commits:
+    - subject: Remove obsolete lenses field from view type schema
+      hash: 8fef319d47a8ff8e0acdd58c71ec1d1610d1064a
+      body: >
+        The front-end now automatically works out which lenses to use for a
+        view.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.3.0
+  date: 2021-03-01T15:57:41.397Z
+- commits:
     - subject: Handle error events in postgres stream emitter
       hash: b7d7e526e9b476e26b35f6e501861cbc0c78e0cf
       body: >
