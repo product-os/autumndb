@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^0.1.106'
+      hash: c40e42627e98704e35d8319bf25ef3cda2240302
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.2.1
+  date: 2021-03-01T08:59:52.803Z
+- commits:
     - subject: Remove fullTextSearch index on user slug
       hash: 6afc2f4eca1f9825f4fdbc52d085713d17c38562
       body: >
