@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^1.0.40'
+      hash: d0faab464230debd406fe2899c4615e099f0d5bc
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.3.1
+  date: 2021-03-01T17:58:42.660Z
+- commits:
     - subject: Remove obsolete lenses field from view type schema
       hash: 8fef319d47a8ff8e0acdd58c71ec1d1610d1064a
       body: >
