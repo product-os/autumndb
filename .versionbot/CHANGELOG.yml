@@ -1,4 +1,28 @@
 - commits:
+    - subject: Handle error events in postgres stream emitter
+      hash: b7d7e526e9b476e26b35f6e501861cbc0c78e0cf
+      body: >
+        If there isn't a registed listener for an EventEmitter "error" event, an
+
+        exception will be raised and the nodeJS process will exit: see
+        https://nodejs.org/api/events.html#events_error_events
+
+        This change adds a listener for the "error" event, and creates a log
+
+        message to prevent the process from crashing.
+
+
+        Fixes https://github.com/product-os/jellyfish/issues/5842
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 2.2.2
+  date: 2021-03-01T13:01:10.897Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^0.1.106'
       hash: c40e42627e98704e35d8319bf25ef3cda2240302
       body: ''
