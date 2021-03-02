@@ -1,4 +1,19 @@
 - commits:
+    - subject: Remove eroneous test code from stream query
+      hash: 959a174eb83cefb31fa7b38ab36ed180e8225787
+      body: >
+        Removes test code that was accidentally merged in
+        https://github.com/product-os/jellyfish-core/commit/b7d7e526e9b476e26b35f6e501861cbc0c78e0cf
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 2.3.5
+  date: 2021-03-02T15:57:30.871Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^0.1.108'
       hash: 09cdf8ec82c144c799ff7a5dffbbab23dcaa62d1
       body: ''
