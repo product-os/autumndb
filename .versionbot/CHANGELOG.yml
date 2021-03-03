@@ -1,4 +1,19 @@
 - commits:
+    - subject: Reinstate full-text-search on user slug
+      hash: 0d3c229927a1c418e89ae134fb18d0c62ed16927
+      body: >
+        User slugs are different! Sometimes we do want to search by username
+        (without the leading `user-`) - which requires a fullTextSearch index.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.4.0
+  date: 2021-03-03T02:53:31.695Z
+- commits:
     - subject: Remove eroneous test code from stream query
       hash: 959a174eb83cefb31fa7b38ab36ed180e8225787
       body: >
