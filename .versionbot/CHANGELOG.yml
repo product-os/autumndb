@@ -1,4 +1,15 @@
 - commits:
+    - subject: Add oauth provider card
+      hash: 188d212d7367f1e703e284193f04c6b0e7872240
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Kakhaber
+      nested: []
+  version: 2.5.0
+  date: 2021-03-03T23:13:11.228Z
+- commits:
     - subject: Reinstate full-text-search on user slug
       hash: 0d3c229927a1c418e89ae134fb18d0c62ed16927
       body: >
