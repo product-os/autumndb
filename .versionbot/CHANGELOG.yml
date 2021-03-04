@@ -1,4 +1,17 @@
 - commits:
+    - subject: Re-enable version columns as trigger targets
+      hash: 0f9822215cfd16cb88009f335b8f3d1ccc92d8c8
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.5.2
+  date: 2021-03-04T08:29:02.452Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-uuid to ^1.0.68'
       hash: 967c6308b933f426c35b89907b17e277256e80ec
       body: ''
