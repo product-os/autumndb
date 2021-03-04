@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-uuid to ^1.0.68'
+      hash: 967c6308b933f426c35b89907b17e277256e80ec
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.5.1
+  date: 2021-03-04T07:43:41.835Z
+- commits:
     - subject: Add oauth provider card
       hash: 188d212d7367f1e703e284193f04c6b0e7872240
       body: ''
