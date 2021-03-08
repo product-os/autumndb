@@ -77,16 +77,22 @@
       }
     }
   },
+  "username": {
+    "ui:widget": "JellyfishLink",
+    "ui:value": "${source[5:]}",
+    "ui:options": {
+      "href": "https://jel.ly.fish/${source}"
+    }
+  },
   "usernameList": {
     "ui:options": {
       "orientation": "horizontal"
     },
     "items": {
-      "ui:widget": "Link",
+      "$ref": "#/username",
       "ui:value": "${source[5:]},",
       "ui:options": {
-        "mr": 1,
-        "href": "https://jel.ly.fish/${source}"
+        "mr": 1
       }
     }
   },
@@ -94,7 +100,7 @@
     "ui:widget": "Txt"
   },
   "idOrSlugLink": {
-    "ui:widget": "Link",
+    "ui:widget": "JellyfishLink",
     "ui:options": {
       "href": "https://jel.ly.fish/${source}"
     }
