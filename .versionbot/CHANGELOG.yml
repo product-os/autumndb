@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add disableNotificationSound field to user profile
+      hash: 661f3fbc8cbb6bba63589af80b771abd8628a888
+      body: >
+        If this value is set to true, no sound will be played when the user
+        receives a notification.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.7.0
+  date: 2021-03-09T06:16:10.999Z
+- commits:
     - subject: Add index on name field to link type card
       hash: c8aa052d28f9902b5ff81282eb93ae6390a88452
       body: >
