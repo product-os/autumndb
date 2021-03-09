@@ -1,4 +1,23 @@
 - commits:
+    - subject: Add index on name field to link type card
+      hash: c8aa052d28f9902b5ff81282eb93ae6390a88452
+      body: >
+        Fixes https://github.com/product-os/jellyfish/issues/5884
+
+
+        Due to the way some queries for links are converted/optimized into SQL,
+        it is necessary to index on the name field as well. Tested manually on
+        production and verified this massively speeds up the slow queries.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.6.0
+  date: 2021-03-09T02:52:09.158Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-uuid to ^1.0.71'
       hash: d31725bd46d4d0e85857f06dc15c588c0d3dd666
       body: ''
