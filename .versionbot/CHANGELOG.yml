@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: e211a8fb90798c1af3887db49d4c21843a7a781c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.7.1
+  date: 2021-03-10T09:31:41.569Z
+- commits:
     - subject: Add disableNotificationSound field to user profile
       hash: 661f3fbc8cbb6bba63589af80b771abd8628a888
       body: >
