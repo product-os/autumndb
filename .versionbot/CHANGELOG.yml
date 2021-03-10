@@ -1,4 +1,19 @@
 - commits:
+    - subject: Use JellyfishLink widget for usernames and slugs/ids
+      hash: 0d722de501182049612e639adb40ed555836580c
+      body: >
+        Also refactored slightly to expose a `username` UI schema (which should
+        be used by `brainstorm-topic.data.reporter`).
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.8.0
+  date: 2021-03-10T10:02:34.932Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: e211a8fb90798c1af3887db49d4c21843a7a781c
       body: ''
