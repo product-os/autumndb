@@ -1,4 +1,19 @@
 - commits:
+    - subject: Export cards in a DRY way.
+      hash: 50696fcef4e13db126cff42424d727c5ca19cf4a
+      body: >
+        Just avoid having to manually enter the card slug and call initialize on
+        each card.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.8.3
+  date: 2021-03-11T09:41:30.677Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^0.1.112'
       hash: 696996055950645ba7951fa560da599207445dba
       body: ''
