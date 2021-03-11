@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add scope to session contract definition
+      hash: ccf308c644fcbc2d9b869f063dd96d5838447552
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.9.0
+  date: 2021-03-11T10:38:43.326Z
+- commits:
     - subject: Export cards in a DRY way.
       hash: 50696fcef4e13db126cff42424d727c5ca19cf4a
       body: >
