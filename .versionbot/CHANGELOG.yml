@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^1.0.45'
+      hash: 300223f5649836d61e9191c849ae8788bba31a4e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.9.1
+  date: 2021-03-11T13:55:35.911Z
+- commits:
     - subject: Add scope to session contract definition
       hash: ccf308c644fcbc2d9b869f063dd96d5838447552
       body: ''
