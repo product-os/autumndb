@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove new version columns from returned cards
+      hash: d988e0746c186d47452d01ad1822d90056e43fcb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.9.8
+  date: 2021-03-12T22:35:25.335Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 565f4d7cc71a552cb04f2c0e020df7504efba2c0
       body: ''
