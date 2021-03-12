@@ -646,6 +646,76 @@ avaTest('order - should be able to sort values by a single string value', async 
 	])
 })
 
+avaTest('order - should be able to sort by version', async (test) => {
+	const table = 'order_3'
+
+	const schema = {
+		type: 'object',
+		properties: {
+			slug: {
+				type: 'string'
+			},
+			data: {
+				type: 'object',
+				required: [ 'bar' ],
+				properties: {
+					bar: {
+						type: 'number',
+						const: 1
+					}
+				}
+			}
+		},
+		required: [ 'slug', 'data' ]
+	}
+
+	const elements = [
+		{
+			slug: 'beta',
+			version: '1.0.0',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: 'gamma',
+			version: '1.0.1',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: 'alpha',
+			version: '1.1.0',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		}
+	]
+
+	const results = await runner({
+		connection: test.context.connection,
+		database: test.context.database,
+		table,
+		elements,
+		schema,
+		options: {
+			sortBy: [ 'version' ]
+		}
+	})
+
+	test.deepEqual(_.map(results, (item) => {
+		return _.pick(item, [ 'version' ])
+	}), [
+		_.pick(elements[0], [ 'version' ]),
+		_.pick(elements[1], [ 'version' ]),
+		_.pick(elements[2], [ 'version' ])
+	])
+})
+
 avaTest('anyOf - nested anyOfs', async (test) => {
 	const table = 'any_of_nested_0'
 
