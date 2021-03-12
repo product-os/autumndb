@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency pg-promise to ^10.9.5'
+      hash: a449bac2dfb0164628792a29ea490fdbd4b687ee
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.9.6
+  date: 2021-03-12T11:28:00.247Z
+- commits:
     - subject: Add test for order by version
       hash: 7a1a0949b043ef265c2f156cad5f0899bd9609f7
       body: ''
