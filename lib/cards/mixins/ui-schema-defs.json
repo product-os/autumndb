@@ -78,11 +78,10 @@
     }
   },
   "username": {
-    "ui:widget": "JellyfishLink",
-    "ui:value": "${source[5:]}",
-    "ui:options": {
-      "href": "https://jel.ly.fish/${source}"
-    }
+    "ui:widget": "JellyfishUser"
+  },
+  "userId": {
+    "ui:widget": "JellyfishUser"
   },
   "usernameList": {
     "ui:options": {
@@ -90,8 +89,20 @@
     },
     "items": {
       "$ref": "#/username",
-      "ui:value": "${source[5:]},",
       "ui:options": {
+        "suffix": ",",
+        "mr": 1
+      }
+    }
+  },
+  "userIdList": {
+    "ui:options": {
+      "orientation": "horizontal"
+    },
+    "items": {
+      "$ref": "#/userId",
+      "ui:options": {
+        "suffix": ",",
         "mr": 1
       }
     }
