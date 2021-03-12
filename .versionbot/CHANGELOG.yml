@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 565f4d7cc71a552cb04f2c0e020df7504efba2c0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.9.7
+  date: 2021-03-12T22:18:51.291Z
+- commits:
     - subject: 'patch: Update dependency pg-promise to ^10.9.5'
       hash: a449bac2dfb0164628792a29ea490fdbd4b687ee
       body: ''
