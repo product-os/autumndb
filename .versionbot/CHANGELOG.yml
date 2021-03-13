@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 83743254156ef242099eb5748a91ac03202717b1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.9.9
+  date: 2021-03-13T02:31:29.333Z
+- commits:
     - subject: Remove new version columns from returned cards
       hash: d988e0746c186d47452d01ad1822d90056e43fcb
       body: ''
