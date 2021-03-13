@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add authentication token to session contract
+      hash: 40c36bd75768f562c82148e3da89778a721591a9
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.10.0
+  date: 2021-03-13T09:42:01.111Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^0.1.116'
       hash: fd5976185cb9311e7dfbbedbbff2747e0e4bcf79
       body: ''
