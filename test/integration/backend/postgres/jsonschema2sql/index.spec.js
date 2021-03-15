@@ -646,7 +646,7 @@ avaTest('order - should be able to sort values by a single string value', async 
 	])
 })
 
-avaTest('order - should be able to sort by version', async (test) => {
+avaTest('order - should be able to sort by version (asc)', async (test) => {
 	const table = 'order_3'
 
 	const schema = {
@@ -671,7 +671,7 @@ avaTest('order - should be able to sort by version', async (test) => {
 
 	const elements = [
 		{
-			slug: 'beta',
+			slug: `card-${uuid()}`,
 			version: '1.0.0',
 			type: 'card',
 			data: {
@@ -679,7 +679,7 @@ avaTest('order - should be able to sort by version', async (test) => {
 			}
 		},
 		{
-			slug: 'gamma',
+			slug: `card-${uuid()}`,
 			version: '1.0.1',
 			type: 'card',
 			data: {
@@ -687,7 +687,7 @@ avaTest('order - should be able to sort by version', async (test) => {
 			}
 		},
 		{
-			slug: 'alpha',
+			slug: `card-${uuid()}`,
 			version: '1.1.0',
 			type: 'card',
 			data: {
@@ -703,7 +703,8 @@ avaTest('order - should be able to sort by version', async (test) => {
 		elements,
 		schema,
 		options: {
-			sortBy: [ 'version' ]
+			sortBy: [ 'version' ],
+			sortDir: 'asc'
 		}
 	})
 
@@ -713,6 +714,77 @@ avaTest('order - should be able to sort by version', async (test) => {
 		_.pick(elements[0], [ 'version' ]),
 		_.pick(elements[1], [ 'version' ]),
 		_.pick(elements[2], [ 'version' ])
+	])
+})
+
+avaTest('order - should be able to sort by version (desc)', async (test) => {
+	const table = 'order_4'
+
+	const schema = {
+		type: 'object',
+		properties: {
+			slug: {
+				type: 'string'
+			},
+			data: {
+				type: 'object',
+				required: [ 'bar' ],
+				properties: {
+					bar: {
+						type: 'number',
+						const: 1
+					}
+				}
+			}
+		},
+		required: [ 'slug', 'data' ]
+	}
+
+	const elements = [
+		{
+			slug: `card-${uuid()}`,
+			version: '1.0.0',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: `card-${uuid()}`,
+			version: '1.0.1',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: `card-${uuid()}`,
+			version: '1.1.0',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		}
+	]
+
+	const results = await runner({
+		connection: test.context.connection,
+		database: test.context.database,
+		table,
+		elements,
+		schema,
+		options: {
+			sortBy: [ 'version' ],
+			sortDir: 'desc'
+		}
+	})
+
+	test.deepEqual(_.map(results, (item) => {
+		return _.pick(item, [ 'version' ])
+	}), [
+		_.pick(elements[2], [ 'version' ]),
+		_.pick(elements[1], [ 'version' ]),
+		_.pick(elements[0], [ 'version' ])
 	])
 })
 
