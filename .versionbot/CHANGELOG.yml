@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add version sortDir desc test
+      hash: f10bfccdcf38c0a8bfbabe9871cb19c69d2d0a27
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.10.1
+  date: 2021-03-15T02:04:42.920Z
+- commits:
     - subject: Add authentication token to session contract
       hash: 40c36bd75768f562c82148e3da89778a721591a9
       body: ''
