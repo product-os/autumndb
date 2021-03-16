@@ -386,6 +386,62 @@ ava('.insertElement() should insert an element with a user defined id', async (t
 	}), result)
 })
 
+ava('.insertElement() should insert an element with pre-release version data', async (test) => {
+	const id = test.context.generateRandomID()
+	const result = await test.context.backend.insertElement(test.context.context, {
+		id,
+		active: true,
+		slug: test.context.generateRandomSlug(),
+		version: '1.0.0-alpha',
+		links: {},
+		tags: [],
+		data: {},
+		markers: [],
+		requires: [],
+		linked_at: {},
+		capabilities: [],
+		created_at: new Date().toISOString(),
+		type: 'card@1.0.0',
+		foo: 'bar'
+	})
+
+	test.is(result.id, id)
+
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
+
+	test.deepEqual(Object.assign({}, element, {
+		id: result.id
+	}), result)
+})
+
+ava('.insertElement() should insert an element with pre-release and build version data', async (test) => {
+	const id = test.context.generateRandomID()
+	const result = await test.context.backend.insertElement(test.context.context, {
+		id,
+		active: true,
+		slug: test.context.generateRandomSlug(),
+		version: '1.0.0-alpha+001',
+		links: {},
+		tags: [],
+		data: {},
+		markers: [],
+		requires: [],
+		linked_at: {},
+		capabilities: [],
+		created_at: new Date().toISOString(),
+		type: 'card@1.0.0',
+		foo: 'bar'
+	})
+
+	test.is(result.id, id)
+
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
+
+	test.deepEqual(Object.assign({}, element, {
+		id: result.id
+	}), result)
+})
+
 ava('.insertElement() should fail to insert an element with an existent id', async (test) => {
 	const result1 = await test.context.backend.insertElement(test.context.context, {
 		slug: test.context.generateRandomSlug(),
@@ -833,6 +889,50 @@ ava('.upsertElement() should not insert an element with a non-matching id nor sl
 	}), {
 		instanceOf: errors.JellyfishDatabaseError
 	})
+})
+
+ava('.upsertElement() should insert a card with prerelease version data', async (test) => {
+	const result = await test.context.backend.upsertElement(test.context.context, {
+		slug: test.context.generateRandomSlug(),
+		type: 'card@1.0.0',
+		version: '1.0.0-alpha',
+		links: {},
+		tags: [],
+		linked_at: {},
+		data: {},
+		markers: [],
+		requires: [],
+		capabilities: [],
+		created_at: new Date().toISOString(),
+		active: true
+	})
+
+	test.not(result.id, 'example')
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
+
+	test.deepEqual(element, result)
+})
+
+ava('.upsertElement() should insert a card with prerelease and build version data', async (test) => {
+	const result = await test.context.backend.upsertElement(test.context.context, {
+		slug: test.context.generateRandomSlug(),
+		type: 'card@1.0.0',
+		version: '1.0.0-alpha+001',
+		links: {},
+		tags: [],
+		linked_at: {},
+		data: {},
+		markers: [],
+		requires: [],
+		capabilities: [],
+		created_at: new Date().toISOString(),
+		active: true
+	})
+
+	test.not(result.id, 'example')
+	const element = await test.context.backend.getElementById(test.context.context, result.id)
+
+	test.deepEqual(element, result)
 })
 
 ava('.query() should correctly take string contraints on the uuid', async (test) => {
