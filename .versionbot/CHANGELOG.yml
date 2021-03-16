@@ -1,4 +1,17 @@
 - commits:
+    - subject: Make use of JellyfishUser widget
+      hash: beb2de350e7f7cec95ad5a9fd3b70c98e577b0fe
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.11.0
+  date: 2021-03-16T01:27:41.941Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 4fa134862af876f977cb773213f7cc1f8b3f67e4
       body: ''
