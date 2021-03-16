@@ -653,40 +653,6 @@ ava('.patchCardBySlug() should apply an empty set of patches', async (test) => {
 	test.deepEqual(result, card)
 })
 
-ava('.patchCardBySlug() should apply patches for optional version data', async (test) => {
-	const slug = context.generateRandomSlug({
-		prefix: 'foobarbaz'
-	})
-	const card = await context.kernel.insertCard(
-		context.context, context.kernel.sessions.admin, {
-			slug,
-			tags: [],
-			type: 'card@1.0.0',
-			version: '1.0.0',
-			data: {
-				foo: 'bar'
-			}
-		})
-
-	const patched = await context.kernel.patchCardBySlug(
-		context.context, context.kernel.sessions.admin, `${card.slug}@${card.version}`, [
-			{
-				op: 'replace',
-				path: '/version',
-				value: '1.0.0-alpha'
-			}
-		], {
-			type: card.type
-		})
-
-	const result = await context.kernel.getCardBySlug(
-		context.context, context.kernel.sessions.admin, `${card.slug}@${card.version}`, {
-			type: card.type
-		})
-
-	test.deepEqual(patched, result)
-})
-
 ava('.patchCardBySlug() should ignore changes to read-only properties', async (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'foobarbaz'
