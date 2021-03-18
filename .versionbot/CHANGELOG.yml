@@ -1,4 +1,177 @@
 - commits:
+    - subject: remove test for changing version as that was not supported
+      hash: 1f2429c85aa65ede8256d59bb5eabaa666623ca7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: allow complete semver pattern for card meta-type
+      hash: 253d04f5f49a8af5432389f1546145bf005611ca
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: Add more optional version data integration tests
+      hash: 0d8b618c47eb3b81e666ea64143303556575d696
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Add build/prerelease to version sorting tests
+      hash: 3a9c1a4a3da1c1ff25d6b6d2e42e9d6f96f722ef
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Fix unique constraint name for links table
+      hash: e07094aeee43a946b8bcdc39f0b2648723dcbd6c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Update unique constraint
+      hash: 3132d699710183d9f5a30f6bd3bce62a645353cc
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Bring back CREATE UNIQUE statements
+      hash: 6cfecbf8835f9a9c656f9a9d3b51a5fdf1ebf7c6
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: >-
+        allow computed version field to be used with and without table
+        specification
+      hash: 3c1d77890929a2ee1e541fe0c72b792ea12fde47
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: simplify createOrderByDefinitions
+      hash: f0de42be712cb951f875ac06ff92ddeb7eeffa9f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: ensure we never return pre-release versions when querying slug@latest
+      hash: 8230d346c8818caeb5c948f5f5fa52a2945f799e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: add special ordering for pre-release versions
+      hash: f1b3447ca2f28beef0015737d21b8f78c99c33a2
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: change orderBy definition creation to allow per path ordering
+      hash: 30463983c03a1c2a50c731a5dba744fbc5993731
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: centralize definition for computed `version` field
+      hash: 77cd4621b93fcfec9328e733da21d2100f17447f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: 'Remove comments, add unit tests, return version ints'
+      hash: fd08a1d367ebcbff532b7893ddf22c70478a2037
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: add prerelease and build version info for cards
+      hash: 8bf5770c5d732d807eaecaa6d9fe769bdcfdef2b
+      body: |
+        This should support contracts for balenaOS
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Martin Rauscher
+      nested: []
+    - subject: add prerelease versions to links
+      hash: 2f198778961319f23913432b5e7ceab8ff53ab14
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: add prerelease and build version info for cards
+      hash: 4c0dae6065325ab2d248f0d188a44b913e7c70e5
+      body: |
+        This should support contracts for balenaOS
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Martin Rauscher
+      nested: []
+  version: 2.12.0
+  date: 2021-03-18T03:47:57.646Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-environment to v3'
       hash: 3248a7d693ab90f4dd4c485f8acd965ddeeecc63
       body: ''
