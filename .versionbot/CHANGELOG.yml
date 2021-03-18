@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add version prerelease and build columns to stream triggers
+      hash: 8a48c5b9562142d5a129d98c82c0a6a118d373ea
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.12.4
+  date: 2021-03-18T10:46:11.063Z
+- commits:
     - subject: Remove version migration bootstrap steps
       hash: 3bc335f8e28bebb08739f781438e271ed605392f
       body: ''
