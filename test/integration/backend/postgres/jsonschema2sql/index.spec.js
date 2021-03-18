@@ -672,7 +672,31 @@ avaTest('order - should be able to sort by version (asc)', async (test) => {
 	const elements = [
 		{
 			slug: `card-${uuid()}`,
+			version: '1.0.0-beta',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: `card-${uuid()}`,
 			version: '1.0.0',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: `card-${uuid()}`,
+			version: '1.0.0-alpha+001',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: `card-${uuid()}`,
+			version: '1.0.0-beta+001',
 			type: 'card',
 			data: {
 				bar: 1
@@ -711,9 +735,12 @@ avaTest('order - should be able to sort by version (asc)', async (test) => {
 	test.deepEqual(_.map(results, (item) => {
 		return _.pick(item, [ 'version' ])
 	}), [
-		_.pick(elements[0], [ 'version' ]),
 		_.pick(elements[1], [ 'version' ]),
-		_.pick(elements[2], [ 'version' ])
+		_.pick(elements[4], [ 'version' ]),
+		_.pick(elements[5], [ 'version' ]),
+		_.pick(elements[2], [ 'version' ]),
+		_.pick(elements[0], [ 'version' ]),
+		_.pick(elements[3], [ 'version' ])
 	])
 })
 
@@ -743,7 +770,31 @@ avaTest('order - should be able to sort by version (desc)', async (test) => {
 	const elements = [
 		{
 			slug: `card-${uuid()}`,
+			version: '1.0.0-beta',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: `card-${uuid()}`,
 			version: '1.0.0',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: `card-${uuid()}`,
+			version: '1.0.0-alpha+001',
+			type: 'card',
+			data: {
+				bar: 1
+			}
+		},
+		{
+			slug: `card-${uuid()}`,
+			version: '1.0.0-beta+001',
 			type: 'card',
 			data: {
 				bar: 1
@@ -782,8 +833,11 @@ avaTest('order - should be able to sort by version (desc)', async (test) => {
 	test.deepEqual(_.map(results, (item) => {
 		return _.pick(item, [ 'version' ])
 	}), [
-		_.pick(elements[2], [ 'version' ]),
+		_.pick(elements[5], [ 'version' ]),
+		_.pick(elements[4], [ 'version' ]),
 		_.pick(elements[1], [ 'version' ]),
+		_.pick(elements[2], [ 'version' ]),
+		_.pick(elements[3], [ 'version' ]),
 		_.pick(elements[0], [ 'version' ])
 	])
 })

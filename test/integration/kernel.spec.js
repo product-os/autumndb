@@ -5383,6 +5383,61 @@ ava('.query() should filter results based on session scope', async (test) => {
 	}))
 })
 
+ava('.query() should work with optional prerelease and build version data', async (test) => {
+	const cards = [
+		await context.kernel.insertCard(
+			context.context, context.kernel.sessions.admin, {
+				slug: `card-${context.generateRandomSlug()}`,
+				type: 'card@1.0.0',
+				version: '3.0.1',
+				active: true,
+				data: {
+					foo: 1
+				}
+			}),
+		await context.kernel.insertCard(
+			context.context, context.kernel.sessions.admin, {
+				slug: `card-${context.generateRandomSlug()}`,
+				type: 'card@1.0.0',
+				version: '3.0.2',
+				active: true,
+				data: {
+					foo: 1
+				}
+			})
+	]
+
+	const results = await context.kernel.query(
+		context.context, context.kernel.sessions.admin, {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				slug: {
+					type: 'string'
+				},
+				version: {
+					type: 'string',
+					enum: [
+						cards[0].version,
+						cards[1].version
+					]
+				}
+			},
+			required: [ 'slug', 'version' ]
+		})
+
+	test.deepEqual(results, [
+		{
+			slug: cards[0].slug,
+			version: cards[0].version
+		},
+		{
+			slug: cards[1].slug,
+			version: cards[1].version
+		}
+	])
+})
+
 ava.cb('.stream() should include data if additionalProperties true', (test) => {
 	const slug = context.generateRandomSlug({
 		prefix: 'card'
