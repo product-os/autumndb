@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove version migration bootstrap steps
+      hash: 3bc335f8e28bebb08739f781438e271ed605392f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.12.3
+  date: 2021-03-18T08:56:11.538Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^0.1.120'
       hash: 37f51b036c92e4c3e98091dbdcfff7ca88a3b02b
       body: ''
