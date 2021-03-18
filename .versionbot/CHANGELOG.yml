@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-environment to v3'
+      hash: 3248a7d693ab90f4dd4c485f8acd965ddeeecc63
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.11.3
+  date: 2021-03-17T18:29:21.003Z
+- commits:
     - subject: 'patch: Update non-major Docker tags'
       hash: 2711eafbc0c0ce98662cc5102680697016861c94
       body: ''
