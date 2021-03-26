@@ -1,4 +1,17 @@
 - commits:
+    - subject: Replace husky with simple-git-hooks
+      hash: 3a5c3f8cc3b4efbe0ce8c39e190719ad2b793b29
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 2.12.17
+  date: 2021-03-26T06:37:33.770Z
+- commits:
     - subject: 'patch: Update dependency @balena/ci-task-runner to ^0.2.114'
       hash: aa2636ba7b92603ee83125920fdef7467a447470
       body: ''
