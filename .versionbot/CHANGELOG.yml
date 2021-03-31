@@ -1,4 +1,25 @@
 - commits:
+    - subject: Bump jellyfish-metrics to v1.0.21
+      hash: b059dcf1f80f5b419a91cbc16d41b494974ac668
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-metrics to v1'
+      hash: 1063e4b0f99bb24f9964e4847a9ffa7bbb83db39
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.12.22
+  date: 2021-03-31T08:59:01.326Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 6b112faeca453447302c4d954d6f9a8c4386de6f
       body: ''
