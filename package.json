@@ -49,7 +49,7 @@
     "lodash": "^4.17.21",
     "pg-format": "^1.0.4",
     "pg-promise": "^10.9.5",
-    "redis": "^3.0.2",
+    "redis": "^3.1.0",
     "redis-mock": "^0.56.3",
     "skhema": "^5.3.3",
     "traverse": "^0.6.6",
