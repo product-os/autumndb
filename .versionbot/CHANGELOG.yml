@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Fix error that stops mixed-case slugs being parsed'
+      hash: 0f6e4b492b1131d93a6a685536237840fcc6c022
+      body: |
+        Fixes #575
+      footer:
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 2.12.24
+  date: 2021-03-31T11:23:32.321Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.22'
       hash: fe88181f32b5937f7b6cd6b9b39f74f8115b4101
       body: ''
