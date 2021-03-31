@@ -165,3 +165,9 @@ ava('parseVersionedSlug should parse valid versioned slug strings', (test) => {
 		latest: true
 	})
 })
+
+ava.only('parseVersionedSlug should be case insensitive', (test) => {
+	test.notThrows(() => {
+		utils.parseVersionedSlug('foo-BAR@1.0.0')
+	})
+})
