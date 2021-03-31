@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency redis to ^3.1.0'
+      hash: c3610bda2e2f1f979e42c5f2ff1ec10f8f9b7180
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.12.25
+  date: 2021-03-31T23:05:47.677Z
+- commits:
     - subject: 'patch: Fix error that stops mixed-case slugs being parsed'
       hash: 0f6e4b492b1131d93a6a685536237840fcc6c022
       body: |
