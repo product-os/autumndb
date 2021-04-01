@@ -11,7 +11,7 @@ const {
 	v4: uuid
 } = require('uuid')
 const pgp = require('../../../../../lib/backend/postgres/pg-promise')
-const environment = require('@balena/jellyfish-environment')
+const environment = require('@balena/jellyfish-environment').defaultEnvironment
 const jsonschema2sql = require('../../../../../lib/backend/postgres/jsonschema2sql')
 const cards = require('../../../../../lib/backend/postgres/cards')
 const links = require('../../../../../lib/backend/postgres/links')

@@ -12,7 +12,7 @@ const {
 } = require('uuid')
 const pgp = require('../../../../../lib/backend/postgres/pg-promise')
 const streams = require('../../../../../lib/backend/postgres/streams')
-const environment = require('@balena/jellyfish-environment')
+const environment = require('@balena/jellyfish-environment').defaultEnvironment
 const PostgresBackend = require('../../../../../lib/backend/postgres/index')
 
 ava.serial.before((test) => {
