@@ -1,4 +1,25 @@
 - commits:
+    - subject: Update jellyfish-environment requires
+      hash: 322c8c1c92c63dcbc2778cdd8e56783631bd2f22
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-environment to v4'
+      hash: 3970c9dbf0b823a40ba2e8401dd605c57d46a706
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.12.28
+  date: 2021-04-01T03:20:43.006Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.23'
       hash: e5d0839102688009009cca0e28607105d1aa7e06
       body: ''
