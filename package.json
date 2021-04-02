@@ -39,7 +39,7 @@
     "@balena/jellyfish-environment": "^4.0.6",
     "@balena/jellyfish-logger": "^2.1.17",
     "@balena/jellyfish-metrics": "^1.0.26",
-    "@balena/jellyfish-uuid": "^1.0.80",
+    "@balena/jellyfish-uuid": "^1.0.81",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
     "fast-equals": "^2.0.0",
@@ -56,7 +56,7 @@
     "typed-errors": "^1.1.0"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.116",
+    "@balena/ci-task-runner": "^0.2.117",
     "@balena/jellycheck": "^0.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.15.0",
@@ -72,7 +72,7 @@
     "eslint-plugin-promise": "^4.3.1",
     "jsdoc-to-markdown": "^7.0.1",
     "lint-staged": "^10.5.4",
-    "simple-git-hooks": "^2.2.0",
+    "simple-git-hooks": "^2.3.0",
     "uuid": "^8.3.2"
   },
   "simple-git-hooks": {
