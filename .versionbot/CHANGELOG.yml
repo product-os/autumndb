@@ -1,4 +1,25 @@
 - commits:
+    - subject: Correctly deal with queries that select nothing inside JSONB objects
+      hash: 84ca1e987fd54f9b1065b6a3946be1ade41294cb
+      body: |
+        When `additionalProperties: false`, JSONB content selection works
+        subtractively, first by fetching the whole object and then removing all
+        keys that were not explicitly selected. If no keys were selected at all,
+        the compiler would generate a query over `VALUES ()` which is not valid
+        SQL. This fix prevents subtraction from happening in this case,
+        replacing the expression with an empty JSONB object.
+
+        Fixes https://github.com/product-os/jellyfish/issues/6191
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 2.12.76
+  date: 2021-04-14T13:45:31.540Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.81'
       hash: 7fe80cba9009ae12f760c645d4a565385c45726d
       body: ''
