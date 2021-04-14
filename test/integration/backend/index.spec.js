@@ -2766,6 +2766,65 @@ ava('.query() should resolve "limit" after resolving links', async (test) => {
 	])
 })
 
+ava('.query() should correctly build a JSONB object with no selected properties', async (test) => {
+	const card = await test.context.backend.upsertElement(test.context.context, {
+		type: 'card@1.0.0',
+		slug: test.context.generateRandomSlug(),
+		links: {},
+		version: '1.0.0',
+		tags: [],
+		markers: [],
+		requires: [],
+		capabilities: [],
+		created_at: new Date().toISOString(),
+		linked_at: {},
+		updated_at: null,
+		active: true,
+		data: {
+			test: {
+				content: 0
+			}
+		}
+	})
+
+	const results = await test.context.backend.query(test.context.context, {}, {
+		properties: {
+			id: {
+				const: card.id
+			},
+			data: {
+				properties: {
+					test: {
+						additionalProperties: false
+					}
+				}
+			}
+		}
+	})
+
+	test.deepEqual(results, [
+		{
+			id: card.id,
+			active: true,
+			capabilities: [],
+			created_at: card.created_at,
+			updated_at: card.updated_at,
+			linked_at: {},
+			markers: [],
+			name: null,
+			requires: [],
+			tags: [],
+			version: '1.0.0',
+			type: card.type,
+			slug: card.slug,
+			links: {},
+			data: {
+				test: {}
+			}
+		}
+	])
+})
+
 ava('adding a link should update the linked_at field', async (test) => {
 	const thread = await test.context.backend.upsertElement(test.context.context, {
 		type: 'thread@1.0.0',
