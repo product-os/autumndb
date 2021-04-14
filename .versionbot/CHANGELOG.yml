@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: f02d16c67982409d80e431c3ec817b44a1454bf0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.12.72
+  date: 2021-04-14T04:00:42.372Z
+- commits:
     - subject: 'patch: Update dependency redis to ^3.1.1'
       hash: 27e2d99ee3fe682c2b053ef6e4a32e8b9616aad3
       body: ''
