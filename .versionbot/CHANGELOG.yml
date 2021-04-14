@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 2a453d2e70bdc8ac8d803912f67704fb9ad52109
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.12.77
+  date: 2021-04-14T23:10:51.223Z
+- commits:
     - subject: Correctly deal with queries that select nothing inside JSONB objects
       hash: 84ca1e987fd54f9b1065b6a3946be1ade41294cb
       body: |
