@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: e3a6e3c6cbd7b565c5d5f0a7c93f373ea41d03e0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.1
+  date: 2021-04-20T20:54:52.326Z
+- commits:
     - subject: 'Export errors, Kernel and Backend objects'
       hash: bc83291befde3abee1ca22b289e23d4dc770991b
       body: >2
