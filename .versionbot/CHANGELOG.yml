@@ -1,4 +1,22 @@
 - commits:
+    - subject: 'Export errors, Kernel and Backend objects'
+      hash: bc83291befde3abee1ca22b289e23d4dc770991b
+      body: >2
+         number of jellyfish modules import these objects from subpaths, which is an abomination.
+        It also makes converting said modules to typescript much more difficult.
+
+        Once everything is converted to typescript this situation needs to be
+        straightened out.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 2.13.0
+  date: 2021-04-20T14:47:42.955Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.123'
       hash: e0fd4a076a2c79ef1a7bd028485d8f2cb7d9e9d2
       body: ''
