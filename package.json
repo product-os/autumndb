@@ -38,7 +38,7 @@
     "@balena/jellyfish-assert": "^1.1.7",
     "@balena/jellyfish-environment": "^4.1.4",
     "@balena/jellyfish-logger": "^2.1.28",
-    "@balena/jellyfish-metrics": "^1.0.128",
+    "@balena/jellyfish-metrics": "^1.0.129",
     "@balena/jellyfish-uuid": "^1.0.84",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
@@ -56,7 +56,7 @@
     "typed-errors": "^1.1.0"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.122",
+    "@balena/ci-task-runner": "^0.2.123",
     "@balena/jellycheck": "^0.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.15.0",
@@ -66,7 +66,7 @@
     "eslint": "^7.24.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsdoc": "^32.3.0",
+    "eslint-plugin-jsdoc": "^32.3.1",
     "eslint-plugin-lodash": "^7.2.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
