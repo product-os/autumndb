@@ -35,10 +35,10 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.1.8",
-    "@balena/jellyfish-environment": "^4.1.5",
-    "@balena/jellyfish-logger": "^2.1.31",
-    "@balena/jellyfish-metrics": "^1.0.135",
+    "@balena/jellyfish-assert": "^1.1.9",
+    "@balena/jellyfish-environment": "^4.1.6",
+    "@balena/jellyfish-logger": "^2.1.33",
+    "@balena/jellyfish-metrics": "^1.0.137",
     "@balena/jellyfish-uuid": "^1.0.84",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
@@ -72,7 +72,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "jsdoc-to-markdown": "^7.0.1",
     "lint-staged": "^10.5.4",
-    "simple-git-hooks": "^2.3.1",
+    "simple-git-hooks": "^2.4.1",
     "uuid": "^8.3.2"
   },
   "simple-git-hooks": {
