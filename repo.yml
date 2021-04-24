@@ -8,7 +8,5 @@ upstream:
     url: 'https://github.com/product-os/jellyfish-logger'
   - repo: 'jellyfish-metrics'
     url: 'https://github.com/product-os/jellyfish-metrics'
-  - repo: 'jellyfish-uuid'
-    url: 'https://github.com/product-os/jellyfish-uuid'
   - repo: 'ci-task-runner'
     url: 'https://github.com/product-os/ci-task-runner'
