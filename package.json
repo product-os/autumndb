@@ -39,7 +39,6 @@
     "@balena/jellyfish-environment": "^4.1.6",
     "@balena/jellyfish-logger": "^2.1.34",
     "@balena/jellyfish-metrics": "^1.0.139",
-    "@balena/jellyfish-uuid": "^1.0.84",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
     "fast-equals": "^2.0.1",
@@ -53,7 +52,9 @@
     "redis-mock": "^0.56.3",
     "skhema": "^5.3.3",
     "traverse": "^0.6.6",
-    "typed-errors": "^1.1.0"
+    "typed-errors": "^1.1.0",
+    "uuid": "^8.3.2",
+    "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
     "@balena/ci-task-runner": "^0.2.123",
@@ -72,8 +73,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "jsdoc-to-markdown": "^7.0.1",
     "lint-staged": "^10.5.4",
-    "simple-git-hooks": "^2.4.1",
-    "uuid": "^8.3.2"
+    "simple-git-hooks": "^2.4.1"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
