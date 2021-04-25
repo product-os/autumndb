@@ -1,4 +1,17 @@
 - commits:
+    - subject: Replace jellyfish-uuid with uuid
+      hash: aac8d5b22ba8bad477ef1998df13b18ab4a4e1da
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.13.15
+  date: 2021-04-25T02:48:23.027Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.139'
       hash: 92197ec30dc6ea0b24118714fd611282ac3c9cb2
       body: ''
