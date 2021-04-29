@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: ee2265120043c4b3a9395f1ac02a7c76722b9de8
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.31
+  date: 2021-04-29T10:29:01.239Z
+- commits:
     - subject: Add title to user card email property
       hash: c6e946bdede30ca77e1ba411fdfdd6890dbbc337
       body: ''
