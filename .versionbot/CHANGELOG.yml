@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add title to user card email property
+      hash: c6e946bdede30ca77e1ba411fdfdd6890dbbc337
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.13.30
+  date: 2021-04-29T05:52:12.037Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 07b4e72071a4d55dbf3af9b964b590362d54d5ce
       body: ''
