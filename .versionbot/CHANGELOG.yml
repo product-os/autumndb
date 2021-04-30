@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 46695cb1cc30330cc208f5b423339aa7ed539d20
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.42
+  date: 2021-04-30T17:07:41.874Z
+- commits:
     - subject: Reduce granularity of logger instances
       hash: a9c119ae240f07a1d6183b2d1486bcc00c863502
       body: |
