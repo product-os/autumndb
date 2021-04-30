@@ -1,4 +1,19 @@
 - commits:
+    - subject: Correctly wait for the redis client to quit when disconnecting cache
+      hash: e5022a312514afedf8a6fbc2daee2a707c4fd8e8
+      body: |
+        See https://stackoverflow.com/a/54560610 for more detail on this
+        solution
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 2.13.39
+  date: 2021-04-30T08:58:45.888Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.160'
       hash: 506b030eb86a02b9bc9eacf990b7116fbd6ffdbd
       body: ''
