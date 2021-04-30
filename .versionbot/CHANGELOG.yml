@@ -1,4 +1,19 @@
 - commits:
+    - subject: Reduce granularity of logger instances
+      hash: a9c119ae240f07a1d6183b2d1486bcc00c863502
+      body: |
+        Winston doesn't handle large amounts of logger instances particularly
+        well and the low level of granularity used here is overkill.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 2.13.41
+  date: 2021-04-30T14:38:01.719Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.161'
       hash: 39f2c0fae085b3495ba0e75571c2f2f882e12944
       body: ''
