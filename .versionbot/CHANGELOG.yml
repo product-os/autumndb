@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.161'
+      hash: 39f2c0fae085b3495ba0e75571c2f2f882e12944
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.40
+  date: 2021-04-30T09:19:16.591Z
+- commits:
     - subject: Correctly wait for the redis client to quit when disconnecting cache
       hash: e5022a312514afedf8a6fbc2daee2a707c4fd8e8
       body: |
