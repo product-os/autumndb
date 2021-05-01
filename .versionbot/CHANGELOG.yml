@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 6b2712dcfb02adce15da549beb83670e2e9f22aa
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.44
+  date: 2021-05-01T01:42:41.482Z
+- commits:
     - subject: 'patch: Update dependency eslint-plugin-jsdoc to v33'
       hash: 854e6aed2a18b9a6c86b65dbddd72738f98c8037
       body: ''
