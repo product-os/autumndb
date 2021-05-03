@@ -57,7 +57,7 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.128",
+    "@balena/ci-task-runner": "0.2.129-renovate-yargs-17-x-03bc14cf640d4b474d30d4f8083bf29568c275d7",
     "@balena/jellycheck": "^0.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.15.0",
