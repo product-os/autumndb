@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update resinci/jellyfish-test Docker tag to v1.3.45'
+      hash: 8872e32d9af6337c5d0b1eb9eaf76c0343229fcd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.71
+  date: 2021-05-05T10:33:21.245Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.190'
       hash: a77c8dfcc290897ee83804bc69d66b0efce56023
       body: ''
