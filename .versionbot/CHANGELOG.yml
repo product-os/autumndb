@@ -1,4 +1,19 @@
 - commits:
+    - subject: Remove unused "queryv2" code.
+      hash: 98a5aac8f283b5b650b44f52d5814bc83a5d14e7
+      body: |
+        This code block is unused and not exported anywhere and can be
+        completely removed
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 2.13.77
+  date: 2021-05-06T12:00:13.501Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 219e028c760248706e337ff90413655f51b775a9
       body: ''
