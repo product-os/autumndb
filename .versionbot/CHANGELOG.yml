@@ -1,4 +1,17 @@
 - commits:
+    - subject: Fix session scope missing await bug
+      hash: 7160a6e01471c833e84790c953068dc722e0a850
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.13.78
+  date: 2021-05-07T00:46:22.523Z
+- commits:
     - subject: Remove unused "queryv2" code.
       hash: 98a5aac8f283b5b650b44f52d5814bc83a5d14e7
       body: |
