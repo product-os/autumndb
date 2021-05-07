@@ -1,4 +1,15 @@
 - commits:
+    - subject: add version to logs on insert conflict
+      hash: ffa179fb0773fdf4dbcdce744021d1f3d01c788a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Martin Rauscher
+      nested: []
+  version: 2.13.79
+  date: 2021-05-07T06:51:31.417Z
+- commits:
     - subject: Fix session scope missing await bug
       hash: 7160a6e01471c833e84790c953068dc722e0a850
       body: ''
