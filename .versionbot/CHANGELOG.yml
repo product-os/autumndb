@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency lint-staged to v11'
+      hash: 0bdb8d9b16a6e68d04d24e477354c4126ef41fa9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.80
+  date: 2021-05-07T18:08:41.339Z
+- commits:
     - subject: add version to logs on insert conflict
       hash: ffa179fb0773fdf4dbcdce744021d1f3d01c788a
       body: ''
