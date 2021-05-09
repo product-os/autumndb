@@ -41,7 +41,7 @@
     "@balena/jellyfish-metrics": "^1.0.202",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
-    "fast-equals": "^2.0.1",
+    "fast-equals": "^2.0.2",
     "fast-json-patch": "^2.2.1",
     "json-e": "^4.4.1",
     "json-schema-deref-sync": "^0.14.0",
