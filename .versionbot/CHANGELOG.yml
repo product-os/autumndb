@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: bff644f29b809c960077c9656a588754d3ed9f3f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.89
+  date: 2021-05-09T16:15:28.993Z
+- commits:
     - subject: 'patch: Update dependency fast-equals to ^2.0.2'
       hash: 70f436cfb9e7aaefac1ea87efdece4a2b46421ca
       body: ''
