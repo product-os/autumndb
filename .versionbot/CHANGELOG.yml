@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency fast-equals to ^2.0.2'
+      hash: 70f436cfb9e7aaefac1ea87efdece4a2b46421ca
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.88
+  date: 2021-05-09T08:24:21.236Z
+- commits:
     - subject: 'patch: Update dependency @balena/ci-task-runner to ^0.2.135'
       hash: 0c6b28b84d0bc4dfe6692cdfb1e0199d24381a37
       body: ''
