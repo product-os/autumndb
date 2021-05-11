@@ -913,6 +913,45 @@ ava('.upsertElement() should insert a card with prerelease version data', async 
 	test.deepEqual(element, result)
 })
 
+ava('.upsertElement() should insert multiple prereleases on same version', async (test) => {
+	const slug = test.context.generateRandomSlug()
+	const results = [
+		await test.context.backend.upsertElement(test.context.context, {
+			slug,
+			type: 'card@1.0.0',
+			version: '1.0.1-alpha',
+			links: {},
+			tags: [],
+			linked_at: {},
+			data: {},
+			markers: [],
+			requires: [],
+			capabilities: [],
+			created_at: new Date().toISOString(),
+			active: true
+		}),
+		await test.context.backend.upsertElement(test.context.context, {
+			slug,
+			type: 'card@1.0.0',
+			version: '1.0.1-beta',
+			links: {},
+			tags: [],
+			linked_at: {},
+			data: {},
+			markers: [],
+			requires: [],
+			capabilities: [],
+			created_at: new Date().toISOString(),
+			active: true
+		})
+	]
+
+	// Check that the cards have the same slug, but different versions and ids
+	test.is(results[0].slug, results[1].slug)
+	test.not(results[0].version, results[1].version)
+	test.not(results[0].id, results[1].id)
+})
+
 ava('.upsertElement() should insert a card with prerelease and build version data', async (test) => {
 	const result = await test.context.backend.upsertElement(test.context.context, {
 		slug: test.context.generateRandomSlug(),
