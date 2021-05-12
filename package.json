@@ -37,11 +37,11 @@
   "dependencies": {
     "@balena/jellyfish-assert": "^1.1.16",
     "@balena/jellyfish-environment": "^4.1.13",
-    "@balena/jellyfish-logger": "^2.1.55",
-    "@balena/jellyfish-metrics": "^1.0.204",
+    "@balena/jellyfish-logger": "^2.1.56",
+    "@balena/jellyfish-metrics": "^1.0.205",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
-    "fast-equals": "^2.0.2",
+    "fast-equals": "^2.0.3",
     "fast-json-patch": "^2.2.1",
     "json-e": "^4.4.1",
     "json-schema-deref-sync": "^0.14.0",
@@ -57,7 +57,7 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.139",
+    "@balena/ci-task-runner": "^0.2.140",
     "@balena/jellycheck": "^0.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.15.0",
