@@ -86,3 +86,9 @@ dist/
 
 # tmp directory
 tmp/
+
+# build output
+build
+
+# docs output
+docs

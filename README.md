@@ -8,10 +8,10 @@ core provides the foundation library for the rest of system.
 
 - The core aims to expose a small and simple interface
 - The core aims to **not** expose any details about the underlying database
-	implementations
+  implementations
 - The core aims for correctness and speed
 - The core aims to be the only module in the system that directly interacts
-	with the database
+  with the database
 
 ## Features
 
@@ -53,7 +53,7 @@ grained updates to made to JSON data.
 ### User system
 
 User cards model the actors that interact with the system.
-There are two default users, the admin  And the guest. The admin user is typically used for system level operations or operations that require unrestricted access. The guest user represents an unauthorised user interacting with the system. Users authorize function calls using a session, which corresponds to the ID of a "session" card in the system.
+There are two default users, the admin And the guest. The admin user is typically used for system level operations or operations that require unrestricted access. The guest user represents an unauthorised user interacting with the system. Users authorize function calls using a session, which corresponds to the ID of a "session" card in the system.
 The data that a user has access to is defined using "role" cards. All user cards
 define a list of roles that they have.
 
@@ -97,6 +97,7 @@ If a card has no markers on it, then the card is unrestricted by the markers sys
 
 For example, if my user slug is `user-lucianbuzzo` and I am a member of the `org-balena` org, then I would be able to
 view cards with the markers:
+
 - `[]` (i.e. no markers defined)
 - `[ "org-balena", "user-lucianbuzzo" ]`
 - `[ "user-lucianbuzzo" ]`
@@ -105,6 +106,7 @@ view cards with the markers:
 - `[ "org-balena+user-foobar" ]`
 
 However, I wouldn't be able to view cards with the markers
+
 - `[ "user-foobar" ]`
 - `[ "user-foobar", "user-lucianbuzzo" ]`
 - `[ "org-balena", "user-foobar" ]`
@@ -145,14 +147,26 @@ This library contains email integration functionality for use in Jellyfish.
 Below is an example how to use this library:
 
 ```js
-const core = require('@balena/jellyfish-core')
+const core = require('@balena/jellyfish-core');
 
-const cache = new core.MemoryCache(environment.redis)
+const cache = new core.MemoryCache(environment.redis);
 const jellyfish = await core.create(context, cache, {
-	backend: environment.database.options
-})
+	backend: environment.database.options,
+});
 ```
 
-# Documentation
+# Testing
 
-ERROR, Cannot find module.
+Unit tests can be easily run with the command `npm test`.
+
+The integration tests require a postgres DB and redis server. The simplest way to run the tests locally is with docker-compose.
+
+```
+docker-compose -f docker-compose.yml up --build
+```
+
+The tests can then be run from your host with:
+
+```
+LOGLEVEL=warn POSTGRES_USER=docker POSTGRES_PASSWORD=docker make test-integration
+```
