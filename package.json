@@ -57,7 +57,7 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.150",
+    "@balena/ci-task-runner": "^0.2.151",
     "@balena/jellycheck": "^0.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "ava": "^3.15.0",
@@ -67,7 +67,7 @@
     "eslint": "^7.26.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.23.2",
-    "eslint-plugin-jsdoc": "^34.6.2",
+    "eslint-plugin-jsdoc": "^34.6.3",
     "eslint-plugin-lodash": "^7.2.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
