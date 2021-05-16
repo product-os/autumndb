@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/ci-task-runner to ^0.2.149'
+      hash: 52996d14b258594e296af7147848e08ddcd94a77
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.117
+  date: 2021-05-16T01:38:40.948Z
+- commits:
     - subject: 'patch: Update dependency eslint-plugin-jsdoc to ^34.6.1'
       hash: 90e1f999e2dbb1e925e470ad85b745403d1e6422
       body: ''
