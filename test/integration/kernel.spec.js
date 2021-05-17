@@ -132,6 +132,7 @@ ava('.patchCardBySlug() should apply a single operation', async (test) => {
 		slug,
 		updated_at: result.updated_at,
 		tags: [],
+		loop: null,
 		type: 'card@1.0.0',
 		version: '1.0.0',
 		data: {
@@ -185,6 +186,7 @@ ava('.patchCardBySlug() should add an element to an array', async (test) => {
 		slug,
 		updated_at: result.updated_at,
 		tags: [],
+		loop: null,
 		type: 'card@1.0.0',
 		version: '1.0.0',
 		data: {
@@ -237,6 +239,7 @@ ava('.patchCardBySlug() should delete a property inside data', async (test) => {
 		slug,
 		updated_at: result.updated_at,
 		tags: [],
+		loop: null,
 		type: 'card@1.0.0',
 		version: '1.0.0',
 		data: {
@@ -297,6 +300,7 @@ ava('.patchCardBySlug() should apply more than one operation', async (test) => {
 		slug,
 		updated_at: result.updated_at,
 		tags: [],
+		loop: null,
 		type: 'card@1.0.0',
 		version: '1.0.0',
 		data: {
@@ -1509,6 +1513,7 @@ ava('.insertCard() should use defaults if required keys are missing', async (tes
 		active: true,
 		version: '1.0.0',
 		tags: [],
+		loop: null,
 		markers: [],
 		links: {},
 		requires: [],
@@ -3617,6 +3622,7 @@ ava('.query() should get all properties of all cards', async (test) => {
 		'id',
 		'linked_at',
 		'links',
+		'loop',
 		'markers',
 		'name',
 		'requires',
@@ -5472,6 +5478,7 @@ ava.cb('.stream() should include data if additionalProperties true', (test) => {
 					active: true,
 					version: '1.0.0',
 					tags: [],
+					loop: null,
 					name: null,
 					markers: [],
 					created_at: change.after.created_at,
