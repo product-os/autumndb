@@ -35,10 +35,10 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.1.19",
+    "@balena/jellyfish-assert": "^1.1.21",
     "@balena/jellyfish-environment": "^4.1.13",
-    "@balena/jellyfish-logger": "^2.1.64",
-    "@balena/jellyfish-metrics": "^1.0.212",
+    "@balena/jellyfish-logger": "^2.1.66",
+    "@balena/jellyfish-metrics": "^1.0.215",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
     "fast-equals": "^2.0.3",
