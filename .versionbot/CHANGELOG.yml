@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^2.1.79'
+      hash: 04cfbc18c6d1089029f040ef23e919a412ec0827
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 2.13.140
+  date: 2021-05-26T01:52:10.944Z
+- commits:
     - subject: Bump eslint-plugin-jdsoc to 35.0.0
       hash: 60ae652f43313ea08d09f5df5c1aef211d916a32
       body: ''
