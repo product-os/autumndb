@@ -1,4 +1,17 @@
 - commits:
+    - subject: Bump eslint-plugin-jdsoc to 35.0.0
+      hash: 60ae652f43313ea08d09f5df5c1aef211d916a32
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 2.13.139
+  date: 2021-05-26T01:38:48.887Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.228'
       hash: db5ace0e19e3646e80bb2328e5032be307e87ff7
       body: ''
