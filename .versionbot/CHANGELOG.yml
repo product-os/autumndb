@@ -1,4 +1,18 @@
 - commits:
+    - subject: Convert core to TypeScript
+      hash: 9fe8747542b2543ea2eeb13fcd95ec0e9eefd772
+      body: |
+        This includes converting the tests from AVA to jest.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Balena CI
+      nested: []
+  version: 3.0.0
+  date: 2021-05-27T07:36:11.233Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: db163e8e51d4043f7fe50a47276e4c2cc6e3f256
       body: ''
