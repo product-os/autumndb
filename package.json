@@ -78,7 +78,7 @@
     "@balena/ci-task-runner": "^0.2.157",
     "@balena/jellycheck": "^0.1.1",
     "@balena/jellyfish-types": "^0.5.134",
-    "@balena/lint": "^5.4.2",
+    "@balena/lint": "^6.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "@types/jest": "^26.0.23",
     "@types/uuid": "^8.3.0",
