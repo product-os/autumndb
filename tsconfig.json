@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "build",
+    "esModuleInterop": false,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2015",
+    "declaration": true,
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "downlevelIteration": true,
+    "resolveJsonModule": true
+  },
+  "typedocOptions": {
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "gitRevision": "master",
+    "out": "docs"
+  },
+  "include": [
+    "lib/**/*.ts",
+    "test/**/*.ts",
+    "@types/**/*.d.ts"
+  ]
+}
