@@ -82,9 +82,8 @@ export const parseVersionedSlug = (slug: string) => {
 		throw new Error(`slug format invalid: ${slug}`);
 	}
 	const { base, version } = match.groups;
-	const { major, minor, patch, prerelease, build, latest } = utils.parseVersion(
-		version,
-	);
+	const { major, minor, patch, prerelease, build, latest } =
+		utils.parseVersion(version);
 
 	return {
 		base,
@@ -325,15 +324,8 @@ export const getBySlug = async (
 		table,
 	});
 
-	const {
-		base,
-		major,
-		minor,
-		patch,
-		prerelease,
-		build,
-		latest,
-	} = parseVersionedSlug(slug);
+	const { base, major, minor, patch, prerelease, build, latest } =
+		parseVersionedSlug(slug);
 
 	let results = [];
 

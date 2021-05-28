@@ -20,8 +20,8 @@
   "scripts": {
     "clean": "rimraf build",
     "build": "npm run clean && tsc -p tsconfig.build.json",
-    "lint": "balena-lint --typescript lib && npm run check && deplint && depcheck --ignore-bin-package --ignores=shellcheck,@types/jest",
-    "lint-fix": "balena-lint --typescript --fix lib",
+    "lint": "balena-lint lib && npm run check && deplint && depcheck --ignore-bin-package --ignores=shellcheck,@types/jest",
+    "lint-fix": "balena-lint --fix lib",
     "unit": "jest lib",
     "integration": "jest test",
     "test": "catch-uncommitted --skip-node-versionbot-changes && npm run lint && npm run unit",
