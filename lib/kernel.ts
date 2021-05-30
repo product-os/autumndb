@@ -123,10 +123,11 @@ const getQueryFromSchema = async (
 	schema: JSONSchema | ViewContract,
 ) => {
 	// TS-TODO: Refactor this to avoid type coercion
-	const finalSchema: JSONSchema = (schema.type ===
-	`${CARDS.view.slug}@${CARDS.view.version}`
-		? views.getSchema(schema as ViewContract)
-		: schema) as JSONSchema;
+	const finalSchema: JSONSchema = (
+		schema.type === `${CARDS.view.slug}@${CARDS.view.version}`
+			? views.getSchema(schema as ViewContract)
+			: schema
+	) as JSONSchema;
 
 	// TODO: this is probably going to be given in the schema itself. See
 	// also `stream()`
@@ -361,13 +362,13 @@ export class Kernel {
 		]);
 
 		const adminUser = await unsafeUpsert(CARDS['user-admin']);
-		const adminSession = await unsafeUpsert(({
+		const adminSession = await unsafeUpsert({
 			slug: 'session-admin-kernel',
 			type: `${CARDS.session.slug}@${CARDS.session.version}`,
 			data: {
 				actor: adminUser.id,
 			},
-		} as any) as Contract);
+		} as any as Contract);
 
 		this.sessions = {
 			admin: adminSession.id,

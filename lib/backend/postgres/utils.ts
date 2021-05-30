@@ -87,7 +87,8 @@ export const parseVersion = (version: string) => {
 		};
 	}
 	// eslint-disable-next-line max-len
-	const versionPattern = /(?<major>\d+)(\.(?<minor>\d+))?(\.(?<patch>\d+))?(-(?<prerelease>[0-9A-Za-z-]+))?(\+(?<build>[0-9A-Za-z-]+))?|(?<latest>latest)/;
+	const versionPattern =
+		/(?<major>\d+)(\.(?<minor>\d+))?(\.(?<patch>\d+))?(-(?<prerelease>[0-9A-Za-z-]+))?(\+(?<build>[0-9A-Za-z-]+))?|(?<latest>latest)/;
 
 	const match = versionPattern.exec(version);
 
