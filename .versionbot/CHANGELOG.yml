@@ -1,4 +1,17 @@
 - commits:
+    - subject: move bootstrapping in a single transaction
+      hash: 5a7a58ef30df3c1eb44a3c9cb2b135eba889e9ee
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 3.0.12
+  date: 2021-06-01T14:33:51.492Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 6fa60af3663ca1e036aa68266efd222733843bc0
       body: ''
