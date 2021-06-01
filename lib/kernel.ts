@@ -343,6 +343,9 @@ export class Kernel {
 	async initialize(context: Context) {
 		await this.backend.connect(context);
 
+		// TODO: all of this bootstrapping should be in the same transaction as the DB setup
+		// happening in the connect() call above
+
 		logger.debug(context, 'Upserting minimal required cards');
 
 		const unsafeUpsert = (card: ContractDefinition) => {

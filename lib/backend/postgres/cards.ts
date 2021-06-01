@@ -55,9 +55,6 @@ const CARDS_SELECT = [
 	'capabilities',
 	'data',
 ].join(', ');
-// Functions cannot be created concurrently
-const CREATE_IMMUTABLE_ARRAY_TO_STRING_FUNCTION_LOCK = 3043989439426746;
-const CREATE_MERGE_JSONB_VIEWS_FUNCTION_LOCK = 3043989439426747;
 
 /**
  * Parses and normalizes slug versions. Can handle these patterns:
@@ -96,9 +93,6 @@ export const parseVersionedSlug = (slug: string) => {
 	};
 };
 
-// Just a random fixed number used as the advisory lock ID for SQL
-// initialization scripts that modify the `cards` table
-export const INIT_LOCK = 1142043989439426;
 export const TABLE = CARDS_TABLE;
 export const TRIGGER_COLUMNS = CARDS_TRIGGER_COLUMNS;
 
@@ -115,17 +109,14 @@ export const setup = async (
 ) => {
 	const table = options.table || TABLE;
 	const tables = _.map(
-		await connection.any(`
-		SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`),
+		await connection.any(
+			`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`,
+		),
 		'table_name',
 	);
 	if (!tables.includes(table)) {
-		await connection.any(`
-			BEGIN;
-
-			SELECT pg_advisory_xact_lock(${exports.INIT_LOCK});
-
-			CREATE TABLE IF NOT EXISTS ${table} (
+		await connection.any(
+			`CREATE TABLE IF NOT EXISTS ${table} (
 				id UUID PRIMARY KEY NOT NULL,
 				slug VARCHAR (255) NOT NULL,
 				type TEXT NOT NULL,
@@ -158,8 +149,8 @@ export const setup = async (
 			ALTER COLUMN links SET STORAGE EXTERNAL,
 			ALTER COLUMN linked_at SET STORAGE EXTERNAL;
 
-			COMMIT;
-		`);
+		`,
+		);
 	}
 	/*
 	 * This query will give us a list of all the indexes
@@ -243,25 +234,15 @@ export const setup = async (
 		/*
 		 * Create function that allows us to create tsvector indexes from text[] fields.
 		 */
-		connection.any(`
-			BEGIN;
-
-			SELECT pg_advisory_xact_lock(${CREATE_IMMUTABLE_ARRAY_TO_STRING_FUNCTION_LOCK});
-
-			CREATE OR REPLACE FUNCTION immutable_array_to_string(arr text[], sep text) RETURNS text AS $$
+		connection.any(
+			`CREATE OR REPLACE FUNCTION immutable_array_to_string(arr text[], sep text) RETURNS text AS $$
 				SELECT array_to_string(arr, sep);
-			$$ LANGUAGE SQL IMMUTABLE;
-
-			COMMIT;
-		`),
+			$$ LANGUAGE SQL IMMUTABLE;`,
+		),
 		// Recursive function to merge JSONB objects. This function assumes both
 		// objects are just views into the same underlying object
-		connection.any(`
-			BEGIN;
-
-			SELECT pg_advisory_xact_lock(${CREATE_MERGE_JSONB_VIEWS_FUNCTION_LOCK});
-
-			CREATE OR REPLACE FUNCTION merge_jsonb_views(x jsonb, y jsonb) RETURNS jsonb AS $$
+		connection.any(
+			`CREATE OR REPLACE FUNCTION merge_jsonb_views(x jsonb, y jsonb) RETURNS jsonb AS $$
 				SELECT coalesce(merged.payload, '{}'::jsonb)
 				FROM (
 					SELECT jsonb_object_agg(
@@ -278,8 +259,8 @@ export const setup = async (
 				) AS merged
 			$$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE;
 
-			COMMIT;
-		`),
+		`,
+		),
 	]);
 };
 
@@ -460,8 +441,7 @@ export const upsert = async (
 	// querying the database before proceeding with the insertion.
 	try {
 		if (options.replace) {
-			const sql = `
-				INSERT INTO ${table}
+			const sql = `INSERT INTO ${table}
 					(id, slug, type, active,
 					version_major, version_minor, version_patch,
 					version_prerelease, version_build,
@@ -493,8 +473,7 @@ export const upsert = async (
 				values: payload,
 			});
 		} else {
-			const sql = `
-				INSERT INTO ${table}
+			const sql = `INSERT INTO ${table}
 					(id, slug, type, active,
 					version_major, version_minor, version_patch,
 					version_prerelease, version_build,
@@ -568,8 +547,7 @@ export const materializeLink = async (
 ) => {
 	const table = options.table || exports.TABLE;
 	try {
-		const sql = `
-			UPDATE ${table}
+		const sql = `UPDATE ${table}
 				SET linked_at = $1::jsonb
 			WHERE id = $2;`;
 		await connection.any({
