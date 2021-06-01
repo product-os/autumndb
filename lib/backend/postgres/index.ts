@@ -29,10 +29,12 @@ import {
 	BackendConnection,
 	BackendQueryOptions,
 	BackendTransaction,
+	DatabaseConnection,
 	SearchFieldDef,
 	SelectObject,
 	SqlQueryOptions,
 } from './types';
+import { Cache } from './../../cache';
 import { TypedError } from 'typed-error';
 import { strict as nativeAssert } from 'assert';
 import pgPromise = require('pg-promise');
@@ -58,6 +60,11 @@ const removeVersionFields = (row?: any) => {
 // 23505: unique violation error
 // 42P07: duplicate table error
 const INIT_IGNORE_CODES = ['23505', '42P07'];
+
+// a random number that's used as an advisory lock in pg to ensure only one
+// JF instance is trying to run DB migrations
+// TODO: replace with proper migration concept
+const BOOTSTRAPPING_LOCK = 608976328976780;
 
 /**
  * Check if a database error encountered on init is safe to ignore.
@@ -409,7 +416,7 @@ interface PostgresBackendOptions {
  * class.
  */
 export class PostgresBackend {
-	connection?: BackendConnection | null;
+	connection?: DatabaseConnection | null;
 	options: PostgresBackendOptions;
 	database: string;
 	connectRetryDelay: number;
@@ -424,7 +431,7 @@ export class PostgresBackend {
 	 * - Various connection options
 	 */
 	constructor(
-		public cache: any,
+		public cache: Cache | null,
 		public errors: { [key: string]: typeof TypedError },
 		options: PostgresBackendOptions,
 	) {
@@ -575,34 +582,46 @@ export class PostgresBackend {
 			});
 		});
 
-		try {
-			await cards.setup(context, this.connection, this.database);
-		} catch (error) {
-			if (!isIgnorableInitError(error.code)) {
-				throw error;
-			}
-		}
+		await this.connection.tx(async (tCon) => {
+			tCon.any(`SELECT pg_advisory_xact_lock(${BOOTSTRAPPING_LOCK});`);
 
-		try {
-			await links.setup(context, this.connection, this.database, {
-				cards: cards.TABLE,
-			});
-		} catch (error) {
-			if (!isIgnorableInitError(error.code)) {
-				throw error;
+			try {
+				await cards.setup(context, tCon, this.database);
+			} catch (error) {
+				if (!isIgnorableInitError(error.code)) {
+					throw error;
+				}
 			}
-		}
 
-		try {
-			await markers.setup(context, this.connection, {
-				source: cards.TABLE,
-				links: links.TABLE,
-			});
-		} catch (error) {
-			if (!isIgnorableInitError(error.code)) {
-				throw error;
+			try {
+				await links.setup(context, tCon, this.database, {
+					cards: cards.TABLE,
+				});
+			} catch (error) {
+				if (!isIgnorableInitError(error.code)) {
+					throw error;
+				}
 			}
-		}
+
+			try {
+				await markers.setup(context, tCon, {
+					source: cards.TABLE,
+					links: links.TABLE,
+				});
+			} catch (error) {
+				if (!isIgnorableInitError(error.code)) {
+					throw error;
+				}
+			}
+
+			try {
+				await streams.setupTrigger(tCon, cards.TABLE, cards.TRIGGER_COLUMNS);
+			} catch (error) {
+				if (!isIgnorableInitError(error.code)) {
+					throw error;
+				}
+			}
+		});
 
 		this.streamClient = await streams.start(
 			context,

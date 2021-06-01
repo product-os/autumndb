@@ -11,10 +11,10 @@ import { EventEmitter } from 'events';
 import { getLogger } from '@balena/jellyfish-logger';
 import { v4 as uuidv4 } from 'uuid';
 import * as metrics from '@balena/jellyfish-metrics';
-import { INIT_LOCK } from './cards';
 import {
-	BackendConnection,
 	BackendQueryOptions,
+	BackendTransaction,
+	DatabaseConnection,
 	SelectObject,
 	SqlQueryOptions,
 } from './types';
@@ -40,13 +40,11 @@ const INSERT_EVENT = 'insert';
 const UPDATE_EVENT = 'update';
 const DELETE_EVENT = 'delete';
 const UNMATCH_EVENT = 'unmatch';
-// Functions cannot be created concurrently
-const CREATE_ROW_CHANGED_FUNCTION_LOCK = 2043989439426746;
 
 export const start = async (
 	context: Context,
 	backend: PostgresBackend,
-	connection: BackendConnection,
+	connection: DatabaseConnection,
 	// The name of the table to stream changes from
 	table: string,
 	// The table columns that should be watched for updates
@@ -62,20 +60,16 @@ export const start = async (
 	return streamer;
 };
 
-const setupTrigger = async (
-	connection: StreamConnection,
+export const setupTrigger = async (
+	connection: BackendTransaction,
 	table: string,
 	columns: string[],
 ) => {
 	const tableIdent = pgFormat.ident(table);
 	const channel = `stream-${table}`;
 	const trigger = pgFormat.ident(`trigger-${channel}`);
-	await connection.any(`
-		BEGIN;
-
-		SELECT pg_advisory_xact_lock(${CREATE_ROW_CHANGED_FUNCTION_LOCK});
-
-		CREATE OR REPLACE FUNCTION rowChanged() RETURNS TRIGGER AS $$
+	await connection.any(
+		`CREATE OR REPLACE FUNCTION rowChanged() RETURNS TRIGGER AS $$
 		DECLARE
 			id UUID;
 			slug TEXT;
@@ -114,12 +108,6 @@ const setupTrigger = async (
 		END;
 		$$ LANGUAGE PLPGSQL;
 
-		COMMIT;
-
-		BEGIN;
-
-		SELECT pg_advisory_xact_lock(${INIT_LOCK});
-
 		DROP TRIGGER IF EXISTS ${trigger} ON ${tableIdent};
 
 		CREATE TRIGGER ${trigger} AFTER
@@ -128,11 +116,13 @@ const setupTrigger = async (
 		DELETE
 		ON ${tableIdent}
 		FOR EACH ROW EXECUTE PROCEDURE rowChanged(${pgFormat.literal(channel)});
+	`,
+	);
+};
 
-		LISTEN ${pgFormat.ident(channel)};
-
-		COMMIT;
-	`);
+const startListen = async (connection: StreamConnection, table: string) => {
+	const channel = `stream-${table}`;
+	await connection.any(`LISTEN ${pgFormat.ident(channel)};`);
 };
 
 const handleNotification = async (streamer: Streamer, notification: any) => {
@@ -237,7 +227,7 @@ export class Streamer {
 		connectRetryDelay: number,
 	) {
 		this.connection = connection;
-		await setupTrigger(connection, this.table, columns);
+		await startListen(connection, this.table);
 		connection.client.on('notification', this.notificationHandler);
 		connection.client.on('error', (error) => {
 			this.errorHandler(context, error);

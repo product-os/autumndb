@@ -19,9 +19,6 @@ const logger = getLogger('jellyfish-core');
 const LINK_ORIGIN_PROPERTY = '$link';
 const LINK_TABLE = 'links';
 
-// Types cannot be created concurrently
-const CREATE_LINK_EDGE_TYPES_LOCK = 1043123456394267;
-
 export const TABLE = LINK_TABLE;
 export const setup = async (
 	context: Context,
@@ -37,12 +34,8 @@ export const setup = async (
 		database,
 	});
 	const initTasks = [
-		connection.any(`
-		BEGIN;
-
-		SELECT pg_advisory_xact_lock(${CREATE_LINK_EDGE_TYPES_LOCK});
-
-		DO $$
+		connection.any(
+			`DO $$
 		BEGIN
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'linkedge') THEN
 				CREATE TYPE linkEdge AS (source UUID, idx INT, sink UUID);
@@ -52,13 +45,10 @@ export const setup = async (
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'polylinkedge') THEN
 				CREATE TYPE polyLinkEdge AS (source UUID, sink UUID, idxs INT[]);
 			END IF;
-		END$$;
-
-		COMMIT;
-	`),
+		END$$;`,
+		),
 	];
-	await connection.any(`
-		CREATE TABLE IF NOT EXISTS ${LINK_TABLE} (
+	await connection.any(`CREATE TABLE IF NOT EXISTS ${LINK_TABLE} (
 			id UUID PRIMARY KEY NOT NULL,
 			slug VARCHAR (255) NOT NULL,
 			version_major INTEGER NOT NULL DEFAULT 1,

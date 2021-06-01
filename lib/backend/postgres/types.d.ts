@@ -7,8 +7,9 @@
 import pgPromise = require('pg-promise');
 import pg = require('pg-promise/typescript/pg-subset');
 
-export type BackendConnection = pgPromise.IDatabase<{}, pg.IClient>;
 export type BackendTransaction = pgPromise.ITask<{}>;
+export type DatabaseConnection = pgPromise.IDatabase<{}, pg.IClient>;
+export type BackendConnection = DatabaseConnection | BackendTransaction;
 
 export interface SearchFieldDef {
 	path: string[];

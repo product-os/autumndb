@@ -12,14 +12,14 @@ import * as streams from '../../../../../lib/backend/postgres/streams';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { PostgresBackend } from '../../../../../lib/backend/postgres/index';
 import { Context } from '@balena/jellyfish-types/build/core';
-import { BackendConnection } from '../../../../../lib/backend/postgres/types';
+import { DatabaseConnection } from '../../../../../lib/backend/postgres/types';
 
 let ctx: {
-	connection: BackendConnection | null;
+	connection: DatabaseConnection | null;
 	context: Context;
-	createConnection: () => Promise<BackendConnection>;
+	createConnection: () => Promise<DatabaseConnection>;
 	database: string;
-	destroyConnection: (con: BackendConnection) => Promise<void>;
+	destroyConnection: (con: DatabaseConnection) => Promise<void>;
 	table: string;
 	triggerColumns: string[];
 };
@@ -71,7 +71,7 @@ beforeEach(async () => {
 		});
 	};
 
-	const destroyConnection = async (con: BackendConnection) => {
+	const destroyConnection = async (con: DatabaseConnection) => {
 		await con.$pool.end();
 		// TS-TODO: add $destroy to connection typings
 		await (con as any).$destroy();
