@@ -8,7 +8,7 @@ module.exports = {
 	verbose: true,
 	preset: "ts-jest",
 	testEnvironment: "node",
-	testTimeout: 10000,
+	testTimeout: 20000, // DB connection/setup seems to be very slow sometimes in CI
 	maxWorkers: 1,
 	forceExit: true
 };
