@@ -15,6 +15,10 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
+	if (!ctx) {
+		console.log('TEST_WARN: afterAll called before beforeAll');
+		return;
+	}
 	return helpers.after(ctx);
 });
 
