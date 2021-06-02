@@ -619,126 +619,122 @@ export class Kernel {
 		);
 
 		const result = await metrics.measureCardPatch(async () => {
-			return this.backend.withSerializableTransaction(
-				context,
-				async (transaction) => {
-					// Set options to ensure subsequent queries are a part of the transaction
-					const options = {
-						connection: transaction,
-						skipCache: true,
-					};
+			return this.backend.withTransaction(async (transaction) => {
+				// Set options to ensure subsequent queries are a part of the transaction
+				const options = {
+					connection: transaction,
+					skipCache: true,
+				};
 
-					// Fetch necessary data from database
-					const fullCard = await this.backend.getElementBySlug(
-						context,
-						slug,
-						options,
-					);
+				// Fetch necessary data from database
+				const fullCard = await this.backend.getElementBySlug(context, slug, {
+					...options,
+					lock: true,
+				});
 
-					assert.INTERNAL(
-						context,
-						fullCard,
-						this.errors.JellyfishNoElement,
-						`No such card: ${slug}`,
-					);
+				assert.INTERNAL(
+					context,
+					fullCard,
+					this.errors.JellyfishNoElement,
+					`No such card: ${slug}`,
+				);
 
-					// TODO: Remove this log once we understand why we are having link card patch requests.
-					if (fullCard.type === 'link@1.0.0') {
-						logger.info(context, 'Received request to patch a link card', {
-							card: fullCard,
-							patch,
-						});
-					}
-
-					const filteredCard = await this.getCardBySlug(
-						context,
-						session,
-						`${fullCard.slug}@${fullCard.version}`,
-						options,
-					);
-
-					if (patch.length === 0) {
-						return filteredCard;
-					}
-
-					const typeCard = await this.getCardBySlug<TypeContract>(
-						context,
-						session,
-						fullCard.type,
-						options,
-					);
-
-					assert.INTERNAL(
-						context,
-						filteredCard,
-						this.errors.JellyfishNoElement,
-						`No such card: ${slug}`,
-					);
-
-					const schema = typeCard && typeCard.data && typeCard.data.schema;
-
-					assert.INTERNAL(
-						context,
-						schema,
-						this.errors.JellyfishUnknownCardType,
-						`Unknown type: ${fullCard.type}`,
-					);
-
-					/*
-					 * The idea of this algorithm is that we get the full card
-					 * as stored in the database and the card as the current actor
-					 * can see it. Then we apply the patch to both the full and
-					 * the filtered card, aborting if it fails on any. If it succeeds
-					 * then we upsert the full card to the database, but only
-					 * if the resulting filtered card still matches the permissions
-					 * filter.
-					 */
-					// TS-TODO: "filteredCard" might be null here, and we should account for this
-					const patchedFilteredCard = patchCard(filteredCard!, patch, {
-						mutate: true,
+				// TODO: Remove this log once we understand why we are having link card patch requests.
+				if (fullCard.type === 'link@1.0.0') {
+					logger.info(context, 'Received request to patch a link card', {
+						card: fullCard,
+						patch,
 					});
+				}
 
-					jsonSchema.validate(filter as any, patchedFilteredCard);
+				const filteredCard = await this.getCardBySlug(
+					context,
+					session,
+					`${fullCard.slug}@${fullCard.version}`,
+					options,
+				);
 
-					const patchedFullCard = patchCard(fullCard, patch, {
-						mutate: false,
+				if (patch.length === 0) {
+					return filteredCard;
+				}
+
+				const typeCard = await this.getCardBySlug<TypeContract>(
+					context,
+					session,
+					fullCard.type,
+					options,
+				);
+
+				assert.INTERNAL(
+					context,
+					filteredCard,
+					this.errors.JellyfishNoElement,
+					`No such card: ${slug}`,
+				);
+
+				const schema = typeCard && typeCard.data && typeCard.data.schema;
+
+				assert.INTERNAL(
+					context,
+					schema,
+					this.errors.JellyfishUnknownCardType,
+					`Unknown type: ${fullCard.type}`,
+				);
+
+				/*
+				 * The idea of this algorithm is that we get the full card
+				 * as stored in the database and the card as the current actor
+				 * can see it. Then we apply the patch to both the full and
+				 * the filtered card, aborting if it fails on any. If it succeeds
+				 * then we upsert the full card to the database, but only
+				 * if the resulting filtered card still matches the permissions
+				 * filter.
+				 */
+				// TS-TODO: "filteredCard" might be null here, and we should account for this
+				const patchedFilteredCard = patchCard(filteredCard!, patch, {
+					mutate: true,
+				});
+
+				jsonSchema.validate(filter as any, patchedFilteredCard);
+
+				const patchedFullCard = patchCard(fullCard, patch, {
+					mutate: false,
+				});
+
+				try {
+					jsonSchema.validate(schema as any, patchedFullCard);
+				} catch (error) {
+					if (error instanceof errors.JellyfishSchemaMismatch) {
+						error.expected = true;
+
+						// Because the "full" unrestricted card is being validated there is
+						// potential for an error message to leak private data. To prevent this,
+						// override the detailed error message with a generic one.
+						error.message = 'The updated card is invalid';
+					}
+
+					throw error;
+				}
+
+				// Don't do a pointless update
+				if (fastEquals.deepEqual(patchedFullCard, fullCard)) {
+					return fullCard;
+				}
+
+				// TODO: Remove this log once we understand why we are having link card patch requests.
+				if (fullCard.type === 'link@1.0.0') {
+					logger.info(context, 'Upserting link card after patch', {
+						card: patchedFullCard,
+						patch,
 					});
+				}
 
-					try {
-						jsonSchema.validate(schema as any, patchedFullCard);
-					} catch (error) {
-						if (error instanceof errors.JellyfishSchemaMismatch) {
-							error.expected = true;
+				await this.backend.upsertElement(context, patchedFullCard, options);
 
-							// Because the "full" unrestricted card is being validated there is
-							// potential for an error message to leak private data. To prevent this,
-							// override the detailed error message with a generic one.
-							error.message = 'The updated card is invalid';
-						}
-
-						throw error;
-					}
-
-					// Don't do a pointless update
-					if (fastEquals.deepEqual(patchedFullCard, fullCard)) {
-						return fullCard;
-					}
-
-					// TODO: Remove this log once we understand why we are having link card patch requests.
-					if (fullCard.type === 'link@1.0.0') {
-						logger.info(context, 'Upserting link card after patch', {
-							card: patchedFullCard,
-							patch,
-						});
-					}
-
-					await this.backend.upsertElement(context, patchedFullCard, options);
-
-					// Otherwise a person that patches a card gets
-					// to see the full card
-					return patchedFilteredCard;
-				},
-			);
+				// Otherwise a person that patches a card gets
+				// to see the full card
+				return patchedFilteredCard;
+			});
 		});
 
 		return result;

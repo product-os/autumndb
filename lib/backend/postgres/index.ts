@@ -11,7 +11,6 @@ import { getLogger } from '@balena/jellyfish-logger';
 import * as assert from '@balena/jellyfish-assert';
 import metrics = require('@balena/jellyfish-metrics');
 import { v4 as uuidv4 } from 'uuid';
-import { txMode } from 'pg-promise';
 import * as jsonschema2sql from './jsonschema2sql';
 import * as links from './links';
 import * as cards from './cards';
@@ -738,38 +737,6 @@ export class PostgresBackend {
 	}
 
 	/*
-	 * Execute a provided callback within a serializable transaction,
-	 * retrying on concurrent update errors.
-	 */
-	async withSerializableTransaction(
-		context: Context,
-		callback: (transaction: pgPromise.ITask<{}>) => any,
-		options = {},
-	) {
-		const transactionOptions = Object.assign({}, options, {
-			mode: new txMode.TransactionMode({
-				tiLevel: txMode.isolationLevel.serializable,
-			}),
-		});
-
-		// TODO: Prevent this from becoming an infinite loop
-		const attemptTransaction = async (): Promise<any> => {
-			return this.withTransaction(callback, transactionOptions).catch(
-				(error) => {
-					if (/serializ/i.test(error.message)) {
-						logger.debug(context, 'Transaction attempt failed', {
-							message: error.message,
-						});
-						return attemptTransaction();
-					}
-					throw error;
-				},
-			);
-		};
-		return attemptTransaction();
-	}
-
-	/*
 	 * Get a card from the database by id and table.
 	 */
 	async getElementById(context: Context, id: string) {
@@ -819,6 +786,7 @@ export class PostgresBackend {
 		options: {
 			connection?: BackendConnection | BackendTransaction;
 			skipCache?: boolean;
+			lock?: boolean;
 		} = {},
 	) {
 		const connection = options.connection || this.connection;
@@ -837,7 +805,7 @@ export class PostgresBackend {
 		 * Lets first check the in-memory cache so we can avoid
 		 * making a full-blown query to the database.
 		 */
-		if (this.cache && !options.skipCache) {
+		if (this.cache && !options.skipCache && !options.lock) {
 			const cacheResult = await this.cache.getBySlug(
 				cards.TABLE,
 				base,
@@ -852,7 +820,7 @@ export class PostgresBackend {
 		 * Make a database request if we didn't have luck with
 		 * the cache.
 		 */
-		const result = await cards.getBySlug(context, connection, slug);
+		const result = await cards.getBySlug(context, connection, slug, options);
 		if (this.cache) {
 			if (result) {
 				/*
