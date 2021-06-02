@@ -296,6 +296,7 @@ export const getBySlug = async (
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
+		lock?: boolean;
 	} = {},
 ) => {
 	const table = options.table || exports.TABLE;
@@ -303,12 +304,17 @@ export const getBySlug = async (
 	logger.debug(context, 'Getting element by slug', {
 		slug,
 		table,
+		locking: options.lock,
 	});
 
 	const { base, major, minor, patch, prerelease, build, latest } =
 		parseVersionedSlug(slug);
 
 	let results = [];
+
+	// We don't test if we're in a transaction here because FOR UPDATE simply
+	// won't have an effect then. Might still be worth to add a warning though
+	const lockSql = options.lock ? 'FOR UPDATE' : '';
 
 	if (latest) {
 		results = await connection.any({
@@ -319,7 +325,7 @@ export const getBySlug = async (
 								 version_minor DESC,
 								 version_patch DESC,
 								 version_build DESC;
-				LIMIT 1;`,
+				LIMIT 1 ${lockSql};`,
 			values: [base],
 		});
 	} else {
@@ -332,7 +338,7 @@ export const getBySlug = async (
 				      version_patch = $4 AND
 				      version_prerelease = $5 AND
 				      version_build = $6
-				LIMIT 1;`,
+				LIMIT 1 ${lockSql};`,
 			values: [base, major, minor, patch, prerelease, build],
 		});
 	}
