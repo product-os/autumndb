@@ -315,10 +315,11 @@ export const getBySlug = async (
 	// We don't test if we're in a transaction here because FOR UPDATE simply
 	// won't have an effect then. Might still be worth to add a warning though
 	const lockSql = options.lock ? 'FOR UPDATE' : '';
+	const lockSuffix = options.lock ? '-lock' : '';
 
 	if (latest) {
 		results = await connection.any({
-			name: `cards-getbyslug-latest-${table}`,
+			name: `cards-getbyslug-latest-${table}${lockSuffix}`,
 			text: `SELECT ${CARDS_SELECT} FROM ${table}
 				WHERE slug = $1 AND version_prerelease = ''
 				ORDER BY version_major DESC,
@@ -330,7 +331,7 @@ export const getBySlug = async (
 		});
 	} else {
 		results = await connection.any({
-			name: `cards-getbyslug-version-${table}`,
+			name: `cards-getbyslug-version-${table}${lockSuffix}`,
 			text: `SELECT ${CARDS_SELECT} FROM ${table}
 				WHERE slug = $1 AND
 				      version_major = $2 AND
