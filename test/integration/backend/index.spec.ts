@@ -41,7 +41,6 @@ describe('backend', () => {
 			'insertElement',
 			'upsertElement',
 			'withTransaction',
-			'withSerializableTransaction',
 			'getElementById',
 			'getElementBySlug',
 			'getElementsById',
