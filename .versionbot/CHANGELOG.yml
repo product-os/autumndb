@@ -1,4 +1,19 @@
 - commits:
+    - subject: change test Dockerfile to use node 14
+      hash: b79a66b71857deffdbc504b507f524b8c5dd574a
+      body: |
+        open-balena-base has switched quite some time ago,
+        so our production code is already using 14
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 3.0.13
+  date: 2021-06-02T07:31:42.259Z
+- commits:
     - subject: move bootstrapping in a single transaction
       hash: 5a7a58ef30df3c1eb44a3c9cb2b135eba889e9ee
       body: ''
