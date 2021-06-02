@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove unnecessary catch-uncommitted
+      hash: 9cee188aee92592a659d0a5964788904a7cd7d3f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 3.0.16
+  date: 2021-06-02T23:16:11.661Z
+- commits:
     - subject: ensure unique names for prepared statements
       hash: 74d80e7597bc307bfb08a81147968c87c94b8e46
       body: ''
