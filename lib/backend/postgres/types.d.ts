@@ -4,12 +4,18 @@
  * Proprietary and confidential.
  */
 
-import pgPromise = require('pg-promise');
-import pg = require('pg-promise/typescript/pg-subset');
+import type pgPromise = require('pg-promise');
+import type pg = require('pg-promise/typescript/pg-subset');
+import type { PostgresBackend } from '.';
 
-export type BackendTransaction = pgPromise.ITask<{}>;
 export type DatabaseConnection = pgPromise.IDatabase<{}, pg.IClient>;
-export type BackendConnection = DatabaseConnection | BackendTransaction;
+export type DatabaseBackend = PostgresBackend;
+
+export interface Queryable {
+	any<T = any>(...args: Parameters<DatabaseConnection['any']>): Promise<T[]>;
+	one<T = any>(...args: [pgPromise.QueryParam, any?]): Promise<T>;
+	task<T>(cb: (t: pgPromise.ITask<{}>) => Promise<T>): Promise<T>;
+}
 
 export interface SearchFieldDef {
 	path: string[];

@@ -13,15 +13,15 @@ import { v4 as uuidv4 } from 'uuid';
 import * as metrics from '@balena/jellyfish-metrics';
 import {
 	BackendQueryOptions,
-	BackendTransaction,
+	DatabaseBackend,
 	DatabaseConnection,
+	Queryable,
 	SelectObject,
 	SqlQueryOptions,
 } from './types';
-import { PostgresBackend } from '.';
 import { Context } from '@balena/jellyfish-types/build/core';
-import { IConnected } from 'pg-promise';
-import { IClient } from 'pg-promise/typescript/pg-subset';
+import type { IConnected } from 'pg-promise';
+import type { IClient } from 'pg-promise/typescript/pg-subset';
 import { strict as nativeAssert } from 'assert';
 import { JSONSchema } from '@balena/jellyfish-types';
 
@@ -43,7 +43,7 @@ const UNMATCH_EVENT = 'unmatch';
 
 export const start = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	connection: DatabaseConnection,
 	// The name of the table to stream changes from
 	table: string,
@@ -61,7 +61,7 @@ export const start = async (
 };
 
 export const setupTrigger = async (
-	connection: BackendTransaction,
+	connection: Queryable,
 	table: string,
 	columns: string[],
 ) => {
@@ -138,12 +138,12 @@ const handleNotification = async (streamer: Streamer, notification: any) => {
 };
 
 export class Streamer {
-	backend: PostgresBackend;
+	backend: DatabaseBackend;
 	table: string;
 	connection: null | StreamConnection;
 	streams: { [id: string]: Stream };
 
-	constructor(backend: PostgresBackend, table: string) {
+	constructor(backend: DatabaseBackend, table: string) {
 		this.backend = backend;
 		this.table = table;
 		this.connection = null;
@@ -178,13 +178,13 @@ export class Streamer {
 			while (reconnecting) {
 				try {
 					nativeAssert(
-						!!this.backend.connection,
+						this.backend.isConnected(),
 						'Database connection required',
 					);
 
 					await this.init(
 						context,
-						await this.backend.connection.connect(),
+						await this.backend.pgConnect(),
 						columns,
 						connectRetryDelay,
 					);

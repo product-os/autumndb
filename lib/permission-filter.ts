@@ -11,7 +11,7 @@ import jsonSchema from './json-schema';
 import * as errors from './errors';
 import { CARDS } from './cards';
 import { Context, Contract } from '@balena/jellyfish-types/build/core';
-import { PostgresBackend } from './backend/postgres';
+import { DatabaseBackend } from './backend/postgres/types';
 import { JSONSchema } from '@balena/jellyfish-types';
 
 const CARD_CARD_TYPE = `${CARDS.card.slug}@${CARDS.card.version}`;
@@ -21,7 +21,7 @@ const VERSIONED_CARDS = _.mapKeys(CARDS, (value: any, key: any) => {
 
 const applyMarkers = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	actor: Contract,
 	schema: JSONSchema,
 ) => {
@@ -155,7 +155,7 @@ const applyMarkers = async (
  */
 export const unsafeUpsertCard = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	card: Contract,
 ) => {
 	jsonSchema.validate(VERSIONED_CARDS[CARD_CARD_TYPE].data.schema as any, card);
@@ -177,7 +177,7 @@ export const unsafeUpsertCard = async (
  */
 export const getSessionActor = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	session: string,
 ) => {
 	const sessionCard = await backend.getElementById(context, session);
@@ -224,7 +224,7 @@ export const getSessionActor = async (
  */
 const getRoleViews = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	actor: Contract,
 ) => {
 	const viewSchemas = [];
@@ -284,7 +284,7 @@ const evalSchema = (object: any, context: { [key: string]: any }) => {
 
 const getActorMask = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	actor: Contract,
 	scope: JSONSchema = {},
 ) => {
@@ -321,7 +321,7 @@ const getActorMask = async (
  */
 export const getMask = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	session: string,
 ) => {
 	const { actor, scope } = await getSessionActor(context, backend, session);
@@ -387,7 +387,7 @@ const mergeMaskInLinks = (schema: JSONSchema, mask: JSONSchema) => {
  */
 export const getQuery = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	session: string,
 	schema: JSONSchema,
 ): Promise<JSONSchema> => {

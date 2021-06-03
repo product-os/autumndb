@@ -12,7 +12,7 @@ import {
 	Contract,
 	LinkContract,
 } from '@balena/jellyfish-types/build/core';
-import { BackendConnection, BackendTransaction } from './types';
+import { Queryable } from './types';
 
 const logger = getLogger('jellyfish-core');
 
@@ -22,7 +22,7 @@ const LINK_TABLE = 'links';
 export const TABLE = LINK_TABLE;
 export const setup = async (
 	context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	database: string,
 	options: {
 		// The name of the "cards" table that should be referenced
@@ -87,7 +87,7 @@ export const setup = async (
 
 export const upsert = async (
 	_context: Context,
-	connection: BackendConnection | BackendTransaction,
+	connection: Queryable,
 	link: LinkContract,
 ) => {
 	if (link.active) {

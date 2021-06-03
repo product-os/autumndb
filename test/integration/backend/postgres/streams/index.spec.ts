@@ -239,8 +239,7 @@ describe('streams', () => {
 
 		// Disconnect client from database without using streams.close(),
 		// simulating an unexpected client end event.
-		// TS-TODO: Add typings for end() function
-		await (testBackend.streamClient!.connection!.client as any).end();
+		await testBackend.streamClient!.connection!.done(true);
 
 		// Use the stream client to query database, after giving a little time to reconnect.
 		await Bluebird.delay(backend.connectRetryDelay);

@@ -1180,7 +1180,7 @@ describe('backend', () => {
 
 			await Bluebird.delay(2000);
 
-			const indexes = await ctx.backend.connection!.any(`
+			const indexes = await ctx.backend.any(`
 		SELECT * FROM pg_indexes WHERE tablename = 'cards';
 	`);
 

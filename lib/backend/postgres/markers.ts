@@ -8,7 +8,7 @@ import debouncePromise = require('debounce-promise');
 import { getLogger } from '@balena/jellyfish-logger';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { Context, Contract } from '@balena/jellyfish-types/build/core';
-import { BackendConnection, BackendTransaction } from './types';
+import { Queryable } from './types';
 
 const logger = getLogger('jellyfish-core');
 
@@ -20,7 +20,7 @@ export const getTable = (source: string) => {
 
 export const setup = async (
 	_context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	options: {
 		// Name of table that contains main contract data
 		source: string;
@@ -85,7 +85,7 @@ export const setup = async (
 
 const refreshView = environment.isProduction()
 	? debouncePromise(
-			(connection: BackendConnection | BackendTransaction, view: string) => {
+			(connection: Queryable, view: string) => {
 				/*
 				 * The "CONCURRENTLY" option allows the database to serve other
 				 * queries on the materialized view while we update it.
@@ -102,16 +102,13 @@ const refreshView = environment.isProduction()
 	   * happening at the same time, so it gives us a little boost
 	   * when running the test suite.
 	   */
-	  async (
-			connection: BackendConnection | BackendTransaction,
-			view: string,
-	  ) => {
+	  async (connection: Queryable, view: string) => {
 			return connection.any(`REFRESH MATERIALIZED VIEW ${view}`);
 	  };
 
 export const refresh = async (
 	context: Context,
-	connection: BackendConnection | BackendTransaction,
+	connection: Queryable,
 	options: {
 		// The table containing the main contract data
 		source: string;
@@ -132,7 +129,7 @@ export const refresh = async (
 
 export const getUserMarkers = async (
 	_context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	user: {
 		id?: string;
 		slug: string;

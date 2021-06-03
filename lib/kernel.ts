@@ -15,7 +15,6 @@ import * as permissionFilter from './permission-filter';
 import metrics = require('@balena/jellyfish-metrics');
 import { getLogger } from '@balena/jellyfish-logger';
 import { JSONSchema } from '@balena/jellyfish-types';
-import { PostgresBackend } from './backend/postgres';
 import {
 	Context,
 	Contract,
@@ -23,7 +22,7 @@ import {
 	TypeContract,
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
-import { BackendQueryOptions } from './backend/postgres/types';
+import { BackendQueryOptions, DatabaseBackend } from './backend/postgres/types';
 
 const logger = getLogger('jellyfish-core');
 
@@ -118,7 +117,7 @@ const rectifySelected = (
 
 const getQueryFromSchema = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	session: string,
 	schema: JSONSchema | ViewContract,
 ) => {
@@ -280,7 +279,7 @@ const preUpsert = async (
 };
 
 export class Kernel {
-	backend: PostgresBackend;
+	backend: DatabaseBackend;
 	errors: typeof errors;
 	cards: typeof CARDS;
 	sessions?: { admin: string };
@@ -303,7 +302,7 @@ export class Kernel {
 	 *
 	 * const kernel = new Kernel(backend)
 	 */
-	constructor(backend: PostgresBackend) {
+	constructor(backend: DatabaseBackend) {
 		this.backend = backend;
 		this.errors = errors;
 		this.cards = CARDS;

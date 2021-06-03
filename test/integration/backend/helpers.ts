@@ -10,12 +10,12 @@ import { defaultEnvironment as environment } from '@balena/jellyfish-environment
 import { Cache } from '../../../lib/cache';
 import * as errors from '../../../lib/errors';
 import { Context } from '@balena/jellyfish-types/build/core';
-import { PostgresBackend } from '../../../lib/backend/postgres';
+import { DatabaseBackend } from '../../../lib/backend/postgres/types';
 
 export interface BackendContext {
 	cache: Cache;
 	context: Context;
-	backend: PostgresBackend;
+	backend: DatabaseBackend;
 	generateRandomSlug: typeof generateRandomSlug;
 	generateRandomID: typeof generateRandomID;
 }
