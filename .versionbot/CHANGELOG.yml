@@ -1,4 +1,15 @@
 - commits:
+    - subject: Optimize auto-linting on commit
+      hash: ff2ff7ea118414e782f7e85afc49aa04fc04796b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Pagan Gazzard
+      nested: []
+  version: 3.0.17
+  date: 2021-06-03T15:39:28.751Z
+- commits:
     - subject: Remove unnecessary catch-uncommitted
       hash: 9cee188aee92592a659d0a5964788904a7cd7d3f
       body: ''
