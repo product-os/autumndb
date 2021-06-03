@@ -456,7 +456,6 @@ export class Kernel {
 		context: Context,
 		session: string,
 		slug: string,
-		options: Partial<BackendQueryOptions> = {},
 	): Promise<T | null> {
 		logger.debug(context, 'Fetching card by slug', {
 			slug,
@@ -481,10 +480,6 @@ export class Kernel {
 		const queryOptions: BackendQueryOptions = {
 			limit: 1,
 		};
-
-		if (options.connection) {
-			queryOptions.connection = options.connection;
-		}
 
 		const schema: JSONSchema = {
 			type: 'object',
@@ -618,10 +613,9 @@ export class Kernel {
 		);
 
 		const result = await metrics.measureCardPatch(async () => {
-			return this.backend.withTransaction(async (transaction) => {
+			return this.backend.withTransaction(async () => {
 				// Set options to ensure subsequent queries are a part of the transaction
 				const options = {
-					connection: transaction,
 					skipCache: true,
 				};
 
@@ -650,7 +644,6 @@ export class Kernel {
 					context,
 					session,
 					`${fullCard.slug}@${fullCard.version}`,
-					options,
 				);
 
 				if (patch.length === 0) {
@@ -661,7 +654,6 @@ export class Kernel {
 					context,
 					session,
 					fullCard.type,
-					options,
 				);
 
 				assert.INTERNAL(
@@ -728,7 +720,7 @@ export class Kernel {
 					});
 				}
 
-				await this.backend.upsertElement(context, patchedFullCard, options);
+				await this.backend.upsertElement(context, patchedFullCard);
 
 				// Otherwise a person that patches a card gets
 				// to see the full card
@@ -790,7 +782,6 @@ export class Kernel {
 				sortDir: options.sortDir,
 				profile: options.profile,
 				links: options.links,
-				connection: options.connection || null,
 				// For debugging purposes
 			})
 			.catch((error) => {
