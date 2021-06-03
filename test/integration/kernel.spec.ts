@@ -113,6 +113,7 @@ describe('Kernel', () => {
 				slug,
 				updated_at: result!.updated_at,
 				tags: [],
+				loop: null,
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				data: {
@@ -171,6 +172,7 @@ describe('Kernel', () => {
 				slug,
 				updated_at: result!.updated_at,
 				tags: [],
+				loop: null,
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				data: {
@@ -229,6 +231,7 @@ describe('Kernel', () => {
 				slug,
 				updated_at: result!.updated_at,
 				tags: [],
+				loop: null,
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				data: {
@@ -295,6 +298,7 @@ describe('Kernel', () => {
 				slug,
 				updated_at: result!.updated_at,
 				tags: [],
+				loop: null,
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				data: {
@@ -1905,6 +1909,7 @@ describe('Kernel', () => {
 				active: true,
 				version: '1.0.0',
 				tags: [],
+				loop: null,
 				markers: [],
 				links: {},
 				requires: [],
@@ -4402,6 +4407,7 @@ describe('Kernel', () => {
 				'id',
 				'linked_at',
 				'links',
+				'loop',
 				'markers',
 				'name',
 				'requires',
@@ -6422,6 +6428,7 @@ describe('Kernel', () => {
 						active: true,
 						version: '1.0.0',
 						tags: [],
+						loop: null,
 						name: null,
 						markers: [],
 						created_at: change.after.created_at,

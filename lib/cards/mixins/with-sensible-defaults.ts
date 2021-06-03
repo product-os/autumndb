@@ -10,6 +10,7 @@ export const sensibleDefaults = {
 	tags: [],
 	links: {},
 	active: true,
+	loop: null,
 	requires: [],
 	capabilities: [],
 };

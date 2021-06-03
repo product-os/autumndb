@@ -426,6 +426,7 @@ export class Kernel {
 				CARDS.view,
 				CARDS.role,
 				CARDS.link,
+				CARDS.loop,
 				CARDS['oauth-provider'],
 				CARDS['oauth-client'],
 			].map(async (card) => {
@@ -998,6 +999,7 @@ export class Kernel {
 				version: '1.0.0',
 				tags: [],
 				markers: [],
+				loop: null,
 				links: {},
 				requires: [],
 				capabilities: [],
