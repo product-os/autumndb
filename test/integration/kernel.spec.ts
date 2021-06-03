@@ -6372,6 +6372,9 @@ describe('Kernel', () => {
 					},
 					required: ['slug', 'version'],
 				},
+				{
+					sortBy: 'version',
+				},
 			);
 
 			expect(results).toEqual([
