@@ -391,8 +391,25 @@ interface PostgresBackendOptions {
 	user: string;
 	host?: string;
 	password?: string;
-	port?: string;
+	port?: string | number;
+	idleTimeoutMillis?: number;
+	statement_timeout?: number;
+	query_timeout?: number;
+	connectionTimeoutMillis?: number; // this is also used for waiting for a connection from the pool
+	keepAlive?: boolean;
+	max?: number; // pool size
+	maxUses?: number; // recycle connection after
 }
+
+const defaultPgOptions: Partial<PostgresBackendOptions> = {
+	// statement_timeout: undefined,
+	// query_timeout: undefined,
+	idleTimeoutMillis: 60 * 1000,
+	connectionTimeoutMillis: 30 * 1000,
+	keepAlive: true,
+	max: 10, // same as default https://github.com/brianc/node-postgres/blob/master/packages/pg-pool/index.js#L84
+	// maxUses: 5000,
+};
 
 /*
  * This class implements various low-level methods to interact
@@ -473,15 +490,15 @@ export class PostgresBackend implements Queryable {
 		 * Lets connect to the default database, that should always be
 		 * available.
 		 */
-		logger.debug(context, 'Connecting to database', {
+		logger.info(context, 'Connecting to database', {
 			database: this.database,
 		});
-		this.connection = pgp(
-			// TS-TODO: this cast happens because the port value is a string, but pgp expects it as a number
-			Object.assign({}, this.options as any, {
-				database: 'postgres',
-			}),
-		);
+		this.connection = pgp({
+			...defaultPgOptions,
+			...this.options,
+			port: Number(this.options.port),
+			database: 'postgres',
+		});
 
 		/*
 		 * This is an arbitrary request just to make sure that the
@@ -560,13 +577,11 @@ export class PostgresBackend implements Queryable {
 		 * default database and connect to the one we're interested in.
 		 */
 		await this.disconnect(context);
-		this.connection = pgp(
-			// TS-TODO: this cast happens because the port value is a string, but pgp expects it as a number
-			Object.assign({}, this.options as any, {
-				idleTimeoutMillis: 60 * 1000,
-				database: this.database,
-			}),
-		);
+		this.connection = pgp({
+			...defaultPgOptions,
+			...this.options,
+			port: Number(this.options.port),
+		});
 
 		this.connection.$pool.on('error', (error: { code: any; message: any }) => {
 			logger.warn(context, 'Backend connection pool error', {
