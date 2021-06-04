@@ -1,4 +1,15 @@
 - commits:
+    - subject: Avoid using the underlying connection in favor of using the db backend
+      hash: a7b7cb427c6c7ad048da8337b103e89abcf89aa8
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Pagan Gazzard
+      nested: []
+  version: 3.0.20
+  date: 2021-06-04T09:37:36.852Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 440dea294d6128008d0942a1f70b289085537253
       body: ''
