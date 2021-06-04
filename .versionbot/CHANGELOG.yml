@@ -1,4 +1,33 @@
 - commits:
+    - subject: allow configuration of more DB options
+      hash: cd1b4d3188b16d874890ed09065ecdad1bcc6ce5
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: >-
+        ensure all database interactions within a transaction use the
+        transaction connection
+      hash: edc178cdc1e0b9ff063844706aad733877c9554d
+      body: >
+        this fixes the possibility of draining the connection pool during a
+        transaction
+
+        and will make the transaction actually behave as expected
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 3.0.21
+  date: 2021-06-04T10:57:06.168Z
+- commits:
     - subject: Avoid using the underlying connection in favor of using the db backend
       hash: a7b7cb427c6c7ad048da8337b103e89abcf89aa8
       body: ''
