@@ -12,19 +12,18 @@ import { defaultEnvironment as environment } from '@balena/jellyfish-environment
 import * as jsonschema2sql from '../../../../../lib/backend/postgres/jsonschema2sql';
 import * as cards from '../../../../../lib/backend/postgres/cards';
 import * as links from '../../../../../lib/backend/postgres/links';
-import * as errors from '../../../../../lib/errors';
 import regexpTestSuite from './regexp';
 import formatMaxMinTestSuite from './format-max-min';
 import { Contract } from '@balena/jellyfish-types/build/core';
-import pgPromise = require('pg-promise');
-import pg = require('pg-promise/typescript/pg-subset');
 import { JSONSchema } from '@balena/jellyfish-types';
+import type { DatabaseBackend } from '../../../../../lib/backend/postgres/types';
+import { PostgresBackend } from '../../../../../lib/backend/postgres';
 
 const IS_POSTGRES = environment.database.type === 'postgres';
 
 let ctx: {
 	database: string;
-	connection: pgPromise.IDatabase<{}, pg.IClient>;
+	backend: DatabaseBackend;
 };
 
 /*
@@ -84,7 +83,7 @@ const context = {
 };
 
 interface RunnerOptions {
-	connection: typeof ctx['connection'];
+	backend: typeof ctx['backend'];
 	database: typeof ctx['database'];
 	elements: Array<Partial<Contract>>;
 	schema: JSONSchema;
@@ -96,7 +95,7 @@ interface RunnerOptions {
 }
 
 const runner = async ({
-	connection,
+	backend,
 	database,
 	elements,
 	options,
@@ -106,10 +105,10 @@ const runner = async ({
 	/*
 	 * 1. Create the necessary tables for the test.
 	 */
-	await cards.setup(context, connection, database, {
+	await cards.setup(context, backend, database, {
 		table,
 	});
-	await links.setup(context, connection, database, {
+	await links.setup(context, backend, database, {
 		cards: table,
 	});
 
@@ -119,8 +118,8 @@ const runner = async ({
 	for (const item of elements) {
 		await cards.upsert(
 			context,
-			errors,
-			connection,
+			backend.errors,
+			backend,
 			{
 				slug: item.slug || `test-${uuid()}`,
 				type: item.type,
@@ -150,7 +149,7 @@ const runner = async ({
 	/*
 	 * 4. Return the results.
 	 */
-	const results = await connection.any(query);
+	const results = await backend.any(query);
 
 	return results.map((wrapper: { payload: any }) => {
 		return wrapper.payload;
@@ -189,18 +188,22 @@ beforeAll(async () => {
 	 * can connect to it, and store the connection in the context
 	 * so we can use it for queries and insertions.
 	 */
-	const connection = await pgp({
-		user: environment.postgres.user,
-		password: environment.postgres.password,
-		database,
-		host: environment.postgres.host,
-		// TS-TODO: fix this cast
-		port: environment.postgres.port as any,
-	});
+	const backend = new PostgresBackend(
+		null,
+		{},
+		{
+			user: environment.postgres.user,
+			database,
+			password: environment.postgres.password,
+			host: environment.postgres.host,
+			port: environment.postgres.port,
+		},
+	);
+	await backend.connect(context);
 
 	ctx = {
 		database,
-		connection,
+		backend,
 	};
 });
 
@@ -284,7 +287,7 @@ describe('jsonSchema2sql: JSONSchema compat', () => {
 					if (_.isPlainObject(testCase.data)) {
 						autotestFn(`${title} [Normal]`, async () => {
 							const results = await runner({
-								connection: ctx.connection,
+								backend: ctx.backend,
 								database: ctx.database,
 								table: table.toLowerCase(),
 								elements: [
@@ -321,7 +324,7 @@ describe('jsonSchema2sql: JSONSchema compat', () => {
 					 */
 					autotestFn(`${title} [Nested object]`, async () => {
 						const results = await runner({
-							connection: ctx.connection,
+							backend: ctx.backend,
 							database: ctx.database,
 							table: `NESTED_${table}`.toLowerCase(),
 							elements: [
@@ -414,7 +417,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -458,7 +461,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -526,7 +529,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				];
 
 				const results = await runner({
-					connection: ctx.connection,
+					backend: ctx.backend,
 					database: ctx.database,
 					table,
 					elements,
@@ -602,7 +605,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -680,7 +683,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				];
 
 				const results = await runner({
-					connection: ctx.connection,
+					backend: ctx.backend,
 					database: ctx.database,
 					table,
 					elements,
@@ -777,7 +780,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -877,7 +880,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -1028,7 +1031,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -1099,7 +1102,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -1152,7 +1155,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -1197,7 +1200,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -1243,7 +1246,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -1298,7 +1301,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -1353,7 +1356,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				];
 
 				const results = await runner({
-					connection: ctx.connection,
+					backend: ctx.backend,
 					database: ctx.database,
 					table,
 					elements,
@@ -1409,7 +1412,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				];
 
 				const results = await runner({
-					connection: ctx.connection,
+					backend: ctx.backend,
 					database: ctx.database,
 					table,
 					elements,
@@ -1468,7 +1471,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				];
 
 				const results = await runner({
-					connection: ctx.connection,
+					backend: ctx.backend,
 					database: ctx.database,
 					table,
 					elements,
@@ -1516,7 +1519,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				];
 
 				const results = await runner({
-					connection: ctx.connection,
+					backend: ctx.backend,
 					database: ctx.database,
 					table,
 					elements,
@@ -1584,7 +1587,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			];
 
 			const results = await runner({
-				connection: ctx.connection,
+				backend: ctx.backend,
 				database: ctx.database,
 				table,
 				elements,
@@ -1848,7 +1851,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 						];
 
 						const results = await runner({
-							connection: ctx.connection,
+							backend: ctx.backend,
 							database: ctx.database,
 							table,
 							elements,
@@ -1892,7 +1895,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				];
 
 				const results = await runner({
-					connection: ctx.connection,
+					backend: ctx.backend,
 					database: ctx.database,
 					table,
 					elements,

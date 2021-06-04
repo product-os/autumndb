@@ -14,7 +14,7 @@ import * as traverse from 'traverse';
 import * as utils from './utils';
 import * as textSearch from './jsonschema2sql/text-search';
 import { SqlPath } from './jsonschema2sql/sql-path';
-import { BackendConnection, BackendTransaction, SearchFieldDef } from './types';
+import { DatabaseBackend, SearchFieldDef, Queryable } from './types';
 import { Context, Contract } from '@balena/jellyfish-types/build/core';
 import { TypedError } from 'typed-error';
 import { JSONSchema } from '@balena/jellyfish-types';
@@ -98,7 +98,7 @@ export const TRIGGER_COLUMNS = CARDS_TRIGGER_COLUMNS;
 
 export const setup = async (
 	context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	_database: string,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -266,7 +266,7 @@ export const setup = async (
 
 export const getById = async (
 	context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	id: string,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -291,7 +291,7 @@ export const getById = async (
 
 export const getBySlug = async (
 	context: Context,
-	connection: BackendConnection | BackendTransaction,
+	connection: Queryable,
 	slug: string,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -352,7 +352,7 @@ export const getBySlug = async (
 
 export const getManyById = async (
 	context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	ids: string[],
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -378,8 +378,8 @@ export const getManyById = async (
 
 export const upsert = async (
 	context: Context,
-	errors: { [key: string]: typeof TypedError },
-	connection: BackendConnection | BackendTransaction,
+	errors: DatabaseBackend['errors'],
+	connection: Queryable,
 	object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -544,8 +544,8 @@ export const upsert = async (
 
 export const materializeLink = async (
 	_context: Context,
-	errors: { [key: string]: typeof TypedError },
-	connection: BackendConnection | BackendTransaction,
+	errors: DatabaseBackend['errors'],
+	connection: Queryable,
 	card: Contract,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -589,7 +589,7 @@ export const materializeLink = async (
  */
 export const createTypeIndex = async (
 	context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	fields: string[],
 	type: string,
 ) => {
@@ -661,7 +661,7 @@ export const createTypeIndex = async (
  */
 export const createFullTextSearchIndex = async (
 	context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	type: string,
 	fields: SearchFieldDef[],
 ) => {

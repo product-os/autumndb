@@ -7,7 +7,7 @@
 import * as _ from 'lodash';
 import { getLogger } from '@balena/jellyfish-logger';
 import { Context } from '@balena/jellyfish-types/build/core';
-import { BackendConnection } from './types';
+import type { Queryable } from './types';
 const logger = getLogger('jellyfish-core');
 
 // FIXME
@@ -48,7 +48,7 @@ export const convertDatesToISOString = (row: any) => {
  */
 export const createIndex = async (
 	context: Context,
-	connection: BackendConnection,
+	connection: Queryable,
 	tableName: string,
 	indexName: string,
 	predicate: string,

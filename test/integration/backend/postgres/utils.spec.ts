@@ -24,13 +24,13 @@ describe('utils', () => {
 			const name = `${ctx.generateRandomSlug().replace(/-/g, '_')}_idx`;
 			await utils.createIndex(
 				ctx.context,
-				ctx.backend.connection!,
+				ctx.backend,
 				cards.TABLE,
 				name,
 				'USING btree (updated_at)',
 			);
 
-			const index = await ctx.backend.connection!.one(
+			const index = await ctx.backend.one(
 				`SELECT EXISTS (SELECT FROM pg_indexes WHERE indexname='${name}')`,
 			);
 

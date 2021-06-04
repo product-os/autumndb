@@ -25,10 +25,10 @@ import {
 	LinkContract,
 } from '@balena/jellyfish-types/build/core';
 import {
-	BackendConnection,
 	BackendQueryOptions,
-	BackendTransaction,
+	DatabaseBackend,
 	DatabaseConnection,
+	Queryable,
 	SearchFieldDef,
 	SelectObject,
 	SqlQueryOptions,
@@ -36,7 +36,7 @@ import {
 import { Cache } from './../../cache';
 import { TypedError } from 'typed-error';
 import { strict as nativeAssert } from 'assert';
-import pgPromise = require('pg-promise');
+import type pgPromise = require('pg-promise');
 
 const logger = getLogger('jellyfish-core');
 
@@ -148,18 +148,17 @@ const runQuery = async (
 	context: Context,
 	schema: JSONSchema,
 	query: string | pgPromise.PreparedStatement,
-	connection: BackendConnection,
-	errors: { [key: string]: typeof TypedError },
+	backend: DatabaseBackend,
 	values?: any[],
 ) => {
 	const queryStart = performance.now();
-	const results = await connection
+	const results = await backend
 		.any(query, values)
 		.catch((error: { message: string }) => {
 			assert.USER(
 				context,
 				!error.message.includes('statement timeout'),
-				errors.JellyfishDatabaseTimeoutError,
+				backend.errors.JellyfishDatabaseTimeoutError,
 				() => {
 					return `Schema query timeout: ${JSON.stringify(schema)}`;
 				},
@@ -167,7 +166,7 @@ const runQuery = async (
 			assert.USER(
 				context,
 				!error.message.startsWith('invalid regular expression:'),
-				errors.JellyfishInvalidRegularExpression,
+				backend.errors.JellyfishInvalidRegularExpression,
 				() => {
 					return `Invalid pattern in schema: ${JSON.stringify(schema)}`;
 				},
@@ -216,13 +215,13 @@ const postProcessResults = (results: Array<{ payload: any }>) => {
 
 const queryTable = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	table: string,
 	select: SelectObject,
 	schema: JSONSchema,
 	options: BackendQueryOptions,
 ) => {
-	nativeAssert(!!backend.connection, 'Database connection required');
+	nativeAssert(backend.isConnected(), 'Database connection required');
 
 	const mode = options.profile ? 'info' : 'debug';
 
@@ -251,8 +250,7 @@ const queryTable = async (
 		context,
 		schema,
 		query,
-		backend.connection,
-		backend.errors,
+		backend,
 	);
 
 	const { elements, postProcessTime } = postProcessResults(results);
@@ -271,14 +269,14 @@ const queryTable = async (
 
 const upsertObject = async (
 	context: Context,
-	backend: PostgresBackend,
+	backend: DatabaseBackend,
 	object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 	options: {
 		replace?: boolean;
-		connection?: BackendConnection | BackendTransaction;
+		connection?: Queryable;
 	} = {},
 ): Promise<Contract> => {
-	const connection = options.connection || backend.connection;
+	const connection = options.connection || backend;
 
 	nativeAssert(!!connection, 'Database connection required');
 
@@ -414,8 +412,8 @@ interface PostgresBackendOptions {
  * to queries and delegate the fully expanded queries to this
  * class.
  */
-export class PostgresBackend {
-	connection?: DatabaseConnection | null;
+export class PostgresBackend implements Queryable {
+	private connection?: DatabaseConnection | null;
 	options: PostgresBackendOptions;
 	database: string;
 	connectRetryDelay: number;
@@ -707,7 +705,7 @@ export class PostgresBackend {
 		object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 		options: {
 			replace?: boolean;
-			connection?: BackendConnection | BackendTransaction;
+			connection?: Queryable;
 		} = {},
 	) {
 		return upsertObject(
@@ -784,7 +782,7 @@ export class PostgresBackend {
 		context: Context,
 		slug: string,
 		options: {
-			connection?: BackendConnection | BackendTransaction;
+			connection?: Queryable;
 			skipCache?: boolean;
 			lock?: boolean;
 		} = {},
@@ -1012,14 +1010,13 @@ export class PostgresBackend {
 		schema: JSONSchema,
 		options: SqlQueryOptions,
 	) {
-		const { connection } = this;
-		nativeAssert(!!connection, 'Database connection required');
+		nativeAssert(!!this.connection, 'Database connection required');
 
 		if (userBelongsToOrgOptimizationIsApplicable(schema)) {
 			return async (id: any) => {
 				return markers.getUserMarkers(
 					context,
-					connection,
+					this,
 					{
 						id,
 						slug: (schema.$$links!['has member'].properties!.slug as any).const,
@@ -1059,8 +1056,7 @@ export class PostgresBackend {
 				context,
 				schema,
 				preparedQuery,
-				connection,
-				this.errors,
+				this,
 				[id],
 			);
 
@@ -1136,7 +1132,7 @@ export class PostgresBackend {
 	async createTypeIndex(context: Context, fields: string[], type: string) {
 		nativeAssert(!!this.connection, 'Database connection required');
 
-		await cards.createTypeIndex(context, this.connection, fields, type);
+		await cards.createTypeIndex(context, this, fields, type);
 	}
 	/*
 	 * Creates a partial index on fields denoted as being targets for full-text searches
@@ -1148,11 +1144,22 @@ export class PostgresBackend {
 	) {
 		nativeAssert(!!this.connection, 'Database connection required');
 
-		await cards.createFullTextSearchIndex(
-			context,
-			this.connection,
-			type,
-			fields,
-		);
+		await cards.createFullTextSearchIndex(context, this, type, fields);
+	}
+
+	isConnected(): boolean {
+		return !!this.connection;
+	}
+	pgConnect() {
+		return this.connection!.connect();
+	}
+	any<T = any>(...args: Parameters<DatabaseConnection['any']>): Promise<T[]> {
+		return this.connection!.any(...args);
+	}
+	one<T = any>(...args: [pgPromise.QueryParam, any?]): Promise<T> {
+		return this.connection!.one<T>(...args);
+	}
+	task<T>(cb: (t: pgPromise.ITask<{}>) => Promise<T>) {
+		return this.connection!.task(cb);
 	}
 }

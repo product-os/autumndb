@@ -22,37 +22,6 @@ afterAll(() => {
 });
 
 describe('backend', () => {
-	it('should only expose the required methods', () => {
-		const methods = Object.getOwnPropertyNames(
-			Reflect.getPrototypeOf(ctx.backend),
-		);
-
-		/*
-		 * Think very hard before extending this interface, as its
-		 * very easy to add cruft over time that will get abused.
-		 * All private methods should remain private.
-		 */
-		expect(methods).toEqual([
-			'constructor',
-			'connect',
-			'disconnect',
-			'drop',
-			'reset',
-			'insertElement',
-			'upsertElement',
-			'withTransaction',
-			'getElementById',
-			'getElementBySlug',
-			'getElementsById',
-			'query',
-			'prepareQueryForStream',
-			'stream',
-			'getStatus',
-			'createTypeIndex',
-			'createFullTextSearchIndex',
-		]);
-	});
-
 	describe('.disconnect()', () => {
 		it('should not throw if called multiple times', async () => {
 			const localCTX = await helpers.before();
@@ -1180,7 +1149,7 @@ describe('backend', () => {
 
 			await Bluebird.delay(2000);
 
-			const indexes = await ctx.backend.connection!.any(`
+			const indexes = await ctx.backend.any(`
 		SELECT * FROM pg_indexes WHERE tablename = 'cards';
 	`);
 
