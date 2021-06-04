@@ -37,8 +37,11 @@ import { Cache } from './../../cache';
 import { TypedError } from 'typed-error';
 import { strict as nativeAssert } from 'assert';
 import type pgPromise = require('pg-promise');
+import { AsyncLocalStorage } from 'async_hooks';
 
 const logger = getLogger('jellyfish-core');
+
+const currentTransaction = new AsyncLocalStorage<Queryable>();
 
 // Removes version fields from database rows, as they are an
 // abstraction over the `version` field on contracts
@@ -79,7 +82,7 @@ const BOOTSTRAPPING_LOCK = 608976328976780;
  *
  * @example
  * try {
- *   await this.connection.any(`CREATE DATABASE mydb`)
+ *   await this.getConnection().any(`CREATE DATABASE mydb`)
  * } catch (error) {
  *   if (!isIgnorableInitError(error.code)) {
  *     throw error
@@ -221,8 +224,6 @@ const queryTable = async (
 	schema: JSONSchema,
 	options: BackendQueryOptions,
 ) => {
-	nativeAssert(backend.isConnected(), 'Database connection required');
-
 	const mode = options.profile ? 'info' : 'debug';
 
 	logger[mode](context, 'Querying from table', {
@@ -273,17 +274,12 @@ const upsertObject = async (
 	object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 	options: {
 		replace?: boolean;
-		connection?: Queryable;
 	} = {},
 ): Promise<Contract> => {
-	const connection = options.connection || backend;
-
-	nativeAssert(!!connection, 'Database connection required');
-
 	const insertedObject = await cards.upsert(
 		context,
 		backend.errors,
-		connection,
+		backend,
 		object,
 		{
 			replace: options.replace,
@@ -294,7 +290,7 @@ const upsertObject = async (
 	}
 	const baseType = insertedObject.type.split('@')[0];
 	if (baseType === 'link') {
-		await links.upsert(context, connection, insertedObject as LinkContract);
+		await links.upsert(context, backend, insertedObject as LinkContract);
 
 		// TODO: Check if we still need to materialize links here
 		// We only "materialize" links in this way because we haven't
@@ -335,7 +331,7 @@ const upsertObject = async (
 				await cards.materializeLink(
 					context,
 					backend.errors,
-					connection,
+					backend,
 					updatedCard,
 				);
 				if (backend.cache) {
@@ -359,7 +355,7 @@ const upsertObject = async (
 			slug: insertedObject.slug,
 			database: backend.database,
 		});
-		await markers.refresh(context, connection, {
+		await markers.refresh(context, backend, {
 			source: cards.TABLE,
 			trigger: insertedObject,
 		});
@@ -395,8 +391,25 @@ interface PostgresBackendOptions {
 	user: string;
 	host?: string;
 	password?: string;
-	port?: string;
+	port?: string | number;
+	idleTimeoutMillis?: number;
+	statement_timeout?: number;
+	query_timeout?: number;
+	connectionTimeoutMillis?: number; // this is also used for waiting for a connection from the pool
+	keepAlive?: boolean;
+	max?: number; // pool size
+	maxUses?: number; // recycle connection after
 }
+
+const defaultPgOptions: Partial<PostgresBackendOptions> = {
+	// statement_timeout: undefined,
+	// query_timeout: undefined,
+	idleTimeoutMillis: 60 * 1000,
+	connectionTimeoutMillis: 30 * 1000,
+	keepAlive: true,
+	max: 10, // same as default https://github.com/brianc/node-postgres/blob/master/packages/pg-pool/index.js#L84
+	// maxUses: 5000,
+};
 
 /*
  * This class implements various low-level methods to interact
@@ -477,15 +490,15 @@ export class PostgresBackend implements Queryable {
 		 * Lets connect to the default database, that should always be
 		 * available.
 		 */
-		logger.debug(context, 'Connecting to database', {
+		logger.info(context, 'Connecting to database', {
 			database: this.database,
 		});
-		this.connection = pgp(
-			// TS-TODO: this cast happens because the port value is a string, but pgp expects it as a number
-			Object.assign({}, this.options as any, {
-				database: 'postgres',
-			}),
-		);
+		this.connection = pgp({
+			...defaultPgOptions,
+			...this.options,
+			port: Number(this.options.port),
+			database: 'postgres',
+		});
 
 		/*
 		 * This is an arbitrary request just to make sure that the
@@ -564,13 +577,11 @@ export class PostgresBackend implements Queryable {
 		 * default database and connect to the one we're interested in.
 		 */
 		await this.disconnect(context);
-		this.connection = pgp(
-			// TS-TODO: this cast happens because the port value is a string, but pgp expects it as a number
-			Object.assign({}, this.options as any, {
-				idleTimeoutMillis: 60 * 1000,
-				database: this.database,
-			}),
-		);
+		this.connection = pgp({
+			...defaultPgOptions,
+			...this.options,
+			port: Number(this.options.port),
+		});
 
 		this.connection.$pool.on('error', (error: { code: any; message: any }) => {
 			logger.warn(context, 'Backend connection pool error', {
@@ -579,11 +590,11 @@ export class PostgresBackend implements Queryable {
 			});
 		});
 
-		await this.connection.tx(async (tCon) => {
-			tCon.any(`SELECT pg_advisory_xact_lock(${BOOTSTRAPPING_LOCK});`);
+		await this.withTransaction(async () => {
+			this.any(`SELECT pg_advisory_xact_lock(${BOOTSTRAPPING_LOCK});`);
 
 			try {
-				await cards.setup(context, tCon, this.database);
+				await cards.setup(context, this, this.database);
 			} catch (error) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
@@ -591,7 +602,7 @@ export class PostgresBackend implements Queryable {
 			}
 
 			try {
-				await links.setup(context, tCon, this.database, {
+				await links.setup(context, this, this.database, {
 					cards: cards.TABLE,
 				});
 			} catch (error) {
@@ -601,7 +612,7 @@ export class PostgresBackend implements Queryable {
 			}
 
 			try {
-				await markers.setup(context, tCon, {
+				await markers.setup(context, this, {
 					source: cards.TABLE,
 					links: links.TABLE,
 				});
@@ -612,7 +623,7 @@ export class PostgresBackend implements Queryable {
 			}
 
 			try {
-				await streams.setupTrigger(tCon, cards.TABLE, cards.TRIGGER_COLUMNS);
+				await streams.setupTrigger(this, cards.TABLE, cards.TRIGGER_COLUMNS);
 			} catch (error) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
@@ -664,9 +675,7 @@ export class PostgresBackend implements Queryable {
 			database: this.database,
 		});
 
-		await this.connection.any(
-			`DROP TABLE ${cards.TABLE}, ${links.TABLE} CASCADE`,
-		);
+		await this.any(`DROP TABLE ${cards.TABLE}, ${links.TABLE} CASCADE`);
 	}
 
 	/*
@@ -677,7 +686,7 @@ export class PostgresBackend implements Queryable {
 			database: this.database,
 		});
 
-		await this.connection?.any(`
+		await this.any(`
 			DELETE FROM ${links.TABLE};
 			DELETE FROM ${cards.TABLE};
 		`);
@@ -705,7 +714,6 @@ export class PostgresBackend implements Queryable {
 		object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 		options: {
 			replace?: boolean;
-			connection?: Queryable;
 		} = {},
 	) {
 		return upsertObject(
@@ -722,24 +730,29 @@ export class PostgresBackend implements Queryable {
 	 * Execute a provided callback within a transaction.
 	 */
 	async withTransaction(
-		callback: (transaction: pgPromise.ITask<{}>) => any,
+		callback: () => Promise<any>,
 		options: {
 			tag?: string;
 			mode?: pgPromise.TransactionMode;
 		} = {},
 	) {
 		options.tag = `transaction_${uuidv4()}`;
-		return this.connection?.tx(options, (transaction: pgPromise.ITask<{}>) => {
-			return callback(transaction);
-		});
+		nativeAssert(!!this.connection, 'Database connection required!');
+		return this.connection.tx(
+			options,
+			async (transaction: pgPromise.ITask<{}>) => {
+				return await currentTransaction.run(
+					transaction,
+					async () => await callback(),
+				);
+			},
+		);
 	}
 
 	/*
 	 * Get a card from the database by id and table.
 	 */
 	async getElementById(context: Context, id: string) {
-		nativeAssert(!!this.connection, 'Database connection required');
-
 		/*
 		 * Lets first check the in-memory cache so we can avoid
 		 * making a full-blown query to the database.
@@ -755,7 +768,7 @@ export class PostgresBackend implements Queryable {
 		 * Make a database request if we didn't have luck with
 		 * the cache.
 		 */
-		const result = await cards.getById(context, this.connection, id);
+		const result = await cards.getById(context, this, id);
 		if (this.cache) {
 			if (result) {
 				/*
@@ -782,15 +795,10 @@ export class PostgresBackend implements Queryable {
 		context: Context,
 		slug: string,
 		options: {
-			connection?: Queryable;
 			skipCache?: boolean;
 			lock?: boolean;
 		} = {},
 	) {
-		const connection = options.connection || this.connection;
-
-		nativeAssert(!!connection, 'Database connection required');
-
 		const [base, version] = slug.split('@');
 		assert.INTERNAL(
 			context,
@@ -818,7 +826,7 @@ export class PostgresBackend implements Queryable {
 		 * Make a database request if we didn't have luck with
 		 * the cache.
 		 */
-		const result = await cards.getBySlug(context, connection, slug, options);
+		const result = await cards.getBySlug(context, this, slug, options);
 		if (this.cache) {
 			if (result) {
 				/*
@@ -842,8 +850,6 @@ export class PostgresBackend implements Queryable {
 	 * Get a set of cards by id from a single table in one shot.
 	 */
 	async getElementsById(context: Context, ids: string[]) {
-		nativeAssert(!!this.connection, 'Database connection required');
-
 		/*
 		 * There is no point making a query if the set of ids
 		 * is empty.
@@ -908,11 +914,7 @@ export class PostgresBackend implements Queryable {
 		 * so lets ask the database for them.
 		 */
 
-		const elements = await cards.getManyById(
-			context,
-			this.connection,
-			uncached,
-		);
+		const elements = await cards.getManyById(context, this, uncached);
 		if (this.cache) {
 			/*
 			 * Store the ones we found in the in-memory cache.
@@ -948,8 +950,6 @@ export class PostgresBackend implements Queryable {
 		schema: JSONSchema,
 		options: Partial<BackendQueryOptions> = {},
 	) {
-		nativeAssert(!!this.connection, 'Database connection required');
-
 		// Apply a maximum for safety reasons
 		if (typeof options.limit === 'undefined') {
 			options.limit = MAXIMUM_QUERY_LIMIT;
@@ -977,7 +977,7 @@ export class PostgresBackend implements Queryable {
 		if (userBelongsToOrgOptimizationIsApplicable(schema)) {
 			return markers.getUserMarkers(
 				context,
-				this.connection,
+				this,
 				{
 					slug: (schema.$$links!['has member'].properties!.slug as any).const,
 				},
@@ -1010,8 +1010,6 @@ export class PostgresBackend implements Queryable {
 		schema: JSONSchema,
 		options: SqlQueryOptions,
 	) {
-		nativeAssert(!!this.connection, 'Database connection required');
-
 		if (userBelongsToOrgOptimizationIsApplicable(schema)) {
 			return async (id: any) => {
 				return markers.getUserMarkers(
@@ -1130,8 +1128,6 @@ export class PostgresBackend implements Queryable {
 	 * Creates a partial index on "fields" constrained by the provided "type"
 	 */
 	async createTypeIndex(context: Context, fields: string[], type: string) {
-		nativeAssert(!!this.connection, 'Database connection required');
-
 		await cards.createTypeIndex(context, this, fields, type);
 	}
 	/*
@@ -1142,9 +1138,13 @@ export class PostgresBackend implements Queryable {
 		type: string,
 		fields: SearchFieldDef[],
 	) {
-		nativeAssert(!!this.connection, 'Database connection required');
-
 		await cards.createFullTextSearchIndex(context, this, type, fields);
+	}
+
+	private getConnection() {
+		const connection = currentTransaction.getStore() || this.connection;
+		nativeAssert(!!connection, 'Database connection required');
+		return connection;
 	}
 
 	isConnected(): boolean {
@@ -1154,12 +1154,12 @@ export class PostgresBackend implements Queryable {
 		return this.connection!.connect();
 	}
 	any<T = any>(...args: Parameters<DatabaseConnection['any']>): Promise<T[]> {
-		return this.connection!.any(...args);
+		return this.getConnection().any(...args);
 	}
 	one<T = any>(...args: [pgPromise.QueryParam, any?]): Promise<T> {
-		return this.connection!.one<T>(...args);
+		return this.getConnection().one<T>(...args);
 	}
 	task<T>(cb: (t: pgPromise.ITask<{}>) => Promise<T>) {
-		return this.connection!.task(cb);
+		return this.getConnection().task(cb);
 	}
 }

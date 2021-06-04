@@ -82,7 +82,4 @@ export interface BackendQueryOptions extends SqlQueryOptions {
 
 	// if true, the query parameters will be logged on every request
 	profile?: boolean;
-
-	// different PG connection to use, typically used for transactions
-	connection?: BackendConnection | BackendTransaction | null;
 }
