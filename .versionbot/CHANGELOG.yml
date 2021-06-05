@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: b1250aef076d198f654ac7cb36ff11208376d5e8
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.0.23
+  date: 2021-06-05T07:43:55.585Z
+- commits:
     - subject: 'patch: Update dependency @types/redis to ^2.8.29'
       hash: 7343bac31a033935fa6f5b579b09e32d0bdddaa6
       body: ''
