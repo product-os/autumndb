@@ -52,7 +52,7 @@
     "@types/bluebird": "^3.5.35",
     "@types/debounce-promise": "^3.1.3",
     "@types/pg-format": "^1.0.1",
-    "@types/redis": "^2.8.28",
+    "@types/redis": "^2.8.29",
     "@types/redis-mock": "^0.17.0",
     "@types/traverse": "^0.6.32",
     "bluebird": "^3.7.2",
