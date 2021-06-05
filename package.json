@@ -45,10 +45,10 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.1.41",
-    "@balena/jellyfish-environment": "^4.1.33",
-    "@balena/jellyfish-logger": "^3.0.3",
-    "@balena/jellyfish-metrics": "^1.0.252",
+    "@balena/jellyfish-assert": "^1.1.42",
+    "@balena/jellyfish-environment": "^4.1.34",
+    "@balena/jellyfish-logger": "^3.0.5",
+    "@balena/jellyfish-metrics": "^1.0.254",
     "@types/bluebird": "^3.5.35",
     "@types/debounce-promise": "^3.1.3",
     "@types/pg-format": "^1.0.1",
@@ -74,7 +74,7 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.158",
+    "@balena/ci-task-runner": "^0.2.159",
     "@balena/jellycheck": "^0.1.1",
     "@balena/jellyfish-types": "^0.5.137",
     "@balena/lint": "^6.1.1",
