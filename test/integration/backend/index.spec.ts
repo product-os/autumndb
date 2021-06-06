@@ -408,64 +408,6 @@ describe('backend', () => {
 			).toEqual(result);
 		});
 
-		it('should insert an element with pre-release version data', async () => {
-			const id = ctx.generateRandomID();
-			const result = await ctx.backend.insertElement(ctx.context, {
-				id,
-				active: true,
-				slug: ctx.generateRandomSlug(),
-				version: '1.0.0-alpha',
-				links: {},
-				tags: [],
-				data: {},
-				markers: [],
-				requires: [],
-				linked_at: {},
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				type: 'card@1.0.0',
-			});
-
-			expect(result.id).toBe(id);
-
-			const element = await ctx.backend.getElementById(ctx.context, result.id);
-
-			expect(
-				Object.assign({}, element, {
-					id: result.id,
-				}),
-			).toEqual(result);
-		});
-
-		it('should insert an element with pre-release and build version data', async () => {
-			const id = ctx.generateRandomID();
-			const result = await ctx.backend.insertElement(ctx.context, {
-				id,
-				active: true,
-				slug: ctx.generateRandomSlug(),
-				version: '1.0.0-alpha+001',
-				links: {},
-				tags: [],
-				data: {},
-				markers: [],
-				requires: [],
-				linked_at: {},
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				type: 'card@1.0.0',
-			});
-
-			expect(result.id).toBe(id);
-
-			const element = await ctx.backend.getElementById(ctx.context, result.id);
-
-			expect(
-				Object.assign({}, element, {
-					id: result.id,
-				}),
-			).toEqual(result);
-		});
-
 		it('should fail to insert an element with an existent id', async () => {
 			const result1 = await ctx.backend.insertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
@@ -966,50 +908,6 @@ describe('backend', () => {
 					active: true,
 				} as any),
 			).rejects.toThrow(errors.JellyfishDatabaseError);
-		});
-
-		it('should insert a card with prerelease version data', async () => {
-			const result = await ctx.backend.upsertElement(ctx.context, {
-				slug: ctx.generateRandomSlug(),
-				type: 'card@1.0.0',
-				version: '1.0.0-alpha',
-				links: {},
-				tags: [],
-				linked_at: {},
-				data: {},
-				markers: [],
-				requires: [],
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				active: true,
-			});
-
-			expect(result.id).not.toBe('example');
-			const element = await ctx.backend.getElementById(ctx.context, result.id);
-
-			expect(element).toEqual(result);
-		});
-
-		it('should insert a card with prerelease and build version data', async () => {
-			const result = await ctx.backend.upsertElement(ctx.context, {
-				slug: ctx.generateRandomSlug(),
-				type: 'card@1.0.0',
-				version: '1.0.0-alpha+001',
-				links: {},
-				tags: [],
-				linked_at: {},
-				data: {},
-				markers: [],
-				requires: [],
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				active: true,
-			});
-
-			expect(result.id).not.toBe('example');
-			const element = await ctx.backend.getElementById(ctx.context, result.id);
-
-			expect(element).toEqual(result);
 		});
 
 		it('should handle multiple parallel insertions on the same slug', async () => {

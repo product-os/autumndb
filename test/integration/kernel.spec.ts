@@ -1687,6 +1687,123 @@ describe('Kernel', () => {
 			expect(element2).toEqual(card2);
 		});
 
+		it('should insert an element with pre-release version data', async () => {
+			const version = '1.0.0-alpha';
+			const slug = ctx.generateRandomSlug({
+				prefix: 'card',
+			});
+			const result = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug,
+					type: 'card@1.0.0',
+					version,
+					data: {},
+				},
+			);
+			const element = await ctx.kernel.getCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				`${result.slug}@${version}`,
+			);
+
+			expect(element!.version).toEqual(version);
+		});
+
+		it('should insert an element with pre-release and build version data', async () => {
+			const version = '1.0.0-alpha+001';
+			const result = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug(),
+					type: 'card@1.0.0',
+					version,
+					data: {},
+				},
+			);
+			const element = await ctx.kernel.getCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				`${result.slug}@${version}`,
+			);
+
+			expect(element!.version).toEqual(version);
+		});
+
+		it('should insert multiple prereleases on same version', async () => {
+			const slug = ctx.generateRandomSlug();
+			const version1 = '1.0.0-alpha';
+			const version2 = '1.0.0-beta';
+			const results = [
+				await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+					slug,
+					type: 'card@1.0.0',
+					version: version1,
+					data: {},
+				}),
+				await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+					slug,
+					type: 'card@1.0.0',
+					version: version2,
+					data: {},
+				}),
+			];
+			const elements = [
+				await ctx.kernel.getCardBySlug(
+					ctx.context,
+					ctx.kernel.sessions!.admin,
+					`${results[0].slug}@${version1}`,
+				),
+				await ctx.kernel.getCardBySlug(
+					ctx.context,
+					ctx.kernel.sessions!.admin,
+					`${results[1].slug}@${version2}`,
+				),
+			];
+
+			// Check that the cards have the same slug, but different versions
+			expect(elements[0]!.slug).toEqual(elements[1]!.slug);
+			expect(elements[0]!.version).toEqual(version1);
+			expect(elements[1]!.version).toEqual(version2);
+		});
+
+		it('should insert multiple builds on same prerelease version', async () => {
+			const slug = ctx.generateRandomSlug();
+			const version1 = '1.0.0-alpha+001';
+			const version2 = '1.0.0-alpha+002';
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug,
+				type: 'card@1.0.0',
+				version: version1,
+				data: {},
+			});
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug,
+				type: 'card@1.0.0',
+				version: version2,
+				data: {},
+			});
+			const elements = [
+				await ctx.kernel.getCardBySlug(
+					ctx.context,
+					ctx.kernel.sessions!.admin,
+					`${slug}@${version1}`,
+				),
+				await ctx.kernel.getCardBySlug(
+					ctx.context,
+					ctx.kernel.sessions!.admin,
+					`${slug}@${version2}`,
+				),
+			];
+
+			// Check that the cards have the same slug, but different versions
+			expect(elements[0]!.slug).toEqual(elements[1]!.slug);
+			expect(elements[0]!.version).toEqual(version1);
+			expect(elements[1]!.version).toEqual(version2);
+		});
+
 		it('should be able to insert a card', async () => {
 			const slug = ctx.generateRandomSlug({
 				prefix: 'hello-world',
