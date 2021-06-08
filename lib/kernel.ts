@@ -24,6 +24,10 @@ import {
 } from '@balena/jellyfish-types/build/core';
 import { BackendQueryOptions, DatabaseBackend } from './backend/postgres/types';
 
+interface KernelQueryOptions extends Partial<BackendQueryOptions> {
+	mask?: JSONSchema;
+}
+
 const logger = getLogger('jellyfish-core');
 
 const flattenSelected = (selected: any) => {
@@ -120,13 +124,21 @@ const getQueryFromSchema = async (
 	backend: DatabaseBackend,
 	session: string,
 	schema: JSONSchema | ViewContract,
+	mask?: JSONSchema,
 ) => {
 	// TS-TODO: Refactor this to avoid type coercion
-	const finalSchema: JSONSchema = (
+	let finalSchema: JSONSchema = (
 		schema.type === `${CARDS.view.slug}@${CARDS.view.version}`
 			? views.getSchema(schema as ViewContract)
 			: schema
 	) as JSONSchema;
+
+	if (mask) {
+		finalSchema = jsonSchema.merge([
+			finalSchema as any,
+			mask as any,
+		]) as JSONSchema;
+	}
 
 	// TODO: this is probably going to be given in the schema itself. See
 	// also `stream()`
@@ -766,13 +778,14 @@ export class Kernel {
 		context: Context,
 		session: string,
 		schema: JSONSchema | ViewContract,
-		options: Partial<BackendQueryOptions> = {},
+		options: KernelQueryOptions = {},
 	): Promise<T[]> {
 		const { selected, filteredQuery } = await getQueryFromSchema(
 			context,
 			this.backend,
 			session,
 			schema,
+			options.mask,
 		);
 		return this.backend
 			.query(context, selected, filteredQuery, {
@@ -874,13 +887,14 @@ export class Kernel {
 		context: Context,
 		session: string,
 		schema: JSONSchema,
-		options: Partial<BackendQueryOptions> = {},
+		options: KernelQueryOptions = {},
 	) {
 		const { selected, filteredQuery } = await getQueryFromSchema(
 			context,
 			this.backend,
 			session,
 			schema,
+			options.mask,
 		);
 
 		logger.debug(context, 'Opening stream');
@@ -900,6 +914,7 @@ export class Kernel {
 				this.backend,
 				session,
 				payload.schema,
+				payload.options?.mask,
 			);
 			const cards = await stream.query(
 				query.selected,

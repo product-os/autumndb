@@ -3208,6 +3208,68 @@ describe('Kernel', () => {
 			]);
 		});
 
+		it('should filter cards by the options.mask schema if set', async () => {
+			const insertedCard = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug(),
+					type: 'card@1.0.0',
+					data: {
+						sequence: 1,
+					},
+				},
+			);
+
+			const query: JSONSchema = {
+				type: 'object',
+				properties: {
+					id: {
+						const: insertedCard.id,
+					},
+				},
+			};
+
+			const mask: JSONSchema = {
+				type: 'object',
+				properties: {
+					type: {
+						const: 'foo@1.0.0',
+					},
+				},
+			};
+
+			const resultWithNoMask = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				query,
+				{},
+			);
+
+			expect(
+				resultWithNoMask.map((card) => {
+					return {
+						id: card.id,
+					};
+				}),
+			).toEqual([
+				{
+					id: insertedCard.id,
+				},
+			]);
+
+			const resultWithMask = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				query,
+				{
+					mask,
+				},
+			);
+
+			expect(resultWithMask.length).toBe(0);
+		});
+
 		it('should be able to skip and limit linked cards', async () => {
 			const parent = await ctx.kernel.insertCard(
 				ctx.context,
