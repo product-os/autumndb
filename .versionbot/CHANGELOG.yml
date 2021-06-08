@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 3a4db6793e2bd9fc0243ff30dedecd9a30732607
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.1
+  date: 2021-06-08T03:09:52.987Z
+- commits:
     - subject: Add support for a query mask
       hash: a2b11a083444e50043e290cb8c4e4fe8a7e4ed62
       body: >
