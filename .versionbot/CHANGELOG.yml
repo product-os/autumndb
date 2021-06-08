@@ -1,4 +1,17 @@
 - commits:
+    - subject: Move type deps to devDependencies
+      hash: 52a4bbee34ca1c785fbcf19d1e246527a8f8a7fe
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 3.0.35
+  date: 2021-06-08T00:51:21.557Z
+- commits:
     - subject: Add more version tests
       hash: e84f813251e3639535b67476af01ee36f94f0e89
       body: ''
