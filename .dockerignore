@@ -1,0 +1,3 @@
+# This file is auto-synced from product-os/jellyfish-config/sync/.dockerignore
+# and should only be edited there!
+node_modules
