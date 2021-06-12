@@ -48,7 +48,7 @@
     "@balena/jellyfish-assert": "^1.1.46",
     "@balena/jellyfish-environment": "^4.2.3",
     "@balena/jellyfish-logger": "^3.0.14",
-    "@balena/jellyfish-metrics": "^1.0.269",
+    "@balena/jellyfish-metrics": "^1.0.270",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
     "fast-equals": "^2.0.3",
@@ -68,7 +68,7 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.160",
+    "@balena/ci-task-runner": "^0.2.161",
     "@balena/jellycheck": "^0.1.1",
     "@balena/jellyfish-types": "^0.6.8",
     "@balena/lint": "^6.1.1",
