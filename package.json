@@ -68,7 +68,7 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/ci-task-runner": "^0.2.162",
+    "@balena/ci-task-runner": "^0.2.163",
     "@balena/jellycheck": "^0.1.1",
     "@balena/jellyfish-types": "^0.6.8",
     "@balena/lint": "^6.1.1",
