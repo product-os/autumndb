@@ -136,6 +136,9 @@ export const setup = async (
 				linked_at JSONB NOT NULL,
 				created_at TIMESTAMP WITH TIME ZONE NOT NULL,
 				updated_at TIMESTAMP WITH TIME ZONE,
+				versioned_slug TEXT UNIQUE GENERATED ALWAYS AS (${SqlPath.getVersionedSlugGeneratedField(
+					table,
+				)}) STORED,
 				CONSTRAINT ${table}_slug_version_key
 					UNIQUE (slug, version_major, version_minor, version_patch, version_prerelease, version_build),
 				CONSTRAINT version_positive
@@ -152,6 +155,14 @@ export const setup = async (
 		`,
 		);
 	}
+
+	// TODO: Remove this block once the production database reflects these changes.
+	await connection.any(`
+		ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS versioned_slug TEXT UNIQUE GENERATED ALWAYS AS (${SqlPath.getVersionedSlugGeneratedField(
+		table,
+	)}) STORED;
+	`);
+
 	/*
 	 * This query will give us a list of all the indexes
 	 * on a particular table.

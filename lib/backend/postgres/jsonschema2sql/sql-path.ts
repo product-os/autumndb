@@ -36,10 +36,40 @@ export class SqlPath {
 	 */
 	static getVersionComputedField(table?: string): string {
 		const tablePrefix = table ? `${table}.` : '';
-		const version = `CONCAT_WS('.', ${tablePrefix}version_major, ${tablePrefix}version_minor, ${tablePrefix}version_patch)`;
-		const vWithPreRelease = `CONCAT_WS('-', ${version}, NULLIF(${tablePrefix}version_prerelease, '') )`;
-		const vWithPreReleaseAndBuildSuffix = `CONCAT_WS('+', ${vWithPreRelease}, NULLIF(${tablePrefix}version_build, '') )`;
+		// Note: We use the '||' operator instead of CONCAT_WS as CONCAT_WS does not produce an immutable value.
+		const version = `${tablePrefix}version_major::text || '.' || ${tablePrefix}version_minor::text || '.' || ${tablePrefix}version_patch::text`;
+		const vWithPreRelease = `${version} || case when ${tablePrefix}version_prerelease = '' then '' else '-' || ${tablePrefix}version_prerelease end`;
+		const vWithPreReleaseAndBuildSuffix = `${vWithPreRelease} || case when ${tablePrefix}version_build = '' then '' else '+' || ${tablePrefix}version_build end`;
 		return vWithPreReleaseAndBuildSuffix;
+	}
+
+	/**
+	 * Get the SQL expression for the `versioned_slug` generated field.
+	 *
+	 * @param {String} table - The table name/alias.
+	 * @returns {String} The SQL expression for the generated field.
+	 *
+	 * @example
+	 * getVersionedSlugGeneratedField('cards');
+	 * > cards.slug ||
+	 * > '@' ||
+	 * > cards.version_major::text ||
+	 * > '.' ||
+	 * > cards.version_minor::text ||
+	 * > '.' ||
+	 * > cards.version_patch::text ||
+	 * > case when cards.version_prerelease = '' then ''
+	 * >      else '-' || cards.version_prerelease
+	 * > end ||
+	 * > case when cards.version_build = '' then ''
+	 * >      else '+' || cards.version_build
+	 * > end
+	 */
+	static getVersionedSlugGeneratedField(table?: string): string {
+		const tablePrefix = table ? `${table}.` : '';
+		const vWithPreReleaseAndBuildSuffix = this.getVersionComputedField(table);
+		const versionedSlug = `${tablePrefix}slug || '@' || ${vWithPreReleaseAndBuildSuffix}`;
+		return versionedSlug;
 	}
 
 	/**

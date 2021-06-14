@@ -52,6 +52,7 @@ const removeVersionFields = (row?: any) => {
 		Reflect.deleteProperty(row, 'version_patch');
 		Reflect.deleteProperty(row, 'version_prerelease');
 		Reflect.deleteProperty(row, 'version_build');
+		Reflect.deleteProperty(row, 'versioned_slug');
 	}
 
 	return row;
