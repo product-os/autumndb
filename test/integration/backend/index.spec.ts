@@ -1004,7 +1004,8 @@ describe('backend', () => {
 			}
 		});
 
-		it('should created indexes for type cards with the indexed_fields field', async () => {
+		it('should create indexes for type cards with the indexed_fields field', async () => {
+			expect.hasAssertions();
 			const typeCard = {
 				slug: 'test-link',
 				type: 'type@1.0.0',
@@ -1071,32 +1072,72 @@ describe('backend', () => {
 											},
 										},
 									},
+									payload: {
+										type: 'object',
+										required: ['message'],
+										properties: {
+											message: {
+												type: 'string',
+												format: 'markdown',
+												fullTextSearch: true,
+											},
+											mentionsUser: {
+												type: 'array',
+												items: {
+													type: 'string',
+												},
+											},
+										},
+									},
 								},
 								required: ['inverseName', 'from', 'to'],
 							},
 						},
 						required: ['name', 'type', 'links', 'data'],
 					},
-					indexed_fields: [['data.from.id', 'name', 'data.to.id']],
+					indexed_fields: [
+						['data.from.id', 'name', 'data.to.id'],
+						['data.payload.message'],
+						['data.payload.mentionsUser'],
+						['name'],
+					],
 				},
 				requires: [],
 				capabilities: [],
 			};
 
 			await ctx.backend.upsertElement(ctx.context, typeCard);
-
 			await Bluebird.delay(2000);
 
-			const indexes = await ctx.backend.any(`
-		SELECT * FROM pg_indexes WHERE tablename = 'cards';
-	`);
+			const indexes = await ctx.backend.any(
+				`SELECT * FROM pg_indexes WHERE tablename = 'cards';`,
+			);
+			const expected = [
+				{
+					indexname: `${typeCard.slug}__name__idx`,
+					indexdef: `CREATE INDEX \"${typeCard.slug}__name__idx\" ON public.cards USING btree (name) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+				},
+				{
+					indexname: `${typeCard.slug}__data_payload_message__idx`,
+					indexdef: `CREATE INDEX \"${typeCard.slug}__data_payload_message__idx\" ON public.cards USING btree (((data #>> '{payload,message}'::text[]))) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+				},
+				{
+					indexname: `${typeCard.slug}__data_payload_mentionsUser__idx`,
+					indexdef: `CREATE INDEX \"${typeCard.slug}__data_payload_mentionsUser__idx\" ON public.cards USING gin (((data #> '{payload,mentionsUser}'::text[]))) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+				},
+				{
+					indexname: `${typeCard.slug}__data_from_id__name__data_to_id__idx`,
+					indexdef: `CREATE INDEX \"test-link__data_from_id__name__data_to_id__idx\" ON public.cards USING btree (((data #>> '{from,id}'::text[])), name, ((data #>> '{to,id}'::text[]))) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+				},
+			];
 
-			// Look for an index with the expected name
-			const typeIndex = _.find(indexes, {
-				indexname: `${typeCard.slug}__data_from_id__name__data_to_id__idx`,
-			});
-
-			expect(typeIndex).toBeTruthy();
+			for (const item of expected) {
+				const index = _.find(indexes, {
+					indexname: item.indexname,
+				});
+				expect(index).toBeTruthy();
+				expect(index.indexdef).toEqual(item.indexdef);
+			}
 		});
 	});
 

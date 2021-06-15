@@ -18,7 +18,7 @@ import * as streams from './streams';
 import * as utils from './utils';
 import * as markers from './markers';
 import pgp from './pg-promise';
-import { JSONSchema } from '@balena/jellyfish-types';
+import { core, JSONSchema } from '@balena/jellyfish-types';
 import {
 	Context,
 	Contract,
@@ -368,7 +368,7 @@ const upsertObject = async <T extends Contract = Contract>(
 	if (baseType === 'type') {
 		if (insertedObject.data.indexed_fields) {
 			for (const fields of (insertedObject as any).data.indexed_fields) {
-				await backend.createTypeIndex(context, fields, insertedObject.slug);
+				await backend.createTypeIndex(context, fields, insertedObject);
 			}
 		}
 		// Find full-text search fields for type cards and create search indexes
@@ -1130,8 +1130,12 @@ export class PostgresBackend implements Queryable {
 	/*
 	 * Creates a partial index on "fields" constrained by the provided "type"
 	 */
-	async createTypeIndex(context: Context, fields: string[], type: string) {
-		await cards.createTypeIndex(context, this, fields, type);
+	async createTypeIndex(
+		context: Context,
+		fields: string[],
+		schema: core.ContractDefinition<any>,
+	) {
+		await cards.createTypeIndex(context, this, fields, schema);
 	}
 	/*
 	 * Creates a partial index on fields denoted as being targets for full-text searches
