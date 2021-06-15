@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 53ff7eac56b5481353ad397e15c5fdbb0a5c754d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.14
+  date: 2021-06-15T01:11:52.462Z
+- commits:
     - subject: Remove redundant relationships definitions
       hash: b6eff9bd625751e78877edb9abd8639a71cda410
       body: >
