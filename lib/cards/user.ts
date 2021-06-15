@@ -343,11 +343,6 @@ export const user = {
 		meta: {
 			relationships: [
 				{
-					title: 'Contact',
-					link: 'has attached contact',
-					type: 'contact',
-				},
-				{
 					title: 'Sales',
 					query: [
 						{
@@ -413,36 +408,6 @@ export const user = {
 							properties: {
 								type: {
 									const: 'support-thread@1.0.0',
-								},
-							},
-							additionalProperties: true,
-						},
-					],
-				},
-				{
-					title: 'Owned conversations',
-					query: [
-						{
-							$$links: {
-								'is owned by': {
-									type: 'object',
-									properties: {
-										type: {
-											const: 'user@1.0.0',
-										},
-										id: {
-											const: {
-												$eval: 'result.id',
-											},
-										},
-									},
-									required: ['id'],
-								},
-							},
-							type: 'object',
-							properties: {
-								type: {
-									enum: ['support-thread@1.0.0', 'sales-thread@1.0.0'],
 								},
 							},
 							additionalProperties: true,

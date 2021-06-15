@@ -47,14 +47,5 @@ export const org = {
 			},
 			required: ['name'],
 		},
-		meta: {
-			relationships: [
-				{
-					title: 'Members',
-					link: 'has member',
-					type: 'user',
-				},
-			],
-		},
 	},
 };
