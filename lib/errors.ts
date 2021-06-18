@@ -29,6 +29,7 @@ export class JellyfishInvalidEnvironmentVariable extends BaseTypedError {}
 export class JellyfishInvalidExpression extends BaseTypedError {}
 export class JellyfishNoAction extends BaseTypedError {}
 export class JellyfishNoElement extends BaseTypedError {}
+export class JellyfishNoLinkTarget extends BaseTypedError {}
 export class JellyfishNoView extends BaseTypedError {}
 export class JellyfishPermissionsError extends BaseTypedError {}
 export class JellyfishSchemaMismatch extends BaseTypedError {}

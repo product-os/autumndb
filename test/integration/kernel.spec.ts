@@ -2269,6 +2269,28 @@ describe('Kernel', () => {
 				}),
 			).rejects.toThrow(errors.JellyfishPermissionsError);
 		});
+
+		it('.insertCard() should not insert a link if any of the two target cards does not exist', async () => {
+			await expect(
+				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+					slug: `link-${ctx.generateRandomSlug()}-is-attached-to-${ctx.generateRandomSlug()}`,
+					name: 'is attached to',
+					type: 'link@1.0.0',
+					version: '1.0.0',
+					data: {
+						inverseName: 'has attached',
+						from: {
+							id: ctx.generateRandomID(),
+							type: 'card@1.0.0',
+						},
+						to: {
+							id: ctx.generateRandomID(),
+							type: 'card@1.0.0',
+						},
+					},
+				}),
+			).rejects.toThrow(errors.JellyfishNoLinkTarget);
+		});
 	});
 
 	describe('.replaceCard()', () => {
