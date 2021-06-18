@@ -289,6 +289,7 @@ const preUpsert = async (
 		throw error;
 	}
 
+	// Validate that both sides of the link contract are readable before inserting
 	if (card.type === 'link@1.0.0') {
 		const targetCardIds = [
 			(card as LinkContract).data.from.id,
