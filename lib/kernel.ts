@@ -19,6 +19,7 @@ import {
 	Context,
 	Contract,
 	ContractDefinition,
+	LinkContract,
 	TypeContract,
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
@@ -287,6 +288,32 @@ const preUpsert = async (
 		}
 		throw error;
 	}
+
+	if (card.type === 'link@1.0.0') {
+		const targetCardIds = [
+			(card as LinkContract).data.from.id,
+			(card as LinkContract).data.to.id,
+		];
+
+		await Promise.all(
+			targetCardIds.map(async (targetCardId) => {
+				const targetCard = await instance.getCardById(
+					context,
+					session,
+					targetCardId,
+				);
+
+				if (!targetCard) {
+					const newError = new errors.JellyfishNoLinkTarget(
+						`Link target does not exist: ${targetCardId}`,
+					);
+					newError.expected = true;
+					throw newError;
+				}
+			}),
+		);
+	}
+
 	return filter;
 };
 
