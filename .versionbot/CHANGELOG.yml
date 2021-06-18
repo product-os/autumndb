@@ -1,4 +1,15 @@
 - commits:
+    - subject: Validate link target availability
+      hash: 6191c15b94bb6f8b2e2ce7e5e2d3e28af8e1596c
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Kakhaber
+      nested: []
+  version: 3.2.0
+  date: 2021-06-18T16:09:52.910Z
+- commits:
     - subject: 'patch: Update dependency @balena/ci-task-runner to ^0.2.165'
       hash: 0df62ccc271f892980f999783f001d942714d155
       body: ''
