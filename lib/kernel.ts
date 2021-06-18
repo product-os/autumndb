@@ -266,7 +266,7 @@ const preUpsert = async (
 		!_.includes((card.data as any).to.type, '@')
 	) {
 		(card.data as any).from.type = `${(card.data as any).from.type}@1.0.0`;
-		(card.data as any).from.to = `${(card.data as any).to.type}@1.0.0`;
+		(card.data as any).to.type = `${(card.data as any).to.type}@1.0.0`;
 	}
 	try {
 		jsonSchema.validate(schema as any, card);
