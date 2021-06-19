@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 32deada756d9ba04b159d026e6953f99d55e3f95
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.2.1
+  date: 2021-06-19T00:46:41.680Z
+- commits:
     - subject: Validate link target availability
       hash: 6191c15b94bb6f8b2e2ce7e5e2d3e28af8e1596c
       body: ''
