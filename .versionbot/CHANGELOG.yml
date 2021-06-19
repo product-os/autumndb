@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.278'
+      hash: 333295ad4e6fea9411bbd4d830ad32db6e5c486a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.2.7
+  date: 2021-06-19T13:34:31.136Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: fce47545d9451c3bf10b0e51656e651b19e29f7d
       body: ''
