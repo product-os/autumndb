@@ -1471,6 +1471,288 @@ describe('Kernel', () => {
 
 			expect(result).toEqual(userCard);
 		});
+
+		it('should not throw when adding a loop field referencing a loop that does exist', async () => {
+			const loopSlug = ctx.generateRandomSlug({
+				prefix: 'loop/',
+			});
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: loopSlug,
+				type: 'loop@1.0.0',
+				version: '1.0.0',
+				active: true,
+				data: {},
+			});
+
+			const slug = ctx.generateRandomSlug({
+				prefix: 'foobarbaz',
+			});
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug,
+					tags: [],
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						foo: 'bar',
+					},
+				},
+			);
+
+			const patchedCard = await ctx.kernel.patchCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				`${card.slug}@${card.version}`,
+				[
+					{
+						op: 'add',
+						path: '/loop',
+						value: `${loopSlug}@1.0.0`,
+					},
+				],
+			);
+
+			expect(patchedCard.loop).toBe(`${loopSlug}@1.0.0`);
+		});
+
+		it('should not throw when removing the loop field value', async () => {
+			const loopSlug = ctx.generateRandomSlug({
+				prefix: 'loop/',
+			});
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: loopSlug,
+				type: 'loop@1.0.0',
+				version: '1.0.0',
+				active: true,
+				data: {},
+			});
+
+			const slug = ctx.generateRandomSlug({
+				prefix: 'foobarbaz',
+			});
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug,
+					tags: [],
+					loop: `${loopSlug}@1.0.0`,
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						foo: 'bar',
+					},
+				},
+			);
+
+			const patchedCard = await ctx.kernel.patchCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				`${card.slug}@${card.version}`,
+				[
+					{
+						op: 'remove',
+						path: '/loop',
+					},
+				],
+			);
+
+			expect(patchedCard.loop).toBeUndefined();
+		});
+
+		it('should not throw when replacing a loop field with a value referencing a loop that does exist', async () => {
+			const loopSlug = ctx.generateRandomSlug({
+				prefix: 'loop/',
+			});
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: loopSlug,
+				type: 'loop@1.0.0',
+				version: '1.0.0',
+				active: true,
+				data: {},
+			});
+
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: loopSlug,
+				type: 'loop@1.0.0',
+				version: '1.0.1',
+				active: true,
+				data: {},
+			});
+
+			const slug = ctx.generateRandomSlug({
+				prefix: 'foobarbaz',
+			});
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug,
+					tags: [],
+					loop: `${loopSlug}@1.0.0`,
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						foo: 'bar',
+					},
+				},
+			);
+
+			const patchedCard = await ctx.kernel.patchCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				`${card.slug}@${card.version}`,
+				[
+					{
+						op: 'replace',
+						path: '/loop',
+						value: `${loopSlug}@1.0.1`,
+					},
+				],
+			);
+
+			expect(patchedCard.loop).toBe(`${loopSlug}@1.0.1`);
+		});
+
+		it('should throw if trying to add a loop field referencing a loop that does not exist', async () => {
+			const slug = ctx.generateRandomSlug({
+				prefix: 'foobarbaz',
+			});
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug,
+					tags: [],
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						foo: 'bar',
+					},
+				},
+			);
+
+			await expect(
+				ctx.kernel.patchCardBySlug(
+					ctx.context,
+					ctx.kernel.sessions!.admin,
+					`${card.slug}@${card.version}`,
+					[
+						{
+							op: 'add',
+							path: '/loop',
+							value: 'saywhat@1.0.0',
+						},
+					],
+				),
+			).rejects.toThrow(errors.JellyfishNoElement);
+
+			const result = await ctx.kernel.getCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				`${card.slug}@${card.version}`,
+			);
+
+			expect(result).toEqual(card);
+		});
+
+		it('should throw if trying to add a loop field referencing a loop that is not a loop card', async () => {
+			const slug = ctx.generateRandomSlug({
+				prefix: 'foobarbaz',
+			});
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug,
+					tags: [],
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						foo: 'bar',
+					},
+				},
+			);
+
+			await expect(
+				ctx.kernel.patchCardBySlug(
+					ctx.context,
+					ctx.kernel.sessions!.admin,
+					`${card.slug}@${card.version}`,
+					[
+						{
+							op: 'add',
+							path: '/loop',
+							value: 'user@1.0.0',
+						},
+					],
+				),
+			).rejects.toThrow(errors.JellyfishNoElement);
+
+			const result = await ctx.kernel.getCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				`${card.slug}@${card.version}`,
+			);
+
+			expect(result).toEqual(card);
+		});
+
+		it('should throw if trying to replace the loop field with a value referencing a loop that does not exist', async () => {
+			const loopSlug = ctx.generateRandomSlug({
+				prefix: 'loop/',
+			});
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: loopSlug,
+				type: 'loop@1.0.0',
+				version: '1.0.0',
+				active: true,
+				data: {},
+			});
+
+			const slug = ctx.generateRandomSlug({
+				prefix: 'foobarbaz',
+			});
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug,
+					loop: `${loopSlug}@1.0.0`,
+					tags: [],
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						foo: 'bar',
+					},
+				},
+			);
+
+			await expect(
+				ctx.kernel.patchCardBySlug(
+					ctx.context,
+					ctx.kernel.sessions!.admin,
+					`${card.slug}@${card.version}`,
+					[
+						{
+							op: 'replace',
+							path: '/loop',
+							value: 'saywhat@1.0.0',
+						},
+					],
+				),
+			).rejects.toThrow(errors.JellyfishNoElement);
+
+			const result = await ctx.kernel.getCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				`${card.slug}@${card.version}`,
+			);
+
+			expect(result).toEqual(card);
+		});
 	});
 
 	describe('.insertCard()', () => {
@@ -1587,6 +1869,7 @@ describe('Kernel', () => {
 				}),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 		});
+
 		it('should throw an error if the element is not a valid card', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
@@ -1638,6 +1921,58 @@ describe('Kernel', () => {
 					data: {},
 				}),
 			).rejects.toThrow(errors.JellyfishUnknownCardType);
+		});
+
+		it('should not throw an error if the referenced loop exists', async () => {
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: 'loop/product-os',
+				type: 'loop@1.0.0',
+				version: '1.0.0',
+				active: true,
+				data: {},
+			});
+
+			const slug = ctx.generateRandomSlug();
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug,
+					type: 'card@1.0.0',
+					loop: 'loop/product-os@1.0.0',
+					version: '1.0.0',
+					active: true,
+					data: {},
+				},
+			);
+
+			expect(card.slug).toBe(slug);
+		});
+
+		it('should throw an error if the referenced loop does not exist', async () => {
+			await expect(
+				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+					slug: ctx.generateRandomSlug(),
+					type: 'card@1.0.0',
+					loop: 'saywhat@1.0.0',
+					version: '1.0.0',
+					active: true,
+					data: {},
+				}),
+			).rejects.toThrow(errors.JellyfishNoElement);
+		});
+
+		it('should throw an error if the referenced loop is not a loop contract', async () => {
+			await expect(
+				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+					slug: ctx.generateRandomSlug(),
+					type: 'card@1.0.0',
+					loop: 'user@1.0.0',
+					version: '1.0.0',
+					active: true,
+					data: {},
+				}),
+			).rejects.toThrow(errors.JellyfishNoElement);
 		});
 
 		it('should be able to insert two versions of the same card', async () => {
@@ -2333,6 +2668,7 @@ describe('Kernel', () => {
 			);
 			expect(element).toEqual(card2);
 		});
+
 		it('should not overwrite the "created_at" field when overriding a card', async () => {
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
@@ -2550,6 +2886,7 @@ describe('Kernel', () => {
 			expect(card).toEqual(result);
 		});
 	});
+
 	describe('.getCardById()', () => {
 		it('should find an active card by its id', async () => {
 			const result = await ctx.kernel.insertCard(
@@ -2612,6 +2949,7 @@ describe('Kernel', () => {
 			expect(card).toEqual(result);
 		});
 	});
+
 	describe('.query()', () => {
 		it('should throw an error given an invalid regex', async () => {
 			await expect(
