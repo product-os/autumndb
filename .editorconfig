@@ -1,4 +1,6 @@
-# editorconfig.org
+# This file is auto-synced from product-os/jellyfish-config/sync/.editorconfig
+# and should only be edited there!
+
 root = true
 
 [*]
