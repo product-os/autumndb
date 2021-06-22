@@ -70,7 +70,7 @@
   "devDependencies": {
     "@balena/ci-task-runner": "^0.2.168",
     "@balena/jellycheck": "^0.1.1",
-    "@balena/jellyfish-types": "^0.6.11",
+    "@balena/jellyfish-types": "^0.7.0",
     "@balena/lint": "^6.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "@types/bluebird": "^3.5.35",
