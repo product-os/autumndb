@@ -452,7 +452,7 @@ export const upsert = async (
 		{},
 		new Date(insertedObject.created_at),
 		insertedObject.updated_at ? new Date(insertedObject.updated_at) : null,
-		insertedObject.loop,
+		typeof insertedObject.loop === 'string' ? insertedObject.loop : null,
 	];
 	let results = null;
 	// Its very important, for concurrency issues, that inserts/upserts
