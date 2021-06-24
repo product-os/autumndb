@@ -4,9 +4,10 @@
  * Proprietary and confidential.
  */
 
-import type pgPromise = require('pg-promise');
-import type pg = require('pg-promise/typescript/pg-subset');
+import pgPromise = require('pg-promise');
+import pg = require('pg-promise/typescript/pg-subset');
 import type { PostgresBackend } from '.';
+import { SqlPath } from './jsonschema2sql/sql-path';
 
 export type DatabaseConnection = pgPromise.IDatabase<{}, pg.IClient>;
 export type DatabaseBackend = PostgresBackend;
