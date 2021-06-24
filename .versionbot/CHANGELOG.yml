@@ -1,4 +1,23 @@
 - commits:
+    - subject: Enforce loop as string or null on insert
+      hash: 441f31761704581dec2fbb857a71654ce18e9472
+      body: >
+        Treat loop just like we do with the optional name field.
+
+
+        Note - we already validate the loop field in the kernel so this
+        shouldn't be a problem in practice but it's worth being consistent and
+        safe at the backend level as well.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 4.0.1
+  date: 2021-06-24T07:26:11.280Z
+- commits:
     - subject: Validate loop on insert/replace/patch
       hash: db67490e3a984ec221a108e50b74bfa625e39841
       body: ''
