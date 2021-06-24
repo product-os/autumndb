@@ -1,4 +1,39 @@
 - commits:
+    - subject: Validate loop on insert/replace/patch
+      hash: db67490e3a984ec221a108e50b74bfa625e39841
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+    - subject: Fix flaky integration test
+      hash: faeb1767ae3ec67b2707f71ce12b08f22554ba66
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+    - subject: Add new top-level 'loop' field
+      hash: 8ba1a4bf2d96128d8ff8d2bc338962bbc64cf86c
+      body: >
+        This field will point to the slug of the loop that the contract belongs
+        to.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 4.0.0
+  date: 2021-06-24T00:35:12.104Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: a7bf8c024dbd48ec832f3ea0729f79fcad205f11
       body: ''
