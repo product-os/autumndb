@@ -1,4 +1,24 @@
 - commits:
+    - subject: Ensure that backend types are included in compiled build
+      hash: f1bf0920369994b81301a95d158664175a0d279a
+      body: |
+        With our tsc configuration, `*.d.ts` files are ignored by the compiler
+        and won't be copied across to the output directory, this causes problems
+        when downstream projects are trying to use types defined here.
+        This change simply changes the extension to `.ts`, causing the file to
+        be included in the build output.
+
+        See https://stackoverflow.com/a/56440335 for more detail
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 4.0.3
+  date: 2021-06-24T16:36:11.693Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.26'
       hash: 26f77e380f05ca35294f680b70d740f8b1317f43
       body: ''
