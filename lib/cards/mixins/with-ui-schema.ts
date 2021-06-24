@@ -12,6 +12,17 @@ export const baseUiSchema = {
 	data: {
 		uiSchema: {
 			fields: uiSchemaDefs.reset,
+			edit: {
+				$ref: '#/data/uiSchema/definitions/form',
+			},
+			create: {
+				$ref: '#/data/uiSchema/edit',
+			},
+			definitions: {
+				form: {
+					'ui:order': ['name', 'loop', 'tags', 'data', '*'],
+				},
+			},
 			snippet: {
 				'ui:explicit': true,
 				data: {

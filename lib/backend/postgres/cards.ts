@@ -30,6 +30,7 @@ const CARDS_TRIGGER_COLUMNS = [
 	'version_prerelease',
 	'version_build',
 	'name',
+	'loop',
 	'tags',
 	'markers',
 	'links',
@@ -45,6 +46,7 @@ const CARDS_SELECT = [
 	'active',
 	`${SqlPath.getVersionComputedField()} AS version`,
 	'name',
+	'loop',
 	'tags',
 	'markers',
 	'created_at',
@@ -127,6 +129,7 @@ export const setup = async (
 				version_prerelease TEXT NOT NULL DEFAULT '',
 				version_build TEXT NOT NULL DEFAULT '',
 				name TEXT,
+				loop TEXT,
 				tags TEXT[] NOT NULL,
 				markers TEXT[] NOT NULL,
 				links JSONB NOT NULL,
@@ -152,6 +155,12 @@ export const setup = async (
 		`,
 		);
 	}
+
+	// TODO: Remove this block once the production database reflects these changes.
+	await connection.any(`
+		ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS loop TEXT;
+	`);
+
 	/*
 	 * This query will give us a list of all the indexes
 	 * on a particular table.
@@ -177,6 +186,9 @@ export const setup = async (
 			[
 				{
 					column: 'slug',
+				},
+				{
+					column: 'loop',
 				},
 				{
 					column: 'tags',
@@ -440,6 +452,7 @@ export const upsert = async (
 		{},
 		new Date(insertedObject.created_at),
 		insertedObject.updated_at ? new Date(insertedObject.updated_at) : null,
+		insertedObject.loop,
 	];
 	let results = null;
 	// Its very important, for concurrency issues, that inserts/upserts
@@ -453,13 +466,15 @@ export const upsert = async (
 					version_major, version_minor, version_patch,
 					version_prerelease, version_build,
 					name, tags, markers, links, requires,
-					capabilities, data, linked_at, created_at, updated_at)
+					capabilities, data, linked_at, created_at, updated_at,
+					loop)
 				VALUES
 					($1, $2, $3, $4,
 					$5, $6, $7,
 					$8, $9,
 					$10, $11, $12, $13, $14,
-					$15, $16, $17, $18, NULL)
+					$15, $16, $17, $18, NULL,
+					$20)
 				ON CONFLICT (slug, version_major, version_minor, version_patch, version_prerelease, version_build) DO UPDATE SET
 					id = ${table}.id,
 					active = $4,
@@ -472,7 +487,8 @@ export const upsert = async (
 					data = $16,
 					linked_at = ${table}.linked_at,
 					created_at = ${table}.created_at,
-					updated_at = $19
+					updated_at = $19,
+					loop = $20
 				RETURNING ${CARDS_SELECT}`;
 			results = await connection.any({
 				name: `cards-upsert-replace-${table}`,
@@ -485,11 +501,13 @@ export const upsert = async (
 					version_major, version_minor, version_patch,
 					version_prerelease, version_build,
 					name, tags, markers, links, requires,
-					capabilities, data, linked_at, created_at, updated_at)
+					capabilities, data, linked_at, created_at, updated_at,
+					loop)
 				VALUES
 					($1, $2, $3, $4, $5, $6, $7, $8,
 					$9, $10, $11, $12, $13, $14,
-					$15, $16, $17, $18, $19)
+					$15, $16, $17, $18, $19,
+					$20)
 				RETURNING ${CARDS_SELECT}`;
 			results = await connection.any({
 				name: `cards-upsert-insert-${table}`,

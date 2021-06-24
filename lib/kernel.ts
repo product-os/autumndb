@@ -239,11 +239,25 @@ const preUpsert = async (
 		'No type in card',
 	);
 	// Fetch necessary objects concurrently
-	const [typeCard, filter] = await Promise.all([
+	const [typeCard, filter, loop] = await Promise.all([
 		instance.getCardBySlug<TypeContract>(context, session, card.type),
 		permissionFilter.getMask(context, instance.backend, session),
+		(async () => {
+			return card.loop && instance.backend.getElementBySlug(context, card.loop);
+		})(),
 	]);
 	const schema = typeCard && typeCard.data && typeCard.data.schema;
+
+	// If the loop field is specified, it should be a valid loop contract
+	if (card.loop) {
+		assert.INTERNAL(
+			context,
+			loop && loop.type.split('@')[0] === 'loop',
+			errors.JellyfishNoElement,
+			`No such loop: ${card.loop}`,
+		);
+	}
+
 	assert.INTERNAL(
 		context,
 		schema,
@@ -426,6 +440,7 @@ export class Kernel {
 				CARDS.view,
 				CARDS.role,
 				CARDS.link,
+				CARDS.loop,
 				CARDS['oauth-provider'],
 				CARDS['oauth-client'],
 			].map(async (card) => {
@@ -760,6 +775,20 @@ export class Kernel {
 					});
 				}
 
+				// If the loop field is changing, check that it points to an actual loop contract
+				if (patchedFullCard.loop && patchedFullCard.loop !== fullCard.loop) {
+					const loopCard = await this.backend.getElementBySlug(
+						context,
+						patchedFullCard.loop,
+					);
+					assert.INTERNAL(
+						context,
+						loopCard && loopCard.type.split('@')[0] === 'loop',
+						errors.JellyfishNoElement,
+						`No such loop: ${patchedFullCard.loop}`,
+					);
+				}
+
 				await this.backend.upsertElement(context, patchedFullCard);
 
 				// Otherwise a person that patches a card gets
@@ -998,6 +1027,7 @@ export class Kernel {
 				version: '1.0.0',
 				tags: [],
 				markers: [],
+				loop: null,
 				links: {},
 				requires: [],
 				capabilities: [],

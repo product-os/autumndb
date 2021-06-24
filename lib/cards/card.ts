@@ -35,6 +35,10 @@ export const card = {
 					type: 'string',
 					pattern: '^[a-z0-9-]+@\\d+(\\.\\d+)?(\\.\\d+)?$',
 				},
+				loop: {
+					// TODO: Add a pattern once the loop slug pattern is finalized
+					type: ['string', 'null'],
+				},
 				tags: {
 					type: 'array',
 					items: {

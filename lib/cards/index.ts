@@ -12,6 +12,7 @@ import { role } from './role';
 import { org } from './org';
 import { event } from './event';
 import { link } from './link';
+import { loop } from './loop';
 import { session } from './session';
 import { type } from './type';
 import { userAdmin } from './user-admin';
@@ -30,6 +31,7 @@ const cards = [
 	org,
 	event,
 	link,
+	loop,
 	session,
 	type,
 	userAdmin,

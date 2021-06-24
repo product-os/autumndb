@@ -216,6 +216,11 @@ export const user = {
 									type: 'string',
 									format: 'uuid',
 								},
+								activeLoop: {
+									// TODO: Add pattern regex once it is finalized
+									description: 'The loop that the user is currently working on',
+									type: ['string', 'null'],
+								},
 								sendCommand: {
 									title: 'Send command',
 									description: 'Command to send a message',
