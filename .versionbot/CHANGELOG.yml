@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-environment to ^4.3.0'
+      hash: 716a13d07e9ab7b6e2ff4f1adcdfea0a8d92d60a
+      body: |
+        Update @balena/jellyfish-environment from 4.2.8 to 4.3.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.0.4
+  date: 2021-06-24T18:31:30.222Z
+- commits:
     - subject: Ensure that backend types are included in compiled build
       hash: f1bf0920369994b81301a95d158664175a0d279a
       body: |
