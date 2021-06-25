@@ -268,15 +268,15 @@ const queryTable = async (
 	return elements;
 };
 
-const upsertObject = async (
+const upsertObject = async <T extends Contract = Contract>(
 	context: Context,
 	backend: DatabaseBackend,
 	object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 	options: {
 		replace?: boolean;
 	} = {},
-): Promise<Contract> => {
-	const insertedObject = await cards.upsert(
+): Promise<T> => {
+	const insertedObject = await cards.upsert<T>(
 		context,
 		backend.errors,
 		backend,
@@ -290,7 +290,7 @@ const upsertObject = async (
 	}
 	const baseType = insertedObject.type.split('@')[0];
 	if (baseType === 'link') {
-		await links.upsert(context, backend, insertedObject as LinkContract);
+		await links.upsert(context, backend, insertedObject as any as LinkContract);
 
 		// TODO: Check if we still need to materialize links here
 		// We only "materialize" links in this way because we haven't
@@ -322,11 +322,14 @@ const upsertObject = async (
 
 				const updatedCard = insertedObject.active
 					? links.addLink(
-							insertedObject as LinkContract,
+							insertedObject as any as LinkContract,
 							linkCards[0],
 							linkCards[1],
 					  )
-					: links.removeLink(insertedObject as LinkContract, linkCards[0]);
+					: links.removeLink(
+							insertedObject as any as LinkContract,
+							linkCards[0],
+					  );
 
 				await cards.materializeLink(
 					context,
@@ -696,11 +699,11 @@ export class PostgresBackend implements Queryable {
 	 * Insert a card to the database, and throw an error
 	 * if a card with the same id or slug already exists.
 	 */
-	async insertElement(
+	async insertElement<T extends Contract = Contract>(
 		context: Context,
 		object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 	) {
-		return upsertObject(context, this, object, {
+		return upsertObject<T>(context, this, object, {
 			replace: false,
 		});
 	}
@@ -709,13 +712,13 @@ export class PostgresBackend implements Queryable {
 	 * Insert a card to the database, or replace it
 	 * if a card with the same id or slug already exists.
 	 */
-	async upsertElement(
+	async upsertElement<T extends Contract = Contract>(
 		context: Context,
 		object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 		options: {
 			replace?: boolean;
 		} = {},
-	) {
+	): Promise<T> {
 		return upsertObject(
 			context,
 			this,

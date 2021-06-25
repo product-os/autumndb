@@ -13,6 +13,7 @@ import * as helpers from './helpers';
 import { once } from 'events';
 import { Contract } from '@balena/jellyfish-types/build/core';
 import { JSONSchema } from '@balena/jellyfish-types';
+import { strict as assert } from 'assert';
 
 let ctx: helpers.KernelContext;
 
@@ -1775,6 +1776,8 @@ describe('Kernel', () => {
 				card.id,
 			);
 
+			assert(element !== null);
+
 			expect(element.links).toEqual({});
 		});
 
@@ -2321,6 +2324,9 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				linkCard.id,
 			);
+
+			assert(element !== null);
+
 			expect(element.data.from).not.toBe(element.data.to);
 		});
 
@@ -2373,6 +2379,7 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				linkCard.id,
 			);
+			assert(element !== null);
 			expect(element.data.from).not.toBe(element.data.to);
 			expect(element.name).toBe(element.data.inverseName);
 		});
@@ -6601,6 +6608,7 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				ctx.kernel.sessions!.admin,
 			);
+			assert(adminSession !== null);
 			const scopedSession = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
