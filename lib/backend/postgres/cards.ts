@@ -388,7 +388,7 @@ export const getManyById = async (
 	return results;
 };
 
-export const upsert = async (
+export const upsert = async <T extends Contract = Contract>(
 	context: Context,
 	errors: DatabaseBackend['errors'],
 	connection: Queryable,
@@ -401,7 +401,7 @@ export const upsert = async (
 		// True if existing contract is being updated
 		replace?: boolean;
 	} = {},
-): Promise<Contract> => {
+): Promise<T> => {
 	const table = options.table || exports.TABLE;
 	assert.INTERNAL(
 		context,
@@ -557,7 +557,7 @@ export const upsert = async (
 	options.replace
 		? metrics.markCardUpsert(insertedObject as Contract)
 		: metrics.markCardInsert(insertedObject as Contract);
-	return insertedObject as Contract;
+	return insertedObject as T;
 };
 
 export const materializeLink = async (

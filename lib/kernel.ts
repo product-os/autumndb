@@ -463,7 +463,11 @@ export class Kernel {
 	 * @param {String} id - card id
 	 * @returns {(Object|Null)} card
 	 */
-	async getCardById(context: Context, session: string, id: string) {
+	async getCardById<T extends Contract = Contract>(
+		context: Context,
+		session: string,
+		id: string,
+	): Promise<T | null> {
 		logger.debug(context, 'Fetching card by id', {
 			id,
 		});
@@ -482,7 +486,7 @@ export class Kernel {
 			required: ['id'],
 		};
 
-		const results = await this.query(context, session, schema, {
+		const results = await this.query<T>(context, session, schema, {
 			limit: 1,
 		});
 
@@ -589,11 +593,11 @@ export class Kernel {
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(card.id)
 	 */
-	async insertCard(
+	async insertCard<T extends Contract = Contract>(
 		context: Context,
 		session: string,
 		object: Partial<Contract> & Pick<Contract, 'slug' | 'type'>,
-	) {
+	): Promise<T> {
 		const card = this.defaults(object);
 
 		logger.debug(context, 'Inserting card', {
@@ -602,7 +606,7 @@ export class Kernel {
 
 		await preUpsert(this, context, session, card as Contract);
 
-		return this.backend.insertElement(context, card as Contract);
+		return this.backend.insertElement<T>(context, card as Contract);
 	}
 
 	/**
@@ -623,13 +627,13 @@ export class Kernel {
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(card.id)
 	 */
-	async replaceCard(
+	async replaceCard<T extends Contract = Contract>(
 		context: Context,
 		session: string,
 		object: Partial<Contract> &
 			Pick<Contract, 'type'> &
 			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
-	) {
+	): Promise<T> {
 		const card = this.defaults(object);
 
 		logger.debug(context, 'Replacing card', {
@@ -655,12 +659,12 @@ export class Kernel {
 	 * @param {Object[]} patch - JSON Patch operations
 	 * @returns {Object} the patched card
 	 */
-	async patchCardBySlug(
+	async patchCardBySlug<T = Contract>(
 		context: Context,
 		session: string,
 		slug: string,
 		patch: jsonpatch.Operation[],
-	) {
+	): Promise<T> {
 		const filter = await permissionFilter.getMask(
 			context,
 			this.backend,
@@ -831,7 +835,7 @@ export class Kernel {
 	 *   required: [ 'slug' ]
 	 * })
 	 */
-	async query<T = Contract>(
+	async query<T extends Contract = Contract>(
 		context: Context,
 		session: string,
 		schema: JSONSchema | ViewContract,
@@ -1017,7 +1021,9 @@ export class Kernel {
 	 *
 	 * console.log(card)
 	 */
-	defaults(card: Partial<Contract>) {
+	defaults<T extends Contract = Contract>(
+		card: Partial<Contract> & Pick<T, 'type'>,
+	): ContractDefinition<T['data']> {
 		// Object.assign is used as it is significantly faster than using lodash
 		const defaultCard = Object.assign(
 			{
@@ -1041,7 +1047,7 @@ export class Kernel {
 			defaultCard.created_at = new Date().toISOString();
 		}
 
-		return defaultCard;
+		return defaultCard as ContractDefinition<T['data']>;
 	}
 
 	/**
