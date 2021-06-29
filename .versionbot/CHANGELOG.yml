@@ -1,4 +1,15 @@
 - commits:
+    - subject: "\U0001F504 Synced file(s) with product-os/jellyfish-config"
+      hash: 4089216a79fbae926a54e8246ed965738f17c387
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: jellyfish-bot
+      nested: []
+  version: 4.0.14
+  date: 2021-06-29T08:37:32.643Z
+- commits:
     - subject: 'patch: Update dependency @balena/ci-task-runner to ^0.3.3'
       hash: 1d0ec0f41ccf1bd7306c843ab759d8d7553eb5ec
       body: ''
