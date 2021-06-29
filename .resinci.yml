@@ -1,3 +1,6 @@
+# This file is auto-synced from product-os/jellyfish-config/sync/.resinci-no-docker.yml
+# and should only be edited there!
+
 docker:
   publish: false
 npm:

@@ -1,3 +1,6 @@
+# This file is auto-synced from product-os/jellyfish-config/.gitignore
+# and should only be edited there!
+
 # Created by https://www.gitignore.io/api/node
 
 ### Node ###
@@ -67,6 +70,7 @@ dump.rdb
 *.lock
 
 # Built files
+build/
 dist/
 .cache-loader/
 *.0x
@@ -87,8 +91,15 @@ dist/
 # tmp directory
 tmp/
 
-# build output
-build
+# Optional custom dotenv file
+custom.env
 
-# docs output
-docs
+# Doc files should not be committed. They are generated using
+# the command 'npm run doc' and committed to the root of the
+# 'docs' branch.
+docs/
+
+# Package lock files should not be generated (see .npmrc).
+# This is just a fail-safe to ensure that if they are generated
+# they are still ignored and not committed.
+package-lock.json
