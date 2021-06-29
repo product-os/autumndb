@@ -4,10 +4,10 @@ FROM balena/open-balena-base:v11.2.0
 
 WORKDIR /usr/src/jellyfish
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 ARG NPM_TOKEN
 RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc && \
-    npm ci && rm -f ~/.npmrc
+    npm i && rm -f ~/.npmrc
 
 COPY . ./
 
