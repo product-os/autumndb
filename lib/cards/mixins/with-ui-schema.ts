@@ -21,6 +21,9 @@ export const baseUiSchema = {
 			definitions: {
 				form: {
 					'ui:order': ['name', 'loop', 'tags', 'data', '*'],
+					loop: {
+						'ui:widget': 'LoopSelect',
+					},
 				},
 			},
 			snippet: {
