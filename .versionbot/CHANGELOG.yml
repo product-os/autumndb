@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove migration code that adds loop column
+      hash: 3c028d44707b3df4fa9b7dc27671f758be43b0bd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 4.0.21
+  date: 2021-06-30T12:56:23.347Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 3c0c0934ac58628fe221c5e6b1fce31d63c7558f
       body: ''
