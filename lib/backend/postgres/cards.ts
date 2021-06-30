@@ -156,11 +156,6 @@ export const setup = async (
 		);
 	}
 
-	// TODO: Remove this block once the production database reflects these changes.
-	await connection.any(`
-		ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS loop TEXT;
-	`);
-
 	/*
 	 * This query will give us a list of all the indexes
 	 * on a particular table.
