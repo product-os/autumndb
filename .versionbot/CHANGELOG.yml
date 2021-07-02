@@ -1,4 +1,18 @@
 - commits:
+    - subject: Use ES6 module export for create function
+      hash: 3201a24f17ba8391330f9c8d41f4b2e48fa107fd
+      body: |
+        Also removed other references to 'exports'.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 5.0.0
+  date: 2021-07-02T09:25:27.527Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: be60a0e0fe1b541092eb25292f8333c28fe82cf5
       body: ''
