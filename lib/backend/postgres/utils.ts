@@ -44,7 +44,7 @@ export const convertDatesToISOString = (row: any) => {
  * @param {Boolean} unique - declare index as UNIQUE (optional)
  *
  * @example
- * await exports.createIndex(context, connection, 'cards', 'example_idx', 'USING btree (updated_at)')
+ * await createIndex(context, connection, 'cards', 'example_idx', 'USING btree (updated_at)')
  */
 export const createIndex = async (
 	context: Context,

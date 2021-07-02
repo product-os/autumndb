@@ -147,10 +147,10 @@ This library contains email integration functionality for use in Jellyfish.
 Below is an example how to use this library:
 
 ```js
-const core = require('@balena/jellyfish-core');
+import { MemoryCache, create } from '@balena/jellyfish-core';
 
 const cache = new core.MemoryCache(environment.redis);
-const jellyfish = await core.create(context, cache, {
+const jellyfish = await create(context, cache, {
 	backend: environment.database.options,
 });
 ```

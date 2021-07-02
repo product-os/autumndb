@@ -16,7 +16,7 @@ import * as pgFormat from 'pg-format';
  * @returns {String} to_tsvector function call
  *
  * @example
- * const result = exports.toTSVector('cards.tags', false, true)
+ * const result = toTSVector('cards.tags', false, true)
  */
 export const toTSVector = (
 	path: string,
@@ -42,7 +42,7 @@ export const toTSVector = (
  *
  * @example
  * const term = 'test'
- * const result = exports.toTSQuery(term)
+ * const result = toTSQuery(term)
  */
 export const toTSQuery = (term: string): string => {
 	return `plainto_tsquery('english', ${pgFormat.literal(term)})`;
