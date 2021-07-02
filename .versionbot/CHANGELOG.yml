@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-types to ^0.8.1'
+      hash: cf2397e08910e674ba1c8ad54d9d8054aaaa3613
+      body: |
+        Update @balena/jellyfish-types from 0.7.3 to 0.8.1
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 5.0.1
+  date: 2021-07-02T22:26:29.238Z
+- commits:
     - subject: Use ES6 module export for create function
       hash: 3201a24f17ba8391330f9c8d41f4b2e48fa107fd
       body: |
