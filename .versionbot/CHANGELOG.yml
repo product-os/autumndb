@@ -1,4 +1,17 @@
 - commits:
+    - subject: Replace ci-task-runner with go-task
+      hash: 4e808a5b4271ef4ebaa8a3ee971d573f9b320f01
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 4.0.22
+  date: 2021-07-02T04:04:29.054Z
+- commits:
     - subject: Remove migration code that adds loop column
       hash: 3c028d44707b3df4fa9b7dc27671f758be43b0bd
       body: ''
