@@ -280,7 +280,7 @@ export const getById = async (
 		table?: string;
 	} = {},
 ) => {
-	const table = options.table || exports.TABLE;
+	const table = options.table || TABLE;
 	logger.debug(context, 'Getting element by id', {
 		id,
 		table,
@@ -306,7 +306,7 @@ export const getBySlug = async (
 		lock?: boolean;
 	} = {},
 ) => {
-	const table = options.table || exports.TABLE;
+	const table = options.table || TABLE;
 
 	logger.debug(context, 'Getting element by slug', {
 		slug,
@@ -366,7 +366,7 @@ export const getManyById = async (
 		table?: string;
 	} = {},
 ) => {
-	const table = options.table || exports.TABLE;
+	const table = options.table || TABLE;
 	logger.debug(context, 'Batch get by id', {
 		count: ids.length,
 		table,
@@ -397,7 +397,7 @@ export const upsert = async <T extends Contract = Contract>(
 		replace?: boolean;
 	} = {},
 ): Promise<T> => {
-	const table = options.table || exports.TABLE;
+	const table = options.table || TABLE;
 	assert.INTERNAL(
 		context,
 		object.slug,
@@ -565,7 +565,7 @@ export const materializeLink = async (
 		table?: string;
 	} = {},
 ) => {
-	const table = options.table || exports.TABLE;
+	const table = options.table || TABLE;
 	try {
 		const sql = `UPDATE ${table}
 				SET linked_at = $1::jsonb

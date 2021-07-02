@@ -14,7 +14,7 @@ export * as cardMixins from './cards/mixins';
 export const MemoryCache = Cache;
 export const cards = CARDS;
 
-exports.create = async (context: any, cache: any, options: any) => {
+export const create = async (context: any, cache: any, options: any) => {
 	const backend = new CoreBackend(cache, coreErrors, options.backend);
 	const kernel = new CoreKernel(backend);
 	await kernel.initialize(context);
