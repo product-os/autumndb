@@ -1,6 +1,6 @@
 # This file is auto-synced from product-os/jellyfish-config/sync/Dockerfile
 # and should only be edited there!
-FROM balena/open-balena-base:v11.2.0
+FROM resinci/jellyfish-test:v1.4.0
 
 WORKDIR /usr/src/jellyfish
 
@@ -11,4 +11,4 @@ RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc && \
 
 COPY . ./
 
-CMD /bin/bash -c "npx ci-task-runner run --config /usr/src/jellyfish/test/ci-tasks.yml"
+CMD /bin/bash -c "task test"

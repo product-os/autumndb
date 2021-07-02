@@ -1,9 +1,0 @@
-tickTimeout: 5
-retryTimeout: 120
-attemptsDefault: 1
-tasks:
-  - name: 'integration-tests'
-    description: 'Integration Tests'
-    command: 'npm run integration'
-    cwd: '/usr/src/jellyfish'
-    required: true
