@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 50c55a9d3c5ae918b1925b57b49d2ccf42f6302d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.0.23
+  date: 2021-07-02T07:46:27.952Z
+- commits:
     - subject: Replace ci-task-runner with go-task
       hash: 4e808a5b4271ef4ebaa8a3ee971d573f9b320f01
       body: ''
