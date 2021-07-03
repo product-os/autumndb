@@ -1,6 +1,6 @@
 # This file is auto-synced from product-os/jellyfish-config/sync/Dockerfile
 # and should only be edited there!
-FROM resinci/jellyfish-test:v1.4.0
+FROM resinci/jellyfish-test:v1.4.2
 
 WORKDIR /usr/src/jellyfish
 
