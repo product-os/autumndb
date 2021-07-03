@@ -1,4 +1,15 @@
 - commits:
+    - subject: "\U0001F504 Synced file(s) with product-os/jellyfish-config"
+      hash: 67e8e074a3ff143e9492f139bb9e7cad3d757107
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: jellyfish-bot
+      nested: []
+  version: 5.0.7
+  date: 2021-07-03T14:48:21.417Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.305'
       hash: 0a095ee8548474c06398e89bb41912b7548ad744
       body: ''
