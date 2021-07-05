@@ -1125,6 +1125,31 @@ describe('backend', () => {
 			expect(results).toEqual([]);
 		});
 
+		it('should not throw "missing FROM-clause" error', async () => {
+			await expect(
+				ctx.backend.query(
+					ctx.context,
+					{},
+					{
+						type: 'object',
+						anyOf: [
+							{
+								type: 'object',
+								additionalProperties: false,
+							},
+							{
+								$$links: {
+									'is attached to': {
+										type: 'object',
+									},
+								},
+							},
+						],
+					},
+				),
+			).resolves.not.toThrow();
+		});
+
 		it('should query the database using JSON schema', async () => {
 			const result1 = await ctx.backend.upsertElement(ctx.context, {
 				type: 'example@1.0.0',
