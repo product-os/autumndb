@@ -37,7 +37,10 @@ import { TypedError } from 'typed-error';
 import { strict as nativeAssert } from 'assert';
 import type pgPromise = require('pg-promise');
 import { AsyncLocalStorage } from 'async_hooks';
+import * as semver from 'semver';
+import corePackage = require('../../../package.json');
 
+const coreVersion = corePackage.version;
 const logger = getLogger('jellyfish-core');
 
 const currentTransaction = new AsyncLocalStorage<Queryable>();
@@ -61,11 +64,6 @@ const removeVersionFields = (row?: any) => {
 // 23505: unique violation error
 // 42P07: duplicate table error
 const INIT_IGNORE_CODES = ['23505', '42P07'];
-
-// a random number that's used as an advisory lock in pg to ensure only one
-// JF instance is trying to run DB migrations
-// TODO: replace with proper migration concept
-const BOOTSTRAPPING_LOCK = 608976328976780;
 
 /**
  * Check if a database error encountered on init is safe to ignore.
@@ -393,6 +391,7 @@ export class PostgresBackend implements Queryable {
 	database: string;
 	connectRetryDelay: number;
 	streamClient?: streams.Streamer;
+	private dbMigrationsPerformed = false;
 
 	/*
 	 * The constructor takes:
@@ -552,9 +551,79 @@ export class PostgresBackend implements Queryable {
 			});
 		});
 
-		await this.withTransaction(async () => {
-			this.any(`SELECT pg_advisory_xact_lock(${BOOTSTRAPPING_LOCK});`);
+		await this.runDbMigrations(context);
 
+		this.streamClient = await streams.start(
+			context,
+			this,
+			this.connection,
+			cards.TABLE,
+			cards.TRIGGER_COLUMNS,
+		);
+
+		return true;
+	}
+
+	private async executeIfDbSchemaIsOutdated(
+		context: Context,
+		migrationsCb: () => Promise<any>,
+	) {
+		const migrationsTable = 'jf_db_migrations';
+		const migrationsId = 0;
+		await this.withTransaction(async () => {
+			this.any(`CREATE TABLE IF NOT EXISTS ${migrationsTable} (
+				id INTEGER PRIMARY KEY NOT NULL,
+				version TEXT NOT NULL,
+				updated_at TIMESTAMP WITH TIME ZONE
+			);`);
+			this.any({
+				name: `insert-first-migration`,
+				text: `INSERT INTO ${migrationsTable} (id, version, updated_at) VALUES ($1, $2, now()) ON CONFLICT (id) DO NOTHING;`,
+				values: [migrationsId, '0.0.0'],
+			});
+		});
+		await this.withTransaction(async () => {
+			const [{ version }] = await this.any({
+				name: `get-migration-state`,
+				text: `SELECT id, version, updated_at FROM ${migrationsTable} WHERE id=$1 FOR UPDATE;`,
+				values: [migrationsId],
+			});
+
+			// Checking for newer versions instead of just testing for inequality ensures that a restarting pod
+			// that is running an old version will not interfere with a new version being rolled out.
+			// We could do better than just checking for the version of core, but that is better left to a proper migration framework
+			const willRunMigrations = semver.compare(version, coreVersion) === -1;
+			logger.info(context, 'Preparing DB migrations', {
+				dbVersion: version,
+				coreVersion,
+				willRunMigrations,
+			});
+			if (!willRunMigrations) {
+				logger.info(
+					context,
+					'DB schema is up to date. No migrations will be run',
+				);
+				return;
+			}
+			await migrationsCb();
+			await this.any({
+				name: `update-migration-version`,
+				text: `UPDATE ${migrationsTable} SET version=$1, updated_at=now() WHERE id=$2;`,
+				values: [coreVersion, migrationsId],
+			});
+		});
+		logger.info(context, 'DB migrations finished');
+	}
+
+	private async runDbMigrations(context: Context) {
+		if (this.dbMigrationsPerformed) {
+			logger.info(
+				context,
+				'DB migrations have run in this session before. Skipping them...',
+			);
+			return;
+		}
+		await this.executeIfDbSchemaIsOutdated(context, async () => {
 			try {
 				await cards.setup(context, this, this.database);
 			} catch (error: any) {
@@ -581,16 +650,7 @@ export class PostgresBackend implements Queryable {
 				}
 			}
 		});
-
-		this.streamClient = await streams.start(
-			context,
-			this,
-			this.connection,
-			cards.TABLE,
-			cards.TRIGGER_COLUMNS,
-		);
-
-		return true;
+		this.dbMigrationsPerformed = true;
 	}
 
 	/*
