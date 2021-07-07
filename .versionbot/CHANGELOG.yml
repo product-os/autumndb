@@ -1,4 +1,19 @@
 - commits:
+    - subject: Specify loop widget for the loop field
+      hash: 6ec113521b9dafcf5284f7f4717ada79533ec6bd
+      body: >
+        Note - if the loop widget is not found, this 'ui:widget' field will be
+        ignored.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 5.1.0
+  date: 2021-07-07T01:15:52.998Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 9d66a642ab5cfdf1cec889c0b55c480f76b7c7d8
       body: ''
