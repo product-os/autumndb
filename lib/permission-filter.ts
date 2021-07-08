@@ -189,6 +189,14 @@ export const getSessionActor = async (
 		`Invalid session: ${session}`,
 	);
 
+	// Don't allow inactive sessions to be used
+	assert.USER(
+		context,
+		sessionCard.active,
+		errors.JellyfishInvalidSession,
+		`Invalid session: ${session}`,
+	);
+
 	assert.USER(
 		context,
 		!sessionCard.data.expiration ||
