@@ -161,7 +161,7 @@ describe('permission-filter', () => {
 			).rejects.toThrow(errors.JellyfishSessionExpired);
 		});
 
-		test.only('should throw if the session has been deleted', async () => {
+		test('should throw if the session has been deleted', async () => {
 			const user = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
