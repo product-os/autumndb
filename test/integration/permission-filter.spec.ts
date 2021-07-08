@@ -160,5 +160,44 @@ describe('permission-filter', () => {
 				permissionFilter.getSessionActor(ctx.context, ctx.backend, session.id),
 			).rejects.toThrow(errors.JellyfishSessionExpired);
 		});
+
+		test.only('should throw if the session has been deleted', async () => {
+			const user = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug({
+						prefix: 'user',
+					}),
+					type: 'user@1.0.0',
+					version: '1.0.0',
+					data: {
+						email: 'johndoe@example.com',
+						hash: 'PASSWORDLESS',
+						roles: ['foo', 'bar'],
+					},
+				},
+			);
+
+			const session = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug({
+						prefix: 'session-delete-test',
+					}),
+					active: false,
+					type: 'session@1.0.0',
+					version: '1.0.0',
+					data: {
+						actor: user.id,
+					},
+				},
+			);
+
+			await expect(
+				permissionFilter.getSessionActor(ctx.context, ctx.backend, session.id),
+			).rejects.toThrow();
+		});
 	});
 });

@@ -6734,6 +6734,37 @@ describe('Kernel', () => {
 				},
 			]);
 		});
+
+		it('should throw if the session is not active', async () => {
+			const adminUser = await ctx.kernel.getCardBySlug(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				'user-admin@1.0.0',
+			);
+
+			assert(adminUser !== null);
+
+			// Create a new inactive session
+			const session = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug({
+						prefix: 'session',
+					}),
+					active: false,
+					type: 'session@1.0.0',
+					version: '1.0.0',
+					data: {
+						actor: adminUser.id,
+					},
+				},
+			);
+
+			expect(
+				ctx.kernel.getCardBySlug(ctx.context, session.id, 'user-admin@1.0.0'),
+			).rejects.toThrow();
+		});
 	});
 
 	describe('.stream()', () => {
