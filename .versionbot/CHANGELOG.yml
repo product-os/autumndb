@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove .only from permission filter tests
+      hash: 959046e280a15dafe5f99f50e85467cb5d92188b
+      body: |
+        Oops! This was added for debugging a previous patch, but never removed
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 5.1.3
+  date: 2021-07-08T14:42:07.997Z
+- commits:
     - subject: Don't allow the use of inactive sessions
       hash: a0012a11fdd3286908378ea9549ead1101caeed1
       body: |
