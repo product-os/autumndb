@@ -1,4 +1,19 @@
 - commits:
+    - subject: Don't allow the use of inactive sessions
+      hash: a0012a11fdd3286908378ea9549ead1101caeed1
+      body: |
+        This change adds an additional check to ensure the session being used is
+        active.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 5.1.2
+  date: 2021-07-08T11:12:42.123Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.310'
       hash: 76d347d04510c3e9856065bbfdb6486bd1b1249f
       body: ''
