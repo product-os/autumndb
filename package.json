@@ -45,9 +45,9 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.1.60",
-    "@balena/jellyfish-environment": "^4.3.12",
-    "@balena/jellyfish-logger": "^3.0.44",
+    "@balena/jellyfish-assert": "^1.1.62",
+    "@balena/jellyfish-environment": "^4.3.13",
+    "@balena/jellyfish-logger": "^3.0.45",
     "@balena/jellyfish-metrics": "^1.0.311",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
@@ -69,7 +69,7 @@
   },
   "devDependencies": {
     "@balena/jellycheck": "^0.1.1",
-    "@balena/jellyfish-types": "^0.8.6",
+    "@balena/jellyfish-types": "^0.8.7",
     "@balena/lint": "^6.1.1",
     "@json-schema-org/tests": "^1.0.0",
     "@types/bluebird": "^3.5.36",
