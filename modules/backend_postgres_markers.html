@@ -70,8 +70,8 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_markers.html#gettable" class="tsd-kind-icon">get<wbr>Table</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_markers.html#getusermarkers" class="tsd-kind-icon">get<wbr>User<wbr>Markers</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_markers.html#getTable" class="tsd-kind-icon">get<wbr>Table</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_markers.html#getUserMarkers" class="tsd-kind-icon">get<wbr>User<wbr>Markers</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_markers.html#refresh" class="tsd-kind-icon">refresh</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_markers.html#setup" class="tsd-kind-icon">setup</a></li>
 							</ul>
@@ -82,7 +82,7 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="gettable" class="tsd-anchor"></a>
+					<a name="getTable" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Table</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
 						<li class="tsd-signature tsd-kind-icon">get<wbr>Table<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
@@ -105,10 +105,10 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="getusermarkers" class="tsd-anchor"></a>
+					<a name="getUserMarkers" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>User<wbr>Markers</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>User<wbr>Markers<span class="tsd-signature-symbol">(</span>_context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, connection<span class="tsd-signature-symbol">: </span><a href="../interfaces/backend_postgres_types.queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a>, user<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>slug<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>User<wbr>Markers<span class="tsd-signature-symbol">(</span>_context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, connection<span class="tsd-signature-symbol">: </span><a href="../interfaces/backend_postgres_types.Queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a>, user<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>slug<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -123,7 +123,7 @@
 									<h5>_context: <span class="tsd-signature-type">Context</span></h5>
 								</li>
 								<li>
-									<h5>connection: <a href="../interfaces/backend_postgres_types.queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a></h5>
+									<h5>connection: <a href="../interfaces/backend_postgres_types.Queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a></h5>
 								</li>
 								<li>
 									<h5>user: <span class="tsd-signature-symbol">{ </span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>slug<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
@@ -153,7 +153,7 @@
 					<a name="refresh" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> refresh</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">refresh<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, connection<span class="tsd-signature-symbol">: </span><a href="../interfaces/backend_postgres_types.queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>trigger<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContractData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">refresh<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, connection<span class="tsd-signature-symbol">: </span><a href="../interfaces/backend_postgres_types.Queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>trigger<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContractData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -168,7 +168,7 @@
 									<h5>context: <span class="tsd-signature-type">Context</span></h5>
 								</li>
 								<li>
-									<h5>connection: <a href="../interfaces/backend_postgres_types.queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a></h5>
+									<h5>connection: <a href="../interfaces/backend_postgres_types.Queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a></h5>
 								</li>
 								<li>
 									<h5>options: <span class="tsd-signature-symbol">{ </span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>trigger<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContractData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></h5>
@@ -190,7 +190,7 @@
 					<a name="setup" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> setup</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">setup<span class="tsd-signature-symbol">(</span>_context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, connection<span class="tsd-signature-symbol">: </span><a href="../interfaces/backend_postgres_types.queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>links<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">setup<span class="tsd-signature-symbol">(</span>_context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, connection<span class="tsd-signature-symbol">: </span><a href="../interfaces/backend_postgres_types.Queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>links<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -205,7 +205,7 @@
 									<h5>_context: <span class="tsd-signature-type">Context</span></h5>
 								</li>
 								<li>
-									<h5>connection: <a href="../interfaces/backend_postgres_types.queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a></h5>
+									<h5>connection: <a href="../interfaces/backend_postgres_types.Queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a></h5>
 								</li>
 								<li>
 									<h5>options: <span class="tsd-signature-symbol">{ </span>links<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
@@ -239,10 +239,10 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="backend_postgres_markers.html#gettable" class="tsd-kind-icon">get<wbr>Table</a>
+						<a href="backend_postgres_markers.html#getTable" class="tsd-kind-icon">get<wbr>Table</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="backend_postgres_markers.html#getusermarkers" class="tsd-kind-icon">get<wbr>User<wbr>Markers</a>
+						<a href="backend_postgres_markers.html#getUserMarkers" class="tsd-kind-icon">get<wbr>User<wbr>Markers</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="backend_postgres_markers.html#refresh" class="tsd-kind-icon">refresh</a>

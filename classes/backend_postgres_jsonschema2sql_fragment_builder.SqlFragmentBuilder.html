@@ -1,0 +1,565 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SqlFragmentBuilder | @balena/jellyfish-core</title>
+	<meta name="description" content="Documentation for @balena/jellyfish-core">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@balena/jellyfish-core</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">@balena/jellyfish-core</a>
+				</li>
+				<li>
+					<a href="../modules/backend_postgres_jsonschema2sql_fragment_builder.html">backend/postgres/jsonschema2sql/fragment-builder</a>
+				</li>
+				<li>
+					<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html">SqlFragmentBuilder</a>
+				</li>
+			</ul>
+			<h1>Class SqlFragmentBuilder</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Builder for any kind of SQL fragment.</p>
+					</div>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">SqlFragmentBuilder</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#context" class="tsd-kind-icon">context</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#expr" class="tsd-kind-icon">expr</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#extendFrom" class="tsd-kind-icon">extend<wbr>From</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#extendParenthisedFrom" class="tsd-kind-icon">extend<wbr>Parenthised<wbr>From</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#getContext" class="tsd-kind-icon">get<wbr>Context</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#getTable" class="tsd-kind-icon">get<wbr>Table</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#push" class="tsd-kind-icon">push</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushCasted" class="tsd-kind-icon">push<wbr>Casted</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushInvoked" class="tsd-kind-icon">push<wbr>Invoked</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushList" class="tsd-kind-icon">push<wbr>List</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushParenthised" class="tsd-kind-icon">push<wbr>Parenthised</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushParenthisedList" class="tsd-kind-icon">push<wbr>Parenthised<wbr>List</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushSpaced" class="tsd-kind-icon">push<wbr>Spaced</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#toSql" class="tsd-kind-icon">to<wbr>Sql</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#toSqlInto" class="tsd-kind-icon">to<wbr>Sql<wbr>Into</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Sql<wbr>Fragment<wbr>Builder<span class="tsd-signature-symbol">(</span>tableOrContext<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_builder_context.BuilderContext.html" class="tsd-signature-type" data-tsd-kind="Class">BuilderContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L20">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:20</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tableOrContext: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_builder_context.BuilderContext.html" class="tsd-signature-type" data-tsd-kind="Class">BuilderContext</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="context" class="tsd-anchor"></a>
+					<h3>context</h3>
+					<div class="tsd-signature tsd-kind-icon">context<span class="tsd-signature-symbol">:</span> <a href="backend_postgres_jsonschema2sql_builder_context.BuilderContext.html" class="tsd-signature-type" data-tsd-kind="Class">BuilderContext</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L17">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:17</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="expr" class="tsd-anchor"></a>
+					<h3>expr</h3>
+					<div class="tsd-signature tsd-kind-icon">expr<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L18">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:18</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="extendFrom" class="tsd-anchor"></a>
+					<h3>extend<wbr>From</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">extend<wbr>From<span class="tsd-signature-symbol">(</span>other<span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_sql_path.SqlPath.html" class="tsd-signature-type" data-tsd-kind="Class">SqlPath</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_sql_filter.SqlFilter.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFilter</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_literal_sql.LiteralSql.html" class="tsd-signature-type" data-tsd-kind="Class">LiteralSql</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_select_builder.SqlSelectBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlSelectBuilder</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_cte_builder.SqlCteBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlCteBuilder</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L73">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:73</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>other: <a href="backend_postgres_jsonschema2sql_sql_path.SqlPath.html" class="tsd-signature-type" data-tsd-kind="Class">SqlPath</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_sql_filter.SqlFilter.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFilter</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_literal_sql.LiteralSql.html" class="tsd-signature-type" data-tsd-kind="Class">LiteralSql</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_select_builder.SqlSelectBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlSelectBuilder</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_cte_builder.SqlCteBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlCteBuilder</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="extendParenthisedFrom" class="tsd-anchor"></a>
+					<h3>extend<wbr>Parenthised<wbr>From</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">extend<wbr>Parenthised<wbr>From<span class="tsd-signature-symbol">(</span>other<span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_sql_filter.SqlFilter.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFilter</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_select_builder.SqlSelectBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlSelectBuilder</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L86">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:86</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>other: <a href="backend_postgres_jsonschema2sql_sql_filter.SqlFilter.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFilter</a><span class="tsd-signature-symbol"> | </span><a href="backend_postgres_jsonschema2sql_select_builder.SqlSelectBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlSelectBuilder</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getContext" class="tsd-anchor"></a>
+					<h3>get<wbr>Context</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Context<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_builder_context.BuilderContext.html" class="tsd-signature-type" data-tsd-kind="Class">BuilderContext</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L32">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:32</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_builder_context.BuilderContext.html" class="tsd-signature-type" data-tsd-kind="Class">BuilderContext</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getTable" class="tsd-anchor"></a>
+					<h3>get<wbr>Table</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Table<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L28">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:28</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="push" class="tsd-anchor"></a>
+					<h3>push</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">push<span class="tsd-signature-symbol">(</span>fragment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L36">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:36</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fragment: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="pushCasted" class="tsd-anchor"></a>
+					<h3>push<wbr>Casted</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">push<wbr>Casted<span class="tsd-signature-symbol">(</span>fragment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, cast<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L58">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:58</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fragment: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>cast: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="pushInvoked" class="tsd-anchor"></a>
+					<h3>push<wbr>Invoked</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">push<wbr>Invoked<span class="tsd-signature-symbol">(</span>functionName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, argument<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L68">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:68</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>functionName: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>argument: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="pushList" class="tsd-anchor"></a>
+					<h3>push<wbr>List</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">push<wbr>List<span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L46">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:46</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fragments: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="pushParenthised" class="tsd-anchor"></a>
+					<h3>push<wbr>Parenthised</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">push<wbr>Parenthised<span class="tsd-signature-symbol">(</span>fragment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L41">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:41</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fragment: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="pushParenthisedList" class="tsd-anchor"></a>
+					<h3>push<wbr>Parenthised<wbr>List</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">push<wbr>Parenthised<wbr>List<span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L51">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:51</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fragments: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="pushSpaced" class="tsd-anchor"></a>
+					<h3>push<wbr>Spaced</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">push<wbr>Spaced<span class="tsd-signature-symbol">(</span>fragment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L63">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:63</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fragment: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="toSql" class="tsd-anchor"></a>
+					<h3>to<wbr>Sql</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Sql<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L93">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:93</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="toSqlInto" class="tsd-anchor"></a>
+					<h3>to<wbr>Sql<wbr>Into</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Sql<wbr>Into<span class="tsd-signature-symbol">(</span>builder<span class="tsd-signature-symbol">: </span><a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/jsonschema2sql/fragment-builder.ts#L97">lib/backend/postgres/jsonschema2sql/fragment-builder.ts:97</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>builder: <a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">SqlFragmentBuilder</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Modules</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/backend_postgres_jsonschema2sql_fragment_builder.html">backend/postgres/jsonschema2sql/fragment-<wbr>builder</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module">
+						<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html" class="tsd-kind-icon">Sql<wbr>Fragment<wbr>Builder</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#context" class="tsd-kind-icon">context</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#expr" class="tsd-kind-icon">expr</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#extendFrom" class="tsd-kind-icon">extend<wbr>From</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#extendParenthisedFrom" class="tsd-kind-icon">extend<wbr>Parenthised<wbr>From</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#getContext" class="tsd-kind-icon">get<wbr>Context</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#getTable" class="tsd-kind-icon">get<wbr>Table</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#push" class="tsd-kind-icon">push</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushCasted" class="tsd-kind-icon">push<wbr>Casted</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushInvoked" class="tsd-kind-icon">push<wbr>Invoked</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushList" class="tsd-kind-icon">push<wbr>List</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushParenthised" class="tsd-kind-icon">push<wbr>Parenthised</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushParenthisedList" class="tsd-kind-icon">push<wbr>Parenthised<wbr>List</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#pushSpaced" class="tsd-kind-icon">push<wbr>Spaced</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#toSql" class="tsd-kind-icon">to<wbr>Sql</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="backend_postgres_jsonschema2sql_fragment_builder.SqlFragmentBuilder.html#toSqlInto" class="tsd-kind-icon">to<wbr>Sql<wbr>Into</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
