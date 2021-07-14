@@ -1,7 +1,9 @@
 {
-  "extends": "./tsconfig.json",
-  "exclude": [
-    "lib/**/*.spec.ts",
-    "test/**/*"
-  ]
+  "extends": "@balena/jellyfish-config/config/tsconfig.build.json",
+  "compilerOptions": {
+    "esModuleInterop": false,
+    "target": "es2015",
+    "noImplicitAny": true,
+    "downlevelIteration": true
+  }
 }
