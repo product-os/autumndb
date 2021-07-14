@@ -39,6 +39,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -77,6 +79,7 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_links.html#addLink" class="tsd-kind-icon">add<wbr>Link</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-private"><a href="backend_postgres_links.html#parseCard" class="tsd-kind-icon">parse<wbr>Card</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_links.html#removeLink" class="tsd-kind-icon">remove<wbr>Link</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_links.html#setup" class="tsd-kind-icon">setup</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_links.html#upsert" class="tsd-kind-icon">upsert</a></li>
@@ -93,7 +96,7 @@
 					<div class="tsd-signature tsd-kind-icon">TABLE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;links&quot;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/links.ts#L22">lib/backend/postgres/links.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/links.ts#L22">lib/backend/postgres/links.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -110,7 +113,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/links.ts#L230">lib/backend/postgres/links.ts:230</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/links.ts#L230">lib/backend/postgres/links.ts:230</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -158,6 +161,75 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-private">
+					<a name="parseCard" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> <span class="tsd-flag ts-flagPrivate">Private</span> parse<wbr>Card</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Card<span class="tsd-signature-symbol">(</span>linkCard<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">LinkContract</span>, card<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContractData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">&gt;</span>, joinedCard<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContractData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>created_at<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>slug<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>slug<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/links.ts#L182">lib/backend/postgres/links.ts:182</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>summary</dt>
+									<dd><p>Parse a card link given a link card</p>
+									</dd>
+									<dt>function</dt>
+									<dd></dd>
+									<dt>example</dt>
+									<dd><p>const result = links.parseCard({
+											name: &#39;is attached to&#39;,
+											data: {
+											inverseName: &#39;has attached element&#39;,
+											from: &#39;xxxx&#39;,
+											to: &#39;yyyy&#39;
+											}
+											}, {
+											id: &#39;xxxx&#39;,
+											...
+										})</p>
+										<p>if (result) {
+											console.log(result.name)
+											console.log(result.id)
+										}</p>
+										<blockquote>
+											<p>&#39;is attached to&#39;
+											&#39;yyy&#39;</p>
+										</blockquote>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>linkCard: <span class="tsd-signature-type">LinkContract</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>link card</p>
+									</div>
+								</li>
+								<li>
+									<h5>card: <span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContractData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>other card</p>
+									</div>
+								</li>
+								<li>
+									<h5>joinedCard: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContractData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = {}</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the card that is linked via linkCard</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>created_at<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>slug<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>slug<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h4>
+							<p>results</p>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="removeLink" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> remove<wbr>Link</h3>
@@ -168,7 +240,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/links.ts#L265">lib/backend/postgres/links.ts:265</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/links.ts#L265">lib/backend/postgres/links.ts:265</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -220,7 +292,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/links.ts#L23">lib/backend/postgres/links.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/links.ts#L23">lib/backend/postgres/links.ts:23</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -257,7 +329,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/links.ts#L88">lib/backend/postgres/links.ts:88</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/links.ts#L88">lib/backend/postgres/links.ts:88</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -296,6 +368,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="backend_postgres_links.html#addLink" class="tsd-kind-icon">add<wbr>Link</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-private">
+						<a href="backend_postgres_links.html#parseCard" class="tsd-kind-icon">parse<wbr>Card</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="backend_postgres_links.html#removeLink" class="tsd-kind-icon">remove<wbr>Link</a>

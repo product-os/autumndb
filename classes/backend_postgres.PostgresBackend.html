@@ -39,6 +39,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -95,6 +97,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#cache" class="tsd-kind-icon">cache</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#connectRetryDelay" class="tsd-kind-icon">connect<wbr>Retry<wbr>Delay</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="backend_postgres.PostgresBackend.html#connection" class="tsd-kind-icon">connection</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#database" class="tsd-kind-icon">database</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#errors" class="tsd-kind-icon">errors</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#options" class="tsd-kind-icon">options</a></li>
@@ -110,6 +113,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#createTypeIndex" class="tsd-kind-icon">create<wbr>Type<wbr>Index</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#disconnect" class="tsd-kind-icon">disconnect</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#drop" class="tsd-kind-icon">drop</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="backend_postgres.PostgresBackend.html#getConnection" class="tsd-kind-icon">get<wbr>Connection</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#getElementById" class="tsd-kind-icon">get<wbr>Element<wbr>ById</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#getElementBySlug" class="tsd-kind-icon">get<wbr>Element<wbr>BySlug</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="backend_postgres.PostgresBackend.html#getElementsById" class="tsd-kind-icon">get<wbr>Elements<wbr>ById</a></li>
@@ -142,7 +146,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L446">lib/backend/postgres/index.ts:446</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L446">lib/backend/postgres/index.ts:446</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -182,7 +186,17 @@
 					<div class="tsd-signature tsd-kind-icon">connect<wbr>Retry<wbr>Delay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L435">lib/backend/postgres/index.ts:435</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L435">lib/backend/postgres/index.ts:435</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="connection" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagOptional">Optional</span> connection</h3>
+					<div class="tsd-signature tsd-kind-icon">connection<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><a href="../modules/backend_postgres_types.html#DatabaseConnection" class="tsd-signature-type" data-tsd-kind="Type alias">DatabaseConnection</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L432">lib/backend/postgres/index.ts:432</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -192,7 +206,7 @@
 					<div class="tsd-signature tsd-kind-icon">database<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L434">lib/backend/postgres/index.ts:434</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L434">lib/backend/postgres/index.ts:434</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -217,7 +231,7 @@
 					<div class="tsd-signature tsd-kind-icon">options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">PostgresBackendOptions</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L433">lib/backend/postgres/index.ts:433</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L433">lib/backend/postgres/index.ts:433</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -227,7 +241,7 @@
 					<div class="tsd-signature tsd-kind-icon">stream<wbr>Client<span class="tsd-signature-symbol">:</span> <a href="backend_postgres_streams.Streamer.html" class="tsd-signature-type" data-tsd-kind="Class">Streamer</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L436">lib/backend/postgres/index.ts:436</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L436">lib/backend/postgres/index.ts:436</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -245,7 +259,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/backend_postgres_types.Queryable.html">Queryable</a>.<a href="../interfaces/backend_postgres_types.Queryable.html#any">any</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1159">lib/backend/postgres/index.ts:1159</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1159">lib/backend/postgres/index.ts:1159</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -274,7 +288,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L486">lib/backend/postgres/index.ts:486</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L486">lib/backend/postgres/index.ts:486</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -297,7 +311,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1139">lib/backend/postgres/index.ts:1139</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1139">lib/backend/postgres/index.ts:1139</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -326,7 +340,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1133">lib/backend/postgres/index.ts:1133</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1133">lib/backend/postgres/index.ts:1133</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -355,7 +369,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L652">lib/backend/postgres/index.ts:652</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L652">lib/backend/postgres/index.ts:652</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -378,7 +392,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L672">lib/backend/postgres/index.ts:672</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L672">lib/backend/postgres/index.ts:672</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -388,6 +402,23 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="getConnection" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>Connection</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Connection<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/backend_postgres_types.Queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a><span class="tsd-signature-symbol"> | </span><a href="../modules/backend_postgres_types.html#DatabaseConnection" class="tsd-signature-type" data-tsd-kind="Type alias">DatabaseConnection</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1147">lib/backend/postgres/index.ts:1147</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/backend_postgres_types.Queryable.html" class="tsd-signature-type" data-tsd-kind="Interface">Queryable</a><span class="tsd-signature-symbol"> | </span><a href="../modules/backend_postgres_types.html#DatabaseConnection" class="tsd-signature-type" data-tsd-kind="Type alias">DatabaseConnection</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -401,7 +432,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L758">lib/backend/postgres/index.ts:758</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L758">lib/backend/postgres/index.ts:758</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -427,7 +458,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L797">lib/backend/postgres/index.ts:797</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L797">lib/backend/postgres/index.ts:797</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -464,7 +495,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L855">lib/backend/postgres/index.ts:855</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L855">lib/backend/postgres/index.ts:855</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -490,7 +521,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1121">lib/backend/postgres/index.ts:1121</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1121">lib/backend/postgres/index.ts:1121</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>streams<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>attachedCount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -507,7 +538,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L702">lib/backend/postgres/index.ts:702</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L702">lib/backend/postgres/index.ts:702</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -539,7 +570,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1153">lib/backend/postgres/index.ts:1153</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1153">lib/backend/postgres/index.ts:1153</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -557,7 +588,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/backend_postgres_types.Queryable.html">Queryable</a>.<a href="../interfaces/backend_postgres_types.Queryable.html#one">one</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1162">lib/backend/postgres/index.ts:1162</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1162">lib/backend/postgres/index.ts:1162</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -586,7 +617,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1156">lib/backend/postgres/index.ts:1156</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1156">lib/backend/postgres/index.ts:1156</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">XPromise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IConnected</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IClient</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -603,7 +634,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1009">lib/backend/postgres/index.ts:1009</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1009">lib/backend/postgres/index.ts:1009</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -656,7 +687,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L950">lib/backend/postgres/index.ts:950</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L950">lib/backend/postgres/index.ts:950</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -688,7 +719,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L687">lib/backend/postgres/index.ts:687</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L687">lib/backend/postgres/index.ts:687</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -711,7 +742,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1100">lib/backend/postgres/index.ts:1100</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1100">lib/backend/postgres/index.ts:1100</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -744,7 +775,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/backend_postgres_types.Queryable.html">Queryable</a>.<a href="../interfaces/backend_postgres_types.Queryable.html#task">task</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L1165">lib/backend/postgres/index.ts:1165</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L1165">lib/backend/postgres/index.ts:1165</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -791,7 +822,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L715">lib/backend/postgres/index.ts:715</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L715">lib/backend/postgres/index.ts:715</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -831,7 +862,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/master/lib/backend/postgres/index.ts#L735">lib/backend/postgres/index.ts:735</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/e2c72b5/lib/backend/postgres/index.ts#L735">lib/backend/postgres/index.ts:735</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -896,6 +927,9 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="backend_postgres.PostgresBackend.html#connectRetryDelay" class="tsd-kind-icon">connect<wbr>Retry<wbr>Delay</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="backend_postgres.PostgresBackend.html#connection" class="tsd-kind-icon">connection</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="backend_postgres.PostgresBackend.html#database" class="tsd-kind-icon">database</a>
 							</li>
@@ -925,6 +959,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="backend_postgres.PostgresBackend.html#drop" class="tsd-kind-icon">drop</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="backend_postgres.PostgresBackend.html#getConnection" class="tsd-kind-icon">get<wbr>Connection</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="backend_postgres.PostgresBackend.html#getElementById" class="tsd-kind-icon">get<wbr>Element<wbr>ById</a>
@@ -998,6 +1035,10 @@
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
