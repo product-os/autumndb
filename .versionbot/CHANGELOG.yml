@@ -1,4 +1,19 @@
 - commits:
+    - subject: Small tweak to default UI schema
+      hash: d80a557dbf32281bfda8849c5e1be7f83bd99e2a
+      body: >
+        This change ensures that the `data` element takes up the full width of
+        it's parent element.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 5.1.8
+  date: 2021-07-16T08:03:13.531Z
+- commits:
     - subject: Use config from jellyfish-config
       hash: 682aca56421d869284cf93c0b8fa793a14ef2309
       body: ''
