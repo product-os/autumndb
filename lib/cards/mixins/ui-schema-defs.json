@@ -2,6 +2,9 @@
   "reset": {
     "data": {
       "ui:title": null,
+      "ui:options": {
+        "alignSelf": "stretch"
+      },
       "origin": null,
       "translateDate": null,
       "$$localSchema": null
