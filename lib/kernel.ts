@@ -190,7 +190,10 @@ const patchCard = (
 
 		// Only addition can happen on non-existent properties
 		if (operation.op !== 'add') {
-			const path = operation.path.split('/').slice(1);
+			const path = operation.path
+				.split('/')
+				.slice(1)
+				.map(jsonpatch.unescapePathComponent);
 			if (!_.has(card, path)) {
 				// This is a schema mismatch as this case tends
 				// to happen when attempting to violate the
