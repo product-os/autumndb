@@ -1,4 +1,17 @@
 - commits:
+    - subject: fix handling of escaped json-patch paths
+      hash: b25ff18d292d1ec67275e639eddf1c046728e3d2
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 5.1.10
+  date: 2021-07-21T07:12:41.786Z
+- commits:
     - subject: Remove whitesource config
       hash: 805fe59d8082209dfa2e29c0559b16652931702c
       body: ''
