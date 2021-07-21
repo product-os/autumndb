@@ -195,7 +195,7 @@ describe('Kernel', () => {
 					type: 'card@1.0.0',
 					version: '1.0.0',
 					data: {
-						foo: 'bar',
+						'foo/bla': 'bar',
 						bar: 'baz',
 					},
 				},
@@ -208,7 +208,7 @@ describe('Kernel', () => {
 				[
 					{
 						op: 'remove',
-						path: '/data/foo',
+						path: '/data/foo~1bla',
 					},
 				],
 			);
