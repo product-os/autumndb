@@ -4,9 +4,9 @@ FROM resinci/jellyfish-test:v1.4.2
 
 WORKDIR /usr/src/jellyfish
 
-COPY package.json ./
+COPY package.json .npmrc ./
 ARG NPM_TOKEN
-RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc && \
+RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc && \
     npm i && rm -f ~/.npmrc
 
 COPY . ./
