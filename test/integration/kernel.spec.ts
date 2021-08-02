@@ -5759,6 +5759,165 @@ describe('Kernel', () => {
 			]);
 		});
 
+		it('should be able to query an optional $$links inside another optional $$links', async () => {
+			const office = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug(),
+					type: 'card@1.0.0',
+					version: '1.0.0',
+				},
+			);
+
+			const worker1 = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug(),
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						order: 0,
+					},
+				},
+			);
+
+			const worker2 = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug(),
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						order: 1,
+					},
+				},
+			);
+
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: `link-${worker1.slug}-works-at-${office.slug}`,
+				type: 'link@1.0.0',
+				version: '1.0.0',
+				name: 'works at',
+				data: {
+					inverseName: 'has worker',
+					from: {
+						id: worker1.id,
+						type: worker1.type,
+					},
+					to: {
+						id: office.id,
+						type: office.type,
+					},
+				},
+			});
+
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: `link-${worker2.slug}-works-at-${office.slug}`,
+				type: 'link@1.0.0',
+				version: '1.0.0',
+				name: 'works at',
+				data: {
+					inverseName: 'has worker',
+					from: {
+						id: worker2.id,
+						type: worker2.type,
+					},
+					to: {
+						id: office.id,
+						type: office.type,
+					},
+				},
+			});
+
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				slug: `link-${worker1.slug}-reports-to-${worker2.slug}`,
+				type: 'link@1.0.0',
+				version: '1.0.0',
+				name: 'reports to',
+				data: {
+					inverseName: 'receives reports from',
+					from: {
+						id: worker1.id,
+						type: worker1.type,
+					},
+					to: {
+						id: worker2.id,
+						type: worker2.type,
+					},
+				},
+			});
+
+			const results = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					anyOf: [
+						true,
+						{
+							$$links: {
+								'has worker': {
+									anyOf: [
+										true,
+										{
+											$$links: {
+												'reports to': {
+													required: ['id'],
+													additionalProperties: false,
+												},
+											},
+										},
+									],
+									required: ['id', 'links'],
+									additionalProperties: false,
+								},
+							},
+						},
+					],
+					required: ['links'],
+					additionalProperties: false,
+					properties: {
+						id: {
+							const: office.id,
+						},
+					},
+				},
+				{
+					links: {
+						'has worker': {
+							sortBy: ['data', 'order'],
+						},
+					},
+				},
+			);
+
+			expect(results).toEqual([
+				{
+					id: office.id,
+					links: {
+						'has worker': [
+							{
+								id: worker1.id,
+								links: {
+									'reports to': [
+										{
+											id: worker2.id,
+										},
+									],
+								},
+							},
+							{
+								id: worker2.id,
+								links: {},
+							},
+						],
+					},
+				},
+			]);
+		});
+
 		it('should be able to query $$links inside a contains', async () => {
 			const office = await ctx.kernel.insertCard(
 				ctx.context,
