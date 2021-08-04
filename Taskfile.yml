@@ -3,4 +3,4 @@ version: '3'
 tasks:
   test:
     cmds:
-      - npm run integration
+      - npm run test:integration
