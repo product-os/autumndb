@@ -1,4 +1,17 @@
 - commits:
+    - subject: 'Add compose up command, more test docs'
+      hash: 8d45a918effd7a88023e4a0a0c2ecba1c685fd9a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 5.1.15
+  date: 2021-08-06T00:00:21.496Z
+- commits:
     - subject: Update test command in README
       hash: 2ec67d969e3127f8d6c1e2feab92c92daffaff31
       body: ''
