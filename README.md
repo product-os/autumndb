@@ -165,3 +165,15 @@ You may need to export an `NPM_TOKEN` and values for the environment variables d
 ```
 npm run test:compose
 ```
+
+You can also run tests locally against Postgres and Redis instances running in `docker-compose`:
+```
+$ npm run compose
+$ POSTGRES_USER=docker POSTGRES_PASSWORD=docker npx jest test/integration/example.spec.ts
+```
+
+You can also access these Postgres and Redis instances:
+```
+$ PGPASSWORD=docker psql -hlocalhost -Udocker
+$ redis-cli -h localhost
+```

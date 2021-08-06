@@ -28,7 +28,8 @@
     "test:compose": "docker-compose -f docker-compose.test.yml -f docker-compose.yml up --build --exit-code-from=sut",
     "doc": "typedoc lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
-    "check": "jellycheck"
+    "check": "jellycheck",
+    "compose": "docker-compose up"
   },
   "deplint": {
     "files": [
