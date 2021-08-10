@@ -1,4 +1,17 @@
 - commits:
+    - subject: add mergeability field for "type" type
+      hash: 9c831b4596d3e597c99d509a21a1ffc67f0b13dd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 5.1.16
+  date: 2021-08-09T15:13:47.612Z
+- commits:
     - subject: 'Add compose up command, more test docs'
       hash: 8d45a918effd7a88023e4a0a0c2ecba1c685fd9a
       body: ''
