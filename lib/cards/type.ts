@@ -4,6 +4,8 @@
  * Proprietary and confidential.
  */
 
+import { mergeProperties } from './transformer-merge-properties';
+
 export const type = {
 	slug: 'type',
 	type: 'type@1.0.0',
@@ -44,6 +46,20 @@ export const type = {
 								items: {
 									type: 'string',
 								},
+							},
+						},
+					},
+					$transformer: {
+						type: 'object',
+						properties: {
+							...mergeProperties,
+							mergeable: {
+								description:
+									'types are validated on insert and thus are always mergeable',
+								type: 'boolean',
+								$$formula: 'true',
+								readOnly: true,
+								default: false,
 							},
 						},
 					},
