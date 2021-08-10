@@ -471,6 +471,7 @@ export class Kernel {
 				CARDS.loop,
 				CARDS['oauth-provider'],
 				CARDS['oauth-client'],
+				CARDS['scheduled-action'],
 			].map(async (card) => {
 				logger.debug(context, 'Upserting core card', {
 					slug: card.slug,

@@ -22,6 +22,7 @@ import { roleUserAdmin } from './role-user-admin';
 import { view } from './view';
 import { oauthProvider } from './oauth-provider';
 import { oauthClient } from './oauth-client';
+import { scheduledAction } from './scheduled-action';
 import { ContractDefinition } from '@balena/jellyfish-types/build/core';
 
 const cards = [
@@ -42,6 +43,7 @@ const cards = [
 	view,
 	oauthProvider,
 	oauthClient,
+	scheduledAction,
 ];
 
 export const CARDS = cards.reduce<{ [slug: string]: ContractDefinition }>(
