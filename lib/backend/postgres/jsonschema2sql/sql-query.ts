@@ -344,7 +344,7 @@ const linkedToSql = (
 	pushLinkedLateral(
 		data.select,
 		idxStart,
-		state.linkEdges.length,
+		idxStart + 1,
 		nestedLaterals,
 		lateralAlias,
 		data.options,
