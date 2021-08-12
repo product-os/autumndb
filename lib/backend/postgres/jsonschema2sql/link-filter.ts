@@ -27,7 +27,6 @@ export class LinkFilter extends SqlFilter {
 
 	scrapLinksInto(list: any) {
 		list.push(this);
-		this.filter.scrapLinksInto(list);
 	}
 
 	toSqlInto(builder: SqlFragmentBuilder) {
