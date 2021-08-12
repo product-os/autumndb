@@ -1,4 +1,39 @@
 - commits:
+    - subject: '`LinkFilter.scrapLinksInto()` should not recurse.'
+      hash: cdc30113f390449e40dbab1c95c9c3a0a06fa4ed
+      body: |
+        The `scrapLinksInto` method is meant to gather `LinkFilter` objects from
+        a filter tree when that filter tree is simplified out. For example,
+        through constant folding. This mechanism allows optional links since
+        links that are mentioned in the original schema will be fetched even if
+        all filters mentioning them are optimized out.
+
+        `scrapLinksInto` is only called by `ExpressionFilter`, and only during
+        optimization, to build a list of optional links. Previously,
+        `LinkFilter` would also call `scrapLinksInto` of its own filter but that
+        does not make sense as doing so breaks nesting between `LinkFilter`s. If
+        a `LinkFilter` `a` had another `LinkFilter` `b` nested directly or not,
+        and `a.scrapLinksInto()` called in turn `b.scrapLinksInto()`, that would
+        duplicate `b` at the same nesting level as `a`.
+
+        While this oversight should only cause suboptimal SQL queries to be
+        generated when `$$links` are nested, it causes an error when two
+        optional links are nested due to how `ExpressionFilter.scrapLinksInto()`
+        is implemented, leading to the nested link being completely moved to the
+        wrong nesting level instead of just duplicated at the wrong level. This
+        in turn leads to invalid references in the resulting SQL.
+
+        Fixes #925
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.1.18
+  date: 2021-08-12T14:53:32.531Z
+- commits:
     - subject: >-
         Fix an issue where the compiler would emit extra statements when
         querying with nested links
