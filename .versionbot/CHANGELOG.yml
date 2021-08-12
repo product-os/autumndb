@@ -1,4 +1,23 @@
 - commits:
+    - subject: >-
+        Fix an issue where the compiler would emit extra statements when
+        querying with nested links
+      hash: 34f4da5d5ede3296b079a57f1264d86e8af878f1
+      body: |
+        This issue does not change the result of the query 99% of the time,
+        though it might lead to duplicate results in some very specific cases.
+        This change should also slightly reduce query times for queries with
+        nested links.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.1.17
+  date: 2021-08-12T14:43:46.706Z
+- commits:
     - subject: add mergeability field for "type" type
       hash: 9c831b4596d3e597c99d509a21a1ffc67f0b13dd
       body: ''
