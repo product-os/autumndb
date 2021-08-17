@@ -1,4 +1,17 @@
 - commits:
+    - subject: Fix type index definition generation
+      hash: 28ed699cf27982b7c3230d52fffc92a03d314141
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 5.1.19
+  date: 2021-08-17T22:31:51.309Z
+- commits:
     - subject: '`LinkFilter.scrapLinksInto()` should not recurse.'
       hash: cdc30113f390449e40dbab1c95c9c3a0a06fa4ed
       body: |
