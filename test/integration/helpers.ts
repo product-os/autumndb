@@ -14,11 +14,11 @@ export interface KernelContext extends helpers.BackendContext {
 export const before = async (
 	options: { suffix?: string; skipConnect?: boolean } = {},
 ): Promise<KernelContext> => {
-	const ctx: helpers.BackendContext &
-		Partial<KernelContext> = await helpers.before({
-		skipConnect: true,
-		suffix: options.suffix,
-	});
+	const ctx: helpers.BackendContext & Partial<KernelContext> =
+		await helpers.before({
+			skipConnect: true,
+			suffix: options.suffix,
+		});
 
 	if (options.suffix) {
 		await ctx.backend.connect(ctx.context);

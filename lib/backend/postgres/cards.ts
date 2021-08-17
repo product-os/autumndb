@@ -14,10 +14,11 @@ import * as traverse from 'traverse';
 import * as utils from './utils';
 import * as textSearch from './jsonschema2sql/text-search';
 import { SqlPath } from './jsonschema2sql/sql-path';
+import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
 import { DatabaseBackend, SearchFieldDef, Queryable } from './types';
 import { Context, Contract } from '@balena/jellyfish-types/build/core';
 import { TypedError } from 'typed-error';
-import { JSONSchema } from '@balena/jellyfish-types';
+import { core, JSONSchema } from '@balena/jellyfish-types';
 
 const logger = getLogger('jellyfish-core');
 
@@ -594,17 +595,17 @@ export const materializeLink = async (
  * @param {Context} context - Session context
  * @param {BackendConnection} connection - Database connection
  * @param {String[]} fields - Fields to use as an index
- * @param {String} type - The card type to constrain the index by
+ * @param {Object} schema - The card schema
  *
  * @example
- * const fields = [ 'name',	'data.from.id',	'data.to.id' ]
- * await cards.createTypeIndex(context, connection, 'cards', fields, 'link')
+ * const fields = [ 'name',	'data.from.id',	'data.to.id' ];
+ * await cards.createTypeIndex(context, connection, 'cards', fields, 'link', {...});
  */
 export const createTypeIndex = async (
 	context: Context,
 	connection: Queryable,
 	fields: string[],
-	type: string,
+	schema: core.ContractDefinition<any>,
 ) => {
 	/*
 	 * This query will give us a list of all the indexes
@@ -624,7 +625,7 @@ export const createTypeIndex = async (
 	 * not be able to cleanup older indexes with the older
 	 * name convention.
 	 */
-	const fullyQualifiedIndexName = `${type}__${fields
+	const fullyQualifiedIndexName = `${schema.slug}__${fields
 		.join('__')
 		.replace(/\./g, '_')}__idx`;
 	/*
@@ -633,27 +634,13 @@ export const createTypeIndex = async (
 	if (indexes.includes(fullyQualifiedIndexName)) {
 		return;
 	}
-	const columns = [];
-	for (const path of fields) {
-		// Make the assumption that if the index is dot seperated, it is a json path
-		const keys = path.split('.').map((value, arrayIndex) => {
-			// Escape input before sending it to the DB
-			return arrayIndex === 0 ? pgFormat.ident(value) : pgFormat.literal(value);
-		});
-		if (keys.length === 1) {
-			columns.push(keys[0]);
-		} else {
-			const final = keys.pop();
-			columns.push(`(${keys.join('->')}->>${final})`);
-		}
-	}
-	const versionedType = type.includes('@') ? type : `${type}@1.0.0`;
+
 	await utils.createIndex(
 		context,
 		connection,
 		CARDS_TABLE,
 		fullyQualifiedIndexName,
-		`(${columns.join(',')}) WHERE type=${pgFormat.literal(versionedType)}`,
+		generateTypeIndexPredicate(fields, schema),
 	);
 };
 /**
