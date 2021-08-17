@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>backend/postgres/jsonschema2sql/text-search | @balena/jellyfish-core</title>
+	<title>backend/postgres/jsonschema2sql/table-index | @balena/jellyfish-core</title>
 	<meta name="description" content="Documentation for @balena/jellyfish-core">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../modules.html">@balena/jellyfish-core</a>
 				</li>
 				<li>
-					<a href="backend_postgres_jsonschema2sql_text_search.html">backend/postgres/jsonschema2sql/text-search</a>
+					<a href="backend_postgres_jsonschema2sql_table_index.html">backend/postgres/jsonschema2sql/table-index</a>
 				</li>
 			</ul>
-			<h1>Module backend/postgres/jsonschema2sql/text-search</h1>
+			<h1>Module backend/postgres/jsonschema2sql/table-index</h1>
 		</div>
 	</div>
 </header>
@@ -72,8 +72,8 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_jsonschema2sql_text_search.html#toTSQuery" class="tsd-kind-icon">toTSQuery</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_jsonschema2sql_text_search.html#toTSVector" class="tsd-kind-icon">toTSVector</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_jsonschema2sql_table_index.html#generateTypeIndexPredicate" class="tsd-kind-icon">generate<wbr>Type<wbr>Index<wbr>Predicate</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_jsonschema2sql_table_index.html#getFieldType" class="tsd-kind-icon">get<wbr>Field<wbr>Type</a></li>
 							</ul>
 						</section>
 					</div>
@@ -82,93 +82,78 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="toTSQuery" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> toTSQuery</h3>
+					<a name="generateTypeIndexPredicate" class="tsd-anchor"></a>
+					<h3>generate<wbr>Type<wbr>Index<wbr>Predicate</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">toTSQuery<span class="tsd-signature-symbol">(</span>term<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">generate<wbr>Type<wbr>Index<wbr>Predicate<span class="tsd-signature-symbol">(</span>fields<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, schema<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">core.ContractDefinition</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/2e44c07/lib/backend/postgres/jsonschema2sql/text-search.ts#L47">lib/backend/postgres/jsonschema2sql/text-search.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/2e44c07/lib/backend/postgres/jsonschema2sql/table-index.ts#L47">lib/backend/postgres/jsonschema2sql/table-index.ts:47</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>summary</dt>
-									<dd><p>Prepare a Postgres tsquery function call for full-text search</p>
-									</dd>
-									<dt>function</dt>
-									<dd></dd>
-									<dt>example</dt>
-									<dd><p>const term = &#39;test&#39;
-										const result = toTSQuery(term)</p>
-									</dd>
-								</dl>
-							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>term: <span class="tsd-signature-type">string</span></h5>
+									<h5>fields: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>term to search for</p>
+										<p>fields to index</p>
+									</div>
+								</li>
+								<li>
+									<h5>schema: <span class="tsd-signature-type">core.ContractDefinition</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>card schema</p>
 									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
-							<p>tsquery function call</p>
+							<p>generated predicate for CREATE INDEX statement</p>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="toTSVector" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> toTSVector</h3>
+					<a name="getFieldType" class="tsd-anchor"></a>
+					<h3>get<wbr>Field<wbr>Type</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">toTSVector<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, isJson<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, isArray<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Field<wbr>Type<span class="tsd-signature-symbol">(</span>contractType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, schema<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">core.ContractDefinition</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span>, fieldPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/2e44c07/lib/backend/postgres/jsonschema2sql/text-search.ts#L21">lib/backend/postgres/jsonschema2sql/text-search.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/2e44c07/lib/backend/postgres/jsonschema2sql/table-index.ts#L21">lib/backend/postgres/jsonschema2sql/table-index.ts:21</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<dl class="tsd-comment-tags">
-									<dt>summary</dt>
-									<dd><p>Prepare a Postgres to_tsvector function call for full-text search</p>
-									</dd>
-									<dt>function</dt>
-									<dd></dd>
 									<dt>example</dt>
-									<dd><p>const result = toTSVector(&#39;cards.tags&#39;, false, true)</p>
+									<dd><p>getFieldType(&#39;message&#39;, {...}, &#39;data.payload.message&#39;);</p>
 									</dd>
 								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>path: <span class="tsd-signature-type">string</span></h5>
+									<h5>contractType: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>schema: <span class="tsd-signature-type">core.ContractDefinition</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>full path to field</p>
+										<p>type contract schema</p>
 									</div>
 								</li>
 								<li>
-									<h5>isJson: <span class="tsd-signature-type">boolean</span></h5>
+									<h5>fieldPath: <span class="tsd-signature-type">string</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>denotes if json field</p>
-									</div>
-								</li>
-								<li>
-									<h5>isArray: <span class="tsd-signature-type">boolean</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>denotes if array</p>
+										<p>path to field in schema</p>
 									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
-							<p>to_tsvector function call</p>
+							<p>string representation of field type</p>
 						</li>
 					</ul>
 				</section>
@@ -181,17 +166,17 @@
 						<a href="../modules.html">Modules</a>
 					</li>
 					<li class="current tsd-kind-module">
-						<a href="backend_postgres_jsonschema2sql_text_search.html">backend/postgres/jsonschema2sql/text-<wbr>search</a>
+						<a href="backend_postgres_jsonschema2sql_table_index.html">backend/postgres/jsonschema2sql/table-<wbr>index</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="backend_postgres_jsonschema2sql_text_search.html#toTSQuery" class="tsd-kind-icon">toTSQuery</a>
+						<a href="backend_postgres_jsonschema2sql_table_index.html#generateTypeIndexPredicate" class="tsd-kind-icon">generate<wbr>Type<wbr>Index<wbr>Predicate</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="backend_postgres_jsonschema2sql_text_search.html#toTSVector" class="tsd-kind-icon">toTSVector</a>
+						<a href="backend_postgres_jsonschema2sql_table_index.html#getFieldType" class="tsd-kind-icon">get<wbr>Field<wbr>Type</a>
 					</li>
 				</ul>
 			</nav>
