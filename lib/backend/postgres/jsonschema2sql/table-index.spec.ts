@@ -4,11 +4,10 @@
  * Proprietary and confidential.
  */
 
-import { generateTypeIndexPredicate, getFieldType } from './table-index';
+import { generateTypeIndexPredicate, isArrayField } from './table-index';
 
-describe('getFieldType()', () => {
-	it('should accurately get field types from a contract type schema', () => {
-		const type = 'message';
+describe('isArrayField()', () => {
+	it('should accurately parse field types from a contract type schema', () => {
 		const schema = {
 			slug: 'foobar',
 			type: 'type@1.0.0',
@@ -43,33 +42,10 @@ describe('getFieldType()', () => {
 			},
 		};
 
-		expect(getFieldType(type, schema, 'data')).toEqual('object');
-		expect(getFieldType(type, schema, 'data.payload')).toEqual('object');
-		expect(getFieldType(type, schema, 'data.payload.message')).toEqual(
-			'string',
-		);
-		expect(getFieldType(type, schema, 'data.payload.mentionsUser')).toEqual(
-			'array',
-		);
-	});
-
-	it('should throw error when no type is found', () => {
-		expect.hasAssertions();
-		try {
-			getFieldType(
-				'message',
-				{
-					slug: 'foobar',
-					type: 'foobar@1.0.0',
-					data: {},
-				},
-				'data.payload.message',
-			);
-		} catch (error) {
-			expect(error.message).toEqual(
-				'Could not find type for field data.payload.message on message',
-			);
-		}
+		expect(isArrayField(schema, 'data')).toEqual(false);
+		expect(isArrayField(schema, 'data.payload')).toEqual(false);
+		expect(isArrayField(schema, 'data.payload.message')).toEqual(false);
+		expect(isArrayField(schema, 'data.payload.mentionsUser')).toEqual(true);
 	});
 });
 

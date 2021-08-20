@@ -10,32 +10,27 @@ import * as pgFormat from 'pg-format';
 import { SqlPath } from './sql-path';
 
 /**
- * @param type - contract type
  * @param schema - type contract schema
  * @param fieldPath - path to field in schema
- * @returns string representation of field type
+ * @returns boolean flag denoting if field is of type array or not
  *
  * @example
- * getFieldType('message', {...}, 'data.payload.message');
+ * isArrayField({...}, 'data.payload.message');
  */
-export function getFieldType(
-	contractType: string,
+export function isArrayField(
 	schema: core.ContractDefinition<any>,
 	fieldPath: string,
-): string {
+): boolean {
 	const fullPath = ['data', 'schema', 'properties'].concat(
 		fieldPath.replace(/\./g, '.properties.').split('.'),
 		['type'],
 	);
 	const fieldType = _.get(schema, fullPath);
-
-	// Error out if no type is found for provided path, invalid schema or indexed_fields.
-	if (!_.isString(fieldType)) {
-		throw new Error(
-			`Could not find type for field ${fieldPath} on ${contractType}`,
-		);
+	if (_.isString(fieldType) && fieldType === 'array') {
+		return true;
 	}
-	return fieldType;
+
+	return false;
 }
 
 /**
@@ -55,8 +50,7 @@ export function generateTypeIndexPredicate(
 
 	for (const path of fields) {
 		// Use gin for indexes on array fields
-		const isArray = getFieldType(type, schema, path) === 'array';
-		if (fields.length === 1 && isArray) {
+		if (fields.length === 1 && isArrayField(schema, path)) {
 			indexType = 'gin';
 			asText = false;
 		}
