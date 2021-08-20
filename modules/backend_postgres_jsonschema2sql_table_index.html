@@ -73,7 +73,7 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_jsonschema2sql_table_index.html#generateTypeIndexPredicate" class="tsd-kind-icon">generate<wbr>Type<wbr>Index<wbr>Predicate</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_jsonschema2sql_table_index.html#getFieldType" class="tsd-kind-icon">get<wbr>Field<wbr>Type</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="backend_postgres_jsonschema2sql_table_index.html#isArrayField" class="tsd-kind-icon">is<wbr>Array<wbr>Field</a></li>
 							</ul>
 						</section>
 					</div>
@@ -91,7 +91,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/2e44c07/lib/backend/postgres/jsonschema2sql/table-index.ts#L47">lib/backend/postgres/jsonschema2sql/table-index.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/6a76f9d/lib/backend/postgres/jsonschema2sql/table-index.ts#L42">lib/backend/postgres/jsonschema2sql/table-index.ts:42</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -115,30 +115,27 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="getFieldType" class="tsd-anchor"></a>
-					<h3>get<wbr>Field<wbr>Type</h3>
+					<a name="isArrayField" class="tsd-anchor"></a>
+					<h3>is<wbr>Array<wbr>Field</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Field<wbr>Type<span class="tsd-signature-symbol">(</span>contractType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, schema<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">core.ContractDefinition</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span>, fieldPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Array<wbr>Field<span class="tsd-signature-symbol">(</span>schema<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">core.ContractDefinition</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span>, fieldPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/2e44c07/lib/backend/postgres/jsonschema2sql/table-index.ts#L21">lib/backend/postgres/jsonschema2sql/table-index.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-core/blob/6a76f9d/lib/backend/postgres/jsonschema2sql/table-index.ts#L20">lib/backend/postgres/jsonschema2sql/table-index.ts:20</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<dl class="tsd-comment-tags">
 									<dt>example</dt>
-									<dd><p>getFieldType(&#39;message&#39;, {...}, &#39;data.payload.message&#39;);</p>
+									<dd><p>isArrayField({...}, &#39;data.payload.message&#39;);</p>
 									</dd>
 								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
-								<li>
-									<h5>contractType: <span class="tsd-signature-type">string</span></h5>
-								</li>
 								<li>
 									<h5>schema: <span class="tsd-signature-type">core.ContractDefinition</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -152,8 +149,8 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
-							<p>string representation of field type</p>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<p>boolean flag denoting if field is of type array or not</p>
 						</li>
 					</ul>
 				</section>
@@ -176,7 +173,7 @@
 						<a href="backend_postgres_jsonschema2sql_table_index.html#generateTypeIndexPredicate" class="tsd-kind-icon">generate<wbr>Type<wbr>Index<wbr>Predicate</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="backend_postgres_jsonschema2sql_table_index.html#getFieldType" class="tsd-kind-icon">get<wbr>Field<wbr>Type</a>
+						<a href="backend_postgres_jsonschema2sql_table_index.html#isArrayField" class="tsd-kind-icon">is<wbr>Array<wbr>Field</a>
 					</li>
 				</ul>
 			</nav>
