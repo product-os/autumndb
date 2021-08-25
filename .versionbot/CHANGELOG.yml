@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Renovate config
+      hash: 368a330acda79579743766fa419141d64cd551b7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 5.1.21
+  date: 2021-08-25T08:21:52.412Z
+- commits:
     - subject: Update index generation to handle evaluated fields
       hash: 007be281bfaf816dfdc61a2cb64e4a539ec32446
       body: ''
