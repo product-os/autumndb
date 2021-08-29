@@ -1,4 +1,25 @@
 - commits:
+    - subject: Fix error type unknown type errors
+      hash: fa4a4033ac127b4ce329df9c63b269b9c11f1142
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'patch: Update external-non-major'
+      hash: 45cc95e3a38200b54d65a488f3e4ed416562ddfb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 5.1.26
+  date: 2021-08-29T02:03:15.102Z
+- commits:
     - subject: Add @types/json-schema
       hash: 75685f79a1bf846fad631fa1e1dad68272f25fae
       body: ''
