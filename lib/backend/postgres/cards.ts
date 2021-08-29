@@ -511,7 +511,7 @@ export const upsert = async <T extends Contract = Contract>(
 				values: payload,
 			});
 		}
-	} catch (error) {
+	} catch (error: any) {
 		if (/^duplicate key value/.test(error.message)) {
 			if (/pkey/.test(error.message)) {
 				const upsertError = new errors.JellyfishElementAlreadyExists(
@@ -576,7 +576,7 @@ export const materializeLink = async (
 			text: sql,
 			values: [card.linked_at, card.id],
 		});
-	} catch (error) {
+	} catch (error: any) {
 		if (/^duplicate key value/.test(error.message)) {
 			throw new errors.JellyfishElementAlreadyExists(
 				`There is already an element with the slug ${card.slug}`,

@@ -192,7 +192,7 @@ export class Streamer {
 					logger.info(context, 'Streamer database client reconnected');
 
 					reconnecting = false;
-				} catch (error) {
+				} catch (error: any) {
 					logger.warn(
 						context,
 						'Streamer database client reconnect attempt failed',
