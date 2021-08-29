@@ -73,6 +73,13 @@ export const link = {
 			},
 			required: ['name', 'type', 'links', 'data'],
 		},
-		indexed_fields: [['name'], ['data.from.id', 'name', 'data.to.id']],
+		indexed_fields: [
+			['name'],
+			['data.from.id'],
+			['data.from.type'],
+			['data.to.id'],
+			['data.to.type'],
+			['data.from.id', 'name', 'data.to.id'],
+		],
 	},
 };
