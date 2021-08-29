@@ -132,7 +132,7 @@ const compileSchema = (
 	let query = null;
 	try {
 		query = jsonschema2sql.compile(table, select, schema, options);
-	} catch (error) {
+	} catch (error: any) {
 		if (error.name === 'InvalidSchema') {
 			throw new errors.JellyfishInvalidSchema(error.message);
 		}
@@ -559,7 +559,7 @@ export class PostgresBackend implements Queryable {
 			try {
 				await this.connection.any(`
 					CREATE DATABASE ${this.database} OWNER = ${this.options.user};`);
-			} catch (error) {
+			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
 				}
@@ -598,7 +598,7 @@ export class PostgresBackend implements Queryable {
 
 			try {
 				await cards.setup(context, this, this.database);
-			} catch (error) {
+			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
 				}
@@ -608,7 +608,7 @@ export class PostgresBackend implements Queryable {
 				await links.setup(context, this, this.database, {
 					cards: cards.TABLE,
 				});
-			} catch (error) {
+			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
 				}
@@ -619,7 +619,7 @@ export class PostgresBackend implements Queryable {
 					source: cards.TABLE,
 					links: links.TABLE,
 				});
-			} catch (error) {
+			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
 				}
@@ -627,7 +627,7 @@ export class PostgresBackend implements Queryable {
 
 			try {
 				await streams.setupTrigger(this, cards.TABLE, cards.TRIGGER_COLUMNS);
-			} catch (error) {
+			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
 				}
