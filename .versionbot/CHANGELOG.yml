@@ -1,4 +1,24 @@
 - commits:
+    - subject: Add indexes on data fields to assist in querying links efficiently
+      hash: 8b04eabe901a10773443a4a10dc3c1088e780cd8
+      body: >
+        Sometimes we will need to query for links as follows:
+
+        * Find all links to or from this specific contract (`data.from.id` or
+        `data.to.id`)
+
+        * Find all links to or from this type of contract (`data.from.type` or
+        `data.to.type`)
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 5.2.0
+  date: 2021-08-29T08:44:04.801Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.336'
       hash: e15b6d0a90bba5c16298c9a36d8a486e418bd2d2
       body: ''
