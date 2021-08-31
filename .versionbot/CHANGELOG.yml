@@ -1,4 +1,21 @@
 - commits:
+    - subject: >-
+        Create `links2` and `strings` tables, and insert on them parallel to
+        `links`
+      hash: 1ff1b1d9ca1e6d71b6d381b8351754cc47b56659
+      body: ''
+      footer:
+        JIP: 'https://jel.ly.fish/74c8126d-d896-43e9-92df-5a293c0db2cc'
+        jip: 'https://jel.ly.fish/74c8126d-d896-43e9-92df-5a293c0db2cc'
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.3.0
+  date: 2021-08-31T12:21:51.083Z
+- commits:
     - subject: Add indexes on data fields to assist in querying links efficiently
       hash: 8b04eabe901a10773443a4a10dc3c1088e780cd8
       body: >
