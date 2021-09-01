@@ -1,4 +1,25 @@
 - commits:
+    - subject: Update files to use secrets
+      hash: f4056fbb04c50da767b9b7602249992590428c52
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: "\U0001F504 Synced file(s) with product-os/secrets"
+      hash: 01469e33da8b33084ffbd96df32dfc826d3199e6
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 5.3.1
+  date: 2021-09-01T00:51:32.129Z
+- commits:
     - subject: >-
         Create `links2` and `strings` tables, and insert on them parallel to
         `links`
