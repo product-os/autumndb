@@ -3,6 +3,16 @@
 
 docker:
   publish: false
+  builds:
+    - path: .
+      dockerfile: Dockerfile
+      docker_repo: balena/jellyfish-core_sut
+      publish: false
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+      secrets:
+        - id: npmrc
+          src: .balena/secrets/npmrc.txt
 npm:
   platforms:
     - name: linux
