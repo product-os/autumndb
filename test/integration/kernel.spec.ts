@@ -65,17 +65,12 @@ describe('Kernel', () => {
 		});
 
 		it('should apply a single operation', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
 					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -111,7 +106,7 @@ describe('Kernel', () => {
 				links: card.links,
 				markers: card.markers,
 				requires: card.requires,
-				slug,
+				slug: card.slug,
 				updated_at: result!.updated_at,
 				tags: [],
 				loop: null,
@@ -124,21 +119,15 @@ describe('Kernel', () => {
 		});
 
 		it('should add an element to an array', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
-				} as any,
+				},
 			);
 
 			await ctx.kernel.patchCardBySlug(
@@ -170,7 +159,7 @@ describe('Kernel', () => {
 				links: {},
 				markers: ['test'],
 				requires: [],
-				slug,
+				slug: card.slug,
 				updated_at: result!.updated_at,
 				tags: [],
 				loop: null,
@@ -183,17 +172,11 @@ describe('Kernel', () => {
 		});
 
 		it('should delete a property inside data', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						'foo/bla': 'bar',
 						bar: 'baz',
@@ -229,7 +212,7 @@ describe('Kernel', () => {
 				links: card.links,
 				markers: card.markers,
 				requires: card.requires,
-				slug,
+				slug: card.slug,
 				updated_at: result!.updated_at,
 				tags: [],
 				loop: null,
@@ -242,18 +225,11 @@ describe('Kernel', () => {
 		});
 
 		it('should apply more than one operation', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -296,7 +272,7 @@ describe('Kernel', () => {
 				links: card.links,
 				markers: card.markers,
 				requires: card.requires,
-				slug,
+				slug: card.slug,
 				updated_at: result!.updated_at,
 				tags: [],
 				loop: null,
@@ -312,17 +288,11 @@ describe('Kernel', () => {
 		});
 
 		it('should not be able to delete an id', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -352,17 +322,11 @@ describe('Kernel', () => {
 		});
 
 		it('should not be able to delete a top level property', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -393,17 +357,11 @@ describe('Kernel', () => {
 		});
 
 		it('should throw given an operation without a path', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -426,17 +384,11 @@ describe('Kernel', () => {
 		});
 
 		it('should throw if the patch does not match', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -467,18 +419,11 @@ describe('Kernel', () => {
 		});
 
 		it('should throw if adding to non existent property', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
-
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -510,17 +455,11 @@ describe('Kernel', () => {
 		});
 
 		it('should throw given an invalid operation', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -552,17 +491,11 @@ describe('Kernel', () => {
 		});
 
 		it('should not apply half matching patches', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -599,16 +532,11 @@ describe('Kernel', () => {
 		});
 
 		it('should not break the type schema', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'user-john-doe',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 						hash: 'PASSWORDLESS',
@@ -641,17 +569,11 @@ describe('Kernel', () => {
 		});
 
 		it('should apply a no-op patch', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -682,17 +604,11 @@ describe('Kernel', () => {
 		});
 
 		it('should apply an empty set of patches', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -717,17 +633,11 @@ describe('Kernel', () => {
 		});
 
 		it('should ignore changes to read-only properties', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -774,7 +684,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
-				version: '1.0.0',
 				data: {
 					read: {
 						type: 'object',
@@ -803,7 +712,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 						hash: 'PASSWORDLESS',
@@ -816,11 +724,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: userCard.id,
 					},
@@ -921,7 +825,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 						hash: 'PASSWORDLESS',
@@ -934,11 +837,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: userCard.id,
 					},
@@ -1041,7 +940,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 						hash: 'secret',
@@ -1054,11 +952,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: userCard.id,
 					},
@@ -1112,7 +1006,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
-				version: '1.0.0',
 				data: {
 					read: {
 						type: 'object',
@@ -1162,7 +1055,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 						hash: 'secret',
@@ -1175,11 +1067,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: userCard.id,
 					},
@@ -1190,11 +1078,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'random-1',
-					}),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						hello: 'world',
 						foo: 7,
@@ -1296,7 +1180,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 						hash: 'secret',
@@ -1309,11 +1192,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: userCard.id,
 					},
@@ -1360,7 +1239,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
-				version: '1.0.0',
 				data: {
 					read: {
 						type: 'object',
@@ -1415,7 +1293,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 						hash: 'secret',
@@ -1428,11 +1305,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: userCard.id,
 					},
@@ -1480,9 +1353,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
-				version: '1.0.0',
-				active: true,
-				data: {},
 			});
 
 			const slug = ctx.generateRandomSlug({
@@ -1493,9 +1363,7 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1525,23 +1393,14 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
-				version: '1.0.0',
-				active: true,
-				data: {},
 			});
 
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foobarbaz',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
-					tags: [],
 					loop: `${loopSlug}@1.0.0`,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1570,17 +1429,12 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
-				version: '1.0.0',
-				active: true,
-				data: {},
 			});
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
 				version: '1.0.1',
-				active: true,
-				data: {},
 			});
 
 			const slug = ctx.generateRandomSlug({
@@ -1591,10 +1445,8 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					tags: [],
 					loop: `${loopSlug}@1.0.0`,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1626,9 +1478,7 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1668,9 +1518,7 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1708,9 +1556,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
-				version: '1.0.0',
-				active: true,
-				data: {},
 			});
 
 			const slug = ctx.generateRandomSlug({
@@ -1722,9 +1567,7 @@ describe('Kernel', () => {
 				{
 					slug,
 					loop: `${loopSlug}@1.0.0`,
-					tags: [],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1762,7 +1605,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `card-${uuid()}`,
 					type: 'card@1.0.0',
 					links: {
 						foo: 'bar',
@@ -1786,11 +1628,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'user',
-					}),
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'johndoe@gmail.com'],
 						hash: 'PASSWORDLESS',
@@ -1808,11 +1646,7 @@ describe('Kernel', () => {
 		it('should not create a user with an empty email list', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: ctx.generateRandomSlug({
-						prefix: 'user',
-					}),
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: [],
 						hash: 'PASSWORDLESS',
@@ -1825,11 +1659,7 @@ describe('Kernel', () => {
 		it('should not create a user with an invalid email', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: ctx.generateRandomSlug({
-						prefix: 'user',
-					}),
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: ['foo'],
 						hash: 'PASSWORDLESS',
@@ -1842,11 +1672,7 @@ describe('Kernel', () => {
 		it('should not create a user with an invalid and a valid email', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: ctx.generateRandomSlug({
-						prefix: 'user',
-					}),
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'foo'],
 						hash: 'PASSWORDLESS',
@@ -1859,11 +1685,7 @@ describe('Kernel', () => {
 		it('should not create a user with duplicated emails', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: ctx.generateRandomSlug({
-						prefix: 'user',
-					}),
 					type: 'user@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'johndoe@example.com'],
 						hash: 'PASSWORDLESS',
@@ -1876,9 +1698,7 @@ describe('Kernel', () => {
 		it('should throw an error if the element does not adhere to the type', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: 'action-foo-bar',
 					type: 'action@1.0.0',
-					version: '1.0.0',
 					data: {},
 				}),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
@@ -1889,8 +1709,6 @@ describe('Kernel', () => {
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 					slug: 'test-1@latest',
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				}),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 		});
@@ -1900,8 +1718,6 @@ describe('Kernel', () => {
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 					slug: 'test-1@1.0.0',
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				}),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 		});
@@ -1909,11 +1725,7 @@ describe('Kernel', () => {
 		it('should throw an error if the card type does not exist', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: 'foo',
 					type: 'foobarbazqux@1.0.0',
-					version: '1.0.0',
-					active: true,
-					data: {},
 				}),
 			).rejects.toThrow(errors.JellyfishUnknownCardType);
 		});
@@ -1922,9 +1734,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: 'loop/product-os',
 				type: 'loop@1.0.0',
-				version: '1.0.0',
-				active: true,
-				data: {},
 			});
 
 			const slug = ctx.generateRandomSlug();
@@ -1935,9 +1744,6 @@ describe('Kernel', () => {
 					slug,
 					type: 'card@1.0.0',
 					loop: 'loop/product-os@1.0.0',
-					version: '1.0.0',
-					active: true,
-					data: {},
 				},
 			);
 
@@ -1947,12 +1753,8 @@ describe('Kernel', () => {
 		it('should throw an error if the referenced loop does not exist', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					loop: 'saywhat@1.0.0',
-					version: '1.0.0',
-					active: true,
-					data: {},
 				}),
 			).rejects.toThrow(errors.JellyfishNoElement);
 		});
@@ -1960,12 +1762,8 @@ describe('Kernel', () => {
 		it('should throw an error if the referenced loop is not a loop contract', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					loop: 'user@1.0.0',
-					version: '1.0.0',
-					active: true,
-					data: {},
 				}),
 			).rejects.toThrow(errors.JellyfishNoElement);
 		});
@@ -1981,7 +1779,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -2033,7 +1830,6 @@ describe('Kernel', () => {
 					slug,
 					type: 'card@1.0.0',
 					version,
-					data: {},
 				},
 			);
 			const element = await ctx.kernel.getCardBySlug(
@@ -2051,10 +1847,8 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					version,
-					data: {},
 				},
 			);
 			const element = await ctx.kernel.getCardBySlug(
@@ -2111,13 +1905,11 @@ describe('Kernel', () => {
 				slug,
 				type: 'card@1.0.0',
 				version: version1,
-				data: {},
 			});
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug,
 				type: 'card@1.0.0',
 				version: version2,
-				data: {},
 			});
 			const elements = [
 				await ctx.kernel.getCardBySlug(
@@ -2139,16 +1931,11 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to insert a card', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'hello-world',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -2164,17 +1951,12 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to set a tag with a colon', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'hello-world',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
 					tags: ['foo:bar'],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -2190,17 +1972,12 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to set a tag with a space and a slash', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'hello-world',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
 					tags: ['CUSTOM HARDWARE/OS'],
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -2216,14 +1993,10 @@ describe('Kernel', () => {
 		});
 
 		it('should use defaults if required keys are missing', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'hello-world',
-			});
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
 					type: 'card@1.0.0',
 				},
 			);
@@ -2233,7 +2006,7 @@ describe('Kernel', () => {
 				created_at: card.created_at,
 				updated_at: null,
 				linked_at: {},
-				slug,
+				slug: card.slug,
 				type: 'card@1.0.0',
 				name: null,
 				active: true,
@@ -2260,7 +2033,7 @@ describe('Kernel', () => {
 			expect(card.slug).toBeTruthy();
 		});
 
-		it('should throw if the card already exists', async () => {
+		it('should throw if the card slug already exists', async () => {
 			const slug = ctx.generateRandomSlug({
 				prefix: 'hello-world',
 			});
@@ -2284,9 +2057,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'foo-bar',
-					}),
 					type: 'card@1.0.0',
 				},
 			);
@@ -2295,9 +2065,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'bar-baz',
-					}),
 					type: 'card@1.0.0',
 				},
 			);
@@ -2339,9 +2106,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'foo-bar',
-					}),
 					type: 'card@1.0.0',
 				},
 			);
@@ -2350,9 +2114,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'bar-baz',
-					}),
 					type: 'card@1.0.0',
 				},
 			);
@@ -2393,9 +2154,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'foo-bar',
-					}),
 					type: 'card@1.0.0',
 				},
 			);
@@ -2404,12 +2162,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'bar-baz',
-					}),
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -2468,17 +2221,12 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					foo: card1.id,
 				},
@@ -2595,11 +2343,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: userCard.id,
 					},
@@ -2646,17 +2390,11 @@ describe('Kernel', () => {
 
 	describe('.replaceCard()', () => {
 		it('should replace an element', async () => {
-			const slug = ctx.generateRandomSlug({
-				prefix: 'foo-bar',
-			});
 			const card1 = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -2664,10 +2402,11 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
+					slug: card1.slug,
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
+					data: {
+						replaced: true,
+					},
 				},
 			);
 
@@ -2685,7 +2424,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `card-${uuid()}`,
 					type: 'card@1.0.0',
 				},
 			);
@@ -2708,7 +2446,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `card-${uuid()}`,
 					type: 'card@1.0.0',
 				},
 			);
@@ -2733,7 +2470,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `card-${uuid()}`,
 					type: 'card@1.0.0',
 				},
 			);
@@ -2769,10 +2505,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -2785,17 +2518,18 @@ describe('Kernel', () => {
 		});
 
 		it('.getCardBySlug() should not find an active card by its slug and the wrong version', async () => {
-			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
-				type: 'card@1.0.0',
-				version: '1.0.0',
-				data: {},
-			});
+			const result = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'card@1.0.0',
+				},
+			);
 
 			const card = await ctx.kernel.getCardBySlug(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
-				'foo-bar@1.0.1',
+				`${result.slug}@1.0.1`,
 			);
 
 			expect(card).toBeFalsy();
@@ -2816,10 +2550,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -2833,22 +2564,22 @@ describe('Kernel', () => {
 		});
 
 		it('.getCardBySlug() should find the latest version of a card', async () => {
-			const slug = ctx.generateRandomSlug();
-
-			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug,
-				type: 'card@1.0.0',
-				version: '1.0.0',
-				data: {
-					foo: 'bar',
+			const card1 = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'card@1.0.0',
+					data: {
+						foo: 'bar',
+					},
 				},
-			});
+			);
 
 			const card2 = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug,
+					slug: card1.slug,
 					type: 'card@1.0.0',
 					version: '2.0.1',
 					data: {
@@ -2858,7 +2589,7 @@ describe('Kernel', () => {
 			);
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug,
+				slug: card1.slug,
 				type: 'card@1.0.0',
 				version: '1.2.1',
 				data: {
@@ -2869,7 +2600,7 @@ describe('Kernel', () => {
 			const element = await ctx.kernel.getCardBySlug(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
-				`${slug}@latest`,
+				`${card1.slug}@latest`,
 			);
 
 			expect(element!.data.foo).toBe('baz');
@@ -2881,10 +2612,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -2904,10 +2632,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -2924,10 +2649,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -2945,10 +2667,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {},
 				},
 			);
 
@@ -3028,9 +2747,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						ref,
 						test: 1,
@@ -3043,9 +2760,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						ref,
 						test: 2,
@@ -3055,9 +2770,7 @@ describe('Kernel', () => {
 			);
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: 'baz',
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					ref,
 					test: 3,
@@ -3098,9 +2811,7 @@ describe('Kernel', () => {
 			const ref = uuid();
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					ref,
 					test: 1,
@@ -3109,9 +2820,7 @@ describe('Kernel', () => {
 			});
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					ref,
 					test: 2,
@@ -3123,9 +2832,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						ref,
 						test: 3,
@@ -3167,9 +2874,7 @@ describe('Kernel', () => {
 			const ref = uuid();
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					ref,
 					test: 1,
@@ -3181,9 +2886,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						ref,
 						test: 2,
@@ -3193,9 +2896,7 @@ describe('Kernel', () => {
 			);
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					ref,
 					test: 3,
@@ -3238,7 +2939,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 				},
 			);
@@ -3247,7 +2947,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 1,
@@ -3259,7 +2958,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 0,
@@ -3357,7 +3055,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 				},
 			);
@@ -3366,7 +3063,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 1,
@@ -3378,7 +3074,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 0,
@@ -3473,7 +3168,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 				},
 			);
@@ -3482,7 +3176,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 1,
@@ -3494,7 +3187,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 0,
@@ -3589,7 +3281,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 1,
@@ -3651,7 +3342,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 				},
 			);
@@ -3660,7 +3350,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 1,
@@ -3672,7 +3361,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
 					data: {
 						sequence: 0,
@@ -3768,9 +3456,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 					},
@@ -3778,9 +3464,7 @@ describe('Kernel', () => {
 			);
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					email: 'johnsmith@example.io',
 				},
@@ -3834,9 +3518,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 					},
@@ -3844,9 +3526,7 @@ describe('Kernel', () => {
 			);
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					email: 'johnsmith@example.io',
 				},
@@ -3901,9 +3581,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						$foo: 'bar',
 					},
@@ -3950,9 +3628,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -3964,11 +3640,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: actor.id,
 					},
@@ -4035,9 +3707,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -4049,11 +3719,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: actor.id,
 					},
@@ -4084,7 +3750,6 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'org@1.0.0',
 					name: 'Foo Ltd',
 				},
@@ -4162,9 +3827,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -4176,11 +3839,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: actor.id,
 					},
@@ -4190,7 +3849,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: `role-${role}`,
 				type: 'role@1.0.0',
-				version: '1.0.0',
 				data: {
 					read: {
 						type: 'object',
@@ -4238,9 +3896,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -4252,11 +3908,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: actor.id,
 					},
@@ -4316,9 +3968,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -4330,11 +3980,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: actor.id,
 					},
@@ -4344,7 +3990,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug: `role-${role}`,
 				type: 'role@1.0.0',
-				version: '1.0.0',
 				data: {
 					read: {
 						type: 'object',
@@ -4465,10 +4110,6 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				{
 					type: 'action-request@1.0.0',
-					slug: ctx.generateRandomSlug({
-						prefix: 'action-request',
-					}),
-					version: '1.0.0',
 					data: {
 						epoch: date.valueOf(),
 						action: 'action-foo@1.0.0',
@@ -4491,9 +4132,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: 'foo',
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						timestamp: date.toISOString(),
 					},
@@ -4534,9 +4173,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `${ctx.generateRandomSlug()}-john-smith`,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					active: false,
 					data: {
 						email: 'johnsmith@example.io',
@@ -4553,8 +4190,7 @@ describe('Kernel', () => {
 					additionalProperties: false,
 					properties: {
 						slug: {
-							type: 'string',
-							pattern: 'smith$',
+							const: card.slug,
 						},
 					},
 					required: ['slug'],
@@ -4570,9 +4206,7 @@ describe('Kernel', () => {
 
 		it('should take a view card with two filters', async () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				tags: ['foo'],
 				data: {
 					number: 1,
@@ -4580,9 +4214,7 @@ describe('Kernel', () => {
 			});
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					number: 1,
 				},
@@ -4592,15 +4224,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'view',
-					}),
 					type: 'view@1.0.0',
-					version: '1.0.0',
-					tags: [],
-					markers: [],
-					links: {},
-					active: true,
 					data: {
 						allOf: [
 							{
@@ -4662,9 +4286,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: true,
 						number: 1,
@@ -4676,9 +4298,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: false,
 						count: 1,
@@ -4773,9 +4393,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: true,
 						number: 1,
@@ -4787,9 +4405,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: true,
 						number: 2,
@@ -4801,9 +4417,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: false,
 						count: 1,
@@ -4834,9 +4448,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: false,
 						count: 2,
@@ -4941,9 +4553,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: true,
 						number: 1,
@@ -4955,9 +4565,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: true,
 						number: 2,
@@ -4966,9 +4574,7 @@ describe('Kernel', () => {
 			);
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					thread: true,
 					number: 3,
@@ -4979,9 +4585,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: false,
 						count: 1,
@@ -5012,9 +4616,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: false,
 						count: 2,
@@ -5045,9 +4647,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						thread: false,
 						count: 3,
@@ -5194,9 +4794,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5204,9 +4802,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
@@ -5231,9 +4827,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
@@ -5313,9 +4907,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5323,9 +4915,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5333,9 +4923,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5379,9 +4967,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5483,9 +5069,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5493,9 +5077,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: true,
 					},
@@ -5506,9 +5088,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: false,
 					},
@@ -5519,9 +5099,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5635,9 +5213,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5645,9 +5221,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: false,
 					},
@@ -5658,9 +5232,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: true,
 					},
@@ -5668,15 +5240,11 @@ describe('Kernel', () => {
 			);
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 			});
 
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					isStressed: false,
 				},
@@ -5768,9 +5336,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5778,9 +5344,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						order: 0,
 					},
@@ -5791,9 +5355,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						order: 1,
 					},
@@ -5927,9 +5489,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -5937,9 +5497,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						stressedDays: [1, 3, 5],
 					},
@@ -5950,9 +5508,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						stressedDays: [1, 2, 4],
 					},
@@ -5963,9 +5519,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6080,9 +5634,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6090,9 +5642,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						stressedDays: [1, 3, 5],
 					},
@@ -6103,9 +5653,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						stressedDays: [1, 'INVALID DAY', 4],
 					},
@@ -6116,9 +5664,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6233,9 +5779,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6243,9 +5787,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6253,9 +5795,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6316,9 +5856,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6326,9 +5864,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: true,
 					},
@@ -6339,9 +5875,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: false,
 					},
@@ -6352,9 +5886,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6490,9 +6022,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						idx: 1,
 						isWorking: true,
@@ -6592,9 +6122,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6602,9 +6130,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: true,
 					},
@@ -6615,9 +6141,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: false,
 					},
@@ -6628,9 +6152,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						isStressed: false,
 					},
@@ -6750,18 +6272,14 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 			const bar = await ctx.kernel.insertCard(
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					type: 'card@1.0.0',
-					version: '1.0.0',
 				},
 			);
 
@@ -6776,11 +6294,7 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: adminSession.data.actor,
 						scope: {
@@ -6845,19 +6359,15 @@ describe('Kernel', () => {
 		it('should work with optional prerelease and build version data', async () => {
 			const cards = [
 				await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: `card-${ctx.generateRandomSlug()}`,
 					type: 'card@1.0.0',
 					version: '3.0.1',
-					active: true,
 					data: {
 						foo: 1,
 					},
 				}),
 				await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					slug: `card-${ctx.generateRandomSlug()}`,
 					type: 'card@1.0.0',
 					version: '3.0.2',
-					active: true,
 					data: {
 						foo: 1,
 					},
@@ -6912,12 +6422,8 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
-						prefix: 'session',
-					}),
 					active: false,
 					type: 'session@1.0.0',
-					version: '1.0.0',
 					data: {
 						actor: adminUser.id,
 					},
@@ -6995,7 +6501,6 @@ describe('Kernel', () => {
 			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug,
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					test: 1,
 				},
@@ -7069,11 +6574,7 @@ describe('Kernel', () => {
 			});
 
 			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug({
-					prefix: 'card',
-				}),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					test: 2,
 				},
@@ -7126,9 +6627,7 @@ describe('Kernel', () => {
 			emitter.on('closed', done);
 
 			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					test: 1,
 				},
@@ -7136,7 +6635,6 @@ describe('Kernel', () => {
 			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug,
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					email: 'johndoe@example.com',
 				},
@@ -7290,10 +6788,6 @@ describe('Kernel', () => {
 
 			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				type: 'action-request@1.0.0',
-				slug: ctx.generateRandomSlug({
-					prefix: 'action-request',
-				}),
-				version: '1.0.0',
 				data: {
 					context: ctx.context,
 					action: 'action-delete-card@1.0.0',
@@ -7308,9 +6802,7 @@ describe('Kernel', () => {
 				},
 			});
 			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					email: 'johndoe@example.com',
 				},
@@ -7376,7 +6868,6 @@ describe('Kernel', () => {
 				slug,
 				active: false,
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					test: 2,
 				},
@@ -7402,10 +6893,8 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					active: false,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						test: 2,
 					},
@@ -7502,7 +6991,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						test: 1,
 					},
@@ -7513,10 +7001,8 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					active: false,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						test: 2,
 					},
@@ -7612,10 +7098,8 @@ describe('Kernel', () => {
 				ctx.context,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
 					active: false,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						test: 2,
 					},
@@ -7773,7 +7257,6 @@ describe('Kernel', () => {
 			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 				slug,
 				type: 'card@1.0.0',
-				version: '1.0.0',
 				data: {
 					status: 'open',
 				},
@@ -7790,7 +7273,6 @@ describe('Kernel', () => {
 				{
 					slug,
 					type: 'card@1.0.0',
-					version: '1.0.0',
 					data: {
 						status: 'open',
 					},
