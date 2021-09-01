@@ -5,11 +5,10 @@ version: '2.1'
 
 services:
   sut:
+    image: balena/jellyfish-core_sut:latest
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        NPM_TOKEN: $NPM_TOKEN
     depends_on:
       - postgres
       - redis
@@ -27,7 +26,6 @@ services:
       - OAUTH_REDIRECT_BASE_URL=https://jel.ly.fish
       - INTEGRATION_DEFAULT_USER=admin
       - CI=1
-      - NPM_TOKEN
     env_file:
       - test.env
     networks:

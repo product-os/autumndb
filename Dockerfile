@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # This file is auto-synced from product-os/jellyfish-config/sync/Dockerfile
 # and should only be edited there!
 FROM resinci/jellyfish-test:v1.4.9
@@ -5,9 +7,9 @@ FROM resinci/jellyfish-test:v1.4.9
 WORKDIR /usr/src/jellyfish
 
 COPY package.json .npmrc ./
-ARG NPM_TOKEN
-RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc && \
-    npm i && rm -f ~/.npmrc
+RUN --mount=type=secret,id=npmrc set -eux \
+    && ln -s /run/secrets/npmrc ~/.npmrc \
+    && npm i && rm ~/.npmrc
 
 COPY . ./
 
