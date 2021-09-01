@@ -1873,14 +1873,6 @@ describe('Kernel', () => {
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 		});
 
-		it('should throw an error if the element is not a valid card', async () => {
-			await expect(
-				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-					hello: 'world',
-				} as any),
-			).rejects.toThrow(errors.JellyfishSchemaMismatch);
-		});
-
 		it('should throw an error if the element does not adhere to the type', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
@@ -2254,6 +2246,18 @@ describe('Kernel', () => {
 				capabilities: [],
 				data: {},
 			});
+		});
+
+		it('should generate a slug if one is not provided', async () => {
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'card@1.0.0',
+				},
+			);
+
+			expect(card.slug).toBeTruthy();
 		});
 
 		it('should throw if the card already exists', async () => {
