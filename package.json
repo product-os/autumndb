@@ -51,7 +51,6 @@
     "@balena/jellyfish-environment": "^5.0.3",
     "@balena/jellyfish-logger": "^3.0.66",
     "@balena/jellyfish-metrics": "^1.0.341",
-    "@sindresorhus/slugify": "^2.1.0",
     "bluebird": "^3.7.2",
     "debounce-promise": "^3.1.2",
     "fast-equals": "^2.0.3",
