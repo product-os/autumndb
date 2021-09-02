@@ -1,4 +1,34 @@
 - commits:
+    - subject: Remove redundant options from kernel test spec
+      hash: 8b5f51366d22ffeb19004b158dffdbca132625c9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Automatically generate slugs when inserting contracts
+      hash: 7dc042acd0dbfe2a186010b566f76a2da51e32cd
+      body: |
+        Previously slugs were required, and `action-create-card` would
+        automatically generate the slug. This change moves the slug generation
+        into the core (which I think makes more sense) and also improves the
+        slug generation by removing stop words and only using a short uuid if
+        there is a name available.
+        Note that a test was removed here, as the assertion it made is now
+        covered by the type signature on the `insertCard` method.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 5.4.0
+  date: 2021-09-01T16:59:51.347Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: c869bb211c9c7b0e7dda1d24d51278fd12307f73
       body: ''
