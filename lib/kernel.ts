@@ -24,7 +24,6 @@ import {
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
 import { BackendQueryOptions, DatabaseBackend } from './backend/postgres/types';
-import slugify from '@sindresorhus/slugify';
 import * as stopword from 'stopword';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -34,7 +33,9 @@ interface KernelQueryOptions extends Partial<BackendQueryOptions> {
 
 const logger = getLogger('jellyfish-core');
 
-const generateSlug = (
+// Generate a concise slug for a contract, using the `name` field
+// if its available
+export const generateSlug = (
 	contract: Partial<Contract> & Pick<Contract, 'type'>,
 ): string => {
 	const baseType = contract.type.split('@')[0];
@@ -44,7 +45,11 @@ const generateSlug = (
 			.removeStopwords(contract.name.split(' '), stopword.en)
 			.join(' ');
 		const shortUUID = uuidv4().slice(0, 7);
-		return `${baseType}-${slugify(name)}-${shortUUID}`;
+
+		// Lowercase the name and replace all non-digit, non-alpha characters with a hyphen
+		const sluggedName = name.toLowerCase().replace(/[^a-z\d]+/g, '-');
+
+		return `${baseType}-${sluggedName}-${shortUUID}`;
 	} else {
 		return `${baseType}-${uuidv4()}`;
 	}
