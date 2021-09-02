@@ -1,4 +1,22 @@
 - commits:
+    - subject: Drop the slugify module dependency in favor of simple inline code
+      hash: eeaec8e71801ea3f4fbe2d4536d5e86f847ad0be
+      body: |
+        Using the @sindresorhus/slugify module was causing a lot of headaches as
+        it is shipped as an esm module and requires additional compiler and jest
+        config. The additional effort wasn't worth the convenience, so I decided
+        to replace it with a simple inline statement that is functionally the
+        same.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 5.4.1
+  date: 2021-09-02T15:14:01.642Z
+- commits:
     - subject: Remove redundant options from kernel test spec
       hash: 8b5f51366d22ffeb19004b158dffdbca132625c9
       body: ''
