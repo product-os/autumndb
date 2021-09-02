@@ -24,12 +24,31 @@ import {
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
 import { BackendQueryOptions, DatabaseBackend } from './backend/postgres/types';
+import slugify from '@sindresorhus/slugify';
+import * as stopword from 'stopword';
+import { v4 as uuidv4 } from 'uuid';
 
 interface KernelQueryOptions extends Partial<BackendQueryOptions> {
 	mask?: JSONSchema;
 }
 
 const logger = getLogger('jellyfish-core');
+
+const generateSlug = (
+	contract: Partial<Contract> & Pick<Contract, 'type'>,
+): string => {
+	const baseType = contract.type.split('@')[0];
+
+	if (contract.name) {
+		const name = stopword
+			.removeStopwords(contract.name.split(' '), stopword.en)
+			.join(' ');
+		const shortUUID = uuidv4().slice(0, 7);
+		return `${baseType}-${slugify(name)}-${shortUUID}`;
+	} else {
+		return `${baseType}-${uuidv4()}`;
+	}
+};
 
 const flattenSelected = (selected: any) => {
 	const flat = selected.properties;
@@ -599,7 +618,7 @@ export class Kernel {
 	async insertCard<T extends Contract = Contract>(
 		context: Context,
 		session: string,
-		object: Partial<Contract> & Pick<Contract, 'slug' | 'type'>,
+		object: Partial<Contract> & Pick<Contract, 'type'>,
 	): Promise<T> {
 		const card = this.defaults(object);
 
@@ -1048,6 +1067,11 @@ export class Kernel {
 		// Only create a timestamp if it's necessary
 		if (!defaultCard.created_at) {
 			defaultCard.created_at = new Date().toISOString();
+		}
+
+		// Only create a slug if it's necessary
+		if (!defaultCard.slug) {
+			defaultCard.slug = generateSlug(defaultCard);
 		}
 
 		return defaultCard as ContractDefinition<T['data']>;
