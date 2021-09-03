@@ -1,4 +1,17 @@
 - commits:
+    - subject: Delete from the new `links2` table on reset
+      hash: 5147b4d9e89e7a6128160a7ffbd90e4fb4a5d8a1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.5.1
+  date: 2021-09-03T15:01:32.155Z
+- commits:
     - subject: Add a generic serialized error contract
       hash: 25ff9d4d7dae2bd13cb1a69a9d4d6e8db99cd310
       body: |
