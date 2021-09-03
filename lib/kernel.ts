@@ -463,6 +463,7 @@ export class Kernel {
 				CARDS.action,
 				CARDS['action-request'],
 				CARDS.org,
+				CARDS.error,
 				CARDS.event,
 				CARDS.view,
 				CARDS.role,

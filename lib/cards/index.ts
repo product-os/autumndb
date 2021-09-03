@@ -10,6 +10,7 @@ import { action } from './action';
 import { card } from './card';
 import { role } from './role';
 import { org } from './org';
+import { error } from './error';
 import { event } from './event';
 import { link } from './link';
 import { loop } from './loop';
@@ -30,6 +31,7 @@ const cards = [
 	role,
 	org,
 	event,
+	error,
 	link,
 	loop,
 	session,
