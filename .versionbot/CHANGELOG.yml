@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add a generic serialized error contract
+      hash: 25ff9d4d7dae2bd13cb1a69a9d4d6e8db99cd310
+      body: |
+        This is a generic contract for representing errors. The initial use case
+        for this is to represent errors in the transformer runtime.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 5.5.0
+  date: 2021-09-03T14:06:32.104Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-types to v1'
       hash: a59482c97c37164025bfa7b85bbcb9ff17023df5
       body: |
