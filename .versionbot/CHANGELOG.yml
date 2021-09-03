@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-types to v1'
+      hash: a59482c97c37164025bfa7b85bbcb9ff17023df5
+      body: |
+        Update @balena/jellyfish-types from 0.9.9 to 1.0.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 5.4.2
+  date: 2021-09-02T15:36:22.048Z
+- commits:
     - subject: Drop the slugify module dependency in favor of simple inline code
       hash: eeaec8e71801ea3f4fbe2d4536d5e86f847ad0be
       body: |
