@@ -691,6 +691,7 @@ export class PostgresBackend implements Queryable {
 
 		await this.any(`
 			DELETE FROM ${links.TABLE};
+			DELETE FROM ${links.TABLE}2;
 			DELETE FROM ${cards.TABLE};
 		`);
 	}
