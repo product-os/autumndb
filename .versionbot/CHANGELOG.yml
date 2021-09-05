@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add scheduled-action
+      hash: fcad7f1b6f404601c70710e04d45a2222b4bfcc6
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 5.6.0
+  date: 2021-09-05T08:42:31.449Z
+- commits:
     - subject: Delete from the new `links2` table on reset
       hash: 5147b4d9e89e7a6128160a7ffbd90e4fb4a5d8a1
       body: ''
