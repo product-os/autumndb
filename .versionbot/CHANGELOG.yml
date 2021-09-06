@@ -1,4 +1,43 @@
 - commits:
+    - subject: Add testing for full-text search functionality
+      hash: bb793d5f85912fe4ac40b65092f16987b09b2a04
+      body: >
+        These tests are mostly an adaptation of the jellyfish repo tests, which
+
+        test at the wrong abstraction level. By testing at the kernel level we
+
+        ensure the gaurantess of the kernel interface and avoid unintended
+
+        breakages.
+
+        See
+        https://github.com/product-os/jellyfish/blob/v38.2.3/test/e2e/server/full-text-search.spec.js
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Remove redundant testing for querying action requests
+      hash: 4219b46c2fb9ecd8e7d79f3f02c452c647108ae5
+      body: >
+        The special case testing for querying action requests is unnecessary.
+
+        Action request contracts are stored and retrieved by the kernel exactly
+        the same as
+
+        any other contract.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 5.7.1
+  date: 2021-09-06T17:17:02.284Z
+- commits:
     - subject: Use the new `links2` table in queries
       hash: 01961cf33f80efb468b34fd59c62cf99d9b24582
       body: ''
