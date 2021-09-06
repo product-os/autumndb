@@ -1,4 +1,19 @@
 - commits:
+    - subject: Use the new `links2` table in queries
+      hash: 01961cf33f80efb468b34fd59c62cf99d9b24582
+      body: ''
+      footer:
+        JIP: 'https://jel.ly.fish/74c8126d-d896-43e9-92df-5a293c0db2cc'
+        jip: 'https://jel.ly.fish/74c8126d-d896-43e9-92df-5a293c0db2cc'
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.7.0
+  date: 2021-09-06T15:50:37.706Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.67'
       hash: 804c305874383f46021282ed53c1a536390db3b9
       body: ''
