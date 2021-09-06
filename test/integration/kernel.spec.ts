@@ -4032,142 +4032,6 @@ describe('Kernel', () => {
 			]);
 		});
 
-		it('should return all action request cards', async () => {
-			const date = new Date();
-			const request = {
-				type: 'action-request@1.0.0',
-				slug: ctx.generateRandomSlug({
-					prefix: 'action-request',
-				}),
-				version: '1.0.0',
-				data: {
-					epoch: date.valueOf(),
-					action: 'action-foo@1.0.0',
-					context: ctx.context,
-					actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					timestamp: date.toISOString(),
-					input: {
-						id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-						type: 'card@1.0.0',
-					},
-					arguments: {
-						foo: 'bar',
-					},
-				},
-			};
-
-			await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				request,
-			);
-
-			const results = await ctx.kernel.query(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					type: 'object',
-					additionalProperties: false,
-					properties: {
-						type: {
-							type: 'string',
-							const: 'action-request@1.0.0',
-						},
-						data: {
-							type: 'object',
-							additionalProperties: true,
-						},
-					},
-					required: ['type', 'data'],
-				},
-			);
-
-			expect(results).toEqual([
-				{
-					type: 'action-request@1.0.0',
-					data: {
-						action: 'action-foo@1.0.0',
-						context: ctx.context,
-						actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-						epoch: date.valueOf(),
-						input: {
-							id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-							type: 'card@1.0.0',
-						},
-						timestamp: date.toISOString(),
-						arguments: {
-							foo: 'bar',
-						},
-					},
-				},
-			]);
-		});
-
-		it('should be able to return both action requests and other cards', async () => {
-			const date = new Date();
-			const result1 = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					type: 'action-request@1.0.0',
-					data: {
-						epoch: date.valueOf(),
-						action: 'action-foo@1.0.0',
-						context: ctx.context,
-						actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-						target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-						timestamp: date.toISOString(),
-						input: {
-							id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-							type: 'card@1.0.0',
-						},
-						arguments: {
-							foo: 'bar',
-						},
-					},
-				},
-			);
-
-			const result2 = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					type: 'card@1.0.0',
-					data: {
-						timestamp: date.toISOString(),
-					},
-				},
-			);
-
-			const results = await ctx.kernel.query(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					type: 'object',
-					properties: {
-						id: {
-							type: 'string',
-						},
-						data: {
-							type: 'object',
-							properties: {
-								timestamp: {
-									type: 'string',
-									const: date.toISOString(),
-								},
-							},
-							required: ['timestamp'],
-						},
-					},
-					required: ['id', 'data'],
-				},
-			);
-
-			expect(_.orderBy(_.map(results, 'id'))).toEqual(
-				_.orderBy([result1.id, result2.id]),
-			);
-		});
-
 		it('should return inactive cards', async () => {
 			const card = await ctx.kernel.insertCard(
 				ctx.context,
@@ -6433,6 +6297,386 @@ describe('Kernel', () => {
 			expect(
 				ctx.kernel.getCardBySlug(ctx.context, session.id, 'user-admin@1.0.0'),
 			).rejects.toThrow();
+		});
+
+		it('should be able to query root level string fields using full text search', async () => {
+			const name = 'lorem ipsum dolor sit amet';
+			const type = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'type@1.0.0',
+					data: {
+						schema: {
+							type: 'object',
+							properties: {
+								name: {
+									type: 'string',
+									fullTextSearch: true,
+								},
+							},
+						},
+					},
+				},
+			);
+
+			const contract = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: `${type.slug}@${type.version}`,
+					name,
+				},
+			);
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				type: `${type.slug}@${type.version}`,
+				name: 'foobar',
+			});
+
+			const results = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'object',
+					properties: {
+						type: {
+							type: 'string',
+							const: `${type.slug}@${type.version}`,
+						},
+						name: {
+							type: 'string',
+							fullTextSearch: {
+								// Reverse the term so its not an exact match
+								term: name.split(' ').reverse().join(' '),
+							},
+						},
+					},
+				} as any,
+			);
+
+			expect(results).toHaveLength(1);
+			expect(results[0].id).toBe(contract.id);
+		});
+
+		it('should be able to query root level array fields using full text search', async () => {
+			const tag = 'lorem';
+			const type = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'type@1.0.0',
+					data: {
+						schema: {
+							type: 'object',
+							properties: {
+								tags: {
+									type: 'array',
+									fullTextSearch: true,
+									items: {
+										type: 'string',
+									},
+								},
+							},
+						},
+					},
+				},
+			);
+
+			const contract = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: `${type.slug}@${type.version}`,
+					tags: [tag],
+				},
+			);
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				type: `${type.slug}@${type.version}`,
+			});
+
+			const results = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'object',
+					properties: {
+						tags: {
+							type: 'array',
+							contains: {
+								fullTextSearch: {
+									term: tag,
+								},
+							},
+						},
+					},
+					required: ['tags'],
+				} as any,
+			);
+
+			expect(results).toHaveLength(1);
+			expect(results[0].id).toBe(contract.id);
+		});
+
+		it('should be able to query nested string fields using full text search', async () => {
+			const description = 'lorem ipsum dolor sit amet';
+			const type = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'type@1.0.0',
+					data: {
+						schema: {
+							type: 'object',
+							properties: {
+								data: {
+									type: 'object',
+									properties: {
+										description: {
+											fullTextSearch: true,
+											type: 'string',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			);
+
+			const contract = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: `${type.slug}@${type.version}`,
+					data: {
+						description,
+					},
+				},
+			);
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				type: `${type.slug}@${type.version}`,
+			});
+
+			const results = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'object',
+					required: ['data'],
+					properties: {
+						type: {
+							type: 'string',
+							const: `${type.slug}@${type.version}`,
+						},
+						data: {
+							type: 'object',
+							required: ['description'],
+							properties: {
+								description: {
+									type: 'string',
+									fullTextSearch: {
+										// Reverse the term so its not an exact match
+										term: description.split(' ').reverse().join(' '),
+									},
+								},
+							},
+						},
+					},
+				} as any,
+			);
+
+			expect(results).toHaveLength(1);
+			expect(results[0].id).toBe(contract.id);
+		});
+
+		it('should be able to query nested array fields using full text search', async () => {
+			const label = 'lorem';
+			const type = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'type@1.0.0',
+					data: {
+						schema: {
+							type: 'object',
+							properties: {
+								data: {
+									type: 'object',
+									properties: {
+										labels: {
+											type: 'array',
+											fullTextSearch: true,
+											items: {
+												type: 'string',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			);
+
+			const contract = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: `${type.slug}@${type.version}`,
+					data: {
+						labels: [label],
+					},
+				},
+			);
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				type: `${type.slug}@${type.version}`,
+			});
+
+			const results = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'object',
+					properties: {
+						type: {
+							type: 'string',
+							const: `${type.slug}@${type.version}`,
+						},
+						data: {
+							type: 'object',
+							required: ['labels'],
+							properties: {
+								labels: {
+									type: 'array',
+									contains: {
+										fullTextSearch: {
+											term: label,
+										},
+									},
+								},
+							},
+						},
+					},
+					required: ['data'],
+				} as any,
+			);
+
+			expect(results).toHaveLength(1);
+			expect(results[0].id).toBe(contract.id);
+		});
+
+		it('should be able to query deeply nested string fields using full text search', async () => {
+			const description = 'lorem ipsum dolor sit amet';
+			const type = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'type@1.0.0',
+					data: {
+						schema: {
+							type: 'object',
+							properties: {
+								data: {
+									type: 'object',
+									properties: {
+										nested: {
+											type: 'object',
+											properties: {
+												nested: {
+													type: 'object',
+													properties: {
+														nested: {
+															type: 'object',
+															properties: {
+																description: {
+																	fullTextSearch: true,
+																	type: 'string',
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			);
+
+			const contract = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: `${type.slug}@${type.version}`,
+					data: {
+						nested: {
+							nested: {
+								nested: {
+									description,
+								},
+							},
+						},
+					},
+				},
+			);
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				type: `${type.slug}@${type.version}`,
+			});
+
+			const results = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'object',
+					required: ['data'],
+					properties: {
+						type: {
+							type: 'string',
+							const: `${type.slug}@${type.version}`,
+						},
+						data: {
+							type: 'object',
+							required: ['nested'],
+							properties: {
+								nested: {
+									type: 'object',
+									required: ['nested'],
+									properties: {
+										nested: {
+											type: 'object',
+											required: ['nested'],
+											properties: {
+												nested: {
+													type: 'object',
+													required: ['description'],
+													properties: {
+														description: {
+															type: 'string',
+															fullTextSearch: {
+																// Reverse the term so its not an exact match
+																term: description
+																	.split(' ')
+																	.reverse()
+																	.join(' '),
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				} as any,
+			);
+
+			expect(results).toHaveLength(1);
+			expect(results[0].id).toBe(contract.id);
 		});
 	});
 
