@@ -1,4 +1,18 @@
 - commits:
+    - subject: Revert "Use the new `links2` table in queries"
+      hash: 521ea2f80c70b86971e855647d4be91c6d15c55c
+      body: |
+        This reverts commit 01961cf33f80efb468b34fd59c62cf99d9b24582.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.7.2
+  date: 2021-09-06T21:24:52.144Z
+- commits:
     - subject: Add testing for full-text search functionality
       hash: bb793d5f85912fe4ac40b65092f16987b09b2a04
       body: >
