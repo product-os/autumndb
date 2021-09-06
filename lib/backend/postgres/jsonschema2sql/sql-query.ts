@@ -179,21 +179,23 @@ const pushLinkedJoins = (
 	cardsTable: string,
 ) => {
 	const linksFilter = new LiteralSql(`
-		${linked.linksAlias}.fromId = ${parentTable}.id AND
-		${linked.linksAlias}.name = (
-			SELECT id
-			FROM strings
-			WHERE string = ${linked.linkName}
+		(
+			${linked.linksAlias}.name = ${linked.linkName} AND
+			${linked.linksAlias}.fromId = ${parentTable}.id
+		) OR (
+			${linked.linksAlias}.inversename = ${linked.linkName} AND
+			${linked.linksAlias}.toId = ${parentTable}.id
 		)
 	`);
-	innerSelect.pushLeftJoin('links2', linksFilter, linked.linksAlias);
+	innerSelect.pushLeftJoin('links', linksFilter, linked.linksAlias);
 	const joinFilter = new LiteralSql(`(
-		${linked.linksAlias}.name = (
-			SELECT id
-			FROM strings
-			WHERE string = ${linked.linkName}
-		) AND
-		${linked.linksAlias}.toId = ${linked.joinAlias}.id
+		(
+			${linked.linksAlias}.name = ${linked.linkName} AND
+			${linked.linksAlias}.toId = ${linked.joinAlias}.id
+		) OR (
+			${linked.linksAlias}.inversename = ${linked.linkName} AND
+			${linked.linksAlias}.fromId = ${linked.joinAlias}.id
+		)
 	) AND (
 		${linked.sqlFilter}
 	)`);
