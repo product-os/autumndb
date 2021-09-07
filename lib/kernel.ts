@@ -625,7 +625,7 @@ export class Kernel {
 	async insertCard<T extends Contract = Contract>(
 		context: Context,
 		session: string,
-		object: Partial<Contract> & Pick<Contract, 'type'>,
+		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
 		const card = this.defaults(object);
 
