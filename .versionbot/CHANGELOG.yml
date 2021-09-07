@@ -1,4 +1,17 @@
 - commits:
+    - subject: Improve typings for insertCard
+      hash: 9b91bae4f9eeca814d70ae130fb470c81b8279de
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 5.7.3
+  date: 2021-09-07T09:01:42.262Z
+- commits:
     - subject: Revert "Use the new `links2` table in queries"
       hash: 521ea2f80c70b86971e855647d4be91c6d15c55c
       body: |
