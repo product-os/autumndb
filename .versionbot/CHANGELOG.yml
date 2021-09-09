@@ -1,4 +1,18 @@
 - commits:
+    - subject: Revert "Revert "Use the new `links2` table in queries""
+      hash: 9242752a13ba7c8258862382659298fad271b7be
+      body: |
+        This reverts commit 521ea2f80c70b86971e855647d4be91c6d15c55c.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.7.4
+  date: 2021-09-09T11:56:02.235Z
+- commits:
     - subject: Improve typings for insertCard
       hash: 9b91bae4f9eeca814d70ae130fb470c81b8279de
       body: ''
