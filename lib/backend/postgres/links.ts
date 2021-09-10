@@ -17,7 +17,7 @@ import { Queryable } from './types';
 const logger = getLogger('jellyfish-core');
 
 const LINK_ORIGIN_PROPERTY = '$link';
-const LINK_TABLE = 'links';
+const LINK_TABLE = 'links2';
 const STRING_TABLE = 'strings';
 
 export const TABLE = LINK_TABLE;
@@ -49,20 +49,6 @@ export const setup = async (
 		END$$;`,
 		),
 	];
-	await connection.any(`CREATE TABLE IF NOT EXISTS ${LINK_TABLE} (
-			id UUID PRIMARY KEY NOT NULL,
-			slug VARCHAR (255) NOT NULL,
-			version_major INTEGER NOT NULL DEFAULT 1,
-			version_minor INTEGER NOT NULL DEFAULT 0,
-			version_patch INTEGER NOT NULL DEFAULT 0,
-			version_prerelease TEXT NOT NULL DEFAULT '',
-			version_build TEXT NOT NULL DEFAULT '',
-			name TEXT NOT NULL,
-			inverseName TEXT NOT NULL,
-			fromId UUID REFERENCES ${options.cards} (id) NOT NULL,
-			toId UUID REFERENCES ${options.cards} (id) NOT NULL,
-			CONSTRAINT ${LINK_TABLE}_slug_version_key
-				UNIQUE (slug, version_major, version_minor, version_patch, version_prerelease, version_build))`);
 	await connection.any(`
 		CREATE TABLE IF NOT EXISTS ${STRING_TABLE} (
 			id SERIAL PRIMARY KEY,
@@ -70,7 +56,7 @@ export const setup = async (
 		)
 	`);
 	await connection.any(`
-		CREATE TABLE IF NOT EXISTS ${LINK_TABLE}2 (
+		CREATE TABLE IF NOT EXISTS ${LINK_TABLE} (
 			id UUID,
 			forward BOOL,
 			fromId UUID REFERENCES ${options.cards} (id) NOT NULL,
@@ -81,35 +67,20 @@ export const setup = async (
 	`);
 	const indexes = _.map(
 		await connection.any(`
-		SELECT * FROM pg_indexes WHERE tablename IN ('${LINK_TABLE}', '${LINK_TABLE}2')`),
+		SELECT * FROM pg_indexes WHERE tablename = '${LINK_TABLE}'`),
 		'indexname',
 	);
-	for (const [name, column] of [
-		['idx_links_fromid_name', 'fromid, name'],
-		['idx_links_toid_inversename', 'toid, inversename'],
-	]) {
-		if (indexes.includes(name)) {
-			return;
-		}
-		await utils.createIndex(
-			context,
-			connection,
-			LINK_TABLE,
-			name,
-			`USING BTREE (${column})`,
-		);
-	}
 	for (const [name, column] of [
 		['idx_links2_fromid_name_toid', 'fromid, name, toid'],
 		['idx_links2_toid_name_fromid', 'toid, name, fromid'],
 	]) {
 		if (indexes.includes(name)) {
-			return;
+			continue;
 		}
 		await utils.createIndex(
 			context,
 			connection,
-			`${LINK_TABLE}2`,
+			`${LINK_TABLE}`,
 			name,
 			`USING BTREE (${column})`,
 		);
@@ -123,112 +94,62 @@ export const upsert = async (
 	link: LinkContract,
 ) => {
 	if (link.active) {
-		const sql = `
-			INSERT INTO ${LINK_TABLE} (
-				id,
-				slug,
-				version_major,
-				version_minor,
-				version_patch,
-				version_prerelease,
-				version_build,
-				name,
-				inverseName,
-				fromId,
-				toId
-			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-			ON CONFLICT (id) DO UPDATE SET
-				slug = $2,
-				version_major = $3,
-				version_minor = $4,
-				version_patch = $5,
-				version_prerelease = $6,
-				version_build = $7,
-				name = $8,
-				inverseName = $9,
-				fromId = $10,
-				toId = $11
-		`;
-		const insertStringsSql = `
-			INSERT INTO ${STRING_TABLE} (string)
-			VALUES ($1), ($2)
-			ON CONFLICT DO NOTHING
-		`;
-		const insertLinks2Sql = `
-			INSERT INTO ${LINK_TABLE}2 (
-				id,
-				forward,
-				fromId,
-				name,
-				toId
-			)
-			VALUES (
-				$1,
-				$2,
-				$3,
-				(
-					SELECT id
-					FROM ${STRING_TABLE}
-					WHERE string = $4
-				),
-				$5
-			)
-			ON CONFLICT (id, forward) DO UPDATE SET
-				fromId = EXCLUDED.fromId,
-				name = EXCLUDED.name,
-				toId = EXCLUDED.toId
-		`;
-		const { major, minor, patch, prerelease, build } = utils.parseVersion(
-			link.version,
-		);
 		await connection.any({
-			text: insertStringsSql,
+			text: `
+				INSERT INTO ${STRING_TABLE} (string)
+				VALUES ($1), ($2)
+				ON CONFLICT DO NOTHING
+			`,
 			values: [link.name, link.data.inverseName],
 		});
-		await Promise.all([
-			connection.any({
-				name: `links-upsert-insert-${LINK_TABLE}`,
-				text: sql,
-				values: [
-					link.id,
-					link.slug,
-					major,
-					minor,
-					patch,
-					prerelease,
-					build,
-					link.name,
-					link.data.inverseName,
-					link.data.from.id,
-					link.data.to.id,
-				],
-			}),
-			connection.any({
-				text: insertLinks2Sql,
-				values: [link.id, true, link.data.from.id, link.name, link.data.to.id],
-			}),
-			connection.any({
-				text: insertLinks2Sql,
-				values: [
-					link.id,
-					false,
-					link.data.to.id,
-					link.data.inverseName,
-					link.data.from.id,
-				],
-			}),
-		]);
-	} else {
-		const sql = `
-			DELETE FROM ${LINK_TABLE} WHERE id = $1`;
 		await connection.any({
-			name: `links-upsert-delete-${LINK_TABLE}`,
-			text: sql,
-			values: [link.id],
+			text: `
+				INSERT INTO ${LINK_TABLE} (
+					id,
+					forward,
+					fromId,
+					name,
+					toId
+				)
+				VALUES
+					(
+						$1,
+						true,
+						$2,
+						(
+							SELECT id
+							FROM ${STRING_TABLE}
+							WHERE string = $3
+						),
+						$4
+					),
+					(
+						$1,
+						false,
+						$4,
+						(
+							SELECT id
+							FROM ${STRING_TABLE}
+							WHERE string = $5
+						),
+						$2
+					)
+				ON CONFLICT (id, forward) DO UPDATE SET
+					fromId = EXCLUDED.fromId,
+					name = EXCLUDED.name,
+					toId = EXCLUDED.toId
+			`,
+			values: [
+				link.id,
+				link.data.from.id,
+				link.name,
+				link.data.to.id,
+				link.data.inverseName,
+			],
 		});
+	} else {
 		await connection.any({
-			text: `DELETE FROM ${LINK_TABLE}2 WHERE id = $1`,
+			text: `DELETE FROM ${LINK_TABLE} WHERE id = $1`,
 			values: [link.id],
 		});
 	}
