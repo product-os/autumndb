@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.68'
+      hash: a5c16aa557efacdac672dcfa60d05f7fd80b6769
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 5.7.5
+  date: 2021-09-11T08:09:31.787Z
+- commits:
     - subject: Revert "Revert "Use the new `links2` table in queries""
       hash: 9242752a13ba7c8258862382659298fad271b7be
       body: |
