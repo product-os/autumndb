@@ -1,4 +1,19 @@
 - commits:
+    - subject: Remove the `cards_markers` materialized view.
+      hash: ee4e493e3362c8d20c8ffed46555a4db5aafbeb0
+      body: |
+        This materialized viewd was used as an optimization for a single query,
+        but benchmark and analysis of the query shows that this is not needed.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.8.0
+  date: 2021-09-13T17:22:02.004Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.69'
       hash: 599d374604464d18708a5c39d6cceb44041404a0
       body: ''
