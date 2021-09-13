@@ -31,11 +31,6 @@ const applyMarkers = async (
 		return schema;
 	}
 
-	/*
-	 * Be careful if modifying this schema as it has been
-	 * written so that the backend can be smart about it
-	 * and execute it really fast.
-	 */
 	const orgs = await backend.query(
 		context,
 		{
