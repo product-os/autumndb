@@ -1,4 +1,19 @@
 - commits:
+    - subject: Remove the `links` table
+      hash: 5b6a8b30b9ee31aa9c3b7833dd9592c443a53025
+      body: ''
+      footer:
+        JIP: 'https://jel.ly.fish/74c8126d-d896-43e9-92df-5a293c0db2cc'
+        jip: 'https://jel.ly.fish/74c8126d-d896-43e9-92df-5a293c0db2cc'
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 6.0.0
+  date: 2021-09-13T19:03:57.326Z
+- commits:
     - subject: Remove stale comment.
       hash: 56a3c18f7a2b535519425792b2cdfc11b2555e35
       body: ''
