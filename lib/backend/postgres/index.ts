@@ -16,7 +16,6 @@ import * as links from './links';
 import * as cards from './cards';
 import * as streams from './streams';
 import * as utils from './utils';
-import * as markers from './markers';
 import pgp from './pg-promise';
 import { core, JSONSchema } from '@balena/jellyfish-types';
 import {
@@ -100,26 +99,6 @@ const MAXIMUM_QUERY_LIMIT = 1000;
 
 // Amount of time to wait before retrying connect
 const DEFAULT_CONNECT_RETRY_DELAY = 2000;
-
-const userBelongsToOrgOptimizationIsApplicable = (schema: JSONSchema) => {
-	return (
-		schema.type === 'object' &&
-		schema.properties &&
-		schema.properties.type &&
-		(schema.properties.type as any).const === 'org@1.0.0' &&
-		schema.properties.slug &&
-		!(schema.properties.slug as any).const! &&
-		Object.keys(schema.properties).length === 2 &&
-		schema.$$links &&
-		schema.$$links['has member'] &&
-		schema.$$links['has member'].properties &&
-		schema.$$links['has member'].properties.type &&
-		(schema.$$links['has member'].properties.type as any).const ===
-			'user@1.0.0' &&
-		schema.$$links['has member'].properties.slug &&
-		(schema.$$links['has member'].properties.slug as any).const
-	);
-};
 
 const compileSchema = (
 	table: string,
@@ -342,26 +321,6 @@ const upsertObject = async <T extends Contract = Contract>(
 				}
 			},
 		);
-	}
-	/*
-	 * Only update the markers view if needed, for performance reasons.
-	 */
-	if (
-		baseType === 'link' &&
-		(((insertedObject as any).data.from.type.split('@')[0] === 'org' &&
-			(insertedObject as any).data.to.type.split('@')[0] === 'user') ||
-			((insertedObject as any).data.to.type.split('@')[0] === 'org' &&
-				(insertedObject as any).data.from.type.split('@')[0] === 'user'))
-	) {
-		logger.info(context, 'Triggering markers refresh', {
-			type: insertedObject.type,
-			slug: insertedObject.slug,
-			database: backend.database,
-		});
-		await markers.refresh(context, backend, {
-			source: cards.TABLE,
-			trigger: insertedObject,
-		});
 	}
 	// If a type was inserted, any indexed fields declared on the type card should be
 	// created
@@ -607,17 +566,6 @@ export class PostgresBackend implements Queryable {
 			try {
 				await links.setup(context, this, this.database, {
 					cards: cards.TABLE,
-				});
-			} catch (error: any) {
-				if (!isIgnorableInitError(error.code)) {
-					throw error;
-				}
-			}
-
-			try {
-				await markers.setup(context, this, {
-					source: cards.TABLE,
-					links: links.TABLE,
 				});
 			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
@@ -971,26 +919,6 @@ export class PostgresBackend implements Queryable {
 			`Query limit must be a finite integer less than ${MAXIMUM_QUERY_LIMIT}: ${options.limit}`,
 		);
 
-		/*
-		 * These optimization detection conditionals are very weak
-		 * and very easy to miss even if expressing the same query
-		 * with a slightly different schema. Hopefully we invest
-		 * more time to make this detection way smarter.
-		 */
-		// Optimize queries for orgs that a user belongs to
-		if (userBelongsToOrgOptimizationIsApplicable(schema)) {
-			return markers.getUserMarkers(
-				context,
-				this,
-				{
-					slug: (schema.$$links!['has member'].properties!.slug as any).const,
-				},
-				{
-					source: cards.TABLE,
-				},
-			);
-		}
-
 		const results = await queryTable(
 			context,
 			this,
@@ -1014,22 +942,6 @@ export class PostgresBackend implements Queryable {
 		schema: JSONSchema,
 		options: SqlQueryOptions,
 	) {
-		if (userBelongsToOrgOptimizationIsApplicable(schema)) {
-			return async (id: any) => {
-				return markers.getUserMarkers(
-					context,
-					this,
-					{
-						id,
-						slug: (schema.$$links!['has member'].properties!.slug as any).const,
-					},
-					{
-						source: cards.TABLE,
-					},
-				);
-			};
-		}
-
 		const { query, queryGenTime } = compileSchema(
 			cards.TABLE,
 			select,
