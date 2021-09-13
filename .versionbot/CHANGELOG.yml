@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove stale comment.
+      hash: 56a3c18f7a2b535519425792b2cdfc11b2555e35
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 5.8.1
+  date: 2021-09-13T18:02:05.061Z
+- commits:
     - subject: Remove the `cards_markers` materialized view.
       hash: ee4e493e3362c8d20c8ffed46555a4db5aafbeb0
       body: |
