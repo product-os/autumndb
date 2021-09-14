@@ -1,4 +1,17 @@
 - commits:
+    - subject: get package version without breaking package structure
+      hash: 09edc4ceba22b0ad7c2aca0f577b58e85c1f47d6
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 6.1.1
+  date: 2021-09-14T07:58:31.872Z
+- commits:
     - subject: ensure migrations are not run when not needed
       hash: 779957b6fd85ceab37d0080c45c9fc3c5f320563
       body: ''
