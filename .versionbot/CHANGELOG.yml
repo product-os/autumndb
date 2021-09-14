@@ -1,4 +1,17 @@
 - commits:
+    - subject: ensure migrations are not run when not needed
+      hash: 779957b6fd85ceab37d0080c45c9fc3c5f320563
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 6.1.0
+  date: 2021-09-14T06:45:22.651Z
+- commits:
     - subject: Remove the `links` table
       hash: 5b6a8b30b9ee31aa9c3b7833dd9592c443a53025
       body: ''
