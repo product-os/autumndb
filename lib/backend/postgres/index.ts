@@ -570,17 +570,17 @@ export class PostgresBackend implements Queryable {
 	) {
 		const migrationsTable = 'jf_db_migrations';
 		const migrationsId = 0;
-		await this.withTransaction(async () => {
-			this.any(`CREATE TABLE IF NOT EXISTS ${migrationsTable} (
-				id INTEGER PRIMARY KEY NOT NULL,
-				version TEXT NOT NULL,
-				updated_at TIMESTAMP WITH TIME ZONE
-			);`);
-			this.any({
-				name: `insert-first-migration`,
-				text: `INSERT INTO ${migrationsTable} (id, version, updated_at) VALUES ($1, $2, now()) ON CONFLICT (id) DO NOTHING;`,
-				values: [migrationsId, '0.0.0'],
-			});
+		// note, this line MUST NOT run inside a transaction. Otherwise the actual creation will block and fail.
+		// (happens in integration tests a lot)
+		await this.any(`CREATE TABLE IF NOT EXISTS ${migrationsTable} (
+			id INTEGER PRIMARY KEY NOT NULL,
+			version TEXT NOT NULL,
+			updated_at TIMESTAMP WITH TIME ZONE
+		);`);
+		await this.any({
+			name: `insert-first-migration`,
+			text: `INSERT INTO ${migrationsTable} (id, version, updated_at) VALUES ($1, $2, now()) ON CONFLICT (id) DO NOTHING;`,
+			values: [migrationsId, '0.0.0'],
 		});
 		await this.withTransaction(async () => {
 			const [{ version }] = await this.any({
