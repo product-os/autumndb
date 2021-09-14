@@ -38,9 +38,9 @@ import { strict as nativeAssert } from 'assert';
 import type pgPromise = require('pg-promise');
 import { AsyncLocalStorage } from 'async_hooks';
 import * as semver from 'semver';
-import corePackage = require('../../../package.json');
+import getPackageVersion = require('@jsbits/get-package-version');
 
-const coreVersion = corePackage.version;
+const coreVersion = getPackageVersion(__dirname);
 const logger = getLogger('jellyfish-core');
 
 const currentTransaction = new AsyncLocalStorage<Queryable>();

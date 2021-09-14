@@ -51,6 +51,7 @@
     "@balena/jellyfish-environment": "^5.0.3",
     "@balena/jellyfish-logger": "^3.0.69",
     "@balena/jellyfish-metrics": "^1.0.341",
+    "@jsbits/get-package-version": "^1.0.3",
     "bluebird": "^3.7.2",
     "fast-equals": "^2.0.3",
     "fast-json-patch": "^2.2.1",
