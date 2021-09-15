@@ -1,4 +1,15 @@
 - commits:
+    - subject: "\U0001F504 Synced file(s) with product-os/secrets"
+      hash: b86c63c60184559e1991dd7e687eaf51cae5c025
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 6.1.3
+  date: 2021-09-15T06:13:21.525Z
+- commits:
     - subject: ensure concurrent initial DB setup doesn't fail
       hash: 34a0075ca0576df613b2af9c4d76d34b4e7a7659
       body: |
