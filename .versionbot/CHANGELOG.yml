@@ -1,4 +1,17 @@
 - commits:
+    - subject: Allow multiple backends to simultaneously bootstrap on the same DB
+      hash: d8170d23fe4e19eeb94530618d319849fd7da586
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 6.1.4
+  date: 2021-09-15T19:42:03.463Z
+- commits:
     - subject: "\U0001F504 Synced file(s) with product-os/secrets"
       hash: b86c63c60184559e1991dd7e687eaf51cae5c025
       body: ''
