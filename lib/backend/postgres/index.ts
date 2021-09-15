@@ -570,13 +570,18 @@ export class PostgresBackend implements Queryable {
 	) {
 		const migrationsTable = 'jf_db_migrations';
 		const migrationsId = 0;
-		// note, this line MUST NOT run inside a transaction. Otherwise the actual creation will block and fail.
-		// (happens in integration tests a lot)
-		await this.any(`CREATE TABLE IF NOT EXISTS ${migrationsTable} (
-			id INTEGER PRIMARY KEY NOT NULL,
-			version TEXT NOT NULL,
-			updated_at TIMESTAMP WITH TIME ZONE
-		);`);
+
+		// "IF NOT EXISTS" is (unexpectedly) not thread safe. This is only a problem on the very first start and any "real"
+		// error will be catched by the subsequent SQL statements.
+		try {
+			await this.any(`CREATE TABLE IF NOT EXISTS ${migrationsTable} (
+				id INTEGER PRIMARY KEY NOT NULL,
+				version TEXT NOT NULL,
+				updated_at TIMESTAMP WITH TIME ZONE
+			);`);
+		} catch (err: any) {
+			logger.warn(context, 'ignoring initial DB error', err);
+		}
 		await this.any({
 			name: `insert-first-migration`,
 			text: `INSERT INTO ${migrationsTable} (id, version, updated_at) VALUES ($1, $2, now()) ON CONFLICT (id) DO NOTHING;`,
@@ -591,7 +596,7 @@ export class PostgresBackend implements Queryable {
 
 			// Checking for newer versions instead of just testing for inequality ensures that a restarting pod
 			// that is running an old version will not interfere with a new version being rolled out.
-			// We could do better than just checking for the version of core, but that is better left to a proper migration framework
+			// We could do better than just checking for the version of course, but that is better left to a proper migration framework
 			const willRunMigrations = semver.compare(version, coreVersion) === -1;
 			logger.info(context, 'Preparing DB migrations', {
 				dbVersion: version,
