@@ -4,8 +4,11 @@
  * Proprietary and confidential.
  */
 
+import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
+import { v4 as uuid } from 'uuid';
 import * as helpers from '../helpers';
 import { version as packageVersion } from '../../../../package.json';
+import { PostgresBackend } from '../../../../lib/backend/postgres';
 
 let ctx: helpers.BackendContext;
 
@@ -31,6 +34,33 @@ describe('DB migrations', () => {
 			expect(new Date(updated_at).getTime()).toBeGreaterThan(
 				new Date().getTime() - longestExpectedTestRun,
 			);
+		});
+	});
+
+	describe('.connect()', () => {
+		it('should safely handle multiple backend instances connecting to the same DB simultaneously', async () => {
+			const dbName = `test_${uuid().replace(/-/g, '_')}`;
+			const makeBackend = () => {
+				const backend = new PostgresBackend(
+					null,
+					{},
+					Object.assign({}, environment.database.options, {
+						database: dbName,
+					}),
+				);
+				return backend.connect({
+					id: `CORE-DB-TEST-${uuid()}`,
+				});
+			};
+			const result = await Promise.all([
+				makeBackend(),
+				makeBackend(),
+				makeBackend(),
+				makeBackend(),
+				makeBackend(),
+			]);
+
+			expect(result.length).toBeTruthy();
 		});
 	});
 });
