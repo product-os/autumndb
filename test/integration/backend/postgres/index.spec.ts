@@ -63,4 +63,108 @@ describe('DB migrations', () => {
 			expect(result.length).toBeTruthy();
 		});
 	});
+
+	describe('.createTypeIndex()', () => {
+		it('should safely multiple backend instances creating the same index simultaneously', async () => {
+			const dbName = `test_${uuid().replace(/-/g, '_')}`;
+			const fields = ['data.status'];
+			const contract = {
+				type: 'type@1.0.0',
+				slug: 'test',
+				data: {
+					schema: {
+						properties: {
+							data: {
+								type: 'object',
+								required: ['status'],
+								properties: {
+									status: {
+										type: 'string',
+										enum: ['open', 'closed'],
+									},
+								},
+							},
+						},
+						required: ['data'],
+					},
+					indexed_fields: [fields],
+				},
+			};
+
+			const makeBackend = async () => {
+				const backend = new PostgresBackend(
+					null,
+					{},
+					Object.assign({}, environment.database.options, {
+						database: dbName,
+					}),
+				);
+				await backend.connect({
+					id: `CORE-DB-TEST-${uuid()}`,
+				});
+
+				return backend;
+			};
+
+			const be1 = await makeBackend();
+			const be2 = await makeBackend();
+			const be3 = await makeBackend();
+			const be4 = await makeBackend();
+			const be5 = await makeBackend();
+
+			const result = await Promise.all([
+				be1.createTypeIndex(ctx.context, fields, contract),
+				be2.createTypeIndex(ctx.context, fields, contract),
+				be3.createTypeIndex(ctx.context, fields, contract),
+				be4.createTypeIndex(ctx.context, fields, contract),
+				be5.createTypeIndex(ctx.context, fields, contract),
+			]);
+
+			expect(result.length).toBeTruthy();
+		});
+	});
+
+	describe('.createFullTextSearchIndex()', () => {
+		it('should safely multiple backend instances creating the same index simultaneously', async () => {
+			const dbName = `test_${uuid().replace(/-/g, '_')}`;
+			const type = 'test@1.0.0';
+			const fields = [
+				{
+					path: ['name'],
+					isArray: false,
+				},
+			];
+
+			const makeBackend = async () => {
+				const backend = new PostgresBackend(
+					null,
+					{},
+					Object.assign({}, environment.database.options, {
+						database: dbName,
+					}),
+				);
+				await backend.connect({
+					id: `CORE-DB-TEST-${uuid()}`,
+				});
+
+				return backend;
+			};
+
+			const be1 = await makeBackend();
+			const be2 = await makeBackend();
+			const be3 = await makeBackend();
+			const be4 = await makeBackend();
+			const be5 = await makeBackend();
+
+			const result = await Promise.all([
+				be1.createFullTextSearchIndex(ctx.context, type, fields),
+				be2.createFullTextSearchIndex(ctx.context, type, fields),
+				be3.createFullTextSearchIndex(ctx.context, type, fields),
+				be4.createFullTextSearchIndex(ctx.context, type, fields),
+				be5.createFullTextSearchIndex(ctx.context, type, fields),
+			]);
+
+			expect(result.length).toBeTruthy();
+		});
+	});
 });
