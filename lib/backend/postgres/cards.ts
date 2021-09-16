@@ -606,7 +606,8 @@ export const createTypeIndex = async (
 	connection: Queryable,
 	fields: string[],
 	schema: core.ContractDefinition<any>,
-) => {
+	retries: number = 1,
+): Promise<void> => {
 	/*
 	 * This query will give us a list of all the indexes
 	 * on a particular table.
@@ -635,13 +636,26 @@ export const createTypeIndex = async (
 		return;
 	}
 
-	await utils.createIndex(
-		context,
-		connection,
-		CARDS_TABLE,
-		fullyQualifiedIndexName,
-		generateTypeIndexPredicate(fields, schema),
-	);
+	// If two instances run this function simultaneously, it's possible to enter a race condition
+	// where the index creation will fail with an error, as one instance will create the index
+	// before the other. Ideally we want a unified way of handling system bootstrapping, but for now we
+	// can simply retry once on a failure and check again to see if the index already exists.
+	try {
+		await utils.createIndex(
+			context,
+			connection,
+			CARDS_TABLE,
+			fullyQualifiedIndexName,
+			generateTypeIndexPredicate(fields, schema),
+		);
+	} catch (error: any) {
+		logger.warn(context, 'Hit error whilst creating type index', error.message);
+		if (retries === 0) {
+			throw error;
+		} else {
+			return createTypeIndex(context, connection, fields, schema, retries - 1);
+		}
+	}
 };
 /**
  * @param {Context} context - session context
@@ -664,7 +678,8 @@ export const createFullTextSearchIndex = async (
 	connection: Queryable,
 	type: string,
 	fields: SearchFieldDef[],
-) => {
+	retries: number = 1,
+): Promise<void> => {
 	// Leave early if fields is empty
 	if (_.isEmpty(fields)) {
 		return;
@@ -679,22 +694,43 @@ export const createFullTextSearchIndex = async (
 	// Create all necessary search indexes for the given type
 	const typeBase = type.split('@')[0];
 	const versionedType = `${typeBase}@1.0.0`;
-	for (const field of fields) {
-		const path = SqlPath.fromArray(_.clone(field.path));
-		const isJson = path.isProcessingJsonProperty;
-		const name = `${typeBase}__${field.path.join('_')}__search_idx`;
-		if (!indexes.includes(name)) {
-			await utils.createIndex(
+
+	// Similar to the logic, in createTypeIndex, we retry once on failure in case we hit a race condition.
+	try {
+		for (const field of fields) {
+			const path = SqlPath.fromArray(_.clone(field.path));
+			const isJson = path.isProcessingJsonProperty;
+			const name = `${typeBase}__${field.path.join('_')}__search_idx`;
+			if (!indexes.includes(name)) {
+				await utils.createIndex(
+					context,
+					connection,
+					CARDS_TABLE,
+					name,
+					`USING GIN(${textSearch.toTSVector(
+						path.toSql(CARDS_TABLE),
+						isJson,
+						field.isArray,
+					)})
+						WHERE type=${pgFormat.literal(versionedType)}`,
+				);
+			}
+		}
+	} catch (error: any) {
+		logger.warn(
+			context,
+			'Hit error whilst creating full text search index',
+			error.message,
+		);
+		if (retries === 0) {
+			throw error;
+		} else {
+			return createFullTextSearchIndex(
 				context,
 				connection,
-				CARDS_TABLE,
-				name,
-				`USING GIN(${textSearch.toTSVector(
-					path.toSql(CARDS_TABLE),
-					isJson,
-					field.isArray,
-				)})
-					WHERE type=${pgFormat.literal(versionedType)}`,
+				type,
+				fields,
+				retries - 1,
 			);
 		}
 	}
