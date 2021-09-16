@@ -1,4 +1,28 @@
 - commits:
+    - subject: Safely handle simultaneous creation of identical indexes
+      hash: 48400d6992e96e9146e1d9e2cfa6e57045c0252d
+      body: >
+        If two instances run this function simultaneously, it's possible to
+        enter a race condition
+
+        where the index creation will fail with an error, as one instance will
+        create the index
+
+        before the other. Ideally we want a unified way of handling system
+        bootstrapping, but for now we
+
+        can simply retry once on a failure and check again to see if the index
+        already exists.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 6.1.5
+  date: 2021-09-16T10:48:42.076Z
+- commits:
     - subject: Allow multiple backends to simultaneously bootstrap on the same DB
       hash: d8170d23fe4e19eeb94530618d319849fd7da586
       body: ''
