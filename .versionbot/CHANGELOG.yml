@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: 8c03d2e0dd440c615e3c8e4c9d57f500d54ee527
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 6.1.6
+  date: 2021-09-17T07:10:41.716Z
+- commits:
     - subject: Safely handle simultaneous creation of identical indexes
       hash: 48400d6992e96e9146e1d9e2cfa6e57045c0252d
       body: >
