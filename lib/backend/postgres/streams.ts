@@ -387,6 +387,7 @@ export class Stream extends EventEmitter {
 		} else if (this.seenCardIds.delete(payload.id)) {
 			this.emit('data', {
 				id: payload.id,
+				contractType: payload.cardType,
 				type: UNMATCH_EVENT,
 				after: null,
 			});
@@ -409,6 +410,7 @@ export class Stream extends EventEmitter {
 			this.seenCardIds.delete(payload.id);
 			this.emit('data', {
 				id: payload.id,
+				contractType: payload.cardType,
 				type: payload.type,
 				after: null,
 			});
@@ -419,6 +421,7 @@ export class Stream extends EventEmitter {
 			if (result.length === 1) {
 				this.emit('data', {
 					id: payload.id,
+					contractType: payload.cardType,
 					type: payload.type,
 					after: result[0],
 				});

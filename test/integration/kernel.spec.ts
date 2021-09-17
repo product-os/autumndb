@@ -6714,6 +6714,7 @@ describe('Kernel', () => {
 				expect(change).toEqual({
 					id: change.after.id,
 					type: 'insert',
+					contractType: 'card@1.0.0',
 					after: {
 						id: change.after.id,
 						slug,
@@ -6960,6 +6961,7 @@ describe('Kernel', () => {
 					times,
 					_.constant({
 						type: 'insert',
+						contractType: 'card@1.0.0',
 						after: {
 							slug,
 							type: 'card@1.0.0',
@@ -7464,6 +7466,7 @@ describe('Kernel', () => {
 					expect(change).toEqual({
 						id,
 						type: 'insert',
+						contractType: 'card@1.0.0',
 						after: {
 							slug,
 							data: {
@@ -7489,6 +7492,7 @@ describe('Kernel', () => {
 					expect(change).toEqual({
 						id,
 						type: 'unmatch',
+						contractType: 'card@1.0.0',
 						after: null,
 					});
 
@@ -7573,6 +7577,7 @@ describe('Kernel', () => {
 				expect(change).toEqual({
 					id: card.id,
 					type: 'unmatch',
+					contractType: 'card@1.0.0',
 					after: null,
 				});
 
