@@ -606,7 +606,7 @@ export const createTypeIndex = async (
 	connection: Queryable,
 	fields: string[],
 	schema: core.ContractDefinition<any>,
-	retries: number = 1,
+	retries: number = 2,
 ): Promise<void> => {
 	/*
 	 * This query will give us a list of all the indexes
@@ -653,6 +653,7 @@ export const createTypeIndex = async (
 		if (retries === 0) {
 			throw error;
 		} else {
+			await Bluebird.delay(1000);
 			return createTypeIndex(context, connection, fields, schema, retries - 1);
 		}
 	}
@@ -678,7 +679,7 @@ export const createFullTextSearchIndex = async (
 	connection: Queryable,
 	type: string,
 	fields: SearchFieldDef[],
-	retries: number = 1,
+	retries: number = 2,
 ): Promise<void> => {
 	// Leave early if fields is empty
 	if (_.isEmpty(fields)) {
@@ -725,6 +726,7 @@ export const createFullTextSearchIndex = async (
 		if (retries === 0) {
 			throw error;
 		} else {
+			await Bluebird.delay(1000);
 			return createFullTextSearchIndex(
 				context,
 				connection,
