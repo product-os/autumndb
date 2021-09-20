@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-types to ^1.2.0'
+      hash: 5a284fb172f30d22a5e5735232333907a5dc8d60
+      body: |
+        Update @balena/jellyfish-types from 1.1.0 to 1.2.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 6.1.11
+  date: 2021-09-20T10:40:12.212Z
+- commits:
     - subject: add contractType to stream events
       hash: 522c11db8664d8c7d8eff0534eb0f1d8fb2fc36f
       body: ''
