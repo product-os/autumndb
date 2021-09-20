@@ -1,4 +1,17 @@
 - commits:
+    - subject: add contractType to stream events
+      hash: 522c11db8664d8c7d8eff0534eb0f1d8fb2fc36f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 6.1.10
+  date: 2021-09-20T10:25:01.820Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.71'
       hash: 3d50d65107132f6a93f9604c9c8535cdb53112b9
       body: ''
