@@ -54,7 +54,7 @@
     "@jsbits/get-package-version": "^1.0.3",
     "bluebird": "^3.7.2",
     "fast-equals": "^2.0.3",
-    "fast-json-patch": "^2.2.1",
+    "fast-json-patch": "^3.1.0",
     "json-e": "^4.4.1",
     "json-schema": "^0.3.0",
     "json-schema-deref-sync": "^0.14.0",
