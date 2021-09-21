@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add json-schema-org Renovate group
+      hash: 4e67bd200e2bfb776a17ab58087e0a75fcce8a34
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 6.1.12
+  date: 2021-09-21T02:57:32.752Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-types to ^1.2.0'
       hash: 5a284fb172f30d22a5e5735232333907a5dc8d60
       body: |
