@@ -1,4 +1,17 @@
 - commits:
+    - subject: Bump fast-json-patch to v3.1.0
+      hash: 144facf2149c899c6f5bea70810892adb2797b1f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 6.1.13
+  date: 2021-09-21T03:12:13.337Z
+- commits:
     - subject: Add json-schema-org Renovate group
       hash: 4e67bd200e2bfb776a17ab58087e0a75fcce8a34
       body: ''
