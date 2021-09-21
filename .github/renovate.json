@@ -11,6 +11,10 @@
       "matchPackagePatterns": ["@balena/jellyfish-*"],
       "matchUpdateTypes": ["patch"],
       "enabled": false
+    },
+    {
+      "matchPackagePatterns": ["^@json-schema-org"],
+      "groupName": "json-schema-org"
     }
   ]
 }
