@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.74'
+      hash: a6c32593a42efb0c62acadaddd87ff0a6ab32428
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 6.1.16
+  date: 2021-09-25T16:31:59.217Z
+- commits:
     - subject: Ignore decrypted mailgun and meet secrets
       hash: 88b7b1575d1d62f1444e18fb54fdbb30669d367f
       body: ''
