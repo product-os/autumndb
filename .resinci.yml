@@ -6,7 +6,7 @@ docker:
   builds:
     - path: .
       dockerfile: Dockerfile
-      docker_repo: balena/jellyfish-core_sut
+      docker_repo: balena/jellyfish-sut
       publish: false
       args:
         - BUILDKIT_INLINE_CACHE=1
@@ -20,3 +20,4 @@ npm:
       architecture: x86_64
       node_versions:
         - "14"
+        - "16"
