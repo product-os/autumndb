@@ -1,4 +1,25 @@
 - commits:
+    - subject: 'Update test:compose to match image name'
+      hash: dad33beb2affb08ec3cb58075e73f2c61f2b316d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: "\U0001F504 Synced file(s) with product-os/jellyfish-config"
+      hash: f4ebcc2eb4ef3185a18cf363898ffb0cf45a5a20
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 6.1.23
+  date: 2021-10-05T00:54:48.700Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.78'
       hash: fbf9ef289abe7c1a7a9079263d4767e425684845
       body: ''
