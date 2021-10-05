@@ -8,8 +8,8 @@ WORKDIR /usr/src/jellyfish
 
 COPY package.json .npmrc ./
 RUN --mount=type=secret,id=npmrc set -eux \
-    && ln -s /run/secrets/npmrc ~/.npmrc \
-    && npm i && rm ~/.npmrc
+	&& ln -s /run/secrets/npmrc ~/.npmrc \
+	&& npm i && rm ~/.npmrc
 
 COPY . ./
 

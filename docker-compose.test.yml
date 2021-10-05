@@ -5,7 +5,7 @@ version: '2.1'
 
 services:
   sut:
-    image: balena/jellyfish-core_sut:latest
+    image: balena/jellyfish-sut:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,5 +28,65 @@ services:
       - CI=1
     env_file:
       - test.env
+    secrets:
+      - integration_balena_api_private_key
+      - integration_balena_api_public_key_production
+      - integration_discourse_signature_key
+      - integration_discourse_token
+      - integration_discourse_username
+      - integration_flowdock_signature_key
+      - integration_flowdock_token
+      - integration_front_token
+      - integration_github_app_id
+      - integration_github_private_key
+      - integration_github_signature_key
+      - integration_github_token
+      - integration_google_meet_credentials
+      - integration_intercom_token
+      - integration_outreach_app_id
+      - integration_outreach_app_secret
+      - integration_outreach_signature_key
+      - integration_typeform_signature_key
+      - mailgun_token
     networks:
       - internal
+
+secrets:
+  integration_balena_api_private_key:
+    file: ./.balena/secrets/integration_balena_api_private_key.txt
+  integration_balena_api_public_key_production:
+    file: ./.balena/secrets/integration_balena_api_public_key_production.txt
+  integration_discourse_signature_key:
+    file: ./.balena/secrets/integration_discourse_signature_key.txt
+  integration_discourse_token:
+    file: ./.balena/secrets/integration_discourse_token.txt
+  integration_discourse_username:
+    file: ./.balena/secrets/integration_discourse_username.txt
+  integration_flowdock_signature_key:
+    file: ./.balena/secrets/integration_flowdock_signature_key.txt
+  integration_flowdock_token:
+    file: ./.balena/secrets/integration_flowdock_token.txt
+  integration_front_token:
+    file: ./.balena/secrets/integration_front_token.txt
+  integration_github_app_id:
+    file: ./.balena/secrets/integration_github_app_id.txt
+  integration_github_private_key:
+    file: ./.balena/secrets/integration_github_private_key.txt
+  integration_github_signature_key:
+    file: ./.balena/secrets/integration_github_signature_key.txt
+  integration_github_token:
+    file: ./.balena/secrets/integration_github_token.txt
+  integration_google_meet_credentials:
+    file: ./.balena/secrets/integration_google_meet_credentials.txt
+  integration_intercom_token:
+    file: ./.balena/secrets/integration_intercom_token.txt
+  integration_outreach_app_id:
+    file: ./.balena/secrets/integration_outreach_app_id.txt
+  integration_outreach_app_secret:
+    file: ./.balena/secrets/integration_outreach_app_secret.txt
+  integration_outreach_signature_key:
+    file: ./.balena/secrets/integration_outreach_signature_key.txt
+  integration_typeform_signature_key:
+    file: ./.balena/secrets/integration_typeform_signature_key.txt
+  mailgun_token:
+    file: ./.balena/secrets/mailgun_token.txt
