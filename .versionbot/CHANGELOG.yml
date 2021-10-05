@@ -1,4 +1,19 @@
 - commits:
+    - subject: return kernel-calculated fields on update
+      hash: ac535ae43f90b2994caa507f7883e9f97e5cbb9f
+      body: >
+        this allows the worker to use this data in subsequent processes like
+        triggers and transformers
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 6.2.0
+  date: 2021-10-05T12:35:29.057Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 714c86fae349f5dc3bae930dd12974c893b7a1ce
       body: ''
