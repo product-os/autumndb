@@ -25,7 +25,7 @@
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest lib",
     "test:integration": "jest test",
-    "test:compose": "DOCKER_BUILDKIT=1 docker build -t balena/jellyfish-core_sut:latest --secret id=npmrc,src=.balena/secrets/npmrc.txt . && docker-compose -f docker-compose.test.yml -f docker-compose.yml up --exit-code-from=sut",
+    "test:compose": "DOCKER_BUILDKIT=1 docker build -t balena/jellyfish-sut:latest --secret id=npmrc,src=.balena/secrets/npmrc.txt . && docker-compose -f docker-compose.test.yml -f docker-compose.yml up --exit-code-from=sut",
     "doc": "typedoc lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
     "check": "jellycheck",
