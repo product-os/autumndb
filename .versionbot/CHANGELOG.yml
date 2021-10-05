@@ -1,4 +1,17 @@
 - commits:
+    - subject: ensure `parentMarged` is correct during contract creation
+      hash: 2e83059e9f6cc8e014b9bf7884b1b35fa7db6a2a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 6.1.24
+  date: 2021-10-05T10:56:15.758Z
+- commits:
     - subject: 'Update test:compose to match image name'
       hash: dad33beb2affb08ec3cb58075e73f2c61f2b316d
       body: ''
