@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 714c86fae349f5dc3bae930dd12974c893b7a1ce
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 6.1.25
+  date: 2021-10-05T11:11:29.364Z
+- commits:
     - subject: ensure `parentMarged` is correct during contract creation
       hash: 2e83059e9f6cc8e014b9bf7884b1b35fa7db6a2a
       body: ''
