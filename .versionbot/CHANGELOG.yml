@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 3009eb7ac2368cefebc34af7c6eaea077dacdb6d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 6.2.13
+  date: 2021-10-18T23:42:40.184Z
+- commits:
     - subject: Update jest test callback usage
       hash: a7146a48fbf25190d5bfd61ba8514c62efef0246
       body: ''
