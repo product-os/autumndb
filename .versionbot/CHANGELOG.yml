@@ -1,4 +1,25 @@
 - commits:
+    - subject: Update jest test callback usage
+      hash: a7146a48fbf25190d5bfd61ba8514c62efef0246
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'patch: Update external-major'
+      hash: 4ab7334ba7b789d5b741a64adcb8f7e50d2eb888
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 6.2.12
+  date: 2021-10-18T06:46:07.863Z
+- commits:
     - subject: 'patch: Update external-non-major'
       hash: a61c04e2f407c06c75c1917d0830c2b678090a5b
       body: ''
