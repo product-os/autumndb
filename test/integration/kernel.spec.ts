@@ -11,7 +11,7 @@ import * as errors from '../../lib/errors';
 import { CARDS } from '../../lib/cards';
 import * as helpers from './helpers';
 import { once } from 'events';
-import { Contract } from '@balena/jellyfish-types/build/core';
+import { Contract, Stream } from '@balena/jellyfish-types/build/core';
 import { JSONSchema } from '@balena/jellyfish-types';
 import { strict as assert } from 'assert';
 
@@ -6681,15 +6681,13 @@ describe('Kernel', () => {
 	});
 
 	describe('.stream()', () => {
-		it('should include data if additionalProperties true', async (done) => {
+		it('should include data if additionalProperties true', (done) => {
 			const slug = ctx.generateRandomSlug({
 				prefix: 'card',
 			});
 
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					type: 'object',
 					additionalProperties: true,
 					required: ['slug', 'active', 'type'],
@@ -6707,59 +6705,58 @@ describe('Kernel', () => {
 							const: 'card@1.0.0',
 						},
 					},
-				},
-			);
+				})
+				.then((emitter: Stream) => {
+					emitter.on('error', done);
+					emitter.on('closed', done);
 
-			emitter.on('data', (change) => {
-				expect(change).toEqual({
-					id: change.after.id,
-					type: 'insert',
-					contractType: 'card@1.0.0',
-					after: {
-						id: change.after.id,
+					emitter.on('data', (change) => {
+						expect(change).toEqual({
+							id: change.after.id,
+							type: 'insert',
+							contractType: 'card@1.0.0',
+							after: {
+								id: change.after.id,
+								slug,
+								type: 'card@1.0.0',
+								active: true,
+								version: '1.0.0',
+								tags: [],
+								loop: null,
+								name: null,
+								markers: [],
+								created_at: change.after.created_at,
+								updated_at: null,
+								linked_at: {},
+								links: {},
+								requires: [],
+								capabilities: [],
+								data: {
+									test: 1,
+								},
+							},
+						});
+
+						emitter.close();
+					});
+
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 						slug,
 						type: 'card@1.0.0',
-						active: true,
-						version: '1.0.0',
-						tags: [],
-						loop: null,
-						name: null,
-						markers: [],
-						created_at: change.after.created_at,
-						updated_at: null,
-						linked_at: {},
-						links: {},
-						requires: [],
-						capabilities: [],
 						data: {
 							test: 1,
 						},
-					},
+					});
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug,
-				type: 'card@1.0.0',
-				data: {
-					test: 1,
-				},
-			});
 		});
 
-		it('should report back new elements that match a certain slug', async (done) => {
+		it('should report back new elements that match a certain slug', (done) => {
 			const slug = ctx.generateRandomSlug({
 				prefix: 'card',
 			});
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					type: 'object',
 					additionalProperties: false,
 					properties: {
@@ -6789,49 +6786,49 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['slug'],
-				},
-			);
-			emitter.on('data', (change) => {
-				expect(change.after).toEqual({
-					type: 'card@1.0.0',
-					slug,
-					active: true,
-					links: {},
-					tags: [],
-					data: {
-						test: 1,
-					},
+				})
+				.then((emitter: Stream) => {
+					emitter.on('data', (change) => {
+						expect(change.after).toEqual({
+							type: 'card@1.0.0',
+							slug,
+							active: true,
+							links: {},
+							tags: [],
+							data: {
+								test: 1,
+							},
+						});
+
+						emitter.close();
+					});
+
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						slug,
+						type: 'card@1.0.0',
+						version: '1.0.0',
+						data: {
+							test: 1,
+						},
+					});
+
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						type: 'card@1.0.0',
+						data: {
+							test: 2,
+						},
+					});
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug,
-				type: 'card@1.0.0',
-				version: '1.0.0',
-				data: {
-					test: 1,
-				},
-			});
-
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
-				data: {
-					test: 2,
-				},
-			});
 		});
 
-		it('should report back elements of a certain type', async (done) => {
+		it('should report back elements of a certain type', (done) => {
 			const slug = ctx.generateRandomSlug();
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					type: 'object',
 					additionalProperties: false,
 					properties: {
@@ -6853,37 +6850,37 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['type'],
-				},
-			);
+				})
+				.then((emitter: Stream) => {
+					emitter.on('data', (change) => {
+						expect(change.after).toEqual({
+							slug,
+							type: 'card@1.0.0',
+							data: {
+								email: 'johndoe@example.com',
+							},
+						});
 
-			emitter.on('data', (change) => {
-				expect(change.after).toEqual({
-					slug,
-					type: 'card@1.0.0',
-					data: {
-						email: 'johndoe@example.com',
-					},
+						emitter.close();
+					});
+
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						type: 'card@1.0.0',
+						data: {
+							test: 1,
+						},
+					});
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						slug,
+						type: 'card@1.0.0',
+						data: {
+							email: 'johndoe@example.com',
+						},
+					});
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
-				data: {
-					test: 1,
-				},
-			});
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug,
-				type: 'card@1.0.0',
-				data: {
-					email: 'johndoe@example.com',
-				},
-			});
 		});
 
 		it('should be able to attach a large number of streams', async () => {
@@ -6974,11 +6971,9 @@ describe('Kernel', () => {
 			);
 		});
 
-		it('should report back action requests', async (done) => {
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+		it('should report back action requests', (done) => {
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					type: 'object',
 					additionalProperties: false,
 					properties: {
@@ -7006,60 +7001,58 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['type'],
-				},
-			);
+				})
+				.then((emitter: Stream) => {
+					emitter.on('data', (change) => {
+						expect(change.after).toEqual({
+							type: 'action-request@1.0.0',
+							data: {
+								context: ctx.context,
+								epoch: 1521170969543,
+								action: 'action-delete-card@1.0.0',
+								actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+								input: {
+									id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+									type: 'card@1.0.0',
+								},
+								timestamp: '2018-03-16T03:29:29.543Z',
+								arguments: {},
+							},
+						});
 
-			emitter.on('data', (change) => {
-				expect(change.after).toEqual({
-					type: 'action-request@1.0.0',
-					data: {
-						context: ctx.context,
-						epoch: 1521170969543,
-						action: 'action-delete-card@1.0.0',
-						actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-						input: {
-							id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-							type: 'card@1.0.0',
+						emitter.close();
+					});
+
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						type: 'action-request@1.0.0',
+						data: {
+							context: ctx.context,
+							action: 'action-delete-card@1.0.0',
+							actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+							epoch: 1521170969543,
+							timestamp: '2018-03-16T03:29:29.543Z',
+							input: {
+								id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+								type: 'card@1.0.0',
+							},
+							arguments: {},
 						},
-						timestamp: '2018-03-16T03:29:29.543Z',
-						arguments: {},
-					},
-				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				type: 'action-request@1.0.0',
-				data: {
-					context: ctx.context,
-					action: 'action-delete-card@1.0.0',
-					actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					epoch: 1521170969543,
-					timestamp: '2018-03-16T03:29:29.543Z',
-					input: {
-						id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+					});
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
 						type: 'card@1.0.0',
-					},
-					arguments: {},
-				},
-			});
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
-				data: {
-					email: 'johndoe@example.com',
-				},
-			});
+						data: {
+							email: 'johndoe@example.com',
+						},
+					});
+				});
 		});
 
-		it('should close without finding anything', async (done) => {
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+		it('should close without finding anything', (done) => {
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					type: 'object',
 					properties: {
 						slug: {
@@ -7068,20 +7061,19 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['slug'],
-				},
-			);
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-			emitter.close();
+				})
+				.then((emitter: Stream) => {
+					emitter.on('error', done);
+					emitter.on('closed', done);
+					emitter.close();
+				});
 		});
 
-		it('should report back inactive elements', async (done) => {
+		it('should report back inactive elements', (done) => {
 			const slug = ctx.generateRandomSlug();
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					type: 'object',
 					additionalProperties: false,
 					properties: {
@@ -7095,79 +7087,36 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['type'],
-				},
-			);
+				})
+				.then((emitter: Stream) => {
+					emitter.on('data', (change) => {
+						expect(change.after).toEqual({
+							type: 'card@1.0.0',
+							slug,
+						});
 
-			emitter.on('data', (change) => {
-				expect(change.after).toEqual({
-					type: 'card@1.0.0',
-					slug,
+						emitter.close();
+					});
+
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						slug,
+						active: false,
+						type: 'card@1.0.0',
+						data: {
+							test: 2,
+						},
+					});
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug,
-				active: false,
-				type: 'card@1.0.0',
-				data: {
-					test: 2,
-				},
-			});
 		});
 
-		it('should be able to resolve links on an update to the base card', async (done) => {
+		it('should be able to resolve links on an update to the base card', (done) => {
 			const slug = ctx.generateRandomSlug();
-			const card1 = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					slug,
-					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {
-						test: 1,
-					},
-				},
-			);
 
-			const card2 = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					active: false,
-					type: 'card@1.0.0',
-					data: {
-						test: 2,
-					},
-				},
-			);
-
-			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
-				type: 'link@1.0.0',
-				name: 'is attached to',
-				data: {
-					inverseName: 'has attached element',
-					from: {
-						id: card1.id,
-						type: card1.type,
-					},
-					to: {
-						id: card2.id,
-						type: card2.type,
-					},
-				},
-			});
-
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					$$links: {
 						'is attached to': {
 							type: 'object',
@@ -7192,73 +7141,89 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['type', 'links'],
-				},
-			);
+				})
+				.then(async (emitter: Stream) => {
+					const card1 = await ctx.kernel.insertCard(
+						ctx.context,
+						ctx.kernel.sessions!.admin,
+						{
+							slug,
+							type: 'card@1.0.0',
+							version: '1.0.0',
+							data: {
+								test: 1,
+							},
+						},
+					);
 
-			emitter.on('data', (change) => {
-				expect(change.after).toEqual({
-					type: 'card@1.0.0',
-					slug,
-					links: {
-						'is attached to': [
+					const card2 = await ctx.kernel.insertCard(
+						ctx.context,
+						ctx.kernel.sessions!.admin,
+						{
+							active: false,
+							type: 'card@1.0.0',
+							data: {
+								test: 2,
+							},
+						},
+					);
+
+					await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
+						type: 'link@1.0.0',
+						name: 'is attached to',
+						data: {
+							inverseName: 'has attached element',
+							from: {
+								id: card1.id,
+								type: card1.type,
+							},
+							to: {
+								id: card2.id,
+								type: card2.type,
+							},
+						},
+					});
+
+					emitter.on('data', (change) => {
+						expect(change.after).toEqual({
+							type: 'card@1.0.0',
+							slug,
+							links: {
+								'is attached to': [
+									{
+										slug: card2.slug,
+									},
+								],
+							},
+						});
+
+						emitter.close();
+					});
+
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					ctx.kernel.patchCardBySlug(
+						ctx.context,
+						ctx.kernel.sessions!.admin,
+						`${card1.slug}@${card1.version}`,
+						[
 							{
-								slug: card2.slug,
+								op: 'replace',
+								path: '/data/test',
+								value: 3,
 							},
 						],
-					},
+					);
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			ctx.kernel.patchCardBySlug(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				`${card1.slug}@${card1.version}`,
-				[
-					{
-						op: 'replace',
-						path: '/data/test',
-						value: 3,
-					},
-				],
-			);
 		});
 
-		it('should be able to resolve links when a new link is added', async (done) => {
+		it('should be able to resolve links when a new link is added', (done) => {
 			const slug = ctx.generateRandomSlug();
 
-			const card1 = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					slug,
-					type: 'card@1.0.0',
-					data: {
-						test: 1,
-					},
-				},
-			);
-
-			const card2 = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					active: false,
-					type: 'card@1.0.0',
-					data: {
-						test: 2,
-					},
-				},
-			);
-
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					$$links: {
 						'is attached to': {
 							type: 'object',
@@ -7283,96 +7248,76 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['type', 'links'],
-				},
-			);
-
-			emitter.on('data', (change) => {
-				expect(change.after).toEqual({
-					type: 'card@1.0.0',
-					slug,
-					links: {
-						'is attached to': [
-							{
-								slug: card2.slug,
+				})
+				.then(async (emitter: Stream) => {
+					const card1 = await ctx.kernel.insertCard(
+						ctx.context,
+						ctx.kernel.sessions!.admin,
+						{
+							slug,
+							type: 'card@1.0.0',
+							data: {
+								test: 1,
 							},
-						],
-					},
+						},
+					);
+
+					const card2 = await ctx.kernel.insertCard(
+						ctx.context,
+						ctx.kernel.sessions!.admin,
+						{
+							active: false,
+							type: 'card@1.0.0',
+							data: {
+								test: 2,
+							},
+						},
+					);
+
+					emitter.on('data', (change) => {
+						expect(change.after).toEqual({
+							type: 'card@1.0.0',
+							slug,
+							links: {
+								'is attached to': [
+									{
+										slug: card2.slug,
+									},
+								],
+							},
+						});
+
+						emitter.close();
+					});
+
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
+						type: 'link@1.0.0',
+						name: 'is attached to',
+						data: {
+							inverseName: 'has attached element',
+							from: {
+								id: card1.id,
+								type: card1.type,
+							},
+							to: {
+								id: card2.id,
+								type: card2.type,
+							},
+						},
+					});
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
-				type: 'link@1.0.0',
-				name: 'is attached to',
-				data: {
-					inverseName: 'has attached element',
-					from: {
-						id: card1.id,
-						type: card1.type,
-					},
-					to: {
-						id: card2.id,
-						type: card2.type,
-					},
-				},
-			});
 		});
 
 		// TODO: Get this working, but in a performant way.
-		test.skip('should be able to resolve links on an update to the linked card', async (done) => {
+		test.skip('should be able to resolve links on an update to the linked card', (done) => {
 			const slug = ctx.generateRandomSlug();
 
-			const card1 = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					slug,
-					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {
-						test: 1,
-					},
-				},
-			);
-
-			const card2 = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					active: false,
-					type: 'card@1.0.0',
-					data: {
-						test: 2,
-					},
-				},
-			);
-
-			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
-				slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
-				type: 'link@1.0.0',
-				name: 'is attached to',
-				data: {
-					inverseName: 'has attached element',
-					from: {
-						id: card1.id,
-						type: card1.type,
-					},
-					to: {
-						id: card2.id,
-						type: card2.type,
-					},
-				},
-			});
-
-			const emitter = await ctx.kernel.stream(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
+			ctx.kernel
+				.stream(ctx.context, ctx.kernel.sessions!.admin, {
 					$$links: {
 						'is attached to': {
 							type: 'object',
@@ -7400,40 +7345,82 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['type'],
-				},
-			);
+				})
+				.then(async (emitter: Stream) => {
+					const card1 = await ctx.kernel.insertCard(
+						ctx.context,
+						ctx.kernel.sessions!.admin,
+						{
+							slug,
+							type: 'card@1.0.0',
+							version: '1.0.0',
+							data: {
+								test: 1,
+							},
+						},
+					);
 
-			emitter.on('data', (change) => {
-				expect(change.after).toEqual({
-					type: 'card@1.0.0',
-					slug,
-					links: {
-						'is attached to': [
+					const card2 = await ctx.kernel.insertCard(
+						ctx.context,
+						ctx.kernel.sessions!.admin,
+						{
+							active: false,
+							type: 'card@1.0.0',
+							data: {
+								test: 2,
+							},
+						},
+					);
+
+					await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+						slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
+						type: 'link@1.0.0',
+						name: 'is attached to',
+						data: {
+							inverseName: 'has attached element',
+							from: {
+								id: card1.id,
+								type: card1.type,
+							},
+							to: {
+								id: card2.id,
+								type: card2.type,
+							},
+						},
+					});
+
+					emitter.on('data', (change) => {
+						expect(change.after).toEqual({
+							type: 'card@1.0.0',
+							slug,
+							links: {
+								'is attached to': [
+									{
+										slug: card2.slug,
+									},
+								],
+							},
+						});
+
+						emitter.close();
+					});
+
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					ctx.kernel.patchCardBySlug(
+						ctx.context,
+						ctx.kernel.sessions!.admin,
+						`${card2.slug}@${card1.version}`,
+						[
 							{
-								slug: card2.slug,
+								op: 'replace',
+								path: '/data/test',
+								value: 3,
 							},
 						],
-					},
+					);
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			ctx.kernel.patchCardBySlug(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				`${card2.slug}@${card1.version}`,
-				[
-					{
-						op: 'replace',
-						path: '/data/test',
-						value: 3,
-					},
-				],
-			);
 		});
 
 		it('should send the unmatch event when a previously matching card does not match anymore', async () => {
