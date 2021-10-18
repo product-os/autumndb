@@ -9,7 +9,7 @@ import * as Bluebird from 'bluebird';
 import * as errors from '../../../lib/errors';
 import * as helpers from './helpers';
 import { JSONSchema } from '@balena/jellyfish-types';
-import { Contract } from '@balena/jellyfish-types/build/core';
+import { Contract, Stream } from '@balena/jellyfish-types/build/core';
 
 let ctx: helpers.BackendContext;
 
@@ -4610,480 +4610,239 @@ describe('backend', () => {
 	});
 
 	describe('.stream()', () => {
-		it('should report back new elements that match a certain type', async (done) => {
+		it('should report back new elements that match a certain type', (done) => {
 			const randString = ctx.generateRandomSlug();
-			const emitter = await ctx.backend.stream(
-				ctx.context,
-				{
-					type: {},
-					data: {},
-				},
-				{
-					type: 'object',
-					additionalProperties: false,
-					properties: {
-						type: {
-							type: 'string',
-							const: 'foo@1.0.0',
-						},
-						data: {
-							type: 'object',
-							required: ['test'],
-							properties: {
-								test: {
-									type: 'string',
-									const: randString,
+			ctx.backend
+				.stream(
+					ctx.context,
+					{
+						type: {},
+						data: {},
+					},
+					{
+						type: 'object',
+						additionalProperties: false,
+						properties: {
+							type: {
+								type: 'string',
+								const: 'foo@1.0.0',
+							},
+							data: {
+								type: 'object',
+								required: ['test'],
+								properties: {
+									test: {
+										type: 'string',
+										const: randString,
+									},
 								},
 							},
 						},
+						required: ['type'],
 					},
-					required: ['type'],
-				},
-			);
+				)
+				.then(async (emitter: Stream) => {
+					emitter.on('data', (change) => {
+						expect(change.type).toBe('insert');
+						expect(change.after).toEqual({
+							type: 'foo@1.0.0',
+							data: {
+								test: randString,
+							},
+						});
 
-			emitter.on('data', (change) => {
-				expect(change.type).toBe('insert');
-				expect(change.after).toEqual({
-					type: 'foo@1.0.0',
-					data: {
-						test: randString,
-					},
+						emitter.close();
+					});
+
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					Bluebird.all([
+						ctx.backend.insertElement(ctx.context, {
+							type: 'foo@1.0.0',
+							version: '1.0.0',
+							tags: [],
+							loop: null,
+							links: {},
+							markers: [],
+							requires: [],
+							capabilities: [],
+							linked_at: {},
+							created_at: new Date().toISOString(),
+							updated_at: null,
+							active: true,
+							slug: ctx.generateRandomSlug(),
+							data: {
+								test: randString,
+							},
+						}),
+						ctx.backend.insertElement(ctx.context, {
+							type: 'bar@1.0.0',
+							version: '1.0.0',
+							tags: [],
+							loop: null,
+							links: {},
+							markers: [],
+							requires: [],
+							capabilities: [],
+							created_at: new Date().toISOString(),
+							updated_at: null,
+							linked_at: {},
+							active: true,
+							slug: ctx.generateRandomSlug(),
+							data: {
+								test: randString,
+							},
+						}),
+					]);
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-			emitter.on('closed', done);
-
-			Bluebird.all([
-				ctx.backend.insertElement(ctx.context, {
-					type: 'foo@1.0.0',
-					version: '1.0.0',
-					tags: [],
-					loop: null,
-					links: {},
-					markers: [],
-					requires: [],
-					capabilities: [],
-					linked_at: {},
-					created_at: new Date().toISOString(),
-					updated_at: null,
-					active: true,
-					slug: ctx.generateRandomSlug(),
-					data: {
-						test: randString,
-					},
-				}),
-				ctx.backend.insertElement(ctx.context, {
-					type: 'bar@1.0.0',
-					version: '1.0.0',
-					tags: [],
-					loop: null,
-					links: {},
-					markers: [],
-					requires: [],
-					capabilities: [],
-					created_at: new Date().toISOString(),
-					updated_at: null,
-					linked_at: {},
-					active: true,
-					slug: ctx.generateRandomSlug(),
-					data: {
-						test: randString,
-					},
-				}),
-			]);
 		});
 
-		it('should report back changes to certain elements', async (done) => {
+		it('should report back changes to certain elements', (done) => {
 			const slug1 = ctx.generateRandomSlug();
 			const slug2 = ctx.generateRandomSlug();
 
-			await ctx.backend.insertElement(ctx.context, {
-				type: 'foo@1.0.0',
-				version: '1.0.0',
-				links: {},
-				tags: [],
-				loop: null,
-				markers: [],
-				requires: [],
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				updated_at: null,
-				linked_at: {},
-				active: true,
-				slug: slug1,
-				data: {
-					test: 1,
-				},
-			});
-
-			await ctx.backend.insertElement(ctx.context, {
-				type: 'bar@1.0.0',
-				version: '1.0.0',
-				tags: [],
-				loop: null,
-				links: {},
-				markers: [],
-				requires: [],
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				updated_at: null,
-				linked_at: {},
-				active: true,
-				slug: slug2,
-				data: {
-					test: 1,
-				},
-			});
-
-			const emitter = await ctx.backend.stream(
-				ctx.context,
-				{
-					slug: {},
-					type: {},
-					data: {},
-				},
-				{
-					type: 'object',
-					additionalProperties: false,
-					properties: {
-						slug: {
-							type: 'string',
-							enum: [slug1, slug2],
-						},
-						type: {
-							type: 'string',
-							const: 'foo@1.0.0',
-						},
-						data: {
-							type: 'object',
-							required: ['test'],
-							properties: {
-								test: {
-									type: 'number',
+			ctx.backend
+				.stream(
+					ctx.context,
+					{
+						slug: {},
+						type: {},
+						data: {},
+					},
+					{
+						type: 'object',
+						additionalProperties: false,
+						properties: {
+							slug: {
+								type: 'string',
+								enum: [slug1, slug2],
+							},
+							type: {
+								type: 'string',
+								const: 'foo@1.0.0',
+							},
+							data: {
+								type: 'object',
+								required: ['test'],
+								properties: {
+									test: {
+										type: 'number',
+									},
 								},
 							},
 						},
+						required: ['type', 'slug'],
 					},
-					required: ['type', 'slug'],
-				},
-			);
-
-			emitter.on('data', (change) => {
-				if (change.type === 'insert') {
-					return;
-				}
-
-				expect(change.type).toBe('update');
-				expect(change.after).toEqual({
-					slug: slug1,
-					type: 'foo@1.0.0',
-					data: {
-						test: 2,
-					},
-				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', (error) => {
-				done(error);
-			});
-
-			emitter.on('closed', () => {
-				done();
-			});
-
-			await ctx.backend.upsertElement(ctx.context, {
-				slug: slug1,
-				version: '1.0.0',
-				tags: [],
-				loop: null,
-				links: {},
-				markers: [],
-				requires: [],
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				updated_at: null,
-				linked_at: {},
-				active: true,
-				type: 'foo@1.0.0',
-				data: {
-					test: 2,
-				},
-			});
-			await ctx.backend.upsertElement(ctx.context, {
-				slug: slug2,
-				active: true,
-				version: '1.0.0',
-				links: {},
-				tags: [],
-				loop: null,
-				markers: [],
-				requires: [],
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				updated_at: null,
-				linked_at: {},
-				type: 'bar@1.0.0',
-				data: {
-					test: 2,
-				},
-			});
-		});
-
-		it('should report back changes to large elements', async (done) => {
-			const slug = ctx.generateRandomSlug();
-			await ctx.backend.insertElement(ctx.context, {
-				type: 'foo@1.0.0',
-				active: true,
-				links: {},
-				version: '1.0.0',
-				tags: [],
-				loop: null,
-				markers: [],
-				requires: [],
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				updated_at: null,
-				linked_at: {},
-				slug,
-				data: {
-					test: new Array(5000).join('foobar'),
-				},
-			});
-
-			const emitter = await ctx.backend.stream(
-				ctx.context,
-				{
-					slug: {},
-					type: {},
-					data: {},
-				},
-				{
-					type: 'object',
-					additionalProperties: false,
-					properties: {
-						slug: {
-							type: 'string',
-							const: slug,
-						},
-						type: {
-							type: 'string',
-							const: 'foo@1.0.0',
-						},
+				)
+				.then(async (emitter: Stream) => {
+					await ctx.backend.insertElement(ctx.context, {
+						type: 'foo@1.0.0',
+						version: '1.0.0',
+						links: {},
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
+						active: true,
+						slug: slug1,
 						data: {
-							type: 'object',
-							required: ['test'],
-							properties: {
-								test: {
-									type: 'string',
-								},
-							},
+							test: 1,
 						},
-					},
-					required: ['type', 'slug'],
-				},
-			);
+					});
 
-			emitter.on('data', (change) => {
-				// Livefeeds are asynchronous and can pick up a change a
-				// moment after the insertion, so there exist the
-				// possibility that we get the initial insert event here,
-				// and if so its fine to ignore, as it doesn't affect
-				// the semantics of the tests.
-				if (
-					change.type === 'insert' &&
-					_.isEqual(change.after, {
-						slug,
+					await ctx.backend.insertElement(ctx.context, {
+						type: 'bar@1.0.0',
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						links: {},
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
+						active: true,
+						slug: slug2,
+						data: {
+							test: 1,
+						},
+					});
+
+					emitter.on('data', (change) => {
+						if (change.type === 'insert') {
+							return;
+						}
+
+						expect(change.type).toBe('update');
+						expect(change.after).toEqual({
+							slug: slug1,
+							type: 'foo@1.0.0',
+							data: {
+								test: 2,
+							},
+						});
+
+						emitter.close();
+					});
+
+					emitter.on('error', (error) => {
+						done(error);
+					});
+
+					emitter.on('closed', () => {
+						done();
+					});
+
+					await ctx.backend.upsertElement(ctx.context, {
+						slug: slug1,
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						links: {},
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
+						active: true,
 						type: 'foo@1.0.0',
 						data: {
-							test: new Array(5000).join('foobar'),
+							test: 2,
 						},
-					})
-				) {
-					return;
-				}
-
-				expect(change.type).toBe('update');
-				expect(change.after).toEqual({
-					slug,
-					type: 'foo@1.0.0',
-					data: {
-						test: new Array(5000).join('bazbuzz'),
-					},
-				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', (error) => {
-				done(error);
-			});
-
-			emitter.on('closed', () => {
-				done();
-			});
-
-			ctx.backend.upsertElement(ctx.context, {
-				slug,
-				active: true,
-				version: '1.0.0',
-				links: {},
-				tags: [],
-				loop: null,
-				markers: [],
-				requires: [],
-				capabilities: [],
-				linked_at: {},
-				created_at: new Date().toISOString(),
-				updated_at: null,
-				type: 'foo@1.0.0',
-				data: {
-					test: new Array(5000).join('bazbuzz'),
-				},
-			});
-		});
-
-		it('should close without finding anything', async (done) => {
-			const emitter = await ctx.backend.stream(
-				ctx.context,
-				{
-					slug: {},
-				},
-				{
-					type: 'object',
-					properties: {
-						slug: {
-							type: 'string',
-							const: ctx.generateRandomSlug(),
-						},
-					},
-					required: ['slug'],
-				},
-			);
-			emitter.on('error', done);
-			emitter.on('closed', done);
-			emitter.close();
-		});
-
-		it('should set "before" to null if it previously did not match the schema', async (done) => {
-			const slug = ctx.generateRandomSlug();
-			await ctx.backend.insertElement(ctx.context, {
-				slug,
-				active: true,
-				links: {},
-				version: '1.0.0',
-				tags: [],
-				loop: null,
-				markers: [],
-				requires: [],
-				capabilities: [],
-				created_at: new Date().toISOString(),
-				updated_at: null,
-				linked_at: {},
-				type: 'foo@1.0.0',
-				data: {
-					test: '1',
-				},
-			});
-			const emitter = await ctx.backend.stream(
-				ctx.context,
-				{
-					slug: {},
-					type: {},
-					data: {},
-				},
-				{
-					type: 'object',
-					additionalProperties: false,
-					properties: {
-						slug: {
-							type: 'string',
-							const: slug,
-						},
-						type: {
-							type: 'string',
-							const: 'foo@1.0.0',
-						},
+					});
+					await ctx.backend.upsertElement(ctx.context, {
+						slug: slug2,
+						active: true,
+						version: '1.0.0',
+						links: {},
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
+						type: 'bar@1.0.0',
 						data: {
-							type: 'object',
-							required: ['test'],
-							properties: {
-								test: {
-									type: 'number',
-								},
-							},
+							test: 2,
 						},
-					},
-					required: ['slug', 'type', 'data'],
-				},
-			);
-
-			emitter.on('data', (change) => {
-				expect(change.after).toEqual({
-					slug,
-					type: 'foo@1.0.0',
-					data: {
-						test: 1,
-					},
+					});
 				});
-
-				emitter.close();
-			});
-
-			emitter.on('error', done);
-
-			emitter.on('closed', done);
-
-			ctx.backend.upsertElement(ctx.context, {
-				slug,
-				active: true,
-				links: {},
-				version: '1.0.0',
-				tags: [],
-				loop: null,
-				markers: [],
-				requires: [],
-				capabilities: [],
-				linked_at: {},
-				created_at: new Date().toISOString(),
-				updated_at: null,
-				type: 'foo@1.0.0',
-				data: {
-					test: 1,
-				},
-			});
 		});
 
-		it(
-			'should filter the "before" section of a change',
-			async (done) => {
-				const slug = ctx.generateRandomSlug();
+		it('should report back changes to large elements', (done) => {
+			const slug = ctx.generateRandomSlug();
 
-				await ctx.backend.insertElement(ctx.context, {
-					type: 'foo@1.0.0',
-					active: true,
-					links: {},
-					version: '1.0.0',
-					tags: [],
-					loop: null,
-					markers: [],
-					requires: [],
-					capabilities: [],
-					linked_at: {},
-					created_at: new Date().toISOString(),
-					updated_at: null,
-					slug,
-					data: {
-						test: 1,
-						extra: true,
-					},
-				});
-
-				const emitter = await ctx.backend.stream(
+			ctx.backend
+				.stream(
 					ctx.context,
 					{
 						slug: {},
@@ -5105,7 +4864,146 @@ describe('backend', () => {
 							data: {
 								type: 'object',
 								required: ['test'],
-								additionalProperties: false,
+								properties: {
+									test: {
+										type: 'string',
+									},
+								},
+							},
+						},
+						required: ['type', 'slug'],
+					},
+				)
+				.then(async (emitter: Stream) => {
+					await ctx.backend.insertElement(ctx.context, {
+						type: 'foo@1.0.0',
+						active: true,
+						links: {},
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
+						slug,
+						data: {
+							test: new Array(5000).join('foobar'),
+						},
+					});
+
+					emitter.on('data', (change) => {
+						// Livefeeds are asynchronous and can pick up a change a
+						// moment after the insertion, so there exist the
+						// possibility that we get the initial insert event here,
+						// and if so its fine to ignore, as it doesn't affect
+						// the semantics of the tests.
+						if (
+							change.type === 'insert' &&
+							_.isEqual(change.after, {
+								slug,
+								type: 'foo@1.0.0',
+								data: {
+									test: new Array(5000).join('foobar'),
+								},
+							})
+						) {
+							return;
+						}
+
+						expect(change.type).toBe('update');
+						expect(change.after).toEqual({
+							slug,
+							type: 'foo@1.0.0',
+							data: {
+								test: new Array(5000).join('bazbuzz'),
+							},
+						});
+
+						emitter.close();
+					});
+
+					emitter.on('error', (error) => {
+						done(error);
+					});
+
+					emitter.on('closed', () => {
+						done();
+					});
+
+					ctx.backend.upsertElement(ctx.context, {
+						slug,
+						active: true,
+						version: '1.0.0',
+						links: {},
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						linked_at: {},
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						type: 'foo@1.0.0',
+						data: {
+							test: new Array(5000).join('bazbuzz'),
+						},
+					});
+				});
+		});
+
+		it('should close without finding anything', (done) => {
+			ctx.backend
+				.stream(
+					ctx.context,
+					{
+						slug: {},
+					},
+					{
+						type: 'object',
+						properties: {
+							slug: {
+								type: 'string',
+								const: ctx.generateRandomSlug(),
+							},
+						},
+						required: ['slug'],
+					},
+				)
+				.then((emitter: Stream) => {
+					emitter.on('error', done);
+					emitter.on('closed', done);
+					emitter.close();
+				});
+		});
+
+		it('should set "before" to null if it previously did not match the schema', (done) => {
+			const slug = ctx.generateRandomSlug();
+			ctx.backend
+				.stream(
+					ctx.context,
+					{
+						slug: {},
+						type: {},
+						data: {},
+					},
+					{
+						type: 'object',
+						additionalProperties: false,
+						properties: {
+							slug: {
+								type: 'string',
+								const: slug,
+							},
+							type: {
+								type: 'string',
+								const: 'foo@1.0.0',
+							},
+							data: {
+								type: 'object',
+								required: ['test'],
 								properties: {
 									test: {
 										type: 'number',
@@ -5113,62 +5011,178 @@ describe('backend', () => {
 								},
 							},
 						},
-						required: ['type', 'slug'],
+						required: ['slug', 'type', 'data'],
 					},
-				);
-
-				emitter.on('data', (change) => {
-					// Livefeeds are asynchronous and can pick up a change a
-					// moment after the insertion, so there exist the
-					// possibility that we get the initial insert event here,
-					// and if so its fine to ignore, as it doesn't affect
-					// the semantics of the tests.
-					if (
-						change.type === 'insert' &&
-						_.isEqual(change.after, {
-							type: 'foo@1.0.0',
-							slug,
-							data: {
-								test: 1,
-							},
-						})
-					) {
-						return;
-					}
-
-					expect(change.after).toEqual({
+				)
+				.then(async (emitter: Stream) => {
+					await ctx.backend.insertElement(ctx.context, {
 						slug,
+						active: true,
+						links: {},
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
 						type: 'foo@1.0.0',
 						data: {
-							test: 2,
+							test: '1',
 						},
 					});
 
-					emitter.close();
-				});
+					emitter.on('data', (change) => {
+						expect(change.after).toEqual({
+							slug,
+							type: 'foo@1.0.0',
+							data: {
+								test: 1,
+							},
+						});
 
-				emitter.on('error', done);
-				emitter.on('closed', done);
+						emitter.close();
+					});
 
-				await ctx.backend.upsertElement(ctx.context, {
-					slug,
-					version: '1.0.0',
-					tags: [],
-					loop: null,
-					links: {},
-					markers: [],
-					requires: [],
-					capabilities: [],
-					created_at: new Date().toISOString(),
-					linked_at: {},
-					updated_at: null,
-					active: true,
-					type: 'foo@1.0.0',
-					data: {
-						test: 2,
-						extra: true,
-					},
+					emitter.on('error', done);
+					emitter.on('closed', done);
+
+					ctx.backend.upsertElement(ctx.context, {
+						slug,
+						active: true,
+						links: {},
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						linked_at: {},
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						type: 'foo@1.0.0',
+						data: {
+							test: 1,
+						},
+					});
 				});
+		});
+
+		it(
+			'should filter the "before" section of a change',
+			(done) => {
+				const slug = ctx.generateRandomSlug();
+
+				ctx.backend
+					.stream(
+						ctx.context,
+						{
+							slug: {},
+							type: {},
+							data: {},
+						},
+						{
+							type: 'object',
+							additionalProperties: false,
+							properties: {
+								slug: {
+									type: 'string',
+									const: slug,
+								},
+								type: {
+									type: 'string',
+									const: 'foo@1.0.0',
+								},
+								data: {
+									type: 'object',
+									required: ['test'],
+									additionalProperties: false,
+									properties: {
+										test: {
+											type: 'number',
+										},
+									},
+								},
+							},
+							required: ['type', 'slug'],
+						},
+					)
+					.then(async (emitter: Stream) => {
+						await ctx.backend.insertElement(ctx.context, {
+							type: 'foo@1.0.0',
+							active: true,
+							links: {},
+							version: '1.0.0',
+							tags: [],
+							loop: null,
+							markers: [],
+							requires: [],
+							capabilities: [],
+							linked_at: {},
+							created_at: new Date().toISOString(),
+							updated_at: null,
+							slug,
+							data: {
+								test: 1,
+								extra: true,
+							},
+						});
+
+						emitter.on('data', (change) => {
+							// Livefeeds are asynchronous and can pick up a change a
+							// moment after the insertion, so there exist the
+							// possibility that we get the initial insert event here,
+							// and if so its fine to ignore, as it doesn't affect
+							// the semantics of the tests.
+							if (
+								change.type === 'insert' &&
+								_.isEqual(change.after, {
+									type: 'foo@1.0.0',
+									slug,
+									data: {
+										test: 1,
+									},
+								})
+							) {
+								return;
+							}
+
+							expect(change.after).toEqual({
+								slug,
+								type: 'foo@1.0.0',
+								data: {
+									test: 2,
+								},
+							});
+
+							emitter.close();
+						});
+
+						emitter.on('error', done);
+						emitter.on('closed', done);
+
+						await ctx.backend.upsertElement(ctx.context, {
+							slug,
+							version: '1.0.0',
+							tags: [],
+							loop: null,
+							links: {},
+							markers: [],
+							requires: [],
+							capabilities: [],
+							created_at: new Date().toISOString(),
+							linked_at: {},
+							updated_at: null,
+							active: true,
+							type: 'foo@1.0.0',
+							data: {
+								test: 2,
+								extra: true,
+							},
+						});
+					});
 			},
 			10 * 1000,
 		);
