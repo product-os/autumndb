@@ -1,4 +1,27 @@
 - commits:
+    - subject: Remove test for unnecessary exception when patching a contract
+      hash: f6343443e8bfc32d5c1a3b0908805e46513afebe
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: remove manual json patch processing
+      hash: 497ca5d38631612c01848e51176981431b0aa331
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 7.0.0
+  date: 2021-10-19T15:02:15.804Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 3009eb7ac2368cefebc34af7c6eaea077dacdb6d
       body: ''
