@@ -383,41 +383,6 @@ describe('Kernel', () => {
 			).rejects.toThrow(errors.JellyfishInvalidPatch);
 		});
 
-		it('should throw if the patch does not match', async () => {
-			const card = await ctx.kernel.insertCard(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				{
-					type: 'card@1.0.0',
-					data: {
-						foo: 'bar',
-					},
-				},
-			);
-
-			await expect(
-				ctx.kernel.patchCardBySlug(
-					ctx.context,
-					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
-					[
-						{
-							op: 'remove',
-							path: '/data/hello',
-						},
-					],
-				),
-			).rejects.toThrow(errors.JellyfishSchemaMismatch);
-
-			const result = await ctx.kernel.getCardBySlug(
-				ctx.context,
-				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
-			);
-
-			expect(result).toEqual(card);
-		});
-
 		it('should throw if adding to non existent property', async () => {
 			const card = await ctx.kernel.insertCard(
 				ctx.context,

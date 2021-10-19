@@ -212,24 +212,6 @@ const patchCard = (
 			return accumulator;
 		}
 
-		// Only addition can happen on non-existent properties
-		if (operation.op !== 'add') {
-			const path = operation.path
-				.split('/')
-				.slice(1)
-				.map(jsonpatch.unescapePathComponent);
-			if (!_.has(card, path)) {
-				// This is a schema mismatch as this case tends
-				// to happen when attempting to violate the
-				// permissions filters.
-				const error = new errors.JellyfishSchemaMismatch(
-					`Path ${operation.path} does not exist in ${card.slug}`,
-				);
-				error.expected = true;
-				throw error;
-			}
-		}
-
 		try {
 			return jsonpatch.applyOperation(
 				accumulator,
@@ -239,11 +221,7 @@ const patchCard = (
 			).newDocument;
 		} catch (error) {
 			const newError = new errors.JellyfishInvalidPatch(
-				`Patch does not apply to ${card.slug}: ${JSON.stringify(
-					patch,
-					null,
-					2,
-				)}`,
+				`Patch does not apply to ${card.slug}: ${JSON.stringify(patch)}`,
 			);
 
 			newError.expected = true;
