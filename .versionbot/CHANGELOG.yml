@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.87'
+      hash: f763638cb13d1039b947c08163b2a2c74bce5e93
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.1
+  date: 2021-10-20T09:04:30.268Z
+- commits:
     - subject: Remove test for unnecessary exception when patching a contract
       hash: f6343443e8bfc32d5c1a3b0908805e46513afebe
       body: ''
