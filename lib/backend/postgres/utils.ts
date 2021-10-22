@@ -5,10 +5,6 @@
  */
 
 import * as _ from 'lodash';
-import { getLogger } from '@balena/jellyfish-logger';
-import { Context } from '@balena/jellyfish-types/build/core';
-import type { Queryable } from './types';
-const logger = getLogger('jellyfish-core');
 
 // FIXME
 // this function is intended to make the transition between dates as
@@ -29,42 +25,6 @@ export const convertDatesToISOString = (row: any) => {
 	}
 
 	return row;
-};
-
-/**
- * Create an index.
- *
- * @function
- *
- * @param {Object} context - execution context
- * @param {Object} connection - connection to database
- * @param {String} tableName - table name
- * @param {String} indexName - index name
- * @param {String} predicate - index create statement predicate
- * @param {Boolean} unique - declare index as UNIQUE (optional)
- *
- * @example
- * await createIndex(context, connection, 'cards', 'example_idx', 'USING btree (updated_at)')
- */
-export const createIndex = async (
-	context: Context,
-	connection: Queryable,
-	tableName: string,
-	indexName: string,
-	predicate: string,
-	unique: boolean = false,
-) => {
-	logger.debug(context, 'Attempting to create table index', {
-		table: tableName,
-		index: indexName,
-	});
-
-	const uniqueFlag = unique ? 'UNIQUE' : '';
-	const statement = `CREATE ${uniqueFlag} INDEX IF NOT EXISTS "${indexName}" ON ${tableName} ${predicate}`;
-	await connection.task(async (task) => {
-		await task.any('SET statement_timeout=0');
-		await task.any(statement);
-	});
 };
 
 /**
