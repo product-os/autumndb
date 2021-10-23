@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: d1b1769d82a0c009c471aa523bca9cc42d94024b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.9
+  date: 2021-10-23T10:27:39.710Z
+- commits:
     - subject: "\U0001F504 Synced file(s) with product-os/jellyfish-config"
       hash: 42de0586e3a4ec437b794f8bde03872af967e10f
       body: ''
