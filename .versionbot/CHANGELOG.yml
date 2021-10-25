@@ -1,4 +1,17 @@
 - commits:
+    - subject: 'fix: patched cards didn''t contain correct updated_at'
+      hash: 6444ac747f7d1b224ed0037eba38fc5e5e81c969
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 7.0.13
+  date: 2021-10-25T11:57:39.472Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.353'
       hash: 5089c2b53b47063c49cb080a9961139642636d27
       body: ''
