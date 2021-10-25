@@ -800,7 +800,10 @@ export class Kernel {
 					);
 				}
 
-				await this.backend.upsertElement(context, patchedFullCard);
+				const upsertedCard = await this.backend.upsertElement(
+					context,
+					patchedFullCard,
+				);
 
 				// Otherwise a person that patches a card gets
 				// to see the full card, but we also need to get back the stuff, the kernel
@@ -808,8 +811,8 @@ export class Kernel {
 				// This will get removed once we get rid of field-level permissions.
 				return {
 					...patchedFilteredCard,
-					created_at: patchedFullCard.created_at,
-					updated_at: patchedFullCard.updated_at,
+					created_at: upsertedCard.created_at,
+					updated_at: upsertedCard.updated_at,
 				};
 			});
 		});
