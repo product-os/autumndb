@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add test for array text search inside oneOf
+      hash: 22c0a99b86e7253981d9576309a974e2068596f8
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 7.0.20
+  date: 2021-10-28T08:09:08.442Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.356'
       hash: 7f1c032091b8a21213544b46accb8e592a4988f2
       body: ''
