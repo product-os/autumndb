@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellycheck to ^0.1.4'
+      hash: b85d0790e09de8de20940f798099fafbd65628d5
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.14
+  date: 2021-10-28T01:17:59.049Z
+- commits:
     - subject: 'fix: patched cards didn''t contain correct updated_at'
       hash: 6444ac747f7d1b224ed0037eba38fc5e5e81c969
       body: ''
