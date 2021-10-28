@@ -6643,6 +6643,92 @@ describe('Kernel', () => {
 			expect(results).toHaveLength(1);
 			expect(results[0].id).toBe(contract.id);
 		});
+
+		it('should be able to query nested array fields inside oneOf using full text search', async () => {
+			const type = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'type@1.0.0',
+					data: {
+						schema: {
+							type: 'object',
+							properties: {
+								data: {
+									type: 'object',
+									properties: {
+										labels: {
+											oneOf: [
+												{
+													type: 'array',
+													fullTextSearch: true,
+													items: {
+														type: 'string',
+													},
+												},
+												{
+													type: 'string',
+													fullTextSearch: true,
+												},
+											],
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			);
+
+			const contract = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: `${type.slug}@${type.version}`,
+					data: {
+						labels: ['lorem ipsum'],
+					},
+				},
+			);
+			await ctx.kernel.insertCard(ctx.context, ctx.kernel.sessions!.admin, {
+				type: `${type.slug}@${type.version}`,
+				data: {
+					labels: ['consecteur dis'],
+				},
+			});
+
+			const results = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					type: 'object',
+					properties: {
+						type: {
+							type: 'string',
+							const: `${type.slug}@${type.version}`,
+						},
+						data: {
+							type: 'object',
+							required: ['labels'],
+							properties: {
+								labels: {
+									type: 'array',
+									contains: {
+										fullTextSearch: {
+											term: 'lorem',
+										},
+									},
+								},
+							},
+						},
+					},
+					required: ['data'],
+				} as any,
+			);
+
+			expect(results).toHaveLength(1);
+			expect(results[0].id).toBe(contract.id);
+		});
 	});
 
 	describe('.stream()', () => {
