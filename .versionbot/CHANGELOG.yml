@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellycheck to ^0.1.5'
+      hash: 7c64103ad50d0fc178149368ef753d8ed0f3f6fd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.21
+  date: 2021-10-28T09:33:19.851Z
+- commits:
     - subject: Add test for array text search inside oneOf
       hash: 22c0a99b86e7253981d9576309a974e2068596f8
       body: ''
