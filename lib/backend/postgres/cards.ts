@@ -660,11 +660,11 @@ export const createTypeIndex = async (
 /**
  * @param {Context} context - session context
  * @param {BackendConnection} connection - database connection
- * @param {String} type - card type name
+ * @param {String} type - type contract versioned slug
  * @param {Array} fields - fields to build indexes for
  *
  * @example
- * const type = 'message'
+ * const type = 'message@1.0.0'
  * const fields = [
  *   {
  *     path: [ 'data', 'payload', 'message' ],
@@ -691,16 +691,14 @@ export const createFullTextSearchIndex = async (
 		),
 		'indexname',
 	);
-	// Create all necessary search indexes for the given type
-	const typeBase = type.split('@')[0];
-	const versionedType = `${typeBase}@1.0.0`;
 
+	// Create all necessary search indexes for the given type.
 	// Similar to the logic, in createTypeIndex, we retry once on failure in case we hit a race condition.
 	try {
 		for (const field of fields) {
 			const path = SqlPath.fromArray(_.clone(field.path));
 			const isJson = path.isProcessingJsonProperty;
-			const name = `${typeBase}__${field.path.join('_')}__search_idx`;
+			const name = `${type.split('@')[0]}__${field.path.join('_')}__search_idx`;
 			if (!indexes.includes(name)) {
 				await utils.createIndex(
 					context,
@@ -712,7 +710,7 @@ export const createFullTextSearchIndex = async (
 						isJson,
 						field.isArray,
 					)})
-						WHERE type=${pgFormat.literal(versionedType)}`,
+						WHERE type=${pgFormat.literal(type)}`,
 				);
 			}
 		}
