@@ -54,6 +54,7 @@ describe('generateTypeIndexPredicate()', () => {
 		const schema = {
 			slug: 'foobar',
 			type: 'type@1.0.0',
+			version: '1.0.1',
 			data: {
 				schema: {
 					type: 'object',
@@ -72,7 +73,7 @@ describe('generateTypeIndexPredicate()', () => {
 			schema,
 		);
 		expect(predicate).toEqual(
-			`USING btree (name) WHERE type='${schema.slug}@1.0.0'`,
+			`USING btree (name) WHERE type='${schema.slug}@${schema.version}'`,
 		);
 	});
 
@@ -80,6 +81,7 @@ describe('generateTypeIndexPredicate()', () => {
 		const schema = {
 			slug: 'foobar',
 			type: 'type@1.0.0',
+			version: '1.0.1',
 			data: {
 				schema: {
 					type: 'object',
@@ -102,7 +104,7 @@ describe('generateTypeIndexPredicate()', () => {
 			schema,
 		);
 		expect(predicate).toEqual(
-			`USING btree (name,slug) WHERE type='${schema.slug}@1.0.0'`,
+			`USING btree (name,slug) WHERE type='${schema.slug}@${schema.version}'`,
 		);
 	});
 
@@ -110,6 +112,7 @@ describe('generateTypeIndexPredicate()', () => {
 		const schema = {
 			slug: 'foobar',
 			type: 'type@1.0.0',
+			version: '1.0.1',
 			data: {
 				schema: {
 					type: 'object',
@@ -131,7 +134,7 @@ describe('generateTypeIndexPredicate()', () => {
 			schema,
 		);
 		expect(predicate).toEqual(
-			`USING gin (tags) WHERE type='${schema.slug}@1.0.0'`,
+			`USING gin (tags) WHERE type='${schema.slug}@${schema.version}'`,
 		);
 	});
 
@@ -139,6 +142,7 @@ describe('generateTypeIndexPredicate()', () => {
 		const schema = {
 			slug: 'foobar',
 			type: 'type@1.0.0',
+			version: '1.0.1',
 			data: {
 				schema: {
 					type: 'object',
@@ -163,7 +167,7 @@ describe('generateTypeIndexPredicate()', () => {
 			schema,
 		);
 		expect(predicate).toEqual(
-			`USING btree (((data#>>'{"name"}')::text)) WHERE type='${schema.slug}@1.0.0'`,
+			`USING btree (((data#>>'{"name"}')::text)) WHERE type='${schema.slug}@${schema.version}'`,
 		);
 	});
 
@@ -171,6 +175,7 @@ describe('generateTypeIndexPredicate()', () => {
 		const schema = {
 			slug: 'foobar',
 			type: 'type@1.0.0',
+			version: '1.0.1',
 			data: {
 				schema: {
 					type: 'object',
@@ -193,7 +198,7 @@ describe('generateTypeIndexPredicate()', () => {
 			schema,
 		);
 		expect(predicate).toEqual(
-			`USING btree (name,slug) WHERE type='${schema.slug}@1.0.0'`,
+			`USING btree (name,slug) WHERE type='${schema.slug}@${schema.version}'`,
 		);
 	});
 
@@ -201,6 +206,7 @@ describe('generateTypeIndexPredicate()', () => {
 		const schema = {
 			slug: 'foobar',
 			type: 'type@1.0.0',
+			version: '1.0.1',
 			data: {
 				schema: {
 					type: 'object',
@@ -228,7 +234,7 @@ describe('generateTypeIndexPredicate()', () => {
 			schema,
 		);
 		expect(predicate).toEqual(
-			`USING gin ((data#>'{"tags"}')) WHERE type='${schema.slug}@1.0.0'`,
+			`USING gin ((data#>'{"tags"}')) WHERE type='${schema.slug}@${schema.version}'`,
 		);
 	});
 });

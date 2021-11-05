@@ -1009,7 +1009,7 @@ describe('backend', () => {
 			const typeCard = {
 				slug: 'test-link',
 				type: 'type@1.0.0',
-				version: '1.0.0',
+				version: '1.0.1',
 				markers: [],
 				tags: [],
 				loop: null,
@@ -1139,6 +1139,78 @@ describe('backend', () => {
 				expect(index.indexdef).toEqual(item.indexdef);
 			}
 		});
+	});
+
+	it('should create full text search indexes for type cards with flagged fields', async () => {
+		expect.hasAssertions();
+		const typeCard = {
+			slug: 'search-test',
+			type: 'type@1.0.0',
+			version: '1.0.1',
+			markers: [],
+			tags: [],
+			loop: null,
+			links: {},
+			active: true,
+			linked_at: {},
+			created_at: new Date().toISOString(),
+			updated_at: null,
+			data: {
+				schema: {
+					type: 'object',
+					properties: {
+						name: {
+							type: 'string',
+							fullTextSearch: true,
+						},
+						data: {
+							type: 'object',
+							properties: {
+								payload: {
+									type: 'object',
+									required: ['message'],
+									properties: {
+										message: {
+											type: 'string',
+											format: 'markdown',
+											fullTextSearch: true,
+										},
+									},
+								},
+							},
+						},
+					},
+					required: ['name', 'data'],
+				},
+			},
+			requires: [],
+			capabilities: [],
+		};
+
+		await ctx.backend.upsertElement(ctx.context, typeCard);
+		await Bluebird.delay(2000);
+
+		const indexes = await ctx.backend.any(
+			`SELECT * FROM pg_indexes WHERE tablename = 'cards' AND indexname LIKE '%__search_idx';`,
+		);
+		const expected = [
+			{
+				indexname: `${typeCard.slug}__name__search_idx`,
+				indexdef: `CREATE INDEX \"${typeCard.slug}__name__search_idx\" ON public.cards USING gin (to_tsvector('english'::regconfig, name)) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+			},
+			{
+				indexname: `${typeCard.slug}__data_payload_message__search_idx`,
+				indexdef: `CREATE INDEX \"${typeCard.slug}__data_payload_message__search_idx\" ON public.cards USING gin (jsonb_to_tsvector('english'::regconfig, (data #> '{payload,message}'::text[]), '["string"]'::jsonb)) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+			},
+		];
+
+		for (const item of expected) {
+			const index = _.find(indexes, {
+				indexname: item.indexname,
+			});
+			expect(index).toBeTruthy();
+			expect(index.indexdef).toEqual(item.indexdef);
+		}
 	});
 
 	describe('.query()', () => {

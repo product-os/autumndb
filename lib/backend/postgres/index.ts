@@ -337,7 +337,7 @@ const upsertObject = async <T extends Contract = Contract>(
 		if (fullTextSearchFields.length) {
 			await backend.createFullTextSearchIndex(
 				context,
-				insertedObject.slug,
+				`${insertedObject.slug}@${insertedObject.version}`,
 				fullTextSearchFields,
 			);
 		}

@@ -43,7 +43,7 @@ export function generateTypeIndexPredicate(
 	fields: string[],
 	schema: core.ContractDefinition<any>,
 ): string {
-	const type = schema.slug;
+	const type = `${schema.slug}@${schema.version}`;
 	const columns = [];
 	let indexType = 'btree';
 	let asText = true;
