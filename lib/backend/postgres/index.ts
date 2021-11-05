@@ -38,11 +38,13 @@ import { strict as nativeAssert } from 'assert';
 import type pgPromise = require('pg-promise');
 import { AsyncLocalStorage } from 'async_hooks';
 import * as semver from 'semver';
-import getPackageVersion = require('@jsbits/get-package-version');
 
-const coreVersion = getPackageVersion(__dirname);
+// tslint:disable-next-line: no-var-requires
+const { version: coreVersion } = require('../../../package.json');
+
+export const INDEX_TABLE = 'jf_indexes';
+
 const logger = getLogger('jellyfish-core');
-
 const currentTransaction = new AsyncLocalStorage<Queryable>();
 
 // Removes version fields from database rows, as they are an
@@ -752,17 +754,126 @@ export class PostgresBackend implements Queryable {
 			mode?: pgPromise.TransactionMode;
 		} = {},
 	) {
-		options.tag = `transaction_${uuidv4()}`;
-		nativeAssert(!!this.connection, 'Database connection required!');
-		return this.connection.tx(
-			options,
-			async (transaction: pgPromise.ITask<{}>) => {
-				return await currentTransaction.run(
-					transaction,
-					async () => await callback(),
-				);
-			},
-		);
+		options.tag = options.tag || `transaction_${uuidv4()}`;
+		if (currentTransaction.getStore()) {
+			// Already in a transaction, just execute the provided callback.
+			const results = await callback();
+			return results;
+		} else {
+			// Not already in a transaction, execute callback in a new transaction.
+			nativeAssert(!!this.connection, 'Database connection required!');
+			return this.connection.tx(
+				options,
+				async (transaction: pgPromise.ITask<{}>) => {
+					return await currentTransaction.run(
+						transaction,
+						async () => await callback(),
+					);
+				},
+			);
+		}
+	}
+
+	/**
+	 * Create an index unless the index already exists.
+	 *
+	 * @function
+	 *
+	 * @param {Object} context - execution context
+	 * @param {String} tableName - table name
+	 * @param {String} indexName - index name
+	 * @param {String} version - type version, core version if not type-based index
+	 * @param {String} predicate - index create statement predicate
+	 * @param {String} typeSlug - type slug (optional)
+	 * @param {Boolean} unique - declare index as UNIQUE (optional)
+	 *
+	 * @example
+	 * await backend.createIndex(context, 'cards', 'example_idx', '1.0.0', 'USING btree (updated_at)');
+	 */
+	async createIndex(
+		context: Context,
+		tableName: string,
+		indexName: string,
+		version: string,
+		predicate: string,
+		typeSlug: string = '',
+		unique: boolean = false,
+	) {
+		// "IF NOT EXISTS" is (unexpectedly) not thread safe. This is only a problem on the very first start and any "real"
+		// error will be catched by the subsequent SQL statements.
+		try {
+			await this.any(`CREATE TABLE IF NOT EXISTS ${INDEX_TABLE} (
+				index_name TEXT PRIMARY KEY NOT NULL,
+				table_name TEXT NOT NULL,
+				sql TEXT NOT NULL,
+				type_slug TEXT NOT NULL DEFAULT '',
+				version TEXT NOT NULL,
+				updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+			);`);
+		} catch (err: any) {
+			logger.warn(context, 'ignoring initial DB error', err);
+		}
+
+		const uniqueFlag = unique ? 'UNIQUE ' : '';
+		const createIndexStatement = `CREATE ${uniqueFlag}INDEX IF NOT EXISTS "${indexName}" ON ${tableName} ${predicate}`;
+		await this.withTransaction(async () => {
+			// Lock index table to make other index creation executions wait.
+			await this.any({
+				name: 'lock-index-table',
+				text: `LOCK TABLE ${INDEX_TABLE} IN EXCLUSIVE MODE`,
+			});
+
+			// Get current index state
+			const [state] = await this.any({
+				name: 'get-index-state',
+				text: `SELECT sql,version FROM ${INDEX_TABLE} WHERE index_name=$1;`,
+				values: [indexName],
+			});
+
+			if (!state) {
+				// Create index if it doesn't already exist.
+				logger.info(context, 'Creating index', {
+					tableName,
+					indexName,
+				});
+
+				// Create index.
+				await this.task(async (task) => {
+					await task.any('SET statement_timeout=0');
+					await task.any(createIndexStatement);
+				});
+
+				// Update record in indexes table.
+				await this.any({
+					name: `insert-index-state`,
+					text: `INSERT INTO ${INDEX_TABLE} (index_name,table_name,sql,type_slug,version,updated_at) VALUES ($1, $2, $3, $4, $5, now());`,
+					values: [
+						indexName,
+						tableName,
+						createIndexStatement,
+						typeSlug.split('@')[0],
+						version,
+					],
+				});
+			} else if (
+				createIndexStatement !== state.sql &&
+				semver.compare(state.version, version) === -1
+			) {
+				// TODO: Add index recreate logic once type-based index version
+				// story is figured out.
+				// https://jel.ly.fish/thread-fc77a33f-1ece-488c-9a3e-4ac501241d7a
+				// https://jel.ly.fish/199e3575-d679-4d15-bae5-b94edf076581
+
+				// Output log to track how often this happens.
+				logger.info(context, 'Should recreate index', {
+					tableName,
+					indexName,
+					typeSlug,
+					version,
+					createIndexStatement,
+				});
+			}
+		});
 	}
 
 	/*

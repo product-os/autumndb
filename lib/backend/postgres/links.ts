@@ -6,14 +6,16 @@
 
 import * as _ from 'lodash';
 import { getLogger } from '@balena/jellyfish-logger';
-import * as utils from './utils';
 import {
 	Context,
 	Contract,
 	LinkContract,
 } from '@balena/jellyfish-types/build/core';
 import { Queryable } from './types';
+import { PostgresBackend } from '.';
 
+// tslint:disable-next-line: no-var-requires
+const { version: coreVersion } = require('../../../package.json');
 const logger = getLogger('jellyfish-core');
 
 const LINK_ORIGIN_PROPERTY = '$link';
@@ -23,7 +25,7 @@ const STRING_TABLE = 'strings';
 export const TABLE = LINK_TABLE;
 export const setup = async (
 	context: Context,
-	connection: Queryable,
+	backend: PostgresBackend,
 	database: string,
 	options: {
 		// The name of the "cards" table that should be referenced
@@ -35,7 +37,7 @@ export const setup = async (
 		database,
 	});
 	const initTasks = [
-		connection.any(
+		backend.any(
 			`DO $$
 		BEGIN
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'linkedge') THEN
@@ -49,13 +51,13 @@ export const setup = async (
 		END$$;`,
 		),
 	];
-	await connection.any(`
+	await backend.any(`
 		CREATE TABLE IF NOT EXISTS ${STRING_TABLE} (
 			id SERIAL PRIMARY KEY,
 			string TEXT UNIQUE NOT NULL
 		)
 	`);
-	await connection.any(`
+	await backend.any(`
 		CREATE TABLE IF NOT EXISTS ${LINK_TABLE} (
 			id UUID,
 			forward BOOL,
@@ -65,23 +67,15 @@ export const setup = async (
 			PRIMARY KEY (id, forward)
 		)
 	`);
-	const indexes = _.map(
-		await connection.any(`
-		SELECT * FROM pg_indexes WHERE tablename = '${LINK_TABLE}'`),
-		'indexname',
-	);
 	for (const [name, column] of [
 		['idx_links2_fromid_name_toid', 'fromid, name, toid'],
 		['idx_links2_toid_name_fromid', 'toid, name, fromid'],
 	]) {
-		if (indexes.includes(name)) {
-			continue;
-		}
-		await utils.createIndex(
+		await backend.createIndex(
 			context,
-			connection,
 			`${LINK_TABLE}`,
 			name,
+			coreVersion,
 			`USING BTREE (${column})`,
 		);
 	}

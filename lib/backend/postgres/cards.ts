@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as assert from '@balena/jellyfish-assert';
 import * as metrics from '@balena/jellyfish-metrics';
 import * as traverse from 'traverse';
+import { PostgresBackend } from '.';
 import * as utils from './utils';
 import * as textSearch from './jsonschema2sql/text-search';
 import { SqlPath } from './jsonschema2sql/sql-path';
@@ -20,6 +21,8 @@ import { Context, Contract } from '@balena/jellyfish-types/build/core';
 import { TypedError } from 'typed-error';
 import { core, JSONSchema } from '@balena/jellyfish-types';
 
+// tslint:disable-next-line: no-var-requires
+const { version: coreVersion } = require('../../../package.json');
 const logger = getLogger('jellyfish-core');
 
 const CARDS_TABLE = 'cards';
@@ -101,7 +104,7 @@ export const TRIGGER_COLUMNS = CARDS_TRIGGER_COLUMNS;
 
 export const setup = async (
 	context: Context,
-	connection: Queryable,
+	backend: PostgresBackend,
 	_database: string,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -112,13 +115,13 @@ export const setup = async (
 ) => {
 	const table = options.table || TABLE;
 	const tables = _.map(
-		await connection.any(
+		await backend.any(
 			`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`,
 		),
 		'table_name',
 	);
 	if (!tables.includes(table)) {
-		await connection.any(
+		await backend.any(
 			`CREATE TABLE IF NOT EXISTS ${table} (
 				id UUID PRIMARY KEY NOT NULL,
 				slug VARCHAR (255) NOT NULL,
@@ -157,24 +160,15 @@ export const setup = async (
 		);
 	}
 
-	/*
-	 * This query will give us a list of all the indexes
-	 * on a particular table.
-	 */
-	const indexes = _.map(
-		await connection.any(
-			`SELECT * FROM pg_indexes WHERE tablename = '${table}'`,
-		),
-		'indexname',
-	);
 	if (options.noIndexes) {
 		return;
 	}
+
 	/*
 	 * Increase work memory for better performance
 	 * TODO: Set this value in k8s configuration instead of here
 	 */
-	await connection.any(`
+	await backend.any(`
 		SET work_mem TO '256 MB';
 	`);
 	await Promise.all([
@@ -219,17 +213,11 @@ export const setup = async (
 				const fullyQualifiedIndexName = `${
 					secondaryIndex.name || secondaryIndex.column
 				}_${table}_idx`;
-				/*
-				 * Lets not create the index if it already exists.
-				 */
-				if (indexes.includes(fullyQualifiedIndexName)) {
-					return;
-				}
-				await utils.createIndex(
+				await backend.createIndex(
 					context,
-					connection,
 					table,
 					fullyQualifiedIndexName,
+					coreVersion,
 					`USING ${secondaryIndex.indexType || 'BTREE'} (${
 						secondaryIndex.column
 					} ${secondaryIndex.options || ''})`,
@@ -242,14 +230,14 @@ export const setup = async (
 		/*
 		 * Create function that allows us to create tsvector indexes from text[] fields.
 		 */
-		connection.any(
+		backend.any(
 			`CREATE OR REPLACE FUNCTION immutable_array_to_string(arr text[], sep text) RETURNS text AS $$
 				SELECT array_to_string(arr, sep);
 			$$ LANGUAGE SQL IMMUTABLE;`,
 		),
 		// Recursive function to merge JSONB objects. This function assumes both
 		// objects are just views into the same underlying object
-		connection.any(
+		backend.any(
 			`CREATE OR REPLACE FUNCTION merge_jsonb_views(x jsonb, y jsonb) RETURNS jsonb AS $$
 				SELECT coalesce(merged.payload, '{}'::jsonb)
 				FROM (
@@ -603,21 +591,11 @@ export const materializeLink = async (
  */
 export const createTypeIndex = async (
 	context: Context,
-	connection: Queryable,
+	connection: PostgresBackend,
 	fields: string[],
 	schema: core.ContractDefinition<any>,
 	retries: number = 1,
 ): Promise<void> => {
-	/*
-	 * This query will give us a list of all the indexes
-	 * on a particular table.
-	 */
-	const indexes = _.map(
-		await connection.any(
-			`SELECT * FROM pg_indexes WHERE tablename = '${CARDS_TABLE}'`,
-		),
-		'indexname',
-	);
 	/*
 	 * This is the actual name of the index that we will create
 	 * in Postgres.
@@ -629,24 +607,19 @@ export const createTypeIndex = async (
 	const fullyQualifiedIndexName = `${schema.slug}__${fields
 		.join('__')
 		.replace(/\./g, '_')}__idx`;
-	/*
-	 * Lets not create the index if it already exists.
-	 */
-	if (indexes.includes(fullyQualifiedIndexName)) {
-		return;
-	}
 
 	// If two instances run this function simultaneously, it's possible to enter a race condition
 	// where the index creation will fail with an error, as one instance will create the index
 	// before the other. Ideally we want a unified way of handling system bootstrapping, but for now we
 	// can simply retry once on a failure and check again to see if the index already exists.
 	try {
-		await utils.createIndex(
+		await connection.createIndex(
 			context,
-			connection,
 			CARDS_TABLE,
 			fullyQualifiedIndexName,
+			schema.version!,
 			generateTypeIndexPredicate(fields, schema),
+			schema.slug,
 		);
 	} catch (error: any) {
 		logger.warn(context, 'Hit error whilst creating type index', error.message);
@@ -675,7 +648,7 @@ export const createTypeIndex = async (
  */
 export const createFullTextSearchIndex = async (
 	context: Context,
-	connection: Queryable,
+	connection: PostgresBackend,
 	type: string,
 	fields: SearchFieldDef[],
 	retries: number = 1,
@@ -684,13 +657,6 @@ export const createFullTextSearchIndex = async (
 	if (_.isEmpty(fields)) {
 		return;
 	}
-	// Get full list of indexes.
-	const indexes = _.map(
-		await connection.any(
-			`SELECT * FROM pg_indexes WHERE tablename = '${CARDS_TABLE}'`,
-		),
-		'indexname',
-	);
 
 	// Create all necessary search indexes for the given type.
 	// Similar to the logic, in createTypeIndex, we retry once on failure in case we hit a race condition.
@@ -699,20 +665,19 @@ export const createFullTextSearchIndex = async (
 			const path = SqlPath.fromArray(_.clone(field.path));
 			const isJson = path.isProcessingJsonProperty;
 			const name = `${type.split('@')[0]}__${field.path.join('_')}__search_idx`;
-			if (!indexes.includes(name)) {
-				await utils.createIndex(
-					context,
-					connection,
-					CARDS_TABLE,
-					name,
-					`USING GIN(${textSearch.toTSVector(
-						path.toSql(CARDS_TABLE),
-						isJson,
-						field.isArray,
-					)})
-						WHERE type=${pgFormat.literal(type)}`,
-				);
-			}
+			await connection.createIndex(
+				context,
+				CARDS_TABLE,
+				name,
+				type.split('@')[1],
+				`USING GIN(${textSearch.toTSVector(
+					path.toSql(CARDS_TABLE),
+					isJson,
+					field.isArray,
+				)})
+					WHERE type=${pgFormat.literal(type)}`,
+				type.split('@')[0],
+			);
 		}
 	} catch (error: any) {
 		logger.warn(
