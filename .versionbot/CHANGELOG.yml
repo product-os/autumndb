@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add locking mechanism for creating indexes
+      hash: 9fb7b9e5d3a262746604a9214d51676773fa3737
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 8.0.0
+  date: 2021-11-05T05:30:25.144Z
+- commits:
     - subject: Use correct type version for indexes
       hash: 9ee46bca7cc5d38981c7f2b726ac38c14e877033
       body: ''
