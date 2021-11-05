@@ -1,4 +1,17 @@
 - commits:
+    - subject: Use correct type version for indexes
+      hash: 9ee46bca7cc5d38981c7f2b726ac38c14e877033
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 7.0.27
+  date: 2021-11-05T04:22:57.933Z
+- commits:
     - subject: "\U0001F504 Synced file(s) with product-os/secrets"
       hash: bc54e6578a1ccff7249f9da400b96a188cab1f63
       body: ''
