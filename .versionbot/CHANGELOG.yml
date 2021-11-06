@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 55fefc7c66f3f527d036674c07345cc2f01a8dfd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.0.1
+  date: 2021-11-05T23:57:58.888Z
+- commits:
     - subject: Add locking mechanism for creating indexes
       hash: 9fb7b9e5d3a262746604a9214d51676773fa3737
       body: ''
