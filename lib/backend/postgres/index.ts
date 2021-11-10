@@ -344,6 +344,120 @@ const upsertObject = async <T extends Contract = Contract>(
 			);
 		}
 	}
+	// Upserting `user` contracts causes two other contracts to be upserted and
+	// two links to be added while we are migrating to a new permission system.
+	// See:
+	// https://jel.ly.fish/improvement-jip-remove-field-level-permissions-8d561c94-2d33-4026-829c-272600018558
+	if (baseType === 'user') {
+		const userContract = insertedObject as any;
+		let settings = {};
+		if ('profile' in userContract.data) {
+			settings = _.pick(userContract.data.profile, [
+				'type',
+				'homeView',
+				'activeLoop',
+				'sendCommand',
+				'disableNotificationSound',
+				'starredViews',
+				'viewSettings',
+			]);
+		}
+		const [authenticationContract, personalSettingsContract] =
+			await Promise.all([
+				upsertObject(
+					context,
+					backend,
+					{
+						slug: 'authentication-' + userContract.slug,
+						version: userContract.version,
+						type: 'authentication@1.0.0',
+						active: userContract.active,
+						created_at: userContract.created_at,
+						markers: userContract.markers,
+						tags: [],
+						data: _.pick(userContract.data, ['hash', 'oauth']),
+						requires: [],
+						capabilities: [],
+					},
+					options,
+				),
+				upsertObject(
+					context,
+					backend,
+					{
+						slug: 'user-settings-' + userContract.slug,
+						version: userContract.version,
+						type: 'user-settings@1.0.0',
+						active: userContract.active,
+						created_at: userContract.created_at,
+						markers: userContract.markers,
+						tags: [],
+						data: settings,
+						requires: [],
+						capabilities: [],
+					},
+					options,
+				),
+			]);
+		await Promise.all([
+			upsertObject(
+				context,
+				backend,
+				{
+					slug: 'link-' + userContract.id + '-' + authenticationContract.id,
+					version: '1.0.0',
+					type: 'link@1.0.0',
+					name: 'is authenticated with',
+					active: true,
+					created_at: userContract.created_at,
+					markers: userContract.markers,
+					tags: [],
+					data: {
+						from: {
+							id: userContract.id,
+							type: 'user@1.0.0',
+						},
+						to: {
+							id: authenticationContract.id,
+							type: 'authentication@1.0.0',
+						},
+						inverseName: 'authenticates',
+					},
+					requires: [],
+					capabilities: [],
+				},
+				options,
+			),
+			upsertObject(
+				context,
+				backend,
+				{
+					slug: 'link-' + userContract.id + '-' + personalSettingsContract.id,
+					version: '1.0.0',
+					type: 'link@1.0.0',
+					name: 'has attachment',
+					active: true,
+					created_at: userContract.created_at,
+					markers: userContract.markers,
+					tags: [],
+					data: {
+						from: {
+							id: userContract.id,
+							type: 'user@1.0.0',
+						},
+						to: {
+							id: personalSettingsContract.id,
+							type: 'user-settings@1.0.0',
+						},
+						inverseName: 'is attached to',
+					},
+					requires: [],
+					capabilities: [],
+				},
+				options,
+			),
+		]);
+	}
 	return insertedObject;
 };
 

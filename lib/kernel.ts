@@ -418,7 +418,9 @@ export class Kernel {
 		await Promise.all([
 			unsafeUpsert(CARDS.type),
 			unsafeUpsert(CARDS.session),
+			unsafeUpsert(CARDS.authentication),
 			unsafeUpsert(CARDS.user),
+			unsafeUpsert(CARDS['user-settings']),
 			unsafeUpsert(CARDS['role-user-admin']),
 		]);
 
