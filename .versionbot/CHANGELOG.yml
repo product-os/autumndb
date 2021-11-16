@@ -1,4 +1,17 @@
 - commits:
+    - subject: Set license
+      hash: d94ac3d05cd9108dd424b4e4462f0d4e5fae363d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 8.0.19
+  date: 2021-11-16T00:54:57.311Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.385'
       hash: f60a744092140420111576c695d76f6647f1d72d
       body: ''
