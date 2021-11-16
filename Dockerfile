@@ -7,9 +7,7 @@ FROM resinci/jellyfish-test:v1.4.12
 WORKDIR /usr/src/jellyfish
 
 COPY package.json .npmrc ./
-RUN --mount=type=secret,id=npmrc set -eux \
-	&& ln -s /run/secrets/npmrc ~/.npmrc \
-	&& npm i && rm ~/.npmrc
+RUN npm install
 
 COPY . ./
 

@@ -10,9 +10,6 @@ docker:
       publish: false
       args:
         - BUILDKIT_INLINE_CACHE=1
-      secrets:
-        - id: npmrc
-          src: .balena/secrets/npmrc.txt
 npm:
   platforms:
     - name: linux
