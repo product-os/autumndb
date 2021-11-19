@@ -529,6 +529,9 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				`${card.slug}@${card.version}`,
 			);
+			if (result !== null) {
+				result.linked_at = card.linked_at;
+			}
 
 			expect(result).toEqual(card);
 		});
@@ -724,6 +727,9 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				`${userCard.slug}@${userCard.version}`,
 			);
+			if (result !== null) {
+				result.linked_at = userCard.linked_at;
+			}
 
 			expect(result).toEqual(userCard);
 		});
@@ -839,6 +845,9 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				`${userCard.slug}@${userCard.version}`,
 			);
+			if (result !== null) {
+				result.linked_at = userCard.linked_at;
+			}
 
 			expect(result).toEqual(userCard);
 		});
@@ -1193,6 +1202,9 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				`${userCard.slug}@${userCard.version}`,
 			);
+			if (result !== null) {
+				result.linked_at = userCard.linked_at;
+			}
 
 			expect(result).toEqual(userCard);
 		});
@@ -1307,6 +1319,9 @@ describe('Kernel', () => {
 				ctx.kernel.sessions!.admin,
 				`${userCard.slug}@${userCard.version}`,
 			);
+			if (result !== null) {
+				result.linked_at = userCard.linked_at;
+			}
 
 			expect(result).toEqual(userCard);
 		});
@@ -3640,7 +3655,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const results = await ctx.kernel.query(ctx.context, session.id, {
+			let results = await ctx.kernel.query(ctx.context, session.id, {
 				type: 'object',
 				required: ['type', 'slug', 'active', 'data'],
 				additionalProperties: false,
@@ -3660,6 +3675,7 @@ describe('Kernel', () => {
 					},
 				},
 			});
+			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
 				_.pick(await CARDS.user, ['type', 'slug', 'active', 'data']),
@@ -3831,7 +3847,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const results = await ctx.kernel.query(ctx.context, session.id, {
+			let results = await ctx.kernel.query(ctx.context, session.id, {
 				type: 'object',
 				properties: {
 					id: {
@@ -3846,6 +3862,7 @@ describe('Kernel', () => {
 					},
 				},
 			});
+			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
 				{
@@ -3902,7 +3919,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const results = await ctx.kernel.query(ctx.context, session.id, {
+			let results = await ctx.kernel.query(ctx.context, session.id, {
 				type: 'object',
 				additionalProperties: true,
 				properties: {
@@ -3918,6 +3935,7 @@ describe('Kernel', () => {
 					},
 				},
 			});
+			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
 				{
@@ -3972,7 +3990,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const results = await ctx.kernel.query(ctx.context, session.id, {
+			let results = await ctx.kernel.query(ctx.context, session.id, {
 				type: 'object',
 				additionalProperties: true,
 				properties: {
@@ -3988,6 +4006,7 @@ describe('Kernel', () => {
 					},
 				},
 			});
+			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
 				{

@@ -3057,6 +3057,9 @@ describe('backend', () => {
 					},
 				},
 			);
+			for (const x of results2) {
+				x.linked_at = {};
+			}
 
 			const results3 = await ctx.backend.query(
 				ctx.context,
