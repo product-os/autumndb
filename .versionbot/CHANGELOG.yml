@@ -1,4 +1,32 @@
 - commits:
+    - subject: Add the `user-settings` and `authentication` types
+      hash: 49673f1b51b705115618f33c9184f1a7f8ffecbf
+      body: |
+        This is the first step in preparation for a refactor on how JF handles
+        permissions. These two new types are automatically updated when `user`
+        contracts are updated.
+      footer:
+        JIP: >-
+          https://jel.ly.fish/improvement-jip-remove-field-level-permissions-8d561c94-2d33-4026-829c-272600018558
+        jip: >-
+          https://jel.ly.fish/improvement-jip-remove-field-level-permissions-8d561c94-2d33-4026-829c-272600018558
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.391'
+      hash: a8313f3841ad03df73a030c1812aa5883d23f826
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.1.0
+  date: 2021-11-19T19:27:41.268Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 09be4807700b3dc00b3ec35f47a6b661cbb8d654
       body: ''
