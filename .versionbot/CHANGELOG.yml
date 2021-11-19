@@ -1,4 +1,61 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 09be4807700b3dc00b3ec35f47a6b661cbb8d654
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: 'patch: Update internal-patch'
+      hash: 67926a3675cabeb24bc0c64ea01285027351a053
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Remove npm token references
+      hash: 0fb8bac49574163556fa3a725d40d57cd5bb7cd5
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'Update test:compose script'
+      hash: 58688a43f3a2feb3d26e77ac76409966051531ab
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'Update compose, remove old secrets'
+      hash: 0daf5f20f990fb679f9b7bed290c0b2a69249eb9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: "\U0001F504 Synced file(s) with product-os/secrets"
+      hash: 756638c1b00e2e3a91d2534625197763c6885dd3
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 8.0.20
+  date: 2021-11-19T10:48:33.569Z
+- commits:
     - subject: Set license
       hash: d94ac3d05cd9108dd424b4e4462f0d4e5fae363d
       body: ''
