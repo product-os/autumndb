@@ -1,4 +1,32 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 2efe143c704e175a80176c372064561b38ff8538
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: 'patch: Update internal-patch'
+      hash: 77942482ee47fd9d5a99c56c5823f20fcd3b508e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellycheck to v1'
+      hash: 64c5d436015e0aa271f1dc2c965c2b74a858af2e
+      body: |
+        Update @balena/jellycheck from 0.1.8 to 1.0.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.1.1
+  date: 2021-11-20T13:21:07.887Z
+- commits:
     - subject: Add the `user-settings` and `authentication` types
       hash: 49673f1b51b705115618f33c9184f1a7f8ffecbf
       body: |
