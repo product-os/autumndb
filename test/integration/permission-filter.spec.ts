@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 import * as permissionFilter from '../../lib/permission-filter';
 import * as errors from '../../lib/errors';
 import * as helpers from './helpers';
