@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 export const roleUserAdmin = {
 	slug: 'role-user-admin',
 	name: 'Kernel admin user permissions',

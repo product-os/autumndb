@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 import { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import * as skhema from 'skhema';

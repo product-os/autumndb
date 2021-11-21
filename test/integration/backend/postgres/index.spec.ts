@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { v4 as uuid } from 'uuid';
 import * as helpers from '../helpers';

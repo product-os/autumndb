@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import { v4 as uuid } from 'uuid';

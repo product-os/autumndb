@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 import { SqlFragmentBuilder } from './fragment-builder';
 import { LiteralSql } from './literal-sql';
 import { SqlSelectBuilder } from './select-builder';

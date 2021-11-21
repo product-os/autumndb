@@ -1,10 +1,4 @@
 /*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
-/*
  * This is a test suite for the non-standard key word "regexp" that is used by the
  * client for doing case insensitive pattern matching.
  * see: https://github.com/epoberezkin/ajv-keywords#regexp

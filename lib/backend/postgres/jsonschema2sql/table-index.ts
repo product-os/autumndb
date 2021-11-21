@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 import { core } from '@balena/jellyfish-types';
 import * as _ from 'lodash';
 import * as pgFormat from 'pg-format';

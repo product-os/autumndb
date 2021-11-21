@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 // TS-TODO: Contribute these type to the json-schema-deref-sync package
 declare module 'json-schema-deref-sync' {
 	import { JSONSchema } from '@balena/jellyfish-types';
