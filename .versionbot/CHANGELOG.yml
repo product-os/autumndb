@@ -1,4 +1,17 @@
 - commits:
+    - subject: Bump external deps
+      hash: b3e7e64866acab2709bedf7fd5d92b8095623983
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 8.1.6
+  date: 2021-11-23T01:23:31.413Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-assert to ^1.1.84'
       hash: cc35a5df61557c6c690d8a2226bf7a99574f0a3e
       body: ''
