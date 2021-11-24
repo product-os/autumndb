@@ -1,5 +1,16 @@
 - commits:
     - subject: 'patch: Update internal-patch'
+      hash: da2887ae40c5700f2c18880f2834b57c17ac6cda
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.1.8
+  date: 2021-11-24T02:40:56.560Z
+- commits:
+    - subject: 'patch: Update internal-patch'
       hash: 49743fbae83a388c1c0dd820a52fc2e5eab19d97
       body: ''
       footer:
