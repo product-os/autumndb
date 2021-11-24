@@ -23,11 +23,6 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Update .npmrc file with NPM Token
-        uses: dkershner6/use-npm-token-action@v1
-        with:
-          token: '${{ secrets.NPM_TOKEN }}'
-
       - name: Install NPM dependencies
         run: npm i
 
