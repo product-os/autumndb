@@ -20,7 +20,7 @@
   "scripts": {
     "clean": "rimraf build",
     "build": "npm run clean && tsc -p tsconfig.build.json",
-    "lint": "balena-lint lib && npm run check && deplint && depcheck --ignore-bin-package --ignores=shellcheck,@types/jest,typedoc",
+    "lint": "balena-lint lib && deplint && depcheck --ignore-bin-package --ignores=shellcheck,@types/jest,typedoc",
     "lint:fix": "balena-lint --fix lib",
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest lib",
@@ -28,7 +28,6 @@
     "test:compose": "docker build -t balena/jellyfish-sut:latest . && docker-compose -f docker-compose.test.yml -f docker-compose.yml up --exit-code-from=sut",
     "doc": "typedoc lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
-    "check": "jellycheck",
     "compose": "docker-compose up"
   },
   "deplint": {
@@ -71,7 +70,6 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/jellycheck": "^1.0.0",
     "@balena/jellyfish-config": "^1.5.1",
     "@balena/jellyfish-types": "^1.2.0",
     "@balena/lint": "^6.1.1",
