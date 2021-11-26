@@ -1,4 +1,17 @@
 - commits:
+    - subject: Use product-os/renovate-config
+      hash: 88f9dd1e027e9fdbf16718590ee06d2c3dff7dfe
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 8.1.18
+  date: 2021-11-26T04:36:57.211Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.414'
       hash: 428026c36d58e3a1bbfd83c9491ef34cd5ec019b
       body: ''
