@@ -72,7 +72,7 @@
   "devDependencies": {
     "@balena/jellyfish-config": "^1.5.1",
     "@balena/jellyfish-types": "^1.2.0",
-    "@balena/lint": "^6.1.1",
+    "@balena/lint": "^6.2.0",
     "@json-schema-org/tests": "^1.0.0",
     "@types/bluebird": "^3.5.36",
     "@types/jest": "^27.0.3",
