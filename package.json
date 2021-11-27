@@ -70,7 +70,7 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/jellyfish-config": "^1.5.1",
+    "@balena/jellyfish-config": "^2.0.1",
     "@balena/jellyfish-types": "^1.2.0",
     "@balena/lint": "^6.2.0",
     "@json-schema-org/tests": "^1.0.0",
