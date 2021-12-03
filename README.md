@@ -168,7 +168,7 @@ $ npm run test:compose
 You can also run tests locally against Postgres and Redis instances running in `docker-compose`:
 ```
 $ npm run compose
-$ REDIS_HOST=localhost POSTGRES_HOST=localhost POSTGRES_USER=docker POSTGRES_PASSWORD=docker npx jest test/integration/example.spec.ts
+$ REDIS_HOST=localhost POSTGRES_HOST=localhost npx jest test/integration/permission-filter.spec.ts
 ```
 
 You can also access these Postgres and Redis instances:
