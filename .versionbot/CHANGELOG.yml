@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update readme
+      hash: 07c731b7231adef5659e71b0b5c43ff8e9c91ff7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 8.1.37
+  date: 2021-12-03T02:00:27.872Z
+- commits:
     - subject: Remove unused secrets
       hash: 6d5a5545573b7b2a9a9fdac369bf2aeb97c4a77c
       body: ''
