@@ -1,4 +1,17 @@
 - commits:
+    - subject: Bump internal dependencies
+      hash: d3192879ed8f1a1e86c2b10bfd680504ad37c45c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 8.1.50
+  date: 2021-12-11T04:36:09.971Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-assert to ^1.1.102'
       hash: 58847bbd272c183b467bd40ed8a1c15427887182
       body: ''
