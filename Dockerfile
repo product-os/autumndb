@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM resinci/jellyfish-test:v1.4.15
+FROM resinci/jellyfish-test:v1.4.16
 
 WORKDIR /usr/src/jellyfish
 
