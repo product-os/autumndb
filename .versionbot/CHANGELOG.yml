@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: 6e252068bab8bad0921948b6202b9a4189eeef66
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.1.52
+  date: 2021-12-14T02:35:06.919Z
+- commits:
     - subject: Drop depcheck
       hash: e959e228408fad839552c663d5ef4e2f0f76224d
       body: ''
