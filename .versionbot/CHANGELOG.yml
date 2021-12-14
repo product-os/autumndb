@@ -1,4 +1,25 @@
 - commits:
+    - subject: Drop depcheck
+      hash: e959e228408fad839552c663d5ef4e2f0f76224d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.435'
+      hash: 52802b62052a21e0a1f308a6cd0bf004d9d4df5c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.1.51
+  date: 2021-12-14T01:20:52.015Z
+- commits:
     - subject: Bump internal dependencies
       hash: d3192879ed8f1a1e86c2b10bfd680504ad37c45c
       body: ''
