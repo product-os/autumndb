@@ -1,3 +1,4 @@
+import { Context } from '../../../context';
 import { JSONSchema } from '@balena/jellyfish-types';
 import * as jsonschema2sql from './index';
 
@@ -28,7 +29,13 @@ describe('jsonschema2sql', () => {
 				limit: 1,
 			};
 
-			const sql = jsonschema2sql.compile('cards', {}, query, options);
+			const sql = jsonschema2sql.compile(
+				new Context(null),
+				'cards',
+				{},
+				query,
+				options,
+			);
 			expect(sql.includes('to_tsvector')).toBe(true);
 			expect(sql.includes('to_tsquery')).toBe(true);
 		});

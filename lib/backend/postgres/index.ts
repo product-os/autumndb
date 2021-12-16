@@ -2,22 +2,17 @@ import * as _ from 'lodash';
 import { performance } from 'perf_hooks';
 import * as Bluebird from 'bluebird';
 import * as skhema from 'skhema';
-import { getLogger } from '@balena/jellyfish-logger';
-import * as assert from '@balena/jellyfish-assert';
 import metrics = require('@balena/jellyfish-metrics');
 import { v4 as uuidv4 } from 'uuid';
 import * as jsonschema2sql from './jsonschema2sql';
+import { Context } from '../../context';
 import * as links from './links';
 import * as cards from './cards';
 import * as streams from './streams';
 import * as utils from './utils';
 import pgp from './pg-promise';
 import { core, JSONSchema } from '@balena/jellyfish-types';
-import {
-	Context,
-	Contract,
-	LinkContract,
-} from '@balena/jellyfish-types/build/core';
+import { Contract, LinkContract } from '@balena/jellyfish-types/build/core';
 import {
 	BackendQueryOptions,
 	DatabaseBackend,
@@ -39,7 +34,6 @@ const { version: coreVersion } = require('../../../package.json');
 
 export const INDEX_TABLE = 'jf_indexes';
 
-const logger = getLogger('jellyfish-core');
 const currentTransaction = new AsyncLocalStorage<Queryable>();
 
 // Removes version fields from database rows, as they are an
@@ -96,6 +90,7 @@ const MAXIMUM_QUERY_LIMIT = 1000;
 const DEFAULT_CONNECT_RETRY_DELAY = 2000;
 
 const compileSchema = (
+	context: Context,
 	table: string,
 	select: SelectObject,
 	schema: JSONSchema,
@@ -105,7 +100,7 @@ const compileSchema = (
 	const queryGenStart = performance.now();
 	let query = null;
 	try {
-		query = jsonschema2sql.compile(table, select, schema, options);
+		query = jsonschema2sql.compile(context, table, select, schema, options);
 	} catch (error: any) {
 		if (error.name === 'InvalidSchema') {
 			throw new errors.JellyfishInvalidSchema(error.message);
@@ -132,16 +127,14 @@ const runQuery = async (
 	const results = await backend
 		.any(query, values)
 		.catch((error: { message: string }) => {
-			assert.USER(
-				context,
+			context.assertUser(
 				!error.message.includes('statement timeout'),
 				backend.errors.JellyfishDatabaseTimeoutError,
 				() => {
 					return `Schema query timeout: ${JSON.stringify(schema)}`;
 				},
 			);
-			assert.USER(
-				context,
+			context.assertUser(
 				!error.message.startsWith('invalid regular expression:'),
 				backend.errors.JellyfishInvalidRegularExpression,
 				() => {
@@ -200,7 +193,7 @@ const queryTable = async (
 ) => {
 	const mode = options.profile ? 'info' : 'debug';
 
-	logger[mode](context, 'Querying from table', {
+	context[mode]('Querying from table', {
 		table,
 		database: backend.database,
 		limit: options.limit,
@@ -214,6 +207,7 @@ const queryTable = async (
 	}
 
 	const { query, queryGenTime } = compileSchema(
+		context,
 		table,
 		select,
 		schema,
@@ -230,7 +224,7 @@ const queryTable = async (
 
 	const { elements, postProcessTime } = postProcessResults(results);
 
-	logger[mode](context, 'Query database response', {
+	context[mode]('Query database response', {
 		table,
 		database: backend.database,
 		count: elements.length,
@@ -562,9 +556,7 @@ export class PostgresBackend implements Queryable {
 		 * Lets connect to the default database, that should always be
 		 * available.
 		 */
-		logger.info(context, 'Connecting to database', {
-			database: this.database,
-		});
+		context.info('Connecting to database', { database: this.database });
 		this.connection = pgp({
 			...defaultPgOptions,
 			...this.options,
@@ -578,13 +570,9 @@ export class PostgresBackend implements Queryable {
 		 */
 		try {
 			const { version } = await this.connection.query('select version()');
-			logger.info(context, 'Connection to database successful!', {
-				version,
-			});
+			context.info('Connection to database successful!', { version });
 		} catch (error) {
-			logger.warn(context, 'Connection to database failed', {
-				error,
-			});
+			context.warn('Connection to database failed', { error });
 			await Bluebird.delay(this.connectRetryDelay);
 			return this.connect(context);
 		}
@@ -597,7 +585,7 @@ export class PostgresBackend implements Queryable {
 		 * templates, which we are of course not interested in.
 		 * See: https://www.postgresql.org/docs/9.3/manage-ag-templatedbs.html
 		 */
-		logger.debug(context, 'Listing databases');
+		context.debug('Listing databases');
 		const databases = _.map(
 			await this.connection.any(`
 			SELECT datname FROM pg_database
@@ -611,9 +599,7 @@ export class PostgresBackend implements Queryable {
 		 * modified on "CREATE DATABASE" so we could avoid these checks.
 		 */
 		if (!databases.includes(this.database)) {
-			logger.debug(context, 'Creating database', {
-				database: this.database,
-			});
+			context.debug('Creating database', { database: this.database });
 
 			/*
 			 * The owner of the database should be the user that the client
@@ -656,7 +642,7 @@ export class PostgresBackend implements Queryable {
 		});
 
 		this.connection.$pool.on('error', (error: { code: any; message: any }) => {
-			logger.warn(context, 'Backend connection pool error', {
+			context.warn('Backend connection pool error', {
 				code: error.code,
 				message: error.message,
 			});
@@ -691,7 +677,7 @@ export class PostgresBackend implements Queryable {
 				updated_at TIMESTAMP WITH TIME ZONE
 			);`);
 		} catch (err: any) {
-			logger.warn(context, 'ignoring initial DB error', err);
+			context.warn('ignoring initial DB error', err);
 		}
 		await this.any({
 			name: `insert-first-migration`,
@@ -709,16 +695,13 @@ export class PostgresBackend implements Queryable {
 			// that is running an old version will not interfere with a new version being rolled out.
 			// We could do better than just checking for the version of course, but that is better left to a proper migration framework
 			const willRunMigrations = semver.compare(version, coreVersion) === -1;
-			logger.info(context, 'Preparing DB migrations', {
+			context.info('Preparing DB migrations', {
 				dbVersion: version,
 				coreVersion,
 				willRunMigrations,
 			});
 			if (!willRunMigrations) {
-				logger.info(
-					context,
-					'DB schema is up to date. No migrations will be run',
-				);
+				context.info('DB schema is up to date. No migrations will be run');
 				return;
 			}
 			await migrationsCb();
@@ -728,13 +711,12 @@ export class PostgresBackend implements Queryable {
 				values: [coreVersion, migrationsId],
 			});
 		});
-		logger.info(context, 'DB migrations finished');
+		context.info('DB migrations finished');
 	}
 
 	private async runDbMigrations(context: Context) {
 		if (this.dbMigrationsPerformed) {
-			logger.info(
-				context,
+			context.info(
 				'DB migrations have run in this session before. Skipping them...',
 			);
 			return;
@@ -780,9 +762,7 @@ export class PostgresBackend implements Queryable {
 		 * Close the main connection pool.
 		 */
 		if (this.connection) {
-			logger.debug(context, 'Disconnecting from database', {
-				database: this.database,
-			});
+			context.debug('Disconnecting from database', { database: this.database });
 			await this.connection.$pool.end();
 			// TS-TODO: Why is $destroy not a method on the type definition?
 			await (this.connection as any).$destroy();
@@ -798,9 +778,7 @@ export class PostgresBackend implements Queryable {
 			return;
 		}
 
-		logger.debug(context, 'Dropping database tables', {
-			database: this.database,
-		});
+		context.debug('Dropping database tables', { database: this.database });
 
 		await this.any(`DROP TABLE ${cards.TABLE}, ${links.TABLE} CASCADE`);
 	}
@@ -809,9 +787,7 @@ export class PostgresBackend implements Queryable {
 	 * Reset the database state.
 	 */
 	async reset(context: Context) {
-		logger.debug(context, 'Resetting database', {
-			database: this.database,
-		});
+		context.debug('Resetting database', { database: this.database });
 
 		await this.any(`
 			DELETE FROM ${links.TABLE};
@@ -920,7 +896,7 @@ export class PostgresBackend implements Queryable {
 				updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 			);`);
 		} catch (err: any) {
-			logger.warn(context, 'ignoring initial DB error', err);
+			context.warn('ignoring initial DB error', err);
 		}
 
 		const uniqueFlag = unique ? 'UNIQUE ' : '';
@@ -941,7 +917,7 @@ export class PostgresBackend implements Queryable {
 
 			if (!state) {
 				// Create index if it doesn't already exist.
-				logger.info(context, 'Creating index', {
+				context.info('Creating index', {
 					tableName,
 					indexName,
 				});
@@ -974,7 +950,7 @@ export class PostgresBackend implements Queryable {
 				// https://jel.ly.fish/199e3575-d679-4d15-bae5-b94edf076581
 
 				// Output log to track how often this happens.
-				logger.info(context, 'Should recreate index', {
+				context.info('Should recreate index', {
 					tableName,
 					indexName,
 					typeSlug,
@@ -1036,8 +1012,7 @@ export class PostgresBackend implements Queryable {
 		} = {},
 	) {
 		const [base, version] = slug.split('@');
-		assert.INTERNAL(
-			context,
+		context.assertInternal(
 			version && version !== 'latest',
 			this.errors.JellyfishInvalidVersion,
 			`Missing version suffix in slug: ${slug}`,
@@ -1196,8 +1171,7 @@ export class PostgresBackend implements Queryable {
 			options.limit >= 0 &&
 			options.limit <= MAXIMUM_QUERY_LIMIT;
 
-		assert.USER(
-			context,
+		context.assertUser(
 			isValidLimit,
 			this.errors.JellyfishInvalidLimit,
 			`Query limit must be a finite integer less than ${MAXIMUM_QUERY_LIMIT}: ${options.limit}`,
@@ -1227,6 +1201,7 @@ export class PostgresBackend implements Queryable {
 		options: SqlQueryOptions,
 	) {
 		const { query, queryGenTime } = compileSchema(
+			context,
 			cards.TABLE,
 			select,
 			schema,
@@ -1243,7 +1218,7 @@ export class PostgresBackend implements Queryable {
 			text: query,
 		});
 
-		logger.debug(context, 'Prepared stream query for table', {
+		context.debug('Prepared stream query for table', {
 			table: cards.TABLE,
 			database: this.database,
 			preProcessingTime: queryGenTime,
@@ -1260,7 +1235,7 @@ export class PostgresBackend implements Queryable {
 
 			const { elements, postProcessTime } = postProcessResults(results);
 
-			logger.debug(context, 'Prepared query database response', {
+			context.debug('Prepared query database response', {
 				table: cards.TABLE,
 				database: this.database,
 				count: elements.length,

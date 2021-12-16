@@ -1,16 +1,11 @@
 import * as _ from 'lodash';
-import { getLogger } from '@balena/jellyfish-logger';
-import {
-	Context,
-	Contract,
-	LinkContract,
-} from '@balena/jellyfish-types/build/core';
+import { Contract, LinkContract } from '@balena/jellyfish-types/build/core';
+import { Context } from '../../context';
 import { Queryable } from './types';
 import { PostgresBackend } from '.';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
-const logger = getLogger('jellyfish-core');
 
 const LINK_ORIGIN_PROPERTY = '$link';
 const LINK_TABLE = 'links2';
@@ -26,7 +21,7 @@ export const setup = async (
 		cards: string;
 	},
 ) => {
-	logger.debug(context, 'Creating links table', {
+	context.debug('Creating links table', {
 		table: LINK_TABLE,
 		database,
 	});

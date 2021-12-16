@@ -6,6 +6,7 @@ import { defaultEnvironment as environment } from '@balena/jellyfish-environment
 import * as jsonschema2sql from '../../../../../lib/backend/postgres/jsonschema2sql';
 import * as cards from '../../../../../lib/backend/postgres/cards';
 import * as links from '../../../../../lib/backend/postgres/links';
+import { Context } from '../../../../../lib/context';
 import regexpTestSuite from './regexp';
 import formatMaxMinTestSuite from './format-max-min';
 import { Contract } from '@balena/jellyfish-types/build/core';
@@ -72,9 +73,7 @@ const SUPPORTED_SUITES = [
 	'formatMaximum|formatMinimum',
 ];
 
-const context = {
-	id: 'jsonschema2sql-test',
-};
+const context = new Context({ id: 'jsonschema2sql-test' });
 
 interface RunnerOptions {
 	backend: typeof ctx['backend'];
@@ -138,7 +137,7 @@ const runner = async ({
 	/*
 	 * 3. Query the elements back using our translator.
 	 */
-	const query = jsonschema2sql.compile(table, {}, schema, options);
+	const query = jsonschema2sql.compile(context, table, {}, schema, options);
 
 	/*
 	 * 4. Return the results.

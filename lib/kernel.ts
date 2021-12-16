@@ -1,17 +1,15 @@
 import * as _ from 'lodash';
 import * as jsonpatch from 'fast-json-patch';
 import * as fastEquals from 'fast-equals';
-import * as assert from '@balena/jellyfish-assert';
+import { Context, MixedContext } from './context';
 import jsonSchema from './json-schema';
 import * as errors from './errors';
 import * as views from './views';
 import { CARDS } from './cards';
 import * as permissionFilter from './permission-filter';
 import metrics = require('@balena/jellyfish-metrics');
-import { getLogger } from '@balena/jellyfish-logger';
 import { JSONSchema } from '@balena/jellyfish-types';
 import {
-	Context,
 	Contract,
 	ContractDefinition,
 	LinkContract,
@@ -25,8 +23,6 @@ import { v4 as uuidv4 } from 'uuid';
 interface KernelQueryOptions extends Partial<BackendQueryOptions> {
 	mask?: JSONSchema;
 }
-
-const logger = getLogger('jellyfish-core');
 
 // Generate a concise slug for a contract, using the `name` field
 // if its available
@@ -232,8 +228,7 @@ const preUpsert = async (
 	session: string,
 	card: Contract,
 ) => {
-	assert.INTERNAL(
-		context,
+	context.assertInternal(
 		card.type,
 		instance.errors.JellyfishSchemaMismatch,
 		'No type in card',
@@ -250,16 +245,14 @@ const preUpsert = async (
 
 	// If the loop field is specified, it should be a valid loop contract
 	if (card.loop) {
-		assert.INTERNAL(
-			context,
+		context.assertInternal(
 			loop && loop.type.split('@')[0] === 'loop',
 			errors.JellyfishNoElement,
 			`No such loop: ${card.loop}`,
 		);
 	}
 
-	assert.INTERNAL(
-		context,
+	context.assertInternal(
 		schema,
 		instance.errors.JellyfishUnknownCardType,
 		`Unknown type: ${card.type}`,
@@ -367,15 +360,15 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 *
 	 * @example
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 * await kernel.disconnect()
 	 */
-	async disconnect(context: Context) {
-		await this.backend.disconnect(context);
+	async disconnect(mixedContext: MixedContext) {
+		await this.backend.disconnect(Context.fromMixed(mixedContext));
 	}
 
 	/**
@@ -383,7 +376,7 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 *
 	 * @description
 	 * This makes sure the kernel is connected to the backend
@@ -393,13 +386,14 @@ export class Kernel {
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 */
-	async initialize(context: Context) {
+	async initialize(mixedContext: MixedContext) {
+		const context = Context.fromMixed(mixedContext);
 		await this.backend.connect(context);
 
 		// TODO: all of this bootstrapping should be in the same transaction as the DB setup
 		// happening in the connect() call above
 
-		logger.debug(context, 'Upserting minimal required cards');
+		context.debug('Upserting minimal required cards');
 
 		const unsafeUpsert = (card: ContractDefinition) => {
 			const element = this.defaults(card);
@@ -448,9 +442,7 @@ export class Kernel {
 				CARDS['oauth-client'],
 				CARDS['scheduled-action'],
 			].map(async (card) => {
-				logger.debug(context, 'Upserting core card', {
-					slug: card.slug,
-				});
+				context.debug('Upserting core card', { slug: card.slug });
 
 				return this.replaceCard(context, this.sessions!.admin, card);
 			}),
@@ -462,21 +454,18 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
 	 * @param {String} id - card id
 	 * @returns {(Object|Null)} card
 	 */
 	async getCardById<T extends Contract = Contract>(
-		context: Context,
+		mixedContext: MixedContext,
 		session: string,
 		id: string,
 	): Promise<T | null> {
-		logger.debug(context, 'Fetching card by id', {
-			id,
-		});
-
-		assert.INTERNAL(context, id, errors.JellyfishInvalidId, 'Id is undefined');
+		const context = Context.fromMixed(mixedContext);
+		context.debug('Fetching card by id', { id });
 
 		const schema: JSONSchema = {
 			type: 'object',
@@ -494,8 +483,7 @@ export class Kernel {
 			limit: 1,
 		});
 
-		assert.INTERNAL(
-			context,
+		context.assertInternal(
 			results.length <= 1,
 			errors.JellyfishDatabaseError,
 			`More than one card with id ${id}`,
@@ -509,23 +497,21 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
 	 * @param {String} slug - card slug
 	 * @param {Object} options - optional set of extra options
 	 * @returns {(Object|Null)} card
 	 */
 	async getCardBySlug<T extends Contract = Contract>(
-		context: Context,
+		mixedContext: MixedContext,
 		session: string,
 		slug: string,
 	): Promise<T | null> {
-		logger.debug(context, 'Fetching card by slug', {
-			slug,
-		});
+		const context = Context.fromMixed(mixedContext);
+		context.debug('Fetching card by slug', { slug });
 
-		assert.INTERNAL(
-			context,
+		context.assertInternal(
 			slug,
 			errors.JellyfishInvalidSlug,
 			'Slug is undefined',
@@ -533,8 +519,7 @@ export class Kernel {
 
 		const [base, version] = slug.split('@');
 
-		assert.INTERNAL(
-			context,
+		context.assertInternal(
 			version,
 			errors.JellyfishInvalidVersion,
 			`No version reference: ${slug}`,
@@ -569,8 +554,7 @@ export class Kernel {
 
 		const results = await this.query<T>(context, session, schema, queryOptions);
 
-		assert.INTERNAL(
-			context,
+		context.assertInternal(
 			results.length <= 1,
 			errors.JellyfishDatabaseError,
 			`More than one card with id slug ${slug}`,
@@ -584,7 +568,7 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
 	 * @param {Object} object - card object
 	 * @returns {Object} the inserted card
@@ -598,15 +582,14 @@ export class Kernel {
 	 * console.log(card.id)
 	 */
 	async insertCard<T extends Contract = Contract>(
-		context: Context,
+		mixedContext: MixedContext,
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
+		const context = Context.fromMixed(mixedContext);
 		const card = this.defaults(object);
 
-		logger.debug(context, 'Inserting card', {
-			slug: card.slug,
-		});
+		context.debug('Inserting card', { slug: card.slug });
 
 		await preUpsert(this, context, session, card as Contract);
 
@@ -618,7 +601,7 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
 	 * @param {Object} object - card object, the slug or ID must be supplied
 	 * @returns {Object} the replaced card
@@ -632,17 +615,16 @@ export class Kernel {
 	 * console.log(card.id)
 	 */
 	async replaceCard<T extends Contract = Contract>(
-		context: Context,
+		mixedContext: MixedContext,
 		session: string,
 		object: Partial<Contract> &
 			Pick<Contract, 'type'> &
 			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
 	): Promise<T> {
+		const context = Context.fromMixed(mixedContext);
 		const card = this.defaults(object);
 
-		logger.debug(context, 'Replacing card', {
-			slug: card.slug,
-		});
+		context.debug('Replacing card', { slug: card.slug });
 
 		await preUpsert(this, context, session, card as Contract);
 
@@ -657,18 +639,19 @@ export class Kernel {
 	 * @description
 	 * See https://tools.ietf.org/html/rfc6902
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
 	 * @param {String} slug - card slug
 	 * @param {Object[]} patch - JSON Patch operations
 	 * @returns {Object} the patched card
 	 */
 	async patchCardBySlug<T = Contract>(
-		context: Context,
+		mixedContext: MixedContext,
 		session: string,
 		slug: string,
 		patch: jsonpatch.Operation[],
 	): Promise<T> {
+		const context = Context.fromMixed(mixedContext);
 		const filter = await permissionFilter.getMask(
 			context,
 			this.backend,
@@ -688,8 +671,7 @@ export class Kernel {
 					lock: true,
 				});
 
-				assert.INTERNAL(
-					context,
+				context.assertInternal(
 					fullCard,
 					this.errors.JellyfishNoElement,
 					`No such card: ${slug}`,
@@ -697,7 +679,7 @@ export class Kernel {
 
 				// TODO: Remove this log once we understand why we are having link card patch requests.
 				if (fullCard.type === 'link@1.0.0') {
-					logger.info(context, 'Received request to patch a link card', {
+					context.info('Received request to patch a link card', {
 						card: fullCard,
 						patch,
 					});
@@ -719,8 +701,7 @@ export class Kernel {
 					fullCard.type,
 				);
 
-				assert.INTERNAL(
-					context,
+				context.assertInternal(
 					filteredCard,
 					this.errors.JellyfishNoElement,
 					`No such card: ${slug}`,
@@ -728,8 +709,7 @@ export class Kernel {
 
 				const schema = typeCard && typeCard.data && typeCard.data.schema;
 
-				assert.INTERNAL(
-					context,
+				context.assertInternal(
 					schema,
 					this.errors.JellyfishUnknownCardType,
 					`Unknown type: ${fullCard.type}`,
@@ -777,7 +757,7 @@ export class Kernel {
 
 				// TODO: Remove this log once we understand why we are having link card patch requests.
 				if (fullCard.type === 'link@1.0.0') {
-					logger.info(context, 'Upserting link card after patch', {
+					context.info('Upserting link card after patch', {
 						card: patchedFullCard,
 						patch,
 					});
@@ -789,8 +769,7 @@ export class Kernel {
 						context,
 						patchedFullCard.loop,
 					);
-					assert.INTERNAL(
-						context,
+					context.assertInternal(
 						loopCard && loopCard.type.split('@')[0] === 'loop',
 						errors.JellyfishNoElement,
 						`No such loop: ${patchedFullCard.loop}`,
@@ -822,7 +801,7 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
 	 * @param {Object} schema - JSON Schema
 	 * @param {Object} [options] - options
@@ -849,11 +828,12 @@ export class Kernel {
 	 * })
 	 */
 	async query<T extends Contract = Contract>(
-		context: Context,
+		mixedContext: MixedContext,
 		session: string,
 		schema: JSONSchema | ViewContract,
 		options: KernelQueryOptions = {},
 	): Promise<T[]> {
+		const context = Context.fromMixed(mixedContext);
 		const { selected, filteredQuery } = await getQueryFromSchema(
 			context,
 			this.backend,
@@ -873,7 +853,7 @@ export class Kernel {
 			})
 			.catch((error) => {
 				if (error instanceof errors.JellyfishDatabaseTimeoutError) {
-					logger.warn(context, 'Query timeout', schema);
+					context.warn('Query timeout', schema);
 				}
 				throw error;
 			});
@@ -919,7 +899,7 @@ export class Kernel {
 	 *   - options: an options object in the same format as `query()`
 	 * - setSchema: set the stream's schema. The payload is the new schema
 	 *
-	 * @param {Object} context - execution context
+	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
 	 * @param {Object} schema - JSON Schema
 	 * @param {Object} options - options object
@@ -958,11 +938,12 @@ export class Kernel {
 	 * emitter.close()
 	 */
 	async stream(
-		context: Context,
+		mixedContext: MixedContext,
 		session: string,
 		schema: JSONSchema,
 		options: KernelQueryOptions = {},
 	) {
+		const context = Context.fromMixed(mixedContext);
 		const { selected, filteredQuery } = await getQueryFromSchema(
 			context,
 			this.backend,
@@ -971,7 +952,7 @@ export class Kernel {
 			options.mask,
 		);
 
-		logger.debug(context, 'Opening stream');
+		context.debug('Opening stream');
 
 		const stream = await this.backend.stream(
 			context,

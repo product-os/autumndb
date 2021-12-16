@@ -1,24 +1,22 @@
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as pgFormat from 'pg-format';
-import { getLogger } from '@balena/jellyfish-logger';
 import { v4 as uuidv4 } from 'uuid';
-import * as assert from '@balena/jellyfish-assert';
 import * as metrics from '@balena/jellyfish-metrics';
 import * as traverse from 'traverse';
 import { PostgresBackend } from '.';
 import * as utils from './utils';
+import { Context } from '../../context';
 import * as textSearch from './jsonschema2sql/text-search';
 import { SqlPath } from './jsonschema2sql/sql-path';
 import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
 import { DatabaseBackend, SearchFieldDef, Queryable } from './types';
-import { Context, Contract } from '@balena/jellyfish-types/build/core';
+import { Contract } from '@balena/jellyfish-types/build/core';
 import { TypedError } from 'typed-error';
 import { core, JSONSchema } from '@balena/jellyfish-types';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
-const logger = getLogger('jellyfish-core');
 
 const CARDS_TABLE = 'cards';
 const CARDS_TRIGGER_COLUMNS = [
@@ -265,7 +263,7 @@ export const getById = async (
 	} = {},
 ) => {
 	const table = options.table || TABLE;
-	logger.debug(context, 'Getting element by id', {
+	context.debug('Getting element by id', {
 		id,
 		table,
 	});
@@ -292,7 +290,7 @@ export const getBySlug = async (
 ) => {
 	const table = options.table || TABLE;
 
-	logger.debug(context, 'Getting element by slug', {
+	context.debug('Getting element by slug', {
 		slug,
 		table,
 		locking: options.lock,
@@ -351,7 +349,7 @@ export const getManyById = async (
 	} = {},
 ) => {
 	const table = options.table || TABLE;
-	logger.debug(context, 'Batch get by id', {
+	context.debug('Batch get by id', {
 		count: ids.length,
 		table,
 	});
@@ -382,14 +380,12 @@ export const upsert = async <T extends Contract = Contract>(
 	} = {},
 ): Promise<T> => {
 	const table = options.table || TABLE;
-	assert.INTERNAL(
-		context,
+	context.assertInternal(
 		object.slug,
 		errors.JellyfishDatabaseError,
 		'Missing primary key',
 	);
-	assert.INTERNAL(
-		context,
+	context.assertInternal(
 		object.type,
 		errors.JellyfishDatabaseError,
 		'Missing type',
@@ -399,13 +395,13 @@ export const upsert = async <T extends Contract = Contract>(
 	const elementId = options.id || insertedObject.id || uuidv4();
 	if (options.replace) {
 		insertedObject.updated_at = new Date().toISOString();
-		logger.debug(context, 'Upserting element', {
+		context.debug('Upserting element', {
 			table,
 			slug: insertedObject.slug,
 		});
 	} else {
 		insertedObject.created_at = new Date().toISOString();
-		logger.debug(context, 'Inserting element', {
+		context.debug('Inserting element', {
 			table,
 			slug: insertedObject.slug,
 		});
@@ -617,7 +613,7 @@ export const createTypeIndex = async (
 			schema.slug,
 		);
 	} catch (error: any) {
-		logger.warn(context, 'Hit error whilst creating type index', error.message);
+		context.warn('Hit error whilst creating type index', error.message);
 		if (retries === 0) {
 			throw error;
 		} else {
@@ -675,8 +671,7 @@ export const createFullTextSearchIndex = async (
 			);
 		}
 	} catch (error: any) {
-		logger.warn(
-			context,
+		context.warn(
 			'Hit error whilst creating full text search index',
 			error.message,
 		);
@@ -723,8 +718,7 @@ export const parseFullTextSearchFields = (
 					(_.has(this.parent?.node, ['items', 'type']) &&
 						this.parent?.node.items.type.includes('string')),
 			);
-			assert.INTERNAL(
-				context,
+			context.assertInternal(
 				hasStringType,
 				errors.JellyfishInvalidSchema,
 				'Full-text search fields must contain "string" as a possible type',

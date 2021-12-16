@@ -3,7 +3,7 @@ import { backend as Backend } from '../../../lib/backend';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { Cache } from '../../../lib/cache';
 import * as errors from '../../../lib/errors';
-import { Context } from '@balena/jellyfish-types/build/core';
+import { Context } from '../../../lib/context';
 import { DatabaseBackend } from '../../../lib/backend/postgres/types';
 
 export interface BackendContext {
@@ -42,11 +42,7 @@ export const before = async (
 		} as any),
 	);
 
-	const context = {
-		id: `CORE-TEST-${uuid()}`,
-	};
-
-	ctx.context = context;
+	ctx.context = new Context({ id: `CORE-TEST-${uuid()}` });
 
 	if (ctx.cache) {
 		await ctx.cache.connect();
