@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import * as assert from '@balena/jellyfish-assert';
+import { Context } from '../../../context';
 import { ArrayContainsFilter } from './array-contains-filter';
 import { ArrayLengthFilter } from './array-length-filter';
 import { EqualsFilter } from './equals-filter';
@@ -366,12 +366,13 @@ export class SqlQuery {
 	types: string[];
 
 	static fromSchema(
+		context: Context,
 		parent: null | SqlQuery,
 		select: { [key: string]: any } = {},
 		schema: boolean | JSONSchema,
 		options: SqlQueryOptions,
 	) {
-		const query = new SqlQuery(parent, select, options);
+		const query = new SqlQuery(context, parent, select, options);
 		if (schema === false) {
 			query.filter.makeUnsatisfiable();
 		} else if (schema !== true) {
@@ -418,6 +419,7 @@ export class SqlQuery {
 	 *          `this.filter`. Useful for constraints with placeholders.
 	 */
 	constructor(
+		private context: Context,
 		parent: null | SqlQuery,
 		select: { [key: string]: any } = {},
 		options: SqlQueryOptions = {},
@@ -498,7 +500,7 @@ export class SqlQuery {
 			| undefined,
 	) {
 		// TODO: technically this can be a schema too
-		assert.INTERNAL(null, _.isBoolean(schema), InvalidSchema, () => {
+		this.context.assertInternal(_.isBoolean(schema), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath(
 				'additionalProperties',
 			)}' must be a boolean`;
@@ -507,8 +509,7 @@ export class SqlQuery {
 	}
 
 	setType(value: string | JSONSchema7TypeName[] | undefined) {
-		assert.INTERNAL(
-			null,
+		this.context.assertInternal(
 			_.isString(value) || Array.isArray(value),
 			InvalidSchema,
 			() => {
@@ -528,7 +529,7 @@ export class SqlQuery {
 	}
 
 	setRequired(required: string[]) {
-		assert.INTERNAL(null, Array.isArray(required), InvalidSchema, () => {
+		this.context.assertInternal(Array.isArray(required), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('required')}' must be an array`;
 		});
 		// We clone here because other methods may modify `this.required`
@@ -539,10 +540,10 @@ export class SqlQuery {
 	}
 
 	setFormat(format: SchemaFormat) {
-		assert.INTERNAL(null, _.isString(format), InvalidSchema, () => {
+		this.context.assertInternal(_.isString(format), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('format')}' must be a string`;
 		});
-		assert.INTERNAL(null, format in REGEXES.format, InvalidSchema, () => {
+		this.context.assertInternal(format in REGEXES.format, InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('format')}' is invalid`;
 		});
 		this.format = format;
@@ -571,7 +572,7 @@ export class SqlQuery {
 	}
 
 	visit(key: string, value: any) {
-		assert.INTERNAL(null, _.isString(key), InvalidSchema, () => {
+		this.context.assertInternal(_.isString(key), InvalidSchema, () => {
 			return `key for '${this.formatJsonPath(key)}' must be a string`;
 		});
 		const skippedKeywords = [
@@ -588,7 +589,7 @@ export class SqlQuery {
 			return;
 		}
 		const visitor = `${key}Visitor` as keyof SqlQuery;
-		assert.INTERNAL(null, visitor in this, InvalidSchema, () => {
+		this.context.assertInternal(visitor in this, InvalidSchema, () => {
 			return `invalid key: ${this.formatJsonPath(key)}`;
 		});
 
@@ -596,7 +597,7 @@ export class SqlQuery {
 	}
 
 	$$linksVisitor(linkMap: { [s: string]: JSONSchema }) {
-		assert.INTERNAL(null, _.isPlainObject(linkMap), InvalidSchema, () => {
+		this.context.assertInternal(_.isPlainObject(linkMap), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('$$links')}' must be a map`;
 		});
 		for (const [linkType, linkSchema] of Object.entries(linkMap)) {
@@ -609,7 +610,7 @@ export class SqlQuery {
 	}
 
 	allOfVisitor(branches: any[]) {
-		assert.INTERNAL(null, Array.isArray(branches), InvalidSchema, () => {
+		this.context.assertInternal(Array.isArray(branches), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('allOf')}' must be an array`;
 		});
 		for (const [idx, branchSchema] of branches.entries()) {
@@ -624,7 +625,7 @@ export class SqlQuery {
 	}
 
 	anyOfVisitor(branches: any[]) {
-		assert.INTERNAL(null, Array.isArray(branches), InvalidSchema, () => {
+		this.context.assertInternal(Array.isArray(branches), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('anyOf')}' must be an array`;
 		});
 		let allFilterImpliesExists = true;
@@ -657,8 +658,7 @@ export class SqlQuery {
 		}
 		let filter = null;
 		if (_.has(schema, ['fullTextSearch'])) {
-			assert.INTERNAL(
-				null,
+			this.context.assertInternal(
 				_.isPlainObject(schema.fullTextSearch),
 				Error,
 				() => {
@@ -667,8 +667,7 @@ export class SqlQuery {
 					)}' must be a map`;
 				},
 			);
-			assert.INTERNAL(
-				null,
+			this.context.assertInternal(
 				// TS-TODO: figure out why "term" isn't present on fullTextSearch
 				_.isString((schema.fullTextSearch! as any).term),
 				Error,
@@ -726,8 +725,7 @@ export class SqlQuery {
 	}
 
 	enumVisitor(values: string | any[]) {
-		assert.INTERNAL(
-			null,
+		this.context.assertInternal(
 			Array.isArray(values) && values.length > 0,
 			InvalidSchema,
 			() => {
@@ -741,7 +739,7 @@ export class SqlQuery {
 	}
 
 	exclusiveMaximumVisitor(limit: any) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath(
 				'exclusiveMaximum',
 			)}' must be a number`;
@@ -751,7 +749,7 @@ export class SqlQuery {
 	}
 
 	exclusiveMinimumVisitor(limit: any) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath(
 				'exclusiveMinimum',
 			)}' must be a number`;
@@ -761,12 +759,12 @@ export class SqlQuery {
 	}
 
 	formatMaximumVisitor(limit: any) {
-		assert.INTERNAL(null, _.isString(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isString(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath(
 				'formatMaximum',
 			)}' must be a string`;
 		});
-		assert.INTERNAL(null, this.format !== null, InvalidSchema, () => {
+		this.context.assertInternal(this.format !== null, InvalidSchema, () => {
 			return `missing '${this.formatJsonPath('format')}' for formatMaximum`;
 		});
 		const filter = new ValueIsFilter(
@@ -779,12 +777,12 @@ export class SqlQuery {
 	}
 
 	formatMinimumVisitor(limit: any) {
-		assert.INTERNAL(null, _.isString(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isString(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath(
 				'formatMinimum',
 			)}' must be a string`;
 		});
-		assert.INTERNAL(null, this.format !== null, InvalidSchema, () => {
+		this.context.assertInternal(this.format !== null, InvalidSchema, () => {
 			return `missing '${this.formatJsonPath('format')}' for formatMinimum`;
 		});
 		const filter = new ValueIsFilter(
@@ -847,7 +845,7 @@ export class SqlQuery {
 	}
 
 	maximumVisitor(limit: any) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('maximum')}' must be a number`;
 		});
 		const filter = new ValueIsFilter(this.path, '<=', limit);
@@ -855,7 +853,7 @@ export class SqlQuery {
 	}
 
 	maxLengthVisitor(limit: number) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('maxLength')}' must be a number`;
 		});
 		const filter = new StringLengthFilter(this.path, '<=', limit);
@@ -863,7 +861,7 @@ export class SqlQuery {
 	}
 
 	maxItemsVisitor(limit: number) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('maxItems')}' must be a number`;
 		});
 		const filter = new ArrayLengthFilter(this.path, '<=', limit);
@@ -871,7 +869,7 @@ export class SqlQuery {
 	}
 
 	maxPropertiesVisitor(limit: number) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath(
 				'maxProperties',
 			)}' must be a number`;
@@ -881,7 +879,7 @@ export class SqlQuery {
 	}
 
 	minimumVisitor(limit: any) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('minimum')}' must be a number`;
 		});
 		const filter = new ValueIsFilter(this.path, '>=', limit);
@@ -889,7 +887,7 @@ export class SqlQuery {
 	}
 
 	minLengthVisitor(limit: number) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('minLength')}' must be a number`;
 		});
 		const filter = new StringLengthFilter(this.path, '>=', limit);
@@ -897,7 +895,7 @@ export class SqlQuery {
 	}
 
 	minItemsVisitor(limit: number) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('minItems')}' must be a number`;
 		});
 		const filter = new ArrayLengthFilter(this.path, '>=', limit);
@@ -905,7 +903,7 @@ export class SqlQuery {
 	}
 
 	minPropertiesVisitor(limit: number) {
-		assert.INTERNAL(null, _.isNumber(limit), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(limit), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath(
 				'minProperties',
 			)}' must be a number`;
@@ -915,7 +913,7 @@ export class SqlQuery {
 	}
 
 	multipleOfVisitor(multiple: number) {
-		assert.INTERNAL(null, _.isNumber(multiple), InvalidSchema, () => {
+		this.context.assertInternal(_.isNumber(multiple), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath(
 				'multipleOf',
 			)}' must be a number`;
@@ -930,7 +928,7 @@ export class SqlQuery {
 	}
 
 	patternVisitor(pattern: string) {
-		assert.INTERNAL(null, _.isString(pattern), InvalidSchema, () => {
+		this.context.assertInternal(_.isString(pattern), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('pattern')}' must be a string`;
 		});
 		const filter = new MatchesRegexFilter(this.path, pattern);
@@ -938,9 +936,13 @@ export class SqlQuery {
 	}
 
 	propertiesVisitor(propertiesMap: { [s: string]: JSONSchema }) {
-		assert.INTERNAL(null, _.isPlainObject(propertiesMap), InvalidSchema, () => {
-			return `value for '${this.formatJsonPath('properties')}' must be a map`;
-		});
+		this.context.assertInternal(
+			_.isPlainObject(propertiesMap),
+			InvalidSchema,
+			() => {
+				return `value for '${this.formatJsonPath('properties')}' must be a map`;
+			},
+		);
 		this.propertiesFilter = new ExpressionFilter(true);
 		this.path.push(null);
 		for (const [propertyName, propertySchema] of Object.entries(
@@ -991,8 +993,7 @@ export class SqlQuery {
 
 	regexpVisitor(value: string | { flags: string; pattern: string }) {
 		const isString = _.isString(value);
-		assert.INTERNAL(
-			null,
+		this.context.assertInternal(
 			isString || _.isPlainObject(value),
 			InvalidSchema,
 			() => {
@@ -1010,8 +1011,7 @@ export class SqlQuery {
 				if (value.flags === 'i') {
 					flags.ignoreCase = true;
 				} else {
-					assert.INTERNAL(
-						null,
+					this.context.assertInternal(
 						false,
 						InvalidSchema,
 						`value for '${this.formatJsonPath([
@@ -1027,12 +1027,12 @@ export class SqlQuery {
 	}
 
 	fullTextSearchVisitor(value: { term: string }) {
-		assert.INTERNAL(null, _.isPlainObject(value), Error, () => {
+		this.context.assertInternal(_.isPlainObject(value), Error, () => {
 			return `value for '${this.formatJsonPath(
 				'fullTextSearch',
 			)}' must be a map`;
 		});
-		assert.INTERNAL(null, _.isString(value.term), Error, () => {
+		this.context.assertInternal(_.isString(value.term), Error, () => {
 			return `value for '${this.formatJsonPath(
 				'fullTextSearch',
 			)}.term' must be a string`;
@@ -1118,6 +1118,7 @@ export class SqlQuery {
 	) {
 		this.options.parentJsonPath?.push(...suffix);
 		const query = SqlQuery.fromSchema(
+			this.context,
 			this,
 			select || this.select,
 			schema,
@@ -1144,7 +1145,7 @@ export class SqlQuery {
 			parentPath = this.path.flattened();
 		}
 		this.options.parentJsonPath?.push(...suffix);
-		const query = SqlQuery.fromSchema(null, this.select, schema, {
+		const query = SqlQuery.fromSchema(this.context, null, this.select, schema, {
 			parentJsonPath: this.options.parentJsonPath,
 			parentPath,
 		});
@@ -1163,7 +1164,7 @@ export class SqlQuery {
 	) {
 		this.options.parentJsonPath?.push(...suffix);
 		const select = this.select.getLink(linkType);
-		const query = SqlQuery.fromSchema(null, select, schema, {
+		const query = SqlQuery.fromSchema(this.context, null, select, schema, {
 			parentJsonPath: this.options.parentJsonPath,
 		});
 		for (const _item of suffix) {

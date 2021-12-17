@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as pgFormat from 'pg-format';
 import { EventEmitter } from 'events';
-import { getLogger } from '@balena/jellyfish-logger';
 import { v4 as uuidv4 } from 'uuid';
 import * as metrics from '@balena/jellyfish-metrics';
 import {
@@ -13,13 +12,11 @@ import {
 	SelectObject,
 	SqlQueryOptions,
 } from './types';
-import { Context } from '@balena/jellyfish-types/build/core';
+import { Context } from '../../context';
 import type { IConnected } from 'pg-promise';
 import type { IClient } from 'pg-promise/typescript/pg-subset';
 import { strict as nativeAssert } from 'assert';
 import { JSONSchema } from '@balena/jellyfish-types';
-
-const logger = getLogger('jellyfish-core');
 
 type StreamConnection = IConnected<{}, IClient>;
 
@@ -150,7 +147,7 @@ export class Streamer {
 	}
 
 	errorHandler(context: Context, error: any) {
-		logger.warn(context, 'Streamer database client error', {
+		context.warn('Streamer database client error', {
 			code: error.code,
 			message: error.message,
 		});
@@ -164,8 +161,7 @@ export class Streamer {
 		// Attempt reconnects to database on unexpected client ends.
 		// Expected ends are performed with Streamer.close(), which nullifies "this.connection" before disconnect.
 		if (this.connection) {
-			logger.warn(
-				context,
+			context.warn(
 				'Streamer database client disconnected, attempting reconnection',
 			);
 			let reconnecting = true;
@@ -183,18 +179,14 @@ export class Streamer {
 						connectRetryDelay,
 					);
 
-					logger.info(context, 'Streamer database client reconnected');
+					context.info('Streamer database client reconnected');
 
 					reconnecting = false;
 				} catch (error: any) {
-					logger.warn(
-						context,
-						'Streamer database client reconnect attempt failed',
-						{
-							code: error.code,
-							message: error.message,
-						},
-					);
+					context.warn('Streamer database client reconnect attempt failed', {
+						code: error.code,
+						message: error.message,
+					});
 
 					await Bluebird.delay(connectRetryDelay);
 				}
@@ -292,19 +284,20 @@ export class Stream extends EventEmitter {
 		this.context = context;
 		this.cardTypes = null;
 		this.setSchema(select, schema, options);
-		logger.info(context, 'Attaching new stream', {
+		context.info('Attaching new stream', {
 			id,
 			table: streamer.table,
 			attachedStreams: streamer.getAttachedStreamCount(),
 		});
 		streamer.register(id, this);
-		metrics.markStreamOpened(context, streamer.table);
+		// TODO: `markStreamOpened` need to be fixed to use the correct type
+		metrics.markStreamOpened(context.getLogContext() as any, streamer.table);
 		// If an EventEmitter does not have at least one listener for the `error` event
 		// an exception will be raised and the nodeJS process will exit. To avoid
 		// this we always add an error listener that will log a warning.
 		// https://nodejs.org/api/events.html#events_error_events
 		this.on('error', (error) => {
-			logger.error(context, 'Encountered an error in stream', {
+			context.error('Encountered an error in stream', {
 				id,
 				table: streamer.table,
 				message: error.message,
@@ -387,6 +380,7 @@ export class Stream extends EventEmitter {
 			});
 		}
 	}
+
 	async tryEmitEvent(payload: EventPayload) {
 		if (this.constCardId && payload.id !== this.constCardId) {
 			return false;
@@ -428,14 +422,19 @@ export class Stream extends EventEmitter {
 		}
 		return true;
 	}
+
 	close() {
-		logger.info(this.context, 'Detaching stream', {
+		this.context.info('Detaching stream', {
 			id: this.id,
 			table: this.streamer.table,
 			attachedStreams: this.streamer.getAttachedStreamCount(),
 		});
 		this.streamer.unregister(this.id);
-		metrics.markStreamClosed(this.context, this.streamer.table);
+		// TODO: `markStreamClosed` need to be fixed to use the correct type
+		metrics.markStreamClosed(
+			this.context.getLogContext() as any,
+			this.streamer.table,
+		);
 		this.emit('closed');
 	}
 }

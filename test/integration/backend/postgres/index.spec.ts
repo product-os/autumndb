@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import * as helpers from '../helpers';
 import { version as packageVersion } from '../../../../package.json';
 import { INDEX_TABLE, PostgresBackend } from '../../../../lib/backend/postgres';
+import { Context } from '../../../../lib/context';
 
 let ctx: helpers.BackendContext;
 
@@ -49,9 +50,7 @@ describe('Setup', () => {
 						database: dbName,
 					}),
 				);
-				return backend.connect({
-					id: `CORE-DB-TEST-${uuid()}`,
-				});
+				return backend.connect(new Context({ id: `CORE-DB-TEST-${uuid()}` }));
 			};
 			const result = await Promise.all([
 				makeBackend(),
@@ -101,9 +100,7 @@ describe('Setup', () => {
 						database: dbName,
 					}),
 				);
-				await backend.connect({
-					id: `CORE-DB-TEST-${uuid()}`,
-				});
+				await backend.connect(new Context({ id: `CORE-DB-TEST-${uuid()}` }));
 
 				return backend;
 			};
@@ -145,9 +142,7 @@ describe('Setup', () => {
 						database: dbName,
 					}),
 				);
-				await backend.connect({
-					id: `CORE-DB-TEST-${uuid()}`,
-				});
+				await backend.connect(new Context({ id: `CORE-DB-TEST-${uuid()}` }));
 
 				return backend;
 			};

@@ -5,7 +5,7 @@ import pgp from '../../../../../lib/backend/postgres/pg-promise';
 import * as streams from '../../../../../lib/backend/postgres/streams';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { PostgresBackend } from '../../../../../lib/backend/postgres/index';
-import { Context } from '@balena/jellyfish-types/build/core';
+import { Context } from '../../../../../lib/context';
 import { DatabaseConnection } from '../../../../../lib/backend/postgres/types';
 
 let ctx: {
@@ -31,9 +31,7 @@ beforeEach(async () => {
 	const id = uuid();
 	const database = `test_streams_${id.replace(/-/g, '')}`;
 
-	const context = {
-		id: `TEST-STREAMS-${id}`,
-	};
+	const context = new Context({ id: `TEST-STREAMS-${id}` });
 
 	const table = 'test_table';
 

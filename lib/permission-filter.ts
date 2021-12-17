@@ -1,10 +1,10 @@
 import jsone = require('json-e');
 import * as _ from 'lodash';
-import * as assert from '@balena/jellyfish-assert';
+import { Context } from './context';
 import jsonSchema from './json-schema';
 import * as errors from './errors';
 import { CARDS } from './cards';
-import { Context, Contract } from '@balena/jellyfish-types/build/core';
+import { Contract } from '@balena/jellyfish-types/build/core';
 import { DatabaseBackend } from './backend/postgres/types';
 import { JSONSchema } from '@balena/jellyfish-types';
 
@@ -171,23 +171,20 @@ export const getSessionActor = async (
 ) => {
 	const sessionCard = await backend.getElementById(context, session);
 
-	assert.USER(
-		context,
+	context.assertUser(
 		sessionCard,
 		errors.JellyfishInvalidSession,
 		`Invalid session: ${session}`,
 	);
 
 	// Don't allow inactive sessions to be used
-	assert.USER(
-		context,
+	context.assertUser(
 		sessionCard.active,
 		errors.JellyfishInvalidSession,
 		`Invalid session: ${session}`,
 	);
 
-	assert.USER(
-		context,
+	context.assertUser(
 		!sessionCard.data.expiration ||
 			new Date() <= new Date(sessionCard.data.expiration),
 		errors.JellyfishSessionExpired,
@@ -196,8 +193,7 @@ export const getSessionActor = async (
 
 	const actor = await backend.getElementById(context, sessionCard.data.actor);
 
-	assert.INTERNAL(
-		context,
+	context.assertInternal(
 		actor,
 		errors.JellyfishNoElement,
 		`Invalid actor: ${sessionCard.data.actor}`,

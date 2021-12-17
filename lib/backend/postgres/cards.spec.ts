@@ -1,10 +1,9 @@
 import * as errors from '../../errors';
 import * as cards from './cards';
+import { Context } from '../../context';
 import { v4 as uuid } from 'uuid';
 
-const TEST_CONTEXT = {
-	id: `UNIT-TEST-${uuid()}`,
-};
+const TEST_CONTEXT = new Context({ id: `UNIT-TEST-${uuid()}` });
 
 describe('cards', () => {
 	describe('.fromTypePath()', () => {
