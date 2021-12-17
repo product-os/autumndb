@@ -279,7 +279,7 @@ const pushLinkedLateral = (
 		.pushLeftJoin(cardsTable, lateralJoinFilter, 'linked')
 		.pushGroupBy('orderedEdges', SqlPath.fromArray(['source']));
 	for (const [nestedLateral, nestedLateralAlias] of nestedLaterals) {
-		lateral.pushInnerJoin(
+		lateral.pushLeftJoin(
 			nestedLateral,
 			new LiteralSql(`${nestedLateralAlias}.source = linked.id`),
 			nestedLateralAlias,

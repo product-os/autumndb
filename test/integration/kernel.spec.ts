@@ -7648,5 +7648,47 @@ describe('Kernel', () => {
 
 			await once(stream, 'closed');
 		});
+
+		it('issue #1128: should be able to query for two nested optional links', async () => {
+			const card = await ctx.kernel.insertCard(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					slug: ctx.generateRandomSlug(),
+					type: 'card@1.0.0',
+				},
+			);
+
+			const results = await ctx.kernel.query(
+				ctx.context,
+				ctx.kernel.sessions!.admin,
+				{
+					properties: {
+						id: {
+							const: card.id,
+						},
+					},
+					anyOf: [
+						{
+							$$links: {
+								'is attached to': {
+									anyOf: [
+										{
+											$$links: {
+												'is attached to': {},
+											},
+										},
+										true,
+									],
+								},
+							},
+						},
+						true,
+					],
+				},
+			);
+
+			expect(results).toEqual([card]);
+		});
 	});
 });
