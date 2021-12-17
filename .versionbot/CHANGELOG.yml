@@ -1,4 +1,17 @@
 - commits:
+    - subject: add ui-schema to errors
+      hash: c1f5e3ceb6e7768dca134f1216b869014aeb2b5d
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 8.2.0
+  date: 2021-12-17T08:56:31.861Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^1.0.439'
       hash: d0f57de2b2302d8e76c04e16778ccb6f87de9c8a
       body: ''
