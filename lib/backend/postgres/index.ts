@@ -1,44 +1,36 @@
-import * as _ from 'lodash';
-import { performance } from 'perf_hooks';
+import { strict as nativeAssert } from 'assert';
 import * as Bluebird from 'bluebird';
-import * as skhema from 'skhema';
-import metrics = require('@balena/jellyfish-metrics');
-import { v4 as uuidv4 } from 'uuid';
-import * as jsonschema2sql from './jsonschema2sql';
-import type { Context } from '../../context';
-import * as links from './links';
-import * as cards from './cards';
-import * as streams from './streams';
-import * as utils from './utils';
-import pgp from './pg-promise';
+import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import type {
 	Contract,
+	ContractDefinition,
 	LinkContract,
 } from '@balena/jellyfish-types/build/core';
+import * as _ from 'lodash';
+import { performance } from 'perf_hooks';
+import { Pool, PoolClient } from 'pg';
+import * as semver from 'semver';
+import * as skhema from 'skhema';
+import type { Cache } from './../../cache';
+import { Context, Database, Query, TransactionIsolation } from '../../context';
+import * as errors from '../../errors';
+import * as cards from './cards';
+import * as jsonschema2sql from './jsonschema2sql';
+import * as links from './links';
 import type {
 	BackendQueryOptions,
-	DatabaseBackend,
-	DatabaseConnection,
-	Queryable,
 	SearchFieldDef,
 	SelectObject,
 	SqlQueryOptions,
 } from './types';
-import type { Cache } from './../../cache';
-import type { TypedError } from 'typed-error';
-import { strict as nativeAssert } from 'assert';
-import * as pgPromise from 'pg-promise';
-import { AsyncLocalStorage } from 'async_hooks';
-import * as semver from 'semver';
+import * as streams from './streams';
+import * as utils from './utils';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
 
 export const INDEX_TABLE = 'jf_indexes';
-
-const currentTransaction = new AsyncLocalStorage<Queryable>();
 
 // Removes version fields from database rows, as they are an
 // abstraction over the `version` field on contracts
@@ -93,13 +85,12 @@ const MAXIMUM_QUERY_LIMIT = 1000;
 // Amount of time to wait before retrying connect
 const DEFAULT_CONNECT_RETRY_DELAY = 2000;
 
-const compileSchema = (
+export const compileSchema = (
 	context: Context,
 	table: string,
 	select: SelectObject,
 	schema: JsonSchema,
 	options: SqlQueryOptions,
-	errors: { [key: string]: typeof TypedError },
 ): { query: string; queryGenTime: number } => {
 	const queryGenStart = performance.now();
 	let query = null;
@@ -120,27 +111,26 @@ const compileSchema = (
 	};
 };
 
-const runQuery = async (
+export const runQuery = async (
 	context: Context,
 	schema: JsonSchema,
-	query: string | pgPromise.PreparedStatement,
-	backend: DatabaseBackend,
+	query: Query,
 	values?: any[],
 ) => {
 	const queryStart = performance.now();
-	const results = await backend
-		.any(query, values)
+	const results = await context
+		.query(query, values)
 		.catch((error: { message: string }) => {
 			context.assertUser(
 				!error.message.includes('statement timeout'),
-				backend.errors.JellyfishDatabaseTimeoutError,
+				errors.JellyfishDatabaseTimeoutError,
 				() => {
 					return `Schema query timeout: ${JSON.stringify(schema)}`;
 				},
 			);
 			context.assertUser(
 				!error.message.startsWith('invalid regular expression:'),
-				backend.errors.JellyfishInvalidRegularExpression,
+				errors.JellyfishInvalidRegularExpression,
 				() => {
 					return `Invalid pattern in schema: ${JSON.stringify(schema)}`;
 				},
@@ -152,9 +142,12 @@ const runQuery = async (
 	const queryTime = queryEnd - queryStart;
 	metrics.markQueryTime(queryTime);
 
+	const { elements, postProcessTime } = postProcessResults(results);
+
 	return {
-		results,
+		elements,
 		queryTime,
+		postProcessTime,
 	};
 };
 
@@ -187,273 +180,6 @@ const postProcessResults = (results: Array<{ payload: any }>) => {
 	};
 };
 
-const queryTable = async (
-	context: Context,
-	backend: DatabaseBackend,
-	table: string,
-	select: SelectObject,
-	schema: JsonSchema,
-	options: BackendQueryOptions,
-) => {
-	const mode = options.profile ? 'info' : 'debug';
-
-	context[mode]('Querying from table', {
-		table,
-		database: backend.database,
-		limit: options.limit,
-		skip: options.skip,
-		sortBy: options.sortBy,
-		profile: options.profile,
-	});
-
-	if (options.limit <= 0) {
-		return [];
-	}
-
-	const { query, queryGenTime } = compileSchema(
-		context,
-		table,
-		select,
-		schema,
-		options,
-		backend.errors,
-	);
-
-	const { results, queryTime } = await runQuery(
-		context,
-		schema,
-		query,
-		backend,
-	);
-
-	const { elements, postProcessTime } = postProcessResults(results);
-
-	context[mode]('Query database response', {
-		table,
-		database: backend.database,
-		count: elements.length,
-		preProcessingTime: queryGenTime,
-		queryTime,
-		postProcessingTime: postProcessTime,
-	});
-
-	return elements;
-};
-
-const upsertObject = async <T extends Contract = Contract>(
-	context: Context,
-	backend: DatabaseBackend,
-	object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
-	options: {
-		replace?: boolean;
-	} = {},
-): Promise<T> => {
-	const insertedObject = await cards.upsert<T>(
-		context,
-		backend.errors,
-		backend,
-		object,
-		{
-			replace: options.replace,
-		},
-	);
-	if (backend.cache) {
-		await backend.cache.set(cards.TABLE, insertedObject);
-	}
-	const baseType = insertedObject.type.split('@')[0];
-	if (baseType === 'link') {
-		await links.upsert(context, backend, insertedObject as any as LinkContract);
-
-		// TODO: Check if we still need to materialize links here
-		// We only "materialize" links in this way because we haven't
-		// come up with a better way to traverse links while streaming.
-		// Ideally we should leverage the database, using joins, rather
-		// than doing all this client side.
-		const { fromCard, toCard } = await Bluebird.props({
-			fromCard: backend.getElementById(
-				context,
-				(insertedObject as any).data.from.id ||
-					(insertedObject as any).data.from,
-			),
-			toCard: backend.getElementById(
-				context,
-				(insertedObject as any).data.to.id || insertedObject.data.to,
-			),
-		});
-
-		// The reversed array is used so that links are parsed in both directions
-		await Bluebird.map(
-			[
-				[fromCard, toCard],
-				[toCard, fromCard],
-			],
-			async (linkCards) => {
-				if (!linkCards[0] || !linkCards[1]) {
-					return;
-				}
-
-				const updatedCard = insertedObject.active
-					? links.addLink(
-							insertedObject as any as LinkContract,
-							linkCards[0],
-							linkCards[1],
-					  )
-					: links.removeLink(
-							insertedObject as any as LinkContract,
-							linkCards[0],
-					  );
-
-				await cards.materializeLink(
-					context,
-					backend.errors,
-					backend,
-					updatedCard,
-				);
-				if (backend.cache) {
-					await backend.cache.unset(updatedCard);
-				}
-			},
-		);
-	}
-	// If a type was inserted, any indexed fields declared on the type card should be
-	// created
-	if (baseType === 'type') {
-		if (insertedObject.data.indexed_fields) {
-			for (const fields of (insertedObject as any).data.indexed_fields) {
-				await backend.createTypeIndex(context, fields, insertedObject);
-			}
-		}
-		// Find full-text search fields for type cards and create search indexes
-		const fullTextSearchFields = cards.parseFullTextSearchFields(
-			context,
-			(insertedObject as any).data.schema,
-			backend.errors,
-		);
-		if (fullTextSearchFields.length) {
-			await backend.createFullTextSearchIndex(
-				context,
-				`${insertedObject.slug}@${insertedObject.version}`,
-				fullTextSearchFields,
-			);
-		}
-	}
-	// Upserting `user` contracts causes two other contracts to be upserted and
-	// two links to be added while we are migrating to a new permission system.
-	// See:
-	// https://jel.ly.fish/improvement-jip-remove-field-level-permissions-8d561c94-2d33-4026-829c-272600018558
-	if (baseType === 'user') {
-		const userContract = insertedObject as any;
-		let settings = {};
-		if ('profile' in userContract.data) {
-			settings = _.pick(userContract.data.profile, [
-				'type',
-				'homeView',
-				'activeLoop',
-				'sendCommand',
-				'disableNotificationSound',
-				'starredViews',
-				'viewSettings',
-			]);
-		}
-		const [authenticationContract, personalSettingsContract] =
-			await Promise.all([
-				upsertObject(
-					context,
-					backend,
-					{
-						slug: 'authentication-' + userContract.slug,
-						version: userContract.version,
-						type: 'authentication@1.0.0',
-						active: userContract.active,
-						created_at: userContract.created_at,
-						markers: userContract.markers,
-						tags: [],
-						data: _.pick(userContract.data, ['hash', 'oauth']),
-						requires: [],
-						capabilities: [],
-					},
-					options,
-				),
-				upsertObject(
-					context,
-					backend,
-					{
-						slug: 'user-settings-' + userContract.slug,
-						version: userContract.version,
-						type: 'user-settings@1.0.0',
-						active: userContract.active,
-						created_at: userContract.created_at,
-						markers: userContract.markers,
-						tags: [],
-						data: settings,
-						requires: [],
-						capabilities: [],
-					},
-					options,
-				),
-			]);
-		await Promise.all([
-			upsertObject(
-				context,
-				backend,
-				{
-					slug: 'link-' + userContract.id + '-' + authenticationContract.id,
-					version: '1.0.0',
-					type: 'link@1.0.0',
-					name: 'is authenticated with',
-					active: true,
-					created_at: userContract.created_at,
-					markers: userContract.markers,
-					tags: [],
-					data: {
-						from: {
-							id: userContract.id,
-							type: 'user@1.0.0',
-						},
-						to: {
-							id: authenticationContract.id,
-							type: 'authentication@1.0.0',
-						},
-						inverseName: 'authenticates',
-					},
-					requires: [],
-					capabilities: [],
-				},
-				options,
-			),
-			upsertObject(
-				context,
-				backend,
-				{
-					slug: 'link-' + userContract.id + '-' + personalSettingsContract.id,
-					version: '1.0.0',
-					type: 'link@1.0.0',
-					name: 'has attachment',
-					active: true,
-					created_at: userContract.created_at,
-					markers: userContract.markers,
-					tags: [],
-					data: {
-						from: {
-							id: userContract.id,
-							type: 'user@1.0.0',
-						},
-						to: {
-							id: personalSettingsContract.id,
-							type: 'user-settings@1.0.0',
-						},
-						inverseName: 'is attached to',
-					},
-					requires: [],
-					capabilities: [],
-				},
-				options,
-			),
-		]);
-	}
-	return insertedObject;
-};
-
 export interface PostgresBackendOptions {
 	database: string;
 	connectRetryDelay?: number;
@@ -467,7 +193,6 @@ export interface PostgresBackendOptions {
 	connectionTimeoutMillis?: number; // this is also used for waiting for a connection from the pool
 	keepAlive?: boolean;
 	max?: number; // pool size
-	maxUses?: number; // recycle connection after
 }
 
 const defaultPgOptions: Partial<PostgresBackendOptions> = {
@@ -481,26 +206,16 @@ const defaultPgOptions: Partial<PostgresBackendOptions> = {
 };
 
 /*
- * This class implements various low-level methods to interact
- * with cards on PostgreSQL, such as:
- *
- * - Getting cards by their primary keys
- * - Querying a database with JSON Schema
- * - Maintaining and traversing link relationships
- * - Streaming from a database using JSON Schema
- *
- * Notice that at this point we don't have any concepts of
- * permissions. The layers above this class will apply permissions
- * to queries and delegate the fully expanded queries to this
- * class.
+ * This class implements CRUD operations and streaming for contracts, backed by
+ * Postgres.
  */
-export class PostgresBackend implements Queryable {
-	public connection?: DatabaseConnection | null;
-	options: PostgresBackendOptions;
-	database: string;
-	connectRetryDelay: number;
-	streamClient?: streams.Streamer;
-	private dbMigrationsPerformed = false;
+export class PostgresBackend implements Database {
+	public pool: Pool | null = null;
+	private options: PostgresBackendOptions;
+	private databaseName: string;
+	private connectRetryDelay: number;
+	private streamClient: streams.Streamer | null = null;
+	private hasInitializedOnce = false;
 
 	/*
 	 * The constructor takes:
@@ -510,13 +225,11 @@ export class PostgresBackend implements Queryable {
 	 * - A set of rich errors classes the instance can throw
 	 * - Various connection options
 	 */
-	constructor(
-		public cache: Cache | null,
-		public errors: { [key: string]: typeof TypedError },
+	public constructor(
+		private cache: Cache | null,
 		options: PostgresBackendOptions,
 	) {
 		this.cache = cache;
-		this.errors = errors;
 		/*
 		 * Omit the options that are falsy, like empty strings.
 		 */
@@ -527,7 +240,7 @@ export class PostgresBackend implements Queryable {
 		 * different databases for parallel automated testing
 		 * purposes.
 		 */
-		this.database = options.database.toLowerCase();
+		this.databaseName = options.database.toLowerCase();
 		// The amount of time in milliseconds to wait before performing subsequent connect/reconnect attempts.
 		this.connectRetryDelay = _.isNumber(options.connectRetryDelay)
 			? options.connectRetryDelay
@@ -550,18 +263,36 @@ export class PostgresBackend implements Queryable {
 	 * 3. Disconnect, and create a new connection to the database
 	 *    that we're actually interested in
 	 */
-	async connect(context: Context): Promise<true> {
+	async connect(context: Context) {
+		const ourContext = new Context(context.getLogContext(), this);
+		while (true) {
+			try {
+				await this.tryConnect(ourContext);
+
+				return;
+			} catch (error: unknown) {
+				context.warn(
+					`Connection to database failed. Retrying in ${this.connectRetryDelay} milliseconds`,
+					{ error },
+				);
+				await Bluebird.delay(this.connectRetryDelay);
+			}
+		}
+	}
+
+	private async tryConnect(context: Context) {
 		/*
 		 * Drop any existing connection so we don't risk having any leaks.
 		 */
 		await this.disconnect(context);
 
 		/*
-		 * Lets connect to the default database, that should always be
-		 * available.
+		 * Connect to the default database. It should always be available.
 		 */
-		context.info('Connecting to database', { database: this.database });
-		this.connection = pgp({
+		context.info('Connecting to database', {
+			databaseName: this.databaseName,
+		});
+		this.pool = new Pool({
 			...defaultPgOptions,
 			...this.options,
 			port: Number(this.options.port),
@@ -569,106 +300,101 @@ export class PostgresBackend implements Queryable {
 		});
 
 		/*
-		 * This is an arbitrary request just to make sure that the
-		 * connection was made successfully. Retry connection on fail.
+		 * This is an arbitrary request just to make sure that the connection
+		 * was made successfully. Retry connection on fail.
 		 */
-		try {
-			const { version } = await this.connection.query('select version()');
-			context.info('Connection to database successful!', { version });
-		} catch (error) {
-			context.warn('Connection to database failed', { error });
-			await Bluebird.delay(this.connectRetryDelay);
-			return this.connect(context);
-		}
+		const [{ version }] = (await this.pool.query('select version()')).rows;
+		context.info('Connection to database successful!', { version });
 
 		/*
-		 * List all available databases so we know if we have to
-		 * create the one that the client specified or not.
+		 * List all available databases so we know if we have to create the
+		 * one that the client specified or not.
 		 *
-		 * Notice that the "pg_database" table may contain database
-		 * templates, which we are of course not interested in.
-		 * See: https://www.postgresql.org/docs/9.3/manage-ag-templatedbs.html
+		 * Notice that the "pg_database" table may contain database templates,
+		 * which we are of course not interested in. See:
+		 * https://www.postgresql.org/docs/9.3/manage-ag-templatedbs.html
 		 */
 		context.debug('Listing databases');
 		const databases = _.map(
-			await this.connection.any(`
-			SELECT datname FROM pg_database
-			WHERE datistemplate = false;`),
+			(
+				await this.pool.query(`
+					SELECT datname FROM pg_database
+					WHERE datistemplate = false
+				`)
+			).rows,
 			'datname',
 		);
 
 		/*
-		 * Of course, we only want to create the database if it doesn't
-		 * exist. Too bad that Postgres doesn't support an "IF NOT EXISTS"
-		 * modified on "CREATE DATABASE" so we could avoid these checks.
+		 * Of course, we only want to create the database if it doesn't exist.
+		 * Too bad that Postgres doesn't support an "IF NOT EXISTS" with
+		 * "CREATE DATABASE" so we could avoid these checks.
 		 */
-		if (!databases.includes(this.database)) {
-			context.debug('Creating database', { database: this.database });
-
+		if (!databases.includes(this.databaseName)) {
 			/*
 			 * The owner of the database should be the user that the client
 			 * specified.
-			 *
-			 * TODO(jviotti): There is a possible issue where the database
-			 * exists, but it was created with another user as an owner. In such
-			 * case we would see that the database exists, we would not create
-			 * it again, but then we might fail to do the operations we need
-			 * because it doesn't belong to us.
 			 */
+			context.debug('Creating database', { databaseName: this.databaseName });
 			try {
-				await this.connection.any(`
-					CREATE DATABASE ${this.database} OWNER = ${this.options.user};`);
+				await this.pool.query(`
+					CREATE DATABASE ${this.databaseName}
+					OWNER = ${this.options.user}
+				`);
 			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
 				}
 			}
-
-			/*
-			 * If the database is fresh, then the in-memory cache should be
-			 * as well.
-			 */
-			if (this.cache) {
-				await this.cache.reset();
-			}
 		}
 
 		/*
-		 * At this point we either created the desired database, or
-		 * confirmed that it exists, so lets disconnect from the
-		 * default database and connect to the one we're interested in.
+		 * If the database is fresh, then the in-memory cache should be
+		 * as well.
+		 */
+		await this.cache?.reset();
+
+		/*
+		 * At this point we either created the desired database, or confirmed
+		 * that it exists, so lets disconnect from the default database and
+		 * connect to the one we're interested in.
 		 */
 		await this.disconnect(context);
-		this.connection = pgp({
+		this.pool = new Pool({
 			...defaultPgOptions,
 			...this.options,
-			database: this.options.database,
+			database: this.databaseName,
 			port: Number(this.options.port),
 		});
 
-		this.connection.$pool.on('error', (error: { code: any; message: any }) => {
-			context.warn('Backend connection pool error', {
-				code: error.code,
-				message: error.message,
-			});
+		/*
+		 * Add an error handler.
+		 */
+		this.pool.on('error', (err: Error) => {
+			context.error('Backend connection pool error', err);
 		});
+
+		/*
+		 * Initialize streams.
+		 */
+		this.streamClient = await streams.start(context, cards.TABLE);
+
+		/*
+		 * Everything from this point on is unecessary if we know that
+		 * `connect` was called successfully at least once.
+		 */
+		if (this.hasInitializedOnce) {
+			return;
+		}
 
 		await this.runDbMigrations(context);
 
-		this.streamClient = await streams.start(
-			context,
-			this,
-			this.connection,
-			cards.TABLE,
-			cards.TRIGGER_COLUMNS,
-		);
-
-		return true;
+		this.hasInitializedOnce = true;
 	}
 
 	private async executeIfDbSchemaIsOutdated(
 		context: Context,
-		migrationsCb: () => Promise<any>,
+		migrationsCb: (context: Context) => Promise<any>,
 	) {
 		const migrationsTable = 'jf_db_migrations';
 		const migrationsId = 0;
@@ -676,84 +402,102 @@ export class PostgresBackend implements Queryable {
 		// "IF NOT EXISTS" is (unexpectedly) not thread safe. This is only a problem on the very first start and any "real"
 		// error will be catched by the subsequent SQL statements.
 		try {
-			await this.any(`CREATE TABLE IF NOT EXISTS ${migrationsTable} (
-				id INTEGER PRIMARY KEY NOT NULL,
-				version TEXT NOT NULL,
-				updated_at TIMESTAMP WITH TIME ZONE
-			);`);
+			await context.runQuery(`
+				CREATE TABLE IF NOT EXISTS ${migrationsTable} (
+					id INTEGER PRIMARY KEY NOT NULL,
+					version TEXT NOT NULL,
+					updated_at TIMESTAMP WITH TIME ZONE
+				)
+			`);
 		} catch (err: any) {
 			context.warn('ignoring initial DB error', err);
 		}
-		await this.any({
-			name: `insert-first-migration`,
-			text: `INSERT INTO ${migrationsTable} (id, version, updated_at) VALUES ($1, $2, now()) ON CONFLICT (id) DO NOTHING;`,
-			values: [migrationsId, '0.0.0'],
-		});
-		await this.withTransaction(async () => {
-			const [{ version }] = await this.any({
-				name: `get-migration-state`,
-				text: `SELECT id, version, updated_at FROM ${migrationsTable} WHERE id=$1 FOR UPDATE;`,
-				values: [migrationsId],
-			});
+		await context.runQuery(
+			`
+			INSERT INTO ${migrationsTable} (id, version, updated_at)
+			VALUES ($1, $2, now())
+			ON CONFLICT (id) DO NOTHING
+			`,
+			[migrationsId, '0.0.0'],
+		);
+		await context.withTransaction(
+			TransactionIsolation.Atomic,
+			async (transactionContext: Context) => {
+				const [{ version }] = await transactionContext.query(
+					`
+					SELECT id, version, updated_at
+					FROM ${migrationsTable}
+					WHERE id=$1
+					FOR UPDATE
+					`,
+					[migrationsId],
+				);
 
-			// Checking for newer versions instead of just testing for inequality ensures that a restarting pod
-			// that is running an old version will not interfere with a new version being rolled out.
-			// We could do better than just checking for the version of course, but that is better left to a proper migration framework
-			const willRunMigrations = semver.compare(version, coreVersion) === -1;
-			context.info('Preparing DB migrations', {
-				dbVersion: version,
-				coreVersion,
-				willRunMigrations,
-			});
-			if (!willRunMigrations) {
-				context.info('DB schema is up to date. No migrations will be run');
-				return;
-			}
-			await migrationsCb();
-			await this.any({
-				name: `update-migration-version`,
-				text: `UPDATE ${migrationsTable} SET version=$1, updated_at=now() WHERE id=$2;`,
-				values: [coreVersion, migrationsId],
-			});
-		});
+				// Checking for newer versions instead of just testing for inequality ensures that a restarting pod
+				// that is running an old version will not interfere with a new version being rolled out.
+				// We could do better than just checking for the version of course, but that is better left to a proper migration framework
+				const willRunMigrations = semver.compare(version, coreVersion) === -1;
+				transactionContext.info('Preparing DB migrations', {
+					dbVersion: version,
+					coreVersion,
+					willRunMigrations,
+				});
+				if (!willRunMigrations) {
+					transactionContext.info(
+						'DB schema is up to date. No migrations will be run',
+					);
+					return;
+				}
+				await migrationsCb(transactionContext);
+				await transactionContext.runQuery(
+					`
+					UPDATE ${migrationsTable}
+					SET version=$1, updated_at=now()
+					WHERE id=$2
+					`,
+					[coreVersion, migrationsId],
+				);
+			},
+		);
 		context.info('DB migrations finished');
 	}
 
 	private async runDbMigrations(context: Context) {
-		if (this.dbMigrationsPerformed) {
-			context.info(
-				'DB migrations have run in this session before. Skipping them...',
-			);
-			return;
-		}
-		await this.executeIfDbSchemaIsOutdated(context, async () => {
-			try {
-				await cards.setup(context, this, this.database);
-			} catch (error: any) {
-				if (!isIgnorableInitError(error.code)) {
-					throw error;
+		await this.executeIfDbSchemaIsOutdated(
+			context,
+			async (childContext: Context) => {
+				try {
+					await cards.setup(childContext, this);
+				} catch (error: any) {
+					if (!isIgnorableInitError(error.code)) {
+						throw error;
+					}
 				}
-			}
 
-			try {
-				await links.setup(context, this, this.database, {
-					cards: cards.TABLE,
-				});
-			} catch (error: any) {
-				if (!isIgnorableInitError(error.code)) {
-					throw error;
+				try {
+					await links.setup(childContext, this, this.databaseName, {
+						cards: cards.TABLE,
+					});
+				} catch (error: any) {
+					if (!isIgnorableInitError(error.code)) {
+						throw error;
+					}
 				}
-			}
 
-			try {
-				await streams.setupTrigger(this, cards.TABLE, cards.TRIGGER_COLUMNS);
-			} catch (error: any) {
-				if (!isIgnorableInitError(error.code)) {
-					throw error;
+				try {
+					await streams.setupTrigger(
+						childContext,
+						cards.TABLE,
+						cards.TRIGGER_COLUMNS,
+					);
+				} catch (error: any) {
+					if (!isIgnorableInitError(error.code)) {
+						throw error;
+					}
 				}
-			}
-		});
-		this.dbMigrationsPerformed = true;
+			},
+		);
+		this.hasInitializedOnce = true;
 	}
 
 	/*
@@ -761,17 +505,18 @@ export class PostgresBackend implements Queryable {
 	 * Postgres, and its mainly used during automated testing.
 	 */
 	async disconnect(context: Context) {
-		await this.streamClient?.close();
+		await this.streamClient?.disconnect();
+		this.streamClient = null;
 
 		/*
 		 * Close the main connection pool.
 		 */
-		if (this.connection) {
-			context.debug('Disconnecting from database', { database: this.database });
-			await this.connection.$pool.end();
-			// TS-TODO: Why is $destroy not a method on the type definition?
-			await (this.connection as any).$destroy();
-			this.connection = null;
+		if (this.pool) {
+			context.debug('Disconnecting from database', {
+				databaseName: this.databaseName,
+			});
+			await this.pool.end();
+			this.pool = null;
 		}
 	}
 
@@ -779,22 +524,24 @@ export class PostgresBackend implements Queryable {
 	 * Drop the database tables.
 	 */
 	async drop(context: Context) {
-		if (!this.connection) {
+		if (!this.pool) {
 			return;
 		}
 
-		context.debug('Dropping database tables', { database: this.database });
+		context.debug('Dropping database tables', {
+			databaseName: this.databaseName,
+		});
 
-		await this.any(`DROP TABLE ${cards.TABLE}, ${links.TABLE} CASCADE`);
+		await context.query(`DROP TABLE ${cards.TABLE}, ${links.TABLE} CASCADE`);
 	}
 
 	/*
 	 * Reset the database state.
 	 */
 	async reset(context: Context) {
-		context.debug('Resetting database', { database: this.database });
+		context.debug('Resetting database', { databaseName: this.databaseName });
 
-		await this.any(`TRUNCATE ${links.TABLE}, ${cards.TABLE};`);
+		await context.runQuery(`TRUNCATE ${links.TABLE}, ${cards.TABLE}`);
 	}
 
 	/*
@@ -805,7 +552,7 @@ export class PostgresBackend implements Queryable {
 		context: Context,
 		object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 	) {
-		return upsertObject<T>(context, this, object, {
+		return this.upsertObject<T>(context, object, {
 			replace: false,
 		});
 	}
@@ -821,9 +568,8 @@ export class PostgresBackend implements Queryable {
 			replace?: boolean;
 		} = {},
 	): Promise<T> {
-		return upsertObject(
+		return this.upsertObject(
 			context,
-			this,
 			object,
 			Object.assign({}, options, {
 				replace: true,
@@ -831,34 +577,197 @@ export class PostgresBackend implements Queryable {
 		);
 	}
 
-	/*
-	 * Execute a provided callback within a transaction.
-	 */
-	async withTransaction(
-		callback: () => Promise<any>,
+	private async upsertObject<T extends Contract = Contract>(
+		context: Context,
+		object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 		options: {
-			tag?: string;
-			mode?: pgPromise.TransactionMode;
+			replace?: boolean;
 		} = {},
-	) {
-		options.tag = options.tag || `transaction_${uuidv4()}`;
-		if (currentTransaction.getStore()) {
-			// Already in a transaction, just execute the provided callback.
-			const results = await callback();
-			return results;
-		} else {
-			// Not already in a transaction, execute callback in a new transaction.
-			nativeAssert(!!this.connection, 'Database connection required!');
-			return this.connection.tx(
-				options,
-				async (transaction: pgPromise.ITask<{}>) => {
-					return await currentTransaction.run(
-						transaction,
-						async () => await callback(),
-					);
+	): Promise<T> {
+		const insertedObject = await cards.upsert<T>(context, object, {
+			replace: options.replace,
+		});
+		await this.cache?.set(cards.TABLE, insertedObject);
+		const baseType = insertedObject.type.split('@')[0];
+		if (baseType === 'link') {
+			await links.upsert(context, insertedObject as any as LinkContract);
+
+			// TODO: Check if we still need to materialize links here
+			// We only "materialize" links in this way because we haven't
+			// come up with a better way to traverse links while streaming.
+			// Ideally we should leverage the database, using joins, rather
+			// than doing all this client side.
+			const { fromCard, toCard } = await Bluebird.props({
+				fromCard: this.getElementById(
+					context,
+					(insertedObject as any).data.from.id ||
+						(insertedObject as any).data.from,
+				),
+				toCard: this.getElementById(
+					context,
+					(insertedObject as any).data.to.id || insertedObject.data.to,
+				),
+			});
+
+			// The reversed array is used so that links are parsed in both directions
+			await Bluebird.map(
+				[
+					[fromCard, toCard],
+					[toCard, fromCard],
+				],
+				async (linkCards) => {
+					if (!linkCards[0] || !linkCards[1]) {
+						return;
+					}
+
+					const updatedCard = insertedObject.active
+						? links.addLink(
+								insertedObject as any as LinkContract,
+								linkCards[0],
+								linkCards[1],
+						  )
+						: links.removeLink(
+								insertedObject as any as LinkContract,
+								linkCards[0],
+						  );
+
+					await cards.materializeLink(context, updatedCard);
+					await this.cache?.unset(updatedCard);
 				},
 			);
 		}
+		// If a type was inserted, any indexed fields declared on the type card should be
+		// created
+		if (baseType === 'type') {
+			if (insertedObject.data.indexed_fields) {
+				for (const fields of (insertedObject as any).data.indexed_fields) {
+					await this.createTypeIndex(context, fields, insertedObject);
+				}
+			}
+			// Find full-text search fields for type cards and create search indexes
+			const fullTextSearchFields = cards.parseFullTextSearchFields(
+				context,
+				(insertedObject as any).data.schema,
+			);
+			if (fullTextSearchFields.length) {
+				await this.createFullTextSearchIndex(
+					context,
+					`${insertedObject.slug}@${insertedObject.version}`,
+					fullTextSearchFields,
+				);
+			}
+		}
+		// Upserting `user` contracts causes two other contracts to be upserted and
+		// two links to be added while we are migrating to a new permission system.
+		// See:
+		// https://jel.ly.fish/improvement-jip-remove-field-level-permissions-8d561c94-2d33-4026-829c-272600018558
+		if (baseType === 'user') {
+			const userContract = insertedObject as any;
+			let settings = {};
+			if ('profile' in userContract.data) {
+				settings = _.pick(userContract.data.profile, [
+					'type',
+					'homeView',
+					'activeLoop',
+					'sendCommand',
+					'disableNotificationSound',
+					'starredViews',
+					'viewSettings',
+				]);
+			}
+			const [authenticationContract, personalSettingsContract] =
+				await Promise.all([
+					this.upsertObject(
+						context,
+						{
+							slug: 'authentication-' + userContract.slug,
+							version: userContract.version,
+							type: 'authentication@1.0.0',
+							active: userContract.active,
+							created_at: userContract.created_at,
+							markers: userContract.markers,
+							tags: [],
+							data: _.pick(userContract.data, ['hash', 'oauth']),
+							requires: [],
+							capabilities: [],
+						},
+						options,
+					),
+					this.upsertObject(
+						context,
+						{
+							slug: 'user-settings-' + userContract.slug,
+							version: userContract.version,
+							type: 'user-settings@1.0.0',
+							active: userContract.active,
+							created_at: userContract.created_at,
+							markers: userContract.markers,
+							tags: [],
+							data: settings,
+							requires: [],
+							capabilities: [],
+						},
+						options,
+					),
+				]);
+			await Promise.all([
+				this.upsertObject(
+					context,
+					{
+						slug: 'link-' + userContract.id + '-' + authenticationContract.id,
+						version: '1.0.0',
+						type: 'link@1.0.0',
+						name: 'is authenticated with',
+						active: true,
+						created_at: userContract.created_at,
+						markers: userContract.markers,
+						tags: [],
+						data: {
+							from: {
+								id: userContract.id,
+								type: 'user@1.0.0',
+							},
+							to: {
+								id: authenticationContract.id,
+								type: 'authentication@1.0.0',
+							},
+							inverseName: 'authenticates',
+						},
+						requires: [],
+						capabilities: [],
+					},
+					options,
+				),
+				this.upsertObject(
+					context,
+					{
+						slug: 'link-' + userContract.id + '-' + personalSettingsContract.id,
+						version: '1.0.0',
+						type: 'link@1.0.0',
+						name: 'has attachment',
+						active: true,
+						created_at: userContract.created_at,
+						markers: userContract.markers,
+						tags: [],
+						data: {
+							from: {
+								id: userContract.id,
+								type: 'user@1.0.0',
+							},
+							to: {
+								id: personalSettingsContract.id,
+								type: 'user-settings@1.0.0',
+							},
+							inverseName: 'is attached to',
+						},
+						requires: [],
+						capabilities: [],
+					},
+					options,
+				),
+			]);
+		}
+		return insertedObject;
 	}
 
 	/**
@@ -889,78 +798,98 @@ export class PostgresBackend implements Queryable {
 		// "IF NOT EXISTS" is (unexpectedly) not thread safe. This is only a problem on the very first start and any "real"
 		// error will be catched by the subsequent SQL statements.
 		try {
-			await this.any(`CREATE TABLE IF NOT EXISTS ${INDEX_TABLE} (
-				index_name TEXT PRIMARY KEY NOT NULL,
-				table_name TEXT NOT NULL,
-				sql TEXT NOT NULL,
-				type_slug TEXT NOT NULL DEFAULT '',
-				version TEXT NOT NULL,
-				updated_at TIMESTAMP WITH TIME ZONE NOT NULL
-			);`);
+			await context.query(`
+				CREATE TABLE IF NOT EXISTS ${INDEX_TABLE} (
+					index_name TEXT PRIMARY KEY NOT NULL,
+					table_name TEXT NOT NULL,
+					sql TEXT NOT NULL,
+					type_slug TEXT NOT NULL DEFAULT '',
+					version TEXT NOT NULL,
+					updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+				)
+			`);
 		} catch (err: any) {
 			context.warn('ignoring initial DB error', err);
 		}
 
-		const uniqueFlag = unique ? 'UNIQUE ' : '';
-		const createIndexStatement = `CREATE ${uniqueFlag}INDEX IF NOT EXISTS "${indexName}" ON ${tableName} ${predicate}`;
-		await this.withTransaction(async () => {
-			// Lock index table to make other index creation executions wait.
-			await this.any({
-				name: 'lock-index-table',
-				text: `LOCK TABLE ${INDEX_TABLE} IN EXCLUSIVE MODE`,
-			});
+		await context.withTransaction(
+			TransactionIsolation.Atomic,
+			async (transactionContext: Context) => {
+				// Lock index table to make other index creation executions wait.
+				await transactionContext.runQuery(
+					`LOCK TABLE ${INDEX_TABLE} IN EXCLUSIVE MODE`,
+				);
 
-			// Get current index state
-			const [state] = await this.any({
-				name: 'get-index-state',
-				text: `SELECT sql,version FROM ${INDEX_TABLE} WHERE index_name=$1;`,
-				values: [indexName],
-			});
+				// Remove timeouts for this transaction only
+				await transactionContext.runQuery('SET LOCAL statement_timeout=0');
 
-			if (!state) {
-				// Create index if it doesn't already exist.
-				context.info('Creating index', {
-					tableName,
-					indexName,
-				});
+				// Get current index state
+				const [state] = await transactionContext.query(
+					`
+					SELECT sql,version
+					FROM ${INDEX_TABLE}
+					WHERE index_name=$1
+					`,
+					[indexName],
+				);
 
-				// Create index.
-				await this.task(async (task) => {
-					await task.any('SET statement_timeout=0');
-					await task.any(createIndexStatement);
-				});
+				const uniqueFlag = unique ? 'UNIQUE ' : '';
+				const createIndexStatement = `
+				CREATE ${uniqueFlag}INDEX IF NOT EXISTS "${indexName}"
+				ON ${tableName} ${predicate}
+				`;
 
-				// Update record in indexes table.
-				await this.any({
-					name: `insert-index-state`,
-					text: `INSERT INTO ${INDEX_TABLE} (index_name,table_name,sql,type_slug,version,updated_at) VALUES ($1, $2, $3, $4, $5, now());`,
-					values: [
-						indexName,
+				if (!state) {
+					// Create index if it doesn't already exist.
+					transactionContext.info('Creating index', {
 						tableName,
-						createIndexStatement,
-						typeSlug.split('@')[0],
-						version,
-					],
-				});
-			} else if (
-				createIndexStatement !== state.sql &&
-				semver.compare(state.version, version) === -1
-			) {
-				// TODO: Add index recreate logic once type-based index version
-				// story is figured out.
-				// https://jel.ly.fish/thread-fc77a33f-1ece-488c-9a3e-4ac501241d7a
-				// https://jel.ly.fish/199e3575-d679-4d15-bae5-b94edf076581
+						indexName,
+					});
 
-				// Output log to track how often this happens.
-				context.info('Should recreate index', {
-					tableName,
-					indexName,
-					typeSlug,
-					version,
-					createIndexStatement,
-				});
-			}
-		});
+					// Create index.
+					await transactionContext.runQuery(createIndexStatement);
+
+					// Update record in indexes table.
+					await transactionContext.query(
+						`
+						INSERT INTO ${INDEX_TABLE}(
+							index_name,
+							table_name,
+							sql,
+							type_slug,
+							version,
+							updated_at
+						)
+						VALUES ($1, $2, $3, $4, $5, now())
+						`,
+						[
+							indexName,
+							tableName,
+							createIndexStatement,
+							typeSlug.split('@')[0],
+							version,
+						],
+					);
+				} else if (
+					createIndexStatement !== state.sql &&
+					semver.compare(state.version, version) === -1
+				) {
+					// TODO: Add index recreate logic once type-based index version
+					// story is figured out.
+					// https://jel.ly.fish/thread-fc77a33f-1ece-488c-9a3e-4ac501241d7a
+					// https://jel.ly.fish/199e3575-d679-4d15-bae5-b94edf076581
+
+					// Output log to track how often this happens.
+					transactionContext.info('Should recreate index', {
+						tableName,
+						indexName,
+						typeSlug,
+						version,
+						createIndexStatement,
+					});
+				}
+			},
+		);
 	}
 
 	/*
@@ -982,7 +911,7 @@ export class PostgresBackend implements Queryable {
 		 * Make a database request if we didn't have luck with
 		 * the cache.
 		 */
-		const result = await cards.getById(context, this, id);
+		const result = await cards.getById(context, id);
 		if (this.cache) {
 			if (result) {
 				/*
@@ -1016,7 +945,7 @@ export class PostgresBackend implements Queryable {
 		const [base, version] = slug.split('@');
 		context.assertInternal(
 			version && version !== 'latest',
-			this.errors.JellyfishInvalidVersion,
+			errors.JellyfishInvalidVersion,
 			`Missing version suffix in slug: ${slug}`,
 		);
 
@@ -1039,7 +968,7 @@ export class PostgresBackend implements Queryable {
 		 * Make a database request if we didn't have luck with
 		 * the cache.
 		 */
-		const result = await cards.getBySlug(context, this, slug, options);
+		const result = await cards.getBySlug(context, slug, options);
 		if (this.cache) {
 			if (result) {
 				/*
@@ -1127,7 +1056,7 @@ export class PostgresBackend implements Queryable {
 		 * so lets ask the database for them.
 		 */
 
-		const elements = await cards.getManyById(context, this, uncached);
+		const elements = await cards.getManyById(context, uncached);
 		if (this.cache) {
 			/*
 			 * Store the ones we found in the in-memory cache.
@@ -1175,13 +1104,12 @@ export class PostgresBackend implements Queryable {
 
 		context.assertUser(
 			isValidLimit,
-			this.errors.JellyfishInvalidLimit,
+			errors.JellyfishInvalidLimit,
 			`Query limit must be a finite integer less than ${MAXIMUM_QUERY_LIMIT}: ${options.limit}`,
 		);
 
-		const results = await queryTable(
+		const results = await this.queryTable(
 			context,
-			this,
 			cards.TABLE,
 			select,
 			schema,
@@ -1195,58 +1123,52 @@ export class PostgresBackend implements Queryable {
 		return results;
 	}
 
-	prepareQueryForStream(
+	private async queryTable(
 		context: Context,
-		name: string,
+		table: string,
 		select: SelectObject,
 		schema: JsonSchema,
-		options: SqlQueryOptions,
+		options: BackendQueryOptions,
 	) {
+		const mode = options.profile ? 'info' : 'debug';
+
+		context[mode]('Querying from table', {
+			table,
+			databaseName: this.databaseName,
+			limit: options.limit,
+			skip: options.skip,
+			sortBy: options.sortBy,
+			profile: options.profile,
+		});
+
+		if (options.limit <= 0) {
+			return [];
+		}
+
 		const { query, queryGenTime } = compileSchema(
 			context,
-			cards.TABLE,
+			table,
 			select,
 			schema,
-			{
-				limit: 1,
-				extraFilter: `${cards.TABLE}.id = $1`,
-				...options,
-			},
-			this.errors,
+			options,
 		);
 
-		const preparedQuery = new pgp.PreparedStatement({
-			name,
-			text: query,
-		});
+		const { elements, queryTime, postProcessTime } = await runQuery(
+			context,
+			schema,
+			query,
+		);
 
-		context.debug('Prepared stream query for table', {
-			table: cards.TABLE,
-			database: this.database,
+		context[mode]('Query database response', {
+			table,
+			databaseName: this.databaseName,
+			count: elements.length,
 			preProcessingTime: queryGenTime,
+			queryTime,
+			postProcessingTime: postProcessTime,
 		});
 
-		return async (id: any) => {
-			const { results, queryTime } = await runQuery(
-				context,
-				schema,
-				preparedQuery,
-				this,
-				[id],
-			);
-
-			const { elements, postProcessTime } = postProcessResults(results);
-
-			context.debug('Prepared query database response', {
-				table: cards.TABLE,
-				database: this.database,
-				count: elements.length,
-				queryTime,
-				postProcessingTime: postProcessTime,
-			});
-
-			return elements;
-		};
+		return elements;
 	}
 
 	/*
@@ -1272,7 +1194,6 @@ export class PostgresBackend implements Queryable {
 	 * stream and resolve links and JSON Schema filtering client side.
 	 */
 	async stream(
-		context: Context,
 		select: SelectObject,
 		schema: JsonSchema,
 		options: SqlQueryOptions = {},
@@ -1285,7 +1206,7 @@ export class PostgresBackend implements Queryable {
 			schemaOnly: true,
 		});
 
-		return this.streamClient.attach(context, select, schema, options);
+		return this.streamClient.attach(select, schema, options);
 	}
 
 	/*
@@ -1301,6 +1222,7 @@ export class PostgresBackend implements Queryable {
 			},
 		};
 	}
+
 	/*
 	 * Creates a partial index on "fields" constrained by the provided "type"
 	 */
@@ -1311,6 +1233,7 @@ export class PostgresBackend implements Queryable {
 	) {
 		await cards.createTypeIndex(context, this, fields, schema);
 	}
+
 	/*
 	 * Creates a partial index on fields denoted as being targets for full-text searches
 	 */
@@ -1322,25 +1245,17 @@ export class PostgresBackend implements Queryable {
 		await cards.createFullTextSearchIndex(context, this, type, fields);
 	}
 
-	private getConnection() {
-		const connection = currentTransaction.getStore() || this.connection;
-		nativeAssert(!!connection, 'Database connection required');
-		return connection;
+	/**
+	 * Retrieve a new connection from the pool.
+	 */
+	public async getConnection(): Promise<PoolClient> {
+		return this.pool!.connect();
 	}
 
-	isConnected(): boolean {
-		return !!this.connection;
-	}
-	pgConnect() {
-		return this.connection!.connect();
-	}
-	any<T = any>(...args: Parameters<DatabaseConnection['any']>): Promise<T[]> {
-		return this.getConnection().any(...args);
-	}
-	one<T = any>(...args: [pgPromise.QueryParam, any?]): Promise<T> {
-		return this.getConnection().one<T>(...args);
-	}
-	task<T>(cb: (t: pgPromise.ITask<{}>) => Promise<T>) {
-		return this.getConnection().task(cb);
+	/**
+	 * Release the given connection back to the pool.
+	 */
+	public async releaseConnection(connection: PoolClient) {
+		connection.release();
 	}
 }

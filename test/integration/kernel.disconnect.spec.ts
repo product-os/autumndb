@@ -2,11 +2,11 @@ import { testUtils } from '../../lib';
 
 let ctx: testUtils.TestContext;
 
-beforeAll(async () => {
+beforeEach(async () => {
 	ctx = await testUtils.newContext();
 });
 
-afterAll(async () => {
+afterEach(async () => {
 	await testUtils.destroyContext(ctx);
 });
 
@@ -25,7 +25,7 @@ describe('Kernel', () => {
 		it('.disconnect() should gracefully close streams', async () => {
 			await expect(
 				(async () => {
-					await ctx.kernel.stream(ctx.logContext, ctx.kernel.sessions!.admin, {
+					await ctx.kernel.stream(ctx.logContext, ctx.kernel.adminSession()!, {
 						type: 'object',
 					});
 					await ctx.kernel.disconnect(ctx.logContext);

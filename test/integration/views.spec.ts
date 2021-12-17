@@ -1,15 +1,5 @@
-import { CARDS, Kernel, testUtils } from '../../lib';
+import { CARDS, Kernel } from '../../lib';
 import * as views from '../../lib/views';
-
-let ctx: testUtils.TestContext;
-
-beforeAll(async () => {
-	ctx = await testUtils.newContext();
-});
-
-afterAll(async () => {
-	await testUtils.destroyContext(ctx);
-});
 
 describe('views', () => {
 	describe('.getSchema()', () => {

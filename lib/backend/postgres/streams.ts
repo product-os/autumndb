@@ -1,24 +1,21 @@
-import * as _ from 'lodash';
-import * as Bluebird from 'bluebird';
-import * as pgFormat from 'pg-format';
-import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
 import * as metrics from '@balena/jellyfish-metrics';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import { EventEmitter } from 'events';
+import * as _ from 'lodash';
+import { Notification } from 'pg';
+import * as pgFormat from 'pg-format';
+import { v4 as uuidv4 } from 'uuid';
+import {
+	Context,
+	DatabaseNotificationHandler,
+	PreparedStatement,
+} from '../../context';
 import type {
 	BackendQueryOptions,
-	DatabaseBackend,
-	DatabaseConnection,
-	Queryable,
 	SelectObject,
 	SqlQueryOptions,
 } from './types';
-import type { Context } from '../../context';
-import type { IConnected } from 'pg-promise';
-import type { IClient } from 'pg-promise/typescript/pg-subset';
-import { strict as nativeAssert } from 'assert';
-import type { JsonSchema } from '@balena/jellyfish-types';
-
-type StreamConnection = IConnected<{}, IClient>;
+import * as backend from '.';
 
 interface EventPayload {
 	id: any;
@@ -34,33 +31,24 @@ const UNMATCH_EVENT = 'unmatch';
 
 export const start = async (
 	context: Context,
-	backend: DatabaseBackend,
-	connection: DatabaseConnection,
-	// The name of the table to stream changes from
 	table: string,
-	// The table columns that should be watched for updates
-	columns: string[],
-) => {
-	const streamer = new Streamer(backend, table);
-	await streamer.init(
-		context,
-		await connection.connect(),
-		columns,
-		backend.connectRetryDelay,
-	);
+): Promise<Streamer> => {
+	const streamer = new Streamer(context, table);
+	await streamer.connect();
+
 	return streamer;
 };
 
 export const setupTrigger = async (
-	connection: Queryable,
+	context: Context,
 	table: string,
 	columns: string[],
 ) => {
 	const tableIdent = pgFormat.ident(table);
 	const channel = `stream-${table}`;
 	const trigger = pgFormat.ident(`trigger-${channel}`);
-	await connection.any(
-		`CREATE OR REPLACE FUNCTION rowChanged() RETURNS TRIGGER AS $$
+	await context.runQuery(`
+		CREATE OR REPLACE FUNCTION rowChanged() RETURNS TRIGGER AS $$
 		DECLARE
 			id UUID;
 			slug TEXT;
@@ -101,126 +89,71 @@ export const setupTrigger = async (
 
 		DROP TRIGGER IF EXISTS ${trigger} ON ${tableIdent};
 
-		CREATE TRIGGER ${trigger} AFTER
-		INSERT OR
-		UPDATE OF ${columns.join(', ')} OR
-		DELETE
+		CREATE TRIGGER ${trigger}
+		AFTER
+			INSERT OR
+			UPDATE OF ${columns.join(', ')} OR
+			DELETE
 		ON ${tableIdent}
 		FOR EACH ROW EXECUTE PROCEDURE rowChanged(${pgFormat.literal(channel)});
-	`,
-	);
-};
-
-const startListen = async (connection: StreamConnection, table: string) => {
-	const channel = `stream-${table}`;
-	await connection.any(`LISTEN ${pgFormat.ident(channel)};`);
-};
-
-const handleNotification = async (streamer: Streamer, notification: any) => {
-	const payload = JSON.parse(notification.payload);
-	if (payload.table !== streamer.table) {
-		return;
-	}
-	await Promise.all(
-		Object.values(streamer.streams).map((stream) => {
-			return stream.push(payload);
-		}),
-	);
+	`);
 };
 
 export class Streamer {
-	backend: DatabaseBackend;
-	table: string;
-	connection: null | StreamConnection;
-	streams: { [id: string]: Stream };
+	private channel: string;
+	private streams: { [id: string]: Stream } = {};
+	private notificationHandler: DatabaseNotificationHandler | null = null;
 
-	constructor(backend: DatabaseBackend, table: string) {
-		this.backend = backend;
-		this.table = table;
-		this.connection = null;
-		this.streams = {};
-		this.notificationHandler = this.notificationHandler.bind(this);
+	constructor(private context: Context, public table: string) {
+		this.channel = `stream-${table}`;
+		this.notificationListener = this.notificationListener.bind(this);
 	}
 
-	async notificationHandler(notification: any) {
-		return handleNotification(this, notification);
-	}
-
-	errorHandler(context: Context, error: any) {
-		context.warn('Streamer database client error', {
-			code: error.code,
-			message: error.message,
-		});
-	}
-
-	async endHandler(
-		context: Context,
-		columns: string[],
-		connectRetryDelay: number,
-	) {
-		// Attempt reconnects to database on unexpected client ends.
-		// Expected ends are performed with Streamer.close(), which nullifies "this.connection" before disconnect.
-		if (this.connection) {
-			context.warn(
-				'Streamer database client disconnected, attempting reconnection',
-			);
-			let reconnecting = true;
-			while (reconnecting) {
-				try {
-					nativeAssert(
-						this.backend.isConnected(),
-						'Database connection required',
-					);
-
-					await this.init(
-						context,
-						await this.backend.pgConnect(),
-						columns,
-						connectRetryDelay,
-					);
-
-					context.info('Streamer database client reconnected');
-
-					reconnecting = false;
-				} catch (error: any) {
-					context.warn('Streamer database client reconnect attempt failed', {
-						code: error.code,
-						message: error.message,
-					});
-
-					await Bluebird.delay(connectRetryDelay);
-				}
-			}
+	async notificationListener(notification: Notification) {
+		if (notification.channel !== this.channel) {
+			return;
 		}
+
+		const payload = JSON.parse(notification.payload!);
+		await Promise.all(
+			Object.values(this.streams).map((stream) => {
+				return stream.push(payload);
+			}),
+		);
+	}
+
+	async relisten() {
+		this.context.error(
+			'Lost connection to the database notification stream. Reconnecting...',
+		);
+		await this.connect();
 	}
 
 	/**
 	 * @summary Initialize a streamer instance, and set up PG notify trigger
-	 * @function
-	 *
-	 * @param {Object} context - execution context
-	 * @param {Object} connection - pg.Client instance
-	 * @param {Array} columns - list of columns names used for trigger
-	 * @param {Number} connectRetryDelay - amount of time (ms) to wait between DB connect attempts
 	 *
 	 * @example
 	 * await streamer.init(context, await connection.connect(), columns, connectRetryDelay)
 	 */
-	async init(
-		context: Context,
-		connection: StreamConnection,
-		columns: string[],
-		connectRetryDelay: number,
-	) {
-		this.connection = connection;
-		await startListen(connection, this.table);
-		connection.client.on('notification', this.notificationHandler);
-		connection.client.on('error', (error) => {
-			this.errorHandler(context, error);
-		});
-		connection.client.on('end', async () => {
-			await this.endHandler(context, columns, connectRetryDelay);
-		});
+	async connect() {
+		await this.disconnect();
+
+		this.notificationHandler =
+			await this.context.listenForDatabaseNotifications(
+				this.channel,
+				this.notificationListener,
+				this.relisten,
+			);
+	}
+
+	async disconnect() {
+		await this.notificationHandler?.end();
+		this.notificationHandler = null;
+
+		for (const stream of Object.values(this.streams)) {
+			stream.close();
+		}
+		this.streams = {};
 	}
 
 	getAttachedStreamCount() {
@@ -228,29 +161,17 @@ export class Streamer {
 	}
 
 	async attach(
-		context: Context,
 		select: SelectObject,
 		schema: JsonSchema,
 		options: SqlQueryOptions = {},
 	) {
-		return new Stream(context, this, uuidv4(), select, schema, options);
-	}
-	async close() {
-		const connection = this.connection;
-		if (connection === null) {
-			return;
-		}
-		this.connection = null;
-		connection.client.removeListener('notification', this.notificationHandler);
-		for (const stream of Object.values(this.streams)) {
-			stream.close();
-		}
-		await connection.done();
+		return new Stream(this.context, this, uuidv4(), select, schema, options);
 	}
 
 	register(id: string, stream: Stream) {
 		this.streams[id] = stream;
 	}
+
 	unregister(id: string) {
 		if (this.streams !== null) {
 			Reflect.deleteProperty(this.streams, id);
@@ -266,7 +187,8 @@ export class Stream extends EventEmitter {
 	constCardId?: string;
 	constCardSlug?: string;
 	cardTypes: null | string[];
-	streamQuery: any;
+	streamQuery?: PreparedStatement;
+	schema: JsonSchema = false;
 
 	constructor(
 		context: Context,
@@ -278,12 +200,15 @@ export class Stream extends EventEmitter {
 	) {
 		super();
 		this.setMaxListeners(Infinity);
+
 		this.seenCardIds = new Set();
 		this.streamer = streamer;
 		this.id = id;
 		this.context = context;
 		this.cardTypes = null;
+
 		this.setSchema(select, schema, options);
+
 		context.info('Attaching new stream', {
 			id,
 			table: streamer.table,
@@ -319,25 +244,30 @@ export class Stream extends EventEmitter {
 			select.id = {};
 		}
 
-		const cards = await this.streamer.backend.query(
+		const { elements } = await backend.runQuery(
 			this.context,
-			select,
 			schema,
-			options,
+			backend.compileSchema(
+				this.context,
+				this.streamer.table,
+				select,
+				schema,
+				options,
+			).query,
 		);
 
-		for (const card of cards) {
-			this.seenCardIds.add(card.id);
+		for (const contract of elements) {
+			this.seenCardIds.add(contract.id);
 		}
 
 		// Remove the ID if that wasn't requested in the first place
 		if (!selectsId && !_.get(schema, ['additionalProperties'], true)) {
-			for (const card of cards) {
-				Reflect.deleteProperty(card, 'id');
+			for (const contract of elements) {
+				Reflect.deleteProperty(contract, 'id');
 			}
 		}
 
-		return cards;
+		return elements;
 	}
 
 	setSchema(
@@ -361,13 +291,14 @@ export class Stream extends EventEmitter {
 				this.cardTypes = deversionedTypes;
 			}
 		}
-		this.streamQuery = this.streamer.backend.prepareQueryForStream(
-			this.context,
-			this.id,
-			select,
-			schema,
-			options,
+		this.streamQuery = Context.prepareQuery(
+			backend.compileSchema(this.context, this.streamer.table, select, schema, {
+				limit: 1,
+				extraFilter: `${this.streamer.table}.id = $1`,
+				...options,
+			}).query,
 		);
+		this.schema = schema;
 	}
 
 	async push(payload: EventPayload) {
@@ -407,7 +338,11 @@ export class Stream extends EventEmitter {
 			return false;
 		}
 		try {
-			const result = await this.streamQuery(payload.id);
+			const result = (
+				await backend.runQuery(this.context, this.schema, this.streamQuery!, [
+					payload.id,
+				])
+			).elements;
 			if (result.length === 1) {
 				this.emit('data', {
 					id: payload.id,

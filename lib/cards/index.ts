@@ -1,3 +1,4 @@
+import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import { initialize } from './mixins';
 import { actionRequest } from './action-request';
 import { action } from './action';
@@ -19,7 +20,6 @@ import { oauthClient } from './oauth-client';
 import { scheduledAction } from './scheduled-action';
 import { authentication } from './authentication';
 import { userSettings } from './user-settings';
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 
 const cards = [
 	actionRequest,
