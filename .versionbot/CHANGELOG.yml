@@ -1,4 +1,26 @@
 - commits:
+    - subject: Rationalize the use of a "context"
+      hash: 522f21e00e63929766c8a1a105484c049975331f
+      body: |
+        Currently, many functions take an argument called `context`. This is
+        simply an arbitrary object that should be passed as first argument to
+        calls into the logging or assert libraries. This commit introduces a
+        `Context` class that encapsulates the logging context. It also exposes
+        logging and assert functions so that, for example, calls like
+        `logger.info(context, ...` are replaced by `context.info(...`.
+
+        In the future the `Context` class will carry more than just the log
+        context.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 8.2.1
+  date: 2021-12-17T10:08:00.584Z
+- commits:
     - subject: add ui-schema to errors
       hash: c1f5e3ceb6e7768dca134f1216b869014aeb2b5d
       body: ''
