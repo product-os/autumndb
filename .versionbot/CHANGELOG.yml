@@ -1,4 +1,25 @@
 - commits:
+    - subject: Set id for log context
+      hash: 89b2d99eb417729b29942e17d13a84e4942045e1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'patch: Update internal-patch'
+      hash: 0189a504a523dc8588786abf98a7393031b4b080
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.2.3
+  date: 2021-12-18T13:25:46.798Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to v4'
       hash: 7df6d348df9ab2903604efde36aeccfc7a94e543
       body: |
