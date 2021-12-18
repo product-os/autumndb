@@ -30,7 +30,9 @@ describe('jsonschema2sql', () => {
 			};
 
 			const sql = jsonschema2sql.compile(
-				new Context(null),
+				new Context({
+					id: 'jsonschema2sql-test',
+				}),
 				'cards',
 				{},
 				query,
