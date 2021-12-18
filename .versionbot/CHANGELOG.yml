@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: 6ee3e372266608cdd573d448289ba141032d07a4
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.2.4
+  date: 2021-12-18T13:40:09.924Z
+- commits:
     - subject: Set id for log context
       hash: 89b2d99eb417729b29942e17d13a84e4942045e1
       body: ''
