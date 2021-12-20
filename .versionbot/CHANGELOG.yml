@@ -1,4 +1,21 @@
 - commits:
+    - subject: >-
+        Restrict usage of `jellyfish-types` to only `JSONSchema` and the
+        contract types
+      hash: f4e200f7e865fb460ffed05f47f5122e843ad016
+      body: ''
+      footer:
+        Connects-to: 'https://github.com/product-os/jellyfish-types/issues/336'
+        connects-to: 'https://github.com/product-os/jellyfish-types/issues/336'
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 8.2.7
+  date: 2021-12-20T18:04:12.112Z
+- commits:
     - subject: 'Tentative fix for #1128'
       hash: 82d78dd87e93d386900d4e385aac7a620c0a42c8
       body: |
