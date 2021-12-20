@@ -1,5 +1,14 @@
 import { TypedError } from 'typed-error';
-import { JellyfishError } from '@balena/jellyfish-types';
+
+export interface JellyfishError extends Error {
+	/**
+	 * True if the error could be expected in normal circumstances.
+	 *
+	 * i.e. if expected is true, this error isn't a result of a bug
+	 * or an out-of-memory or segmentation-fault error etc.
+	 */
+	expected: boolean;
+}
 
 export class BaseTypedError extends TypedError implements JellyfishError {
 	expected: boolean = false;

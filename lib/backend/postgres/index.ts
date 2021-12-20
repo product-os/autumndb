@@ -11,7 +11,8 @@ import * as cards from './cards';
 import * as streams from './streams';
 import * as utils from './utils';
 import pgp from './pg-promise';
-import { core, JSONSchema } from '@balena/jellyfish-types';
+import { JSONSchema } from '@balena/jellyfish-types';
+import { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import { Contract, LinkContract } from '@balena/jellyfish-types/build/core';
 import {
 	BackendQueryOptions,
@@ -1305,7 +1306,7 @@ export class PostgresBackend implements Queryable {
 	async createTypeIndex(
 		context: Context,
 		fields: string[],
-		schema: core.ContractDefinition<any>,
+		schema: ContractDefinition<any>,
 	) {
 		await cards.createTypeIndex(context, this, fields, schema);
 	}

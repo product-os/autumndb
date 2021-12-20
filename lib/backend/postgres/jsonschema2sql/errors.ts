@@ -1,5 +1,5 @@
 import { TypedError } from 'typed-error';
-import { JellyfishError } from '@balena/jellyfish-types';
+import { JellyfishError } from '../../../errors';
 
 export class BaseTypedError extends TypedError implements JellyfishError {
 	expected: boolean = false;
