@@ -372,6 +372,13 @@ export class Kernel {
 	}
 
 	/**
+	 * Drop database tables.
+	 */
+	async drop(mixedContext: MixedContext) {
+		await this.backend.drop(Context.fromMixed(mixedContext));
+	}
+
+	/**
 	 * @summary Initialize the kernel
 	 * @function
 	 * @public
