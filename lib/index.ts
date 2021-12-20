@@ -1,19 +1,28 @@
-import { Kernel as CoreKernel } from './kernel';
-import { backend as CoreBackend } from './backend';
-import { Cache } from './cache';
-import * as coreErrors from './errors';
+import { LogContext } from '@balena/jellyfish-logger';
+import { Cache as MemoryCache } from './cache';
 import { CARDS } from './cards';
+import { backend as CoreBackend, PostgresBackendOptions } from './backend';
+import * as coreErrors from './errors';
+import { Kernel as CoreKernel } from './kernel';
 
 export * as cardMixins from './cards/mixins';
-// TODO: why would external modules need to access the `BackendObject`?
-export { CoreBackend, CoreKernel, coreErrors };
+export {
+	CoreBackend,
+	coreErrors,
+	CoreKernel,
+	MemoryCache,
+	PostgresBackendOptions,
+};
 
-export const MemoryCache = Cache;
 export const cards = CARDS;
 
-export const create = async (context: any, cache: any, options: any) => {
-	const backend = new CoreBackend(cache, coreErrors, options.backend);
+export const create = async (
+	logContext: LogContext,
+	cache: MemoryCache | null,
+	options: PostgresBackendOptions,
+) => {
+	const backend = new CoreBackend(cache, coreErrors, options);
 	const kernel = new CoreKernel(backend);
-	await kernel.initialize(context);
+	await kernel.initialize(logContext);
 	return kernel;
 };
