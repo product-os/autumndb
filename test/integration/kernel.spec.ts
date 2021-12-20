@@ -3,9 +3,10 @@ import * as Bluebird from 'bluebird';
 import { v4 as uuid } from 'uuid';
 import * as errors from '../../lib/errors';
 import { CARDS } from '../../lib/cards';
+import { Stream } from '../../lib/backend/postgres/streams';
 import * as helpers from './helpers';
 import { once } from 'events';
-import { Contract, Stream } from '@balena/jellyfish-types/build/core';
+import { Contract } from '@balena/jellyfish-types/build/core';
 import { JSONSchema } from '@balena/jellyfish-types';
 import { strict as assert } from 'assert';
 

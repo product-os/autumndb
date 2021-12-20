@@ -13,7 +13,8 @@ import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
 import { DatabaseBackend, SearchFieldDef, Queryable } from './types';
 import { Contract } from '@balena/jellyfish-types/build/core';
 import { TypedError } from 'typed-error';
-import { core, JSONSchema } from '@balena/jellyfish-types';
+import { JSONSchema } from '@balena/jellyfish-types';
+import { ContractDefinition } from '@balena/jellyfish-types/build/core';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
@@ -584,7 +585,7 @@ export const createTypeIndex = async (
 	context: Context,
 	connection: PostgresBackend,
 	fields: string[],
-	schema: core.ContractDefinition<any>,
+	schema: ContractDefinition<any>,
 	retries: number = 1,
 ): Promise<void> => {
 	/*

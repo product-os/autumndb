@@ -1,4 +1,4 @@
-import { core } from '@balena/jellyfish-types';
+import { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import * as pgFormat from 'pg-format';
 import { SqlPath } from './sql-path';
@@ -12,7 +12,7 @@ import { SqlPath } from './sql-path';
  * isArrayField({...}, 'data.payload.message');
  */
 export function isArrayField(
-	schema: core.ContractDefinition<any>,
+	schema: ContractDefinition<any>,
 	fieldPath: string,
 ): boolean {
 	const fullPath = ['data', 'schema', 'properties'].concat(
@@ -35,7 +35,7 @@ export function isArrayField(
  */
 export function generateTypeIndexPredicate(
 	fields: string[],
-	schema: core.ContractDefinition<any>,
+	schema: ContractDefinition<any>,
 ): string {
 	const type = `${schema.slug}@${schema.version}`;
 	const columns = [];
