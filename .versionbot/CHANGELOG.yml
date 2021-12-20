@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add a `drop` method to the `Kernel` which calls the backend's own `drop`
+      hash: 0b03286282e4e7715728cee4c7622d94b9d4356f
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 10.1.0
+  date: 2021-12-20T20:01:57.335Z
+- commits:
     - subject: More interface fixes
       hash: 17432d595f1d02ce838e6c57b36039e82107e21a
       body: |
