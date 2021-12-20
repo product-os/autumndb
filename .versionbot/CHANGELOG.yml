@@ -1,4 +1,54 @@
 - commits:
+    - subject: 'Tentative fix for #1128'
+      hash: 82d78dd87e93d386900d4e385aac7a620c0a42c8
+      body: |
+        The subquery that builds the final contract tree when querying with
+        links uses an inner join to get the nested link. Roughly:
+
+        ```
+        JOIN (
+          // Build the linked contract...
+        ) AS linked
+        ON edge.source = linked.id
+        ```
+
+        These joins are nested in the case of nested links and there is a
+        toplevel `LATERAL`. In the case of two nested optional links, the
+        `LATERAL` subquery looks roughly like this:
+
+        ```
+        FROM
+          cards,
+          LATERAL (
+            // ...
+            JOIN (
+              // ...
+            ) AS linked
+            ON edge1.source = linked.id
+            // ...
+          )
+        WHERE edge0.source = cards.id
+        ```
+
+        If the optional contracts don't exist, `linked.id` will be null and the
+        `edge1.to = linked.id` condition will fail. As a consequence, the whole
+        lateral will be empty and so will the result. The fix is change those
+        inner joins into left joins.
+
+        This is a tentative fix because I have fuzzy memories of making this
+        exact change and causing unrelated tests to fail.
+      footer:
+        Fixes: '#1128'
+        fixes: '#1128'
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 8.2.6
+  date: 2021-12-20T17:09:23.658Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 1baa199da991d4ccec8628b3768b41a9c7a9c245
       body: ''
