@@ -451,7 +451,7 @@ const upsertObject = async <T extends Contract = Contract>(
 	return insertedObject;
 };
 
-interface PostgresBackendOptions {
+export interface PostgresBackendOptions {
 	database: string;
 	connectRetryDelay?: number;
 	user: string;
@@ -492,7 +492,7 @@ const defaultPgOptions: Partial<PostgresBackendOptions> = {
  * class.
  */
 export class PostgresBackend implements Queryable {
-	private connection?: DatabaseConnection | null;
+	public connection?: DatabaseConnection | null;
 	options: PostgresBackendOptions;
 	database: string;
 	connectRetryDelay: number;

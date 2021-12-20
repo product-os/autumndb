@@ -1,5 +1,5 @@
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
-import { PostgresBackend } from './postgres';
+import { PostgresBackend, PostgresBackendOptions } from './postgres';
 
 const backends = {
 	postgres: PostgresBackend,
@@ -7,3 +7,5 @@ const backends = {
 
 export const backend =
 	backends[environment.database.type as keyof typeof backends];
+
+export { PostgresBackendOptions };
