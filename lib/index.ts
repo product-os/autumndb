@@ -3,7 +3,10 @@ import { backend as CoreBackend } from './backend';
 import { Cache } from './cache';
 import * as coreErrors from './errors';
 import { CARDS } from './cards';
+
 export * as cardMixins from './cards/mixins';
+// TODO: why would external modules need to access the `BackendObject`?
+export { CoreBackend, CoreKernel, coreErrors };
 
 export const MemoryCache = Cache;
 export const cards = CARDS;
@@ -14,10 +17,3 @@ export const create = async (context: any, cache: any, options: any) => {
 	await kernel.initialize(context);
 	return kernel;
 };
-
-// TODO: A number of jellyfish modules import these objects from subpaths, which is an abomination.
-// It also makes converting said modules to typescript much more difficult.
-// Once everything is converted to typescript this situation needs to be straightened out.
-export const Backend = CoreBackend;
-export const errors = coreErrors;
-export const Kernel = CoreKernel;
