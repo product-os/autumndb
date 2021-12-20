@@ -1,4 +1,17 @@
 - commits:
+    - subject: Properly export types and modules
+      hash: 662a2787e7ec97c8b0bfc3826c22708fcf135e0f
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 9.0.0
+  date: 2021-12-20T18:31:11.963Z
+- commits:
     - subject: >-
         Restrict usage of `jellyfish-types` to only `JSONSchema` and the
         contract types
