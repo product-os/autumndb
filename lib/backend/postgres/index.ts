@@ -791,8 +791,8 @@ export class PostgresBackend implements Queryable {
 		context.debug('Resetting database', { database: this.database });
 
 		await this.any(`
-			DELETE FROM ${links.TABLE};
-			DELETE FROM ${cards.TABLE};
+			TRUNCATE ${links.TABLE};
+			TRUNCATE ${cards.TABLE};
 		`);
 	}
 
