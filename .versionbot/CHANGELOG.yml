@@ -1,4 +1,17 @@
 - commits:
+    - subject: Use `TRUNCATE` instead of `DELETE FROM` when resetting the database
+      hash: e2e4050e271962ed0259a169e25a2d7ebf0e0285
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 10.1.1
+  date: 2021-12-22T20:45:03.827Z
+- commits:
     - subject: Add a `drop` method to the `Kernel` which calls the backend's own `drop`
       hash: 0b03286282e4e7715728cee4c7622d94b9d4356f
       body: ''
