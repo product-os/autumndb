@@ -1,4 +1,17 @@
 - commits:
+    - subject: Expose the backend's `reset` method in the kernel
+      hash: aed69d7afeeaa1f2c8cfa2888548703dcb8fc21b
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 10.2.0
+  date: 2021-12-22T21:14:08.820Z
+- commits:
     - subject: Use `TRUNCATE` instead of `DELETE FROM` when resetting the database
       hash: e2e4050e271962ed0259a169e25a2d7ebf0e0285
       body: ''
