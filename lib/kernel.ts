@@ -372,6 +372,13 @@ export class Kernel {
 	}
 
 	/**
+	 * Truncate database tables.
+	 */
+	async reset(mixedContext: MixedContext) {
+		await this.backend.reset(Context.fromMixed(mixedContext));
+	}
+
+	/**
 	 * Drop database tables.
 	 */
 	async drop(mixedContext: MixedContext) {
