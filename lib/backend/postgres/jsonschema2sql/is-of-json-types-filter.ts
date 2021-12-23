@@ -1,7 +1,7 @@
 import * as pgFormat from 'pg-format';
-import { SqlFragmentBuilder } from './fragment-builder';
+import type { SqlFragmentBuilder } from './fragment-builder';
 import { SqlFilter } from './sql-filter';
-import { SqlPath } from './sql-path';
+import type { SqlPath } from './sql-path';
 
 /**
  * Filter asserting that the type of a JSON property is one of the accepted

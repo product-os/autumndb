@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as errors from '../../../lib/errors';
-import { Stream } from '../../../lib/backend/postgres/streams';
+import type { Stream } from '../../../lib/backend/postgres/streams';
 import * as helpers from './helpers';
-import { JSONSchema } from '@balena/jellyfish-types';
-import { Contract } from '@balena/jellyfish-types/build/core';
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type { Contract } from '@balena/jellyfish-types/build/core';
 
 let ctx: helpers.BackendContext;
 

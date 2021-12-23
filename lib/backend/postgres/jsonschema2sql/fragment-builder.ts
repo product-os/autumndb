@@ -1,9 +1,9 @@
 import { BuilderContext } from './builder-context';
-import { SqlCteBuilder } from './cte-builder';
-import { LiteralSql } from './literal-sql';
-import { SqlSelectBuilder } from './select-builder';
-import { SqlFilter } from './sql-filter';
-import { SqlPath } from './sql-path';
+import type { SqlCteBuilder } from './cte-builder';
+import type { LiteralSql } from './literal-sql';
+import type { SqlSelectBuilder } from './select-builder';
+import type { SqlFilter } from './sql-filter';
+import type { SqlPath } from './sql-path';
 
 /**
  * Builder for any kind of SQL fragment.

@@ -1,6 +1,6 @@
-import { SqlFragmentBuilder } from './fragment-builder';
-import { LiteralSql } from './literal-sql';
-import { SqlSelectBuilder } from './select-builder';
+import type { SqlFragmentBuilder } from './fragment-builder';
+import type { LiteralSql } from './literal-sql';
+import type { SqlSelectBuilder } from './select-builder';
 
 /**
  * Builder for common table expressions.

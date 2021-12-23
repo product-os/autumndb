@@ -1,8 +1,11 @@
 import * as _ from 'lodash';
-import { Contract, LinkContract } from '@balena/jellyfish-types/build/core';
-import { Context } from '../../context';
-import { Queryable } from './types';
-import { PostgresBackend } from '.';
+import type {
+	Contract,
+	LinkContract,
+} from '@balena/jellyfish-types/build/core';
+import type { Context } from '../../context';
+import type { Queryable } from './types';
+import type { PostgresBackend } from '.';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');

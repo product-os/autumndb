@@ -1,4 +1,4 @@
-import { SqlFragmentBuilder } from './fragment-builder';
+import type { SqlFragmentBuilder } from './fragment-builder';
 
 /**
  * Class that wraps literal SQL fragments and provides `toSql` and `toSqlInto`

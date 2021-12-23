@@ -3,11 +3,11 @@ import * as Bluebird from 'bluebird';
 import { v4 as uuid } from 'uuid';
 import * as errors from '../../lib/errors';
 import { CARDS } from '../../lib/cards';
-import { Stream } from '../../lib/backend/postgres/streams';
+import type { Stream } from '../../lib/backend/postgres/streams';
 import * as helpers from './helpers';
 import { once } from 'events';
 import { Contract } from '@balena/jellyfish-types/build/core';
-import { JSONSchema } from '@balena/jellyfish-types';
+import type { JSONSchema } from '@balena/jellyfish-types';
 import { strict as assert } from 'assert';
 
 let ctx: helpers.KernelContext;

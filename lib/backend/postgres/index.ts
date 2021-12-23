@@ -5,16 +5,19 @@ import * as skhema from 'skhema';
 import metrics = require('@balena/jellyfish-metrics');
 import { v4 as uuidv4 } from 'uuid';
 import * as jsonschema2sql from './jsonschema2sql';
-import { Context } from '../../context';
+import type { Context } from '../../context';
 import * as links from './links';
 import * as cards from './cards';
 import * as streams from './streams';
 import * as utils from './utils';
 import pgp from './pg-promise';
-import { JSONSchema } from '@balena/jellyfish-types';
-import { ContractDefinition } from '@balena/jellyfish-types/build/core';
-import { Contract, LinkContract } from '@balena/jellyfish-types/build/core';
-import {
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type {
+	Contract,
+	LinkContract,
+} from '@balena/jellyfish-types/build/core';
+import type {
 	BackendQueryOptions,
 	DatabaseBackend,
 	DatabaseConnection,
@@ -23,10 +26,10 @@ import {
 	SelectObject,
 	SqlQueryOptions,
 } from './types';
-import { Cache } from './../../cache';
-import { TypedError } from 'typed-error';
+import type { Cache } from './../../cache';
+import type { TypedError } from 'typed-error';
 import { strict as nativeAssert } from 'assert';
-import type pgPromise = require('pg-promise');
+import * as pgPromise from 'pg-promise';
 import { AsyncLocalStorage } from 'async_hooks';
 import * as semver from 'semver';
 

@@ -1,5 +1,5 @@
-import { JSONSchema } from '@balena/jellyfish-types';
-import { ViewContract } from '@balena/jellyfish-types/build/core';
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type { ViewContract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import jsonSchema from './json-schema';
 

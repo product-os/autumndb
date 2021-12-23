@@ -1,7 +1,7 @@
-import { JSONSchema } from '@balena/jellyfish-types';
+import type { JSONSchema } from '@balena/jellyfish-types';
 import * as _ from 'lodash';
-import { Context } from '../../../context';
-import { SqlQueryOptions } from '../types';
+import type { Context } from '../../../context';
+import type { SqlQueryOptions } from '../types';
 import { SelectMap } from './select-map';
 import { SqlQuery } from './sql-query';
 

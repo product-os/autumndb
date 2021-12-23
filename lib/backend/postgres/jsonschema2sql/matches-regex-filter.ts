@@ -1,7 +1,7 @@
 import * as pgFormat from 'pg-format';
-import { SqlFragmentBuilder } from './fragment-builder';
+import type { SqlFragmentBuilder } from './fragment-builder';
 import { SqlFilter } from './sql-filter';
-import { SqlPath } from './sql-path';
+import type { SqlPath } from './sql-path';
 
 /**
  * Filter asserting that the value of a column, as a string, matches a regular

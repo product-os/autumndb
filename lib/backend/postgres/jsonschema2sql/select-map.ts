@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as pgFormat from 'pg-format';
 import { ExpressionFilter } from './expression-filter';
-import { SqlFilter } from './sql-filter';
+import type { SqlFilter } from './sql-filter';
 import { SqlPath } from './sql-path';
 import * as util from './util';
 

@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
-import { ArrayLengthFilter } from './array-length-filter';
+import type { ArrayLengthFilter } from './array-length-filter';
 import { SqlFragmentBuilder } from './fragment-builder';
-import { IsOfJsonTypesFilter } from './is-of-json-types-filter';
-import { LiteralSql } from './literal-sql';
-import { MultipleOfFilter } from './multiple-of-filter';
+import type { IsOfJsonTypesFilter } from './is-of-json-types-filter';
+import type { LiteralSql } from './literal-sql';
+import type { MultipleOfFilter } from './multiple-of-filter';
 import { NotFilter } from './not-filter';
 import { SqlFilter } from './sql-filter';
 

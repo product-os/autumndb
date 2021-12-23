@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import pgFormat = require('pg-format');
-import { SqlFilter } from './sql-filter';
+import type { SqlFilter } from './sql-filter';
 
 /**
  * Context for `SqlFragmentBuilder` that is shared between users of a builder

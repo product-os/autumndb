@@ -4,7 +4,7 @@ import * as pgFormat from 'pg-format';
 import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 import * as metrics from '@balena/jellyfish-metrics';
-import {
+import type {
 	BackendQueryOptions,
 	DatabaseBackend,
 	DatabaseConnection,
@@ -12,11 +12,11 @@ import {
 	SelectObject,
 	SqlQueryOptions,
 } from './types';
-import { Context } from '../../context';
+import type { Context } from '../../context';
 import type { IConnected } from 'pg-promise';
 import type { IClient } from 'pg-promise/typescript/pg-subset';
 import { strict as nativeAssert } from 'assert';
-import { JSONSchema } from '@balena/jellyfish-types';
+import type { JSONSchema } from '@balena/jellyfish-types';
 
 type StreamConnection = IConnected<{}, IClient>;
 

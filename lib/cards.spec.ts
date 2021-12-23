@@ -1,4 +1,4 @@
-import { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import * as skhema from 'skhema';
 import { CARDS } from './cards';

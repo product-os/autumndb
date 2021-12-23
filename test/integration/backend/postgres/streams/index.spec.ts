@@ -6,7 +6,7 @@ import * as streams from '../../../../../lib/backend/postgres/streams';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { PostgresBackend } from '../../../../../lib/backend/postgres/index';
 import { Context } from '../../../../../lib/context';
-import { DatabaseConnection } from '../../../../../lib/backend/postgres/types';
+import type { DatabaseConnection } from '../../../../../lib/backend/postgres/types';
 
 let ctx: {
 	connection: DatabaseConnection | null;

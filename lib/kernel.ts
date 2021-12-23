@@ -8,15 +8,18 @@ import * as views from './views';
 import { CARDS } from './cards';
 import * as permissionFilter from './permission-filter';
 import metrics = require('@balena/jellyfish-metrics');
-import { JSONSchema } from '@balena/jellyfish-types';
-import {
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type {
 	Contract,
 	ContractDefinition,
 	LinkContract,
 	TypeContract,
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
-import { BackendQueryOptions, DatabaseBackend } from './backend/postgres/types';
+import type {
+	BackendQueryOptions,
+	DatabaseBackend,
+} from './backend/postgres/types';
 import * as stopword from 'stopword';
 import { v4 as uuidv4 } from 'uuid';
 
