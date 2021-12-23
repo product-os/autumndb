@@ -1,4 +1,17 @@
 - commits:
+    - subject: Use `import type` as much as possible
+      hash: 6e435de82b0b64646fd11a8385b08622d1b9c583
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 10.2.1
+  date: 2021-12-23T16:01:20.043Z
+- commits:
     - subject: Expose the backend's `reset` method in the kernel
       hash: aed69d7afeeaa1f2c8cfa2888548703dcb8fc21b
       body: ''
