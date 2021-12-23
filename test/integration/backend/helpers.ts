@@ -4,7 +4,7 @@ import { defaultEnvironment as environment } from '@balena/jellyfish-environment
 import { Cache } from '../../../lib/cache';
 import * as errors from '../../../lib/errors';
 import { Context } from '../../../lib/context';
-import { DatabaseBackend } from '../../../lib/backend/postgres/types';
+import type { DatabaseBackend } from '../../../lib/backend/postgres/types';
 
 export interface BackendContext {
 	cache: Cache;

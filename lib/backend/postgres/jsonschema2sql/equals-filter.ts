@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import * as pgFormat from 'pg-format';
 import { ExpressionFilter } from './expression-filter';
-import { SqlFragmentBuilder } from './fragment-builder';
+import type { SqlFragmentBuilder } from './fragment-builder';
 import { IsNullFilter } from './is-null-filter';
 import { SqlFilter } from './sql-filter';
-import { SqlPath } from './sql-path';
+import type { SqlPath } from './sql-path';
 
 /**
  * Filter asserting that the value of a field is equal to one or more possible

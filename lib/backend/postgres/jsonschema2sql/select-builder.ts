@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
-import { SqlCteBuilder } from './cte-builder';
+import type { SqlCteBuilder } from './cte-builder';
 import { ExpressionFilter } from './expression-filter';
-import { SqlFragmentBuilder } from './fragment-builder';
-import { LiteralSql } from './literal-sql';
-import { SqlFilter } from './sql-filter';
-import { SqlPath } from './sql-path';
+import type { SqlFragmentBuilder } from './fragment-builder';
+import type { LiteralSql } from './literal-sql';
+import type { SqlFilter } from './sql-filter';
+import type { SqlPath } from './sql-path';
 
 // Types of joins
 const INNER_JOIN = 0;

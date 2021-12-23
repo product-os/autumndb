@@ -19,7 +19,7 @@ import { oauthClient } from './oauth-client';
 import { scheduledAction } from './scheduled-action';
 import { authentication } from './authentication';
 import { userSettings } from './user-settings';
-import { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 
 const cards = [
 	actionRequest,

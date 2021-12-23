@@ -9,8 +9,8 @@ import * as links from '../../../../../lib/backend/postgres/links';
 import { Context } from '../../../../../lib/context';
 import regexpTestSuite from './regexp';
 import formatMaxMinTestSuite from './format-max-min';
-import { Contract } from '@balena/jellyfish-types/build/core';
-import { JSONSchema } from '@balena/jellyfish-types';
+import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { JSONSchema } from '@balena/jellyfish-types';
 import type { DatabaseBackend } from '../../../../../lib/backend/postgres/types';
 import { PostgresBackend } from '../../../../../lib/backend/postgres';
 

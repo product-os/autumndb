@@ -1,7 +1,7 @@
 import * as pgFormat from 'pg-format';
 import { SqlFragmentBuilder } from './fragment-builder';
 import { ExpressionFilter } from './expression-filter';
-import { SqlPath } from './sql-path';
+import type { SqlPath } from './sql-path';
 
 /**
  * Base class for SQL boolean expressions, aka filters, constraints, or

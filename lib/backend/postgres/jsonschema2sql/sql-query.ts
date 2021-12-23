@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Context } from '../../../context';
+import type { Context } from '../../../context';
 import { ArrayContainsFilter } from './array-contains-filter';
 import { ArrayLengthFilter } from './array-length-filter';
 import { EqualsFilter } from './equals-filter';
@@ -23,10 +23,10 @@ import { ValueIsFilter } from './value-is-filter';
 import * as REGEXES from './regexes';
 import { InvalidSchema } from './errors';
 import * as util from './util';
-import { JSONSchema } from '@balena/jellyfish-types';
-import { JSONSchema7TypeName } from 'json-schema';
-import { SqlFilter } from './sql-filter';
-import { SqlQueryOptions } from '../types';
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JSONSchema7TypeName } from 'json-schema';
+import type { SqlFilter } from './sql-filter';
+import type { SqlQueryOptions } from '../types';
 
 const FENCE_REWRAP = new LiteralSql(`
 	SELECT

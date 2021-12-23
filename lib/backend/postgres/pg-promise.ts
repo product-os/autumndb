@@ -1,7 +1,7 @@
-import getPgp = require('pg-promise');
+import * as pgPromise from 'pg-promise';
 import * as _ from 'lodash';
 
-const pgp = getPgp();
+const pgp = pgPromise();
 const pgTypes = pgp.pg.types;
 
 const installCustomDateParserIntoPostgresDriver = () => {

@@ -4,17 +4,17 @@ import * as pgFormat from 'pg-format';
 import { v4 as uuidv4 } from 'uuid';
 import * as metrics from '@balena/jellyfish-metrics';
 import * as traverse from 'traverse';
-import { PostgresBackend } from '.';
+import type { PostgresBackend } from '.';
 import * as utils from './utils';
-import { Context } from '../../context';
+import type { Context } from '../../context';
 import * as textSearch from './jsonschema2sql/text-search';
 import { SqlPath } from './jsonschema2sql/sql-path';
 import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
-import { DatabaseBackend, SearchFieldDef, Queryable } from './types';
-import { Contract } from '@balena/jellyfish-types/build/core';
-import { TypedError } from 'typed-error';
-import { JSONSchema } from '@balena/jellyfish-types';
-import { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { DatabaseBackend, SearchFieldDef, Queryable } from './types';
+import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { TypedError } from 'typed-error';
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');

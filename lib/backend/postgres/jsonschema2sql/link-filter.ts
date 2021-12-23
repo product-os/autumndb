@@ -1,4 +1,4 @@
-import { SqlFragmentBuilder } from './fragment-builder';
+import type { SqlFragmentBuilder } from './fragment-builder';
 import { SqlFilter } from './sql-filter';
 
 /**

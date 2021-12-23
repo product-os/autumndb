@@ -1,11 +1,11 @@
 import * as assert from '@balena/jellyfish-assert';
-import {
+import type {
 	AssertExpression,
 	AssertMessage,
 	AssertErrorConstructor,
 } from '@balena/jellyfish-assert';
 import * as logger from '@balena/jellyfish-logger';
-import { LogContext } from '@balena/jellyfish-logger';
+import type { LogContext } from '@balena/jellyfish-logger';
 
 const LOGGER = logger.getLogger('jellyfish-core');
 

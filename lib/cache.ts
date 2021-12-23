@@ -5,7 +5,7 @@ import { TABLE as cardsTable } from './backend/postgres/cards';
 import * as metrics from '@balena/jellyfish-metrics';
 import * as redismock from 'redis-mock';
 import * as redis from 'redis';
-import { Contract } from '@balena/jellyfish-types/build/core';
+import type { Contract } from '@balena/jellyfish-types/build/core';
 
 interface CacheOptions extends redis.ClientOpts {
 	namespace: string;
