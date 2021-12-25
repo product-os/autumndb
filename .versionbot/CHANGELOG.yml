@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: 8f8dcbd92f2543ef4bef17083f6ee6856f58f713
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.2.2
+  date: 2021-12-25T00:27:14.822Z
+- commits:
     - subject: Use `import type` as much as possible
       hash: 6e435de82b0b64646fd11a8385b08622d1b9c583
       body: ''
