@@ -1,3 +1,6 @@
+import { PostgresBackend, PostgresBackendOptions } from './backend';
+import type { LogContext } from '@balena/jellyfish-logger';
+import type { Cache } from './cache';
 import * as _ from 'lodash';
 import * as jsonpatch from 'fast-json-patch';
 import * as fastEquals from 'fast-equals';
@@ -8,7 +11,7 @@ import * as views from './views';
 import { CARDS } from './cards';
 import * as permissionFilter from './permission-filter';
 import metrics = require('@balena/jellyfish-metrics');
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	Contract,
 	ContractDefinition,
@@ -24,7 +27,7 @@ import * as stopword from 'stopword';
 import { v4 as uuidv4 } from 'uuid';
 
 interface KernelQueryOptions extends Partial<BackendQueryOptions> {
-	mask?: JSONSchema;
+	mask?: JsonSchema;
 }
 
 // Generate a concise slug for a contract, using the `name` field
@@ -69,7 +72,7 @@ const mergeSelectedMaps = (base: any, extras: any) => {
 	});
 };
 
-const getSelected = (schema: JSONSchema): { links: any; properties: any } => {
+const getSelected = (schema: JsonSchema): { links: any; properties: any } => {
 	if (_.isBoolean(schema)) {
 		return {
 			links: {},
@@ -77,7 +80,7 @@ const getSelected = (schema: JSONSchema): { links: any; properties: any } => {
 		};
 	}
 
-	const links: { [linkType: string]: JSONSchema } = {};
+	const links: { [linkType: string]: JsonSchema } = {};
 
 	if ('$$links' in schema) {
 		for (const [linkType, linked] of Object.entries(schema.$$links!)) {
@@ -142,21 +145,22 @@ const getQueryFromSchema = async (
 	context: Context,
 	backend: DatabaseBackend,
 	session: string,
-	schema: JSONSchema | ViewContract,
-	mask?: JSONSchema,
+	schema: JsonSchema | ViewContract,
+	mask?: JsonSchema,
 ) => {
 	// TS-TODO: Refactor this to avoid type coercion
-	let finalSchema: JSONSchema = (
+	let finalSchema: JsonSchema = (
+		schema instanceof Object &&
 		schema.type === `${CARDS.view.slug}@${CARDS.view.version}`
 			? views.getSchema(schema as ViewContract)
 			: schema
-	) as JSONSchema;
+	) as JsonSchema;
 
 	if (mask) {
 		finalSchema = jsonSchema.merge([
 			finalSchema as any,
 			mask as any,
-		]) as JSONSchema;
+		]) as JsonSchema;
 	}
 
 	// TODO: this is probably going to be given in the schema itself. See
@@ -352,10 +356,26 @@ export class Kernel {
 	 *
 	 * const kernel = new Kernel(backend)
 	 */
-	constructor(backend: DatabaseBackend) {
+	private constructor(backend: DatabaseBackend) {
 		this.backend = backend;
 		this.errors = errors;
 		this.cards = CARDS;
+	}
+
+	/**
+	 * Create a new [[`Kernel`]] object backed by a PostgreSQL database and
+	 * optionally use the specified cache.
+	 */
+	public static async withPostgres(
+		logContext: LogContext,
+		cache: Cache | null,
+		options: PostgresBackendOptions,
+	): Promise<Kernel> {
+		const backend = new PostgresBackend(cache, errors, options);
+		const kernel = new Kernel(backend);
+		await kernel.initialize(logContext);
+
+		return kernel;
 	}
 
 	/**
@@ -393,7 +413,7 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {MixedContext} context - execution context
+	 * @param logContext - log context
 	 *
 	 * @description
 	 * This makes sure the kernel is connected to the backend
@@ -403,8 +423,8 @@ export class Kernel {
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 */
-	async initialize(mixedContext: MixedContext) {
-		const context = Context.fromMixed(mixedContext);
+	async initialize(logContext: LogContext) {
+		const context = new Context(logContext);
 		await this.backend.connect(context);
 
 		// TODO: all of this bootstrapping should be in the same transaction as the DB setup
@@ -484,7 +504,7 @@ export class Kernel {
 		const context = Context.fromMixed(mixedContext);
 		context.debug('Fetching card by id', { id });
 
-		const schema: JSONSchema = {
+		const schema: JsonSchema = {
 			type: 'object',
 			properties: {
 				id: {
@@ -546,7 +566,7 @@ export class Kernel {
 			limit: 1,
 		};
 
-		const schema: JSONSchema = {
+		const schema: JsonSchema = {
 			type: 'object',
 			additionalProperties: true,
 			properties: {
@@ -847,7 +867,7 @@ export class Kernel {
 	async query<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
-		schema: JSONSchema | ViewContract,
+		schema: JsonSchema | ViewContract,
 		options: KernelQueryOptions = {},
 	): Promise<T[]> {
 		const context = Context.fromMixed(mixedContext);
@@ -870,7 +890,7 @@ export class Kernel {
 			})
 			.catch((error) => {
 				if (error instanceof errors.JellyfishDatabaseTimeoutError) {
-					context.warn('Query timeout', schema);
+					context.warn('Query timeout', { schema });
 				}
 				throw error;
 			});
@@ -957,7 +977,7 @@ export class Kernel {
 	async stream(
 		mixedContext: MixedContext,
 		session: string,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		options: KernelQueryOptions = {},
 	) {
 		const context = Context.fromMixed(mixedContext);

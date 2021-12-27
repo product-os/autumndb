@@ -5,7 +5,7 @@ const backends = {
 	postgres: PostgresBackend,
 };
 
-export const backend =
+export const defaultBackend =
 	backends[environment.database.type as keyof typeof backends];
 
-export { PostgresBackendOptions };
+export { PostgresBackend, PostgresBackendOptions };

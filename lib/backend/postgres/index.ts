@@ -11,7 +11,7 @@ import * as cards from './cards';
 import * as streams from './streams';
 import * as utils from './utils';
 import pgp from './pg-promise';
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import type {
 	Contract,
@@ -97,7 +97,7 @@ const compileSchema = (
 	context: Context,
 	table: string,
 	select: SelectObject,
-	schema: JSONSchema,
+	schema: JsonSchema,
 	options: SqlQueryOptions,
 	errors: { [key: string]: typeof TypedError },
 ): { query: string; queryGenTime: number } => {
@@ -122,7 +122,7 @@ const compileSchema = (
 
 const runQuery = async (
 	context: Context,
-	schema: JSONSchema,
+	schema: JsonSchema,
 	query: string | pgPromise.PreparedStatement,
 	backend: DatabaseBackend,
 	values?: any[],
@@ -192,7 +192,7 @@ const queryTable = async (
 	backend: DatabaseBackend,
 	table: string,
 	select: SelectObject,
-	schema: JSONSchema,
+	schema: JsonSchema,
 	options: BackendQueryOptions,
 ) => {
 	const mode = options.profile ? 'info' : 'debug';
@@ -642,6 +642,7 @@ export class PostgresBackend implements Queryable {
 		this.connection = pgp({
 			...defaultPgOptions,
 			...this.options,
+			database: this.options.database,
 			port: Number(this.options.port),
 		});
 
@@ -1162,7 +1163,7 @@ export class PostgresBackend implements Queryable {
 	async query(
 		context: Context,
 		select: SelectObject,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		options: Partial<BackendQueryOptions> = {},
 	) {
 		// Apply a maximum for safety reasons
@@ -1201,7 +1202,7 @@ export class PostgresBackend implements Queryable {
 		context: Context,
 		name: string,
 		select: SelectObject,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		options: SqlQueryOptions,
 	) {
 		const { query, queryGenTime } = compileSchema(
@@ -1276,7 +1277,7 @@ export class PostgresBackend implements Queryable {
 	async stream(
 		context: Context,
 		select: SelectObject,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		options: SqlQueryOptions = {},
 	): Promise<streams.Stream> {
 		nativeAssert(!!this.streamClient, 'Stream client must be initialized');

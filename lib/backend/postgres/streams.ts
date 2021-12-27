@@ -16,7 +16,7 @@ import type { Context } from '../../context';
 import type { IConnected } from 'pg-promise';
 import type { IClient } from 'pg-promise/typescript/pg-subset';
 import { strict as nativeAssert } from 'assert';
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 
 type StreamConnection = IConnected<{}, IClient>;
 
@@ -230,7 +230,7 @@ export class Streamer {
 	async attach(
 		context: Context,
 		select: SelectObject,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		options: SqlQueryOptions = {},
 	) {
 		return new Stream(context, this, uuidv4(), select, schema, options);
@@ -273,7 +273,7 @@ export class Stream extends EventEmitter {
 		streamer: Streamer,
 		id: string,
 		select: SelectObject,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		options: SqlQueryOptions = {},
 	) {
 		super();
@@ -308,7 +308,7 @@ export class Stream extends EventEmitter {
 
 	async query(
 		select: SelectObject,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		options: BackendQueryOptions,
 	) {
 		// Query the cards with the IDs so we can add them to
@@ -342,22 +342,24 @@ export class Stream extends EventEmitter {
 
 	setSchema(
 		select: SelectObject,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		options: SqlQueryOptions = {},
 	) {
 		this.constCardId = _.get(schema, ['properties', 'id', 'const']);
 		this.constCardSlug = _.get(schema, ['properties', 'slug', 'const']);
 		this.cardTypes = null;
-		if (_.has(schema, ['properties', 'type', 'const'])) {
-			this.cardTypes = [(schema.properties!.type as any).const.split('@')[0]];
-		}
-		if (_.has(schema, ['properties', 'type', 'enum'])) {
-			const deversionedTypes = (schema.properties!.type as any).enum.map(
-				(typeName: string) => {
-					return typeName.split('@')[0];
-				},
-			);
-			this.cardTypes = deversionedTypes;
+		if (schema instanceof Object) {
+			if (_.has(schema, ['properties', 'type', 'const'])) {
+				this.cardTypes = [(schema.properties!.type as any).const.split('@')[0]];
+			}
+			if (_.has(schema, ['properties', 'type', 'enum'])) {
+				const deversionedTypes = (schema.properties!.type as any).enum.map(
+					(typeName: string) => {
+						return typeName.split('@')[0];
+					},
+				);
+				this.cardTypes = deversionedTypes;
+			}
 		}
 		this.streamQuery = this.streamer.backend.prepareQueryForStream(
 			this.context,

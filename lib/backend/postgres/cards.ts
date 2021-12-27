@@ -13,7 +13,7 @@ import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
 import type { DatabaseBackend, SearchFieldDef, Queryable } from './types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { TypedError } from 'typed-error';
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 
 // tslint:disable-next-line: no-var-requires
@@ -702,7 +702,7 @@ export const createFullTextSearchIndex = async (
  */
 export const parseFullTextSearchFields = (
 	context: Context,
-	schema: JSONSchema,
+	schema: JsonSchema,
 	errors: { [key: string]: typeof TypedError },
 ) => {
 	const fields: SearchFieldDef[] = [];

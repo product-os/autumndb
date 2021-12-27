@@ -1,6 +1,6 @@
 import * as helpers from './helpers';
 
-let ctx: helpers.KernelContext;
+let ctx: helpers.CoreTestContext;
 
 /*
  * Tests in this spec file actively disconnect the server. As such they are
@@ -11,8 +11,8 @@ beforeEach(async () => {
 	ctx = await helpers.before();
 });
 
-afterEach(() => {
-	return helpers.after(ctx);
+afterEach(async () => {
+	await helpers.after(ctx);
 });
 
 describe('Kernel', () => {
@@ -20,9 +20,9 @@ describe('Kernel', () => {
 		it('should be able to disconnect the kernel multiple times without errors', async () => {
 			await expect(
 				(async () => {
-					await ctx.kernel.disconnect(ctx.context);
-					await ctx.kernel.disconnect(ctx.context);
-					await ctx.kernel.disconnect(ctx.context);
+					await ctx.kernel.disconnect(ctx.logContext);
+					await ctx.kernel.disconnect(ctx.logContext);
+					await ctx.kernel.disconnect(ctx.logContext);
 				})(),
 			).resolves.not.toThrow();
 		});
@@ -30,10 +30,10 @@ describe('Kernel', () => {
 		it('.disconnect() should gracefully close streams', async () => {
 			await expect(
 				(async () => {
-					await ctx.kernel.stream(ctx.context, ctx.kernel.sessions!.admin, {
+					await ctx.kernel.stream(ctx.logContext, ctx.kernel.sessions!.admin, {
 						type: 'object',
 					});
-					await ctx.kernel.disconnect(ctx.context);
+					await ctx.kernel.disconnect(ctx.logContext);
 				})(),
 			).resolves.not.toThrow();
 		});

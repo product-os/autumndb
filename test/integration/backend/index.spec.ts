@@ -3,7 +3,7 @@ import * as Bluebird from 'bluebird';
 import * as errors from '../../../lib/errors';
 import type { Stream } from '../../../lib/backend/postgres/streams';
 import * as helpers from './helpers';
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 
 let ctx: helpers.BackendContext;
@@ -1220,7 +1220,7 @@ describe('backend', () => {
 					properties: {
 						id: {
 							type: 'string',
-							// TS-TODO: add typings for Regexp to JSONSchemaQL schemas
+							// TS-TODO: add typings for Regexp to JsonSchemaQL schemas
 							regexp: {
 								pattern: 'assume',
 								flags: 'i',
@@ -1431,7 +1431,7 @@ describe('backend', () => {
 				times: number,
 				seeds: string[],
 				index = 0,
-			): JSONSchema => {
+			): JsonSchema => {
 				if (times === 0) {
 					return {
 						type: 'string',

@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { backend as Backend } from '../../../lib/backend';
+import { defaultBackend as Backend } from '../../../lib/backend';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { Cache } from '../../../lib/cache';
 import * as errors from '../../../lib/errors';

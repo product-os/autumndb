@@ -23,7 +23,7 @@ import { ValueIsFilter } from './value-is-filter';
 import * as REGEXES from './regexes';
 import { InvalidSchema } from './errors';
 import * as util from './util';
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type { JSONSchema7TypeName } from 'json-schema';
 import type { SqlFilter } from './sql-filter';
 import type { SqlQueryOptions } from '../types';
@@ -369,7 +369,7 @@ export class SqlQuery {
 		context: Context,
 		parent: null | SqlQuery,
 		select: { [key: string]: any } = {},
-		schema: boolean | JSONSchema,
+		schema: boolean | JsonSchema,
 		options: SqlQueryOptions,
 	) {
 		const query = new SqlQuery(context, parent, select, options);
@@ -496,7 +496,7 @@ export class SqlQuery {
 
 	setAdditionalProperties(
 		schema:
-			| ((boolean | JSONSchema) & { $$formula?: string | undefined })
+			| ((boolean | JsonSchema) & { $$formula?: string | undefined })
 			| undefined,
 	) {
 		// TODO: technically this can be a schema too
@@ -596,7 +596,7 @@ export class SqlQuery {
 		this[visitor](value);
 	}
 
-	$$linksVisitor(linkMap: { [s: string]: JSONSchema }) {
+	$$linksVisitor(linkMap: { [s: string]: JsonSchema }) {
 		this.context.assertInternal(_.isPlainObject(linkMap), InvalidSchema, () => {
 			return `value for '${this.formatJsonPath('$$links')}' must be a map`;
 		});
@@ -652,12 +652,12 @@ export class SqlQuery {
 		this.filter.and(new EqualsFilter(this.path, [value]));
 	}
 
-	containsVisitor(schema: JSONSchema) {
+	containsVisitor(schema: JsonSchema) {
 		if (this.tryJsonContainsOptimization(schema)) {
 			return;
 		}
 		let filter = null;
-		if (_.has(schema, ['fullTextSearch'])) {
+		if (schema instanceof Object && _.has(schema, ['fullTextSearch'])) {
 			this.context.assertInternal(
 				_.isPlainObject(schema.fullTextSearch),
 				Error,
@@ -693,15 +693,17 @@ export class SqlQuery {
 
 	// If applicable, use the `@>` operator as an optimization for schemas
 	// containing only the `const` keyword (and maybe a compatible `type`)
-	tryJsonContainsOptimization(schema: { const?: any; type?: any }) {
-		let filter = null;
+	tryJsonContainsOptimization(schema: JsonSchema) {
 		if (
+			schema instanceof Object &&
 			_.isPlainObject(schema) &&
 			'const' in schema &&
 			this.path.isProcessingJsonProperty
 		) {
+			let filter = null;
 			const value = schema.const;
 			const keyCount = Object.keys(schema).length;
+
 			if (keyCount === 1) {
 				filter = new ValueIsFilter(this.path, '@>', value);
 			} else if (keyCount === 2 && 'type' in schema) {
@@ -716,11 +718,14 @@ export class SqlQuery {
 					filter = new ExpressionFilter(false);
 				}
 			}
+
+			if (filter !== null) {
+				this.filter.and(this.ifTypeThen('array', filter));
+
+				return true;
+			}
 		}
-		if (filter !== null) {
-			this.filter.and(this.ifTypeThen('array', filter));
-			return true;
-		}
+
 		return false;
 	}
 
@@ -935,7 +940,7 @@ export class SqlQuery {
 		this.filter.and(this.ifTypeThen('string', filter));
 	}
 
-	propertiesVisitor(propertiesMap: { [s: string]: JSONSchema }) {
+	propertiesVisitor(propertiesMap: { [s: string]: JsonSchema }) {
 		this.context.assertInternal(
 			_.isPlainObject(propertiesMap),
 			InvalidSchema,
@@ -1112,7 +1117,7 @@ export class SqlQuery {
 	// `this` and are just build as a separate object for organizational
 	// purposes
 	buildQueryFromSubSchema(
-		schema: JSONSchema,
+		schema: JsonSchema,
 		suffix: string | any[],
 		select?: { [key: string]: any },
 	) {
@@ -1135,7 +1140,7 @@ export class SqlQuery {
 	// the SQL level, so the tables (or table aliases) they refer to are
 	// different, but they still rely on some shared context with `this`
 	buildQueryFromCorrelatedSchema(
-		schema: boolean | JSONSchema,
+		schema: boolean | JsonSchema,
 		suffix: string | any[],
 	) {
 		let parentPath = null;
@@ -1159,7 +1164,7 @@ export class SqlQuery {
 	// cards that are linked to the current schema
 	buildQueryFromLinkedSchema(
 		linkType: string,
-		schema: JSONSchema,
+		schema: JsonSchema,
 		suffix: string | any[],
 	) {
 		this.options.parentJsonPath?.push(...suffix);
