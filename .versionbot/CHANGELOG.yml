@@ -1,4 +1,25 @@
 - commits:
+    - subject: Update the API
+      hash: dea38774700ced45dd05ded5359240f0132bf681
+      body: |
+        - Remove the `core*` prefix from exported symbols.
+        - Do not export `PostgresBackend`. This is an implementation detail.
+        - Replace the `create` function with a static method in the `Kernel`:
+          `withPostgres`.
+        - `Kernel.initialize` now takes a `LogContext` instead of a
+          `MixedContext` as it doesn't make sense for it to accept a `Context`
+          object.
+        - Update `jellyfish-types` to v2 and use the new `JsonSchema` type.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 11.0.0
+  date: 2021-12-27T18:13:23.406Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: c19678b6f47d67e4dcb973f6e8284610f1284a66
       body: ''
