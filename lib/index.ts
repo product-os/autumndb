@@ -4,3 +4,4 @@ export { CARDS } from './cards';
 export * as cardMixins from './cards/mixins';
 export * as errors from './errors';
 export { Kernel } from './kernel';
+export * as testUtils from './test-utils';

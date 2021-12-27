@@ -4,20 +4,20 @@ import { v4 as uuid } from 'uuid';
 import * as errors from '../../lib/errors';
 import { CARDS } from '../../lib/cards';
 import type { Stream } from '../../lib/backend/postgres/streams';
-import * as helpers from './helpers';
 import { once } from 'events';
 import { Contract } from '@balena/jellyfish-types/build/core';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import { strict as assert } from 'assert';
+import { testUtils } from '../../lib';
 
-let ctx: helpers.CoreTestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await testUtils.newContext();
 });
 
-afterAll(() => {
-	return helpers.after(ctx);
+afterAll(async () => {
+	await testUtils.destroyContext(ctx);
 });
 
 describe('Kernel', () => {
@@ -40,7 +40,7 @@ describe('Kernel', () => {
 
 	describe('.patchCardBySlug()', () => {
 		it('should throw an error if the element does not exist', async () => {
-			const slug = `${ctx.generateRandomSlug({
+			const slug = `${testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			})}@1.0.0`;
 			await expect(
@@ -641,7 +641,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to patch cards hidden to the user', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -730,7 +730,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not allow updates in hidden fields', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -848,7 +848,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not return the full card', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -969,7 +969,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not allow a patch that makes a card inaccessible', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -1088,7 +1088,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not remove inaccessible fields', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -1205,7 +1205,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not add an inaccesible field', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -1322,7 +1322,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not throw when adding a loop field referencing a loop that does exist', async () => {
-			const loopSlug = ctx.generateRandomSlug({
+			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -1330,7 +1330,7 @@ describe('Kernel', () => {
 				type: 'loop@1.0.0',
 			});
 
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
 			const card = await ctx.kernel.insertCard(
@@ -1362,7 +1362,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not throw when removing the loop field value', async () => {
-			const loopSlug = ctx.generateRandomSlug({
+			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -1398,7 +1398,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not throw when replacing a loop field with a value referencing a loop that does exist', async () => {
-			const loopSlug = ctx.generateRandomSlug({
+			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -1412,7 +1412,7 @@ describe('Kernel', () => {
 				version: '1.0.1',
 			});
 
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
 			const card = await ctx.kernel.insertCard(
@@ -1445,7 +1445,7 @@ describe('Kernel', () => {
 		});
 
 		it('should throw if trying to add a loop field referencing a loop that does not exist', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
 			const card = await ctx.kernel.insertCard(
@@ -1485,7 +1485,7 @@ describe('Kernel', () => {
 		});
 
 		it('should throw if trying to add a loop field referencing a loop that is not a loop card', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
 			const card = await ctx.kernel.insertCard(
@@ -1525,7 +1525,7 @@ describe('Kernel', () => {
 		});
 
 		it('should throw if trying to replace the loop field with a value referencing a loop that does not exist', async () => {
-			const loopSlug = ctx.generateRandomSlug({
+			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -1533,7 +1533,7 @@ describe('Kernel', () => {
 				type: 'loop@1.0.0',
 			});
 
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
 			const card = await ctx.kernel.insertCard(
@@ -1711,7 +1711,7 @@ describe('Kernel', () => {
 				type: 'loop@1.0.0',
 			});
 
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 			const card = await ctx.kernel.insertCard(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
@@ -1744,7 +1744,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to insert two versions of the same card', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'hello-world',
 			});
 
@@ -1795,7 +1795,7 @@ describe('Kernel', () => {
 
 		it('should insert an element with pre-release version data', async () => {
 			const version = '1.0.0-alpha';
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'card',
 			});
 			const result = await ctx.kernel.insertCard(
@@ -1836,7 +1836,7 @@ describe('Kernel', () => {
 		});
 
 		it('should insert multiple prereleases on same version', async () => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 			const version1 = '1.0.0-alpha';
 			const version2 = '1.0.0-beta';
 			const results = [
@@ -1881,7 +1881,7 @@ describe('Kernel', () => {
 		});
 
 		it('should insert multiple builds on same prerelease version', async () => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 			const version1 = '1.0.0-alpha+001';
 			const version2 = '1.0.0-alpha+002';
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -2017,7 +2017,7 @@ describe('Kernel', () => {
 		});
 
 		it('should throw if the card slug already exists', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'hello-world',
 			});
 			const card = {
@@ -2235,7 +2235,7 @@ describe('Kernel', () => {
 		});
 
 		it('.insertCard() read access on a property should not allow to write other properties', async () => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
 			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -2309,7 +2309,7 @@ describe('Kernel', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
+					slug: testUtils.generateRandomSlug({
 						prefix: 'user-janedoe',
 					}),
 					type: 'user@1.0.0',
@@ -2351,18 +2351,18 @@ describe('Kernel', () => {
 		it('.insertCard() should not insert a link if any of the two target cards does not exist', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-					slug: `link-${ctx.generateRandomSlug()}-is-attached-to-${ctx.generateRandomSlug()}`,
+					slug: `link-${testUtils.generateRandomSlug()}-is-attached-to-${testUtils.generateRandomSlug()}`,
 					name: 'is attached to',
 					type: 'link@1.0.0',
 					version: '1.0.0',
 					data: {
 						inverseName: 'has attached',
 						from: {
-							id: ctx.generateRandomID(),
+							id: testUtils.generateRandomId(),
 							type: 'card@1.0.0',
 						},
 						to: {
-							id: ctx.generateRandomID(),
+							id: testUtils.generateRandomId(),
 							type: 'card@1.0.0',
 						},
 					},
@@ -3543,7 +3543,7 @@ describe('Kernel', () => {
 		});
 
 		it('should take roles into account', async () => {
-			const role = ctx.generateRandomSlug({ prefix: 'foo' });
+			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
 			const actor = await ctx.kernel.insertCard(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
@@ -3623,7 +3623,7 @@ describe('Kernel', () => {
 		});
 
 		it('should take roles into account when querying for linked cards', async () => {
-			const role = ctx.generateRandomSlug({ prefix: 'foo' });
+			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
 			const actor = await ctx.kernel.insertCard(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
@@ -3697,7 +3697,7 @@ describe('Kernel', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
+					slug: testUtils.generateRandomSlug(),
 					type: 'card@1.0.0',
 				},
 			);
@@ -3741,7 +3741,7 @@ describe('Kernel', () => {
 		});
 
 		it('should ignore queries to properties not whitelisted by a role', async () => {
-			const role = ctx.generateRandomSlug({
+			const role = testUtils.generateRandomSlug({
 				prefix: 'foo',
 			});
 			const actor = await ctx.kernel.insertCard(
@@ -3813,7 +3813,7 @@ describe('Kernel', () => {
 		});
 
 		it('should ignore $id properties in roles', async () => {
-			const role = ctx.generateRandomSlug({ prefix: 'foo' });
+			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
 			const actor = await ctx.kernel.insertCard(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
@@ -3886,7 +3886,7 @@ describe('Kernel', () => {
 		});
 
 		it('should ignore queries to disallowed properties with additionalProperties: true', async () => {
-			const role = ctx.generateRandomSlug({ prefix: 'foo' });
+			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
 			const actor = await ctx.kernel.insertCard(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
@@ -5790,7 +5790,7 @@ describe('Kernel', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
+					slug: testUtils.generateRandomSlug(),
 					type: 'card@1.0.0',
 					version: '1.0.0',
 				},
@@ -5800,7 +5800,7 @@ describe('Kernel', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
+					slug: testUtils.generateRandomSlug(),
 					type: 'card@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -6708,7 +6708,7 @@ describe('Kernel', () => {
 
 	describe('.stream()', () => {
 		it('should include data if additionalProperties true', (done) => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'card',
 			});
 
@@ -6777,7 +6777,7 @@ describe('Kernel', () => {
 		});
 
 		it('should report back new elements that match a certain slug', (done) => {
-			const slug = ctx.generateRandomSlug({
+			const slug = testUtils.generateRandomSlug({
 				prefix: 'card',
 			});
 
@@ -6851,7 +6851,7 @@ describe('Kernel', () => {
 		});
 
 		it('should report back elements of a certain type', (done) => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
 				.stream(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -6910,7 +6910,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to attach a large number of streams', async () => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 			const schema: JsonSchema = {
 				type: 'object',
 				additionalProperties: false,
@@ -7083,7 +7083,7 @@ describe('Kernel', () => {
 					properties: {
 						slug: {
 							type: 'string',
-							const: ctx.generateRandomSlug(),
+							const: testUtils.generateRandomSlug(),
 						},
 					},
 					required: ['slug'],
@@ -7096,7 +7096,7 @@ describe('Kernel', () => {
 		});
 
 		it('should report back inactive elements', (done) => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
 				.stream(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -7139,7 +7139,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to resolve links on an update to the base card', (done) => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
 				.stream(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -7250,7 +7250,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to resolve links when a new link is added', (done) => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
 				.stream(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -7344,7 +7344,7 @@ describe('Kernel', () => {
 
 		// TODO: Get this working, but in a performant way.
 		test.skip('should be able to resolve links on an update to the linked card', (done) => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
 				.stream(ctx.logContext, ctx.kernel.sessions!.admin, {
@@ -7458,7 +7458,7 @@ describe('Kernel', () => {
 		});
 
 		it('should send the unmatch event when a previously matching card does not match anymore', async () => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 			const stream = await ctx.kernel.stream(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
@@ -7535,7 +7535,7 @@ describe('Kernel', () => {
 		});
 
 		it('should send the dataset event on a query request and support the unmatch event for these cards', async () => {
-			const slug = ctx.generateRandomSlug();
+			const slug = testUtils.generateRandomSlug();
 			const card = await ctx.kernel.insertCard(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
@@ -7624,7 +7624,7 @@ describe('Kernel', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug(),
+					slug: testUtils.generateRandomSlug(),
 					type: 'card@1.0.0',
 				},
 			);

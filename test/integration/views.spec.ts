@@ -1,19 +1,15 @@
+import { testUtils } from '../../lib';
 import * as views from '../../lib/views';
 import { CARDS } from '../../lib/cards';
-import * as helpers from './helpers';
 
-let ctx: helpers.CoreTestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await testUtils.newContext();
 });
 
-afterAll(() => {
-	if (!ctx) {
-		console.log('TEST_WARN: afterAll called before beforeAll');
-		return;
-	}
-	return helpers.after(ctx);
+afterAll(async () => {
+	await testUtils.destroyContext(ctx);
 });
 
 describe('views', () => {
