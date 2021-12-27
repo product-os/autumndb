@@ -1,8 +1,9 @@
+import { Context } from '../../lib/context';
 import * as permissionFilter from '../../lib/permission-filter';
 import * as errors from '../../lib/errors';
 import * as helpers from './helpers';
 
-let ctx: helpers.KernelContext;
+let ctx: helpers.CoreTestContext;
 
 beforeAll(async () => {
 	ctx = await helpers.before();
@@ -17,8 +18,8 @@ describe('permission-filter', () => {
 		test('should throw if the session is invalid', async () => {
 			await expect(
 				permissionFilter.getSessionActor(
-					ctx.context,
-					ctx.backend,
+					new Context(ctx.logContext),
+					ctx.kernel.backend,
 					'4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				),
 			).rejects.toThrow(errors.JellyfishInvalidSession);
@@ -26,7 +27,7 @@ describe('permission-filter', () => {
 
 		test('should throw if the session actor is invalid', async () => {
 			const session = await ctx.kernel.insertCard(
-				ctx.context,
+				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: ctx.generateRandomSlug({
@@ -41,13 +42,17 @@ describe('permission-filter', () => {
 			);
 
 			await expect(
-				permissionFilter.getSessionActor(ctx.context, ctx.backend, session.id),
+				permissionFilter.getSessionActor(
+					new Context(ctx.logContext),
+					ctx.kernel.backend,
+					session.id,
+				),
 			).rejects.toThrow(errors.JellyfishNoElement);
 		});
 
 		test('should get the session user and scope given the session did not expire', async () => {
 			const result = await ctx.kernel.insertCard(
-				ctx.context,
+				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: ctx.generateRandomSlug({
@@ -80,7 +85,7 @@ describe('permission-filter', () => {
 			};
 
 			const session = await ctx.kernel.insertCard(
-				ctx.context,
+				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: ctx.generateRandomSlug({
@@ -97,8 +102,8 @@ describe('permission-filter', () => {
 			);
 
 			const { actor, scope } = await permissionFilter.getSessionActor(
-				ctx.context,
-				ctx.backend,
+				new Context(ctx.logContext),
+				ctx.kernel.backend,
 				session.id,
 			);
 
@@ -115,7 +120,7 @@ describe('permission-filter', () => {
 
 		test('should throw if the session expired', async () => {
 			const user = await ctx.kernel.insertCard(
-				ctx.context,
+				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: ctx.generateRandomSlug({
@@ -135,7 +140,7 @@ describe('permission-filter', () => {
 			date.setDate(date.getDate() - 1);
 
 			const session = await ctx.kernel.insertCard(
-				ctx.context,
+				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: ctx.generateRandomSlug({
@@ -151,13 +156,17 @@ describe('permission-filter', () => {
 			);
 
 			await expect(
-				permissionFilter.getSessionActor(ctx.context, ctx.backend, session.id),
+				permissionFilter.getSessionActor(
+					new Context(ctx.logContext),
+					ctx.kernel.backend,
+					session.id,
+				),
 			).rejects.toThrow(errors.JellyfishSessionExpired);
 		});
 
 		test('should throw if the session has been deleted', async () => {
 			const user = await ctx.kernel.insertCard(
-				ctx.context,
+				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: ctx.generateRandomSlug({
@@ -174,7 +183,7 @@ describe('permission-filter', () => {
 			);
 
 			const session = await ctx.kernel.insertCard(
-				ctx.context,
+				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: ctx.generateRandomSlug({
@@ -190,7 +199,11 @@ describe('permission-filter', () => {
 			);
 
 			await expect(
-				permissionFilter.getSessionActor(ctx.context, ctx.backend, session.id),
+				permissionFilter.getSessionActor(
+					new Context(ctx.logContext),
+					ctx.kernel.backend,
+					session.id,
+				),
 			).rejects.toThrow();
 		});
 	});

@@ -1,32 +1,52 @@
-import * as helpers from './backend/helpers';
+import { defaultEnvironment } from '@balena/jellyfish-environment';
+import type { LogContext } from '@balena/jellyfish-logger';
+import { v4 as uuid } from 'uuid';
+import { generateRandomSlug, generateRandomID } from './backend/helpers';
+import { Cache } from '../../lib/cache';
 import { Kernel } from '../../lib/kernel';
 
-export interface KernelContext extends helpers.BackendContext {
+export interface CoreTestContext {
+	logContext: LogContext;
+	cache: Cache;
 	kernel: Kernel;
+	generateRandomSlug: typeof generateRandomSlug;
+	generateRandomID: typeof generateRandomID;
 }
 
 export const before = async (
 	options: { suffix?: string; skipConnect?: boolean } = {},
-): Promise<KernelContext> => {
-	const ctx: helpers.BackendContext & Partial<KernelContext> =
-		await helpers.before({
-			skipConnect: true,
-			suffix: options.suffix,
-		});
+): Promise<CoreTestContext> => {
+	const suffix = options.suffix || uuid();
+	const dbName = `test_${suffix.replace(/-/g, '_')}`;
 
-	if (options.suffix) {
-		await ctx.backend.connect(ctx.context);
-		await ctx.backend.reset(ctx.context);
-	}
+	const cache = new Cache(
+		Object.assign({}, defaultEnvironment.redis, {
+			namespace: dbName,
+		} as any),
+	);
+	await cache.connect();
 
-	ctx.kernel = new Kernel(ctx.backend);
-	await ctx.kernel.initialize(ctx.context);
+	const logContext = { id: `CORE-TEST-${uuid()}` };
 
-	return ctx as KernelContext;
+	const kernel = await Kernel.withPostgres(
+		logContext,
+		cache,
+		Object.assign({}, defaultEnvironment.database.options, {
+			database: dbName,
+		}),
+	);
+
+	return {
+		logContext,
+		cache,
+		kernel,
+		generateRandomID,
+		generateRandomSlug,
+	};
 };
 
-export const after = async (ctx: KernelContext) => {
-	await ctx.backend.drop(ctx.context);
-	await ctx.kernel.disconnect(ctx.context);
-	await helpers.after(ctx);
+export const after = async (context: CoreTestContext) => {
+	await context.kernel.drop(context.logContext);
+	await context.kernel.disconnect(context.logContext);
+	await context.cache.disconnect();
 };

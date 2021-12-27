@@ -10,7 +10,7 @@ import { Context } from '../../../../../lib/context';
 import regexpTestSuite from './regexp';
 import formatMaxMinTestSuite from './format-max-min';
 import type { Contract } from '@balena/jellyfish-types/build/core';
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type { DatabaseBackend } from '../../../../../lib/backend/postgres/types';
 import { PostgresBackend } from '../../../../../lib/backend/postgres';
 
@@ -79,7 +79,7 @@ interface RunnerOptions {
 	backend: typeof ctx['backend'];
 	database: typeof ctx['database'];
 	elements: Array<Partial<Contract>>;
-	schema: JSONSchema;
+	schema: JsonSchema;
 	table: string;
 	options?: {
 		sortBy?: string[] | string;
@@ -219,7 +219,7 @@ testSuites.push(regexpTestSuite as any);
  */
 testSuites.push(formatMaxMinTestSuite as any);
 
-describe('jsonSchema2sql: JSONSchema compat', () => {
+describe('jsonSchema2sql: JsonSchema compat', () => {
 	/*
 	 * The JSON Schema tests are divided in suites, where
 	 * each of them corresponds to a JSON Schema keyword.
@@ -372,7 +372,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should escape malicious query keys', async () => {
 			const table = 'malicious_queries_0';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['id', 'data'],
 				properties: {
@@ -423,7 +423,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should escape malicious query values', async () => {
 			const table = 'malicious_queries_1';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['id', 'data'],
 				properties: {
@@ -471,7 +471,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			async () => {
 				const table = 'order_0';
 
-				const schema: JSONSchema = {
+				const schema: JsonSchema = {
 					type: 'object',
 					properties: {
 						slug: {
@@ -547,7 +547,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should be able to sort values in descending order', async () => {
 			const table = 'order_1';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				properties: {
 					slug: {
@@ -625,7 +625,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			async () => {
 				const table = 'order_2';
 
-				const schema: JSONSchema = {
+				const schema: JsonSchema = {
 					type: 'object',
 					properties: {
 						slug: {
@@ -701,7 +701,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should be able to sort by version (asc)', async () => {
 			const table = 'order_3';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				properties: {
 					slug: {
@@ -801,7 +801,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should be able to sort by version (desc)', async () => {
 			const table = 'order_4';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				properties: {
 					slug: {
@@ -902,7 +902,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should handle nested anyOf statements', async () => {
 			const table = 'any_of_nested_0';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['slug'],
 				properties: {
@@ -1039,7 +1039,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('inside items in a jsonb column', async () => {
 			const table = 'pattern_items_jsonb';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['id', 'slug', 'type', 'data'],
 				properties: {
@@ -1111,7 +1111,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('pattern keyword should be case sensitive', async () => {
 			const table = 'pattern_case_jsonb';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['id', 'slug', 'type', 'data'],
 				properties: {
@@ -1164,7 +1164,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should work on TEXT array columns', async () => {
 			const table = 'minitems_text_array';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['markers'],
 				properties: {
@@ -1209,7 +1209,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should work on TEXT array columns', async () => {
 			const table = 'maxitems_text_array';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['markers'],
 				properties: {
@@ -1255,7 +1255,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('should work for boolean values', async () => {
 			const table = 'const_boolean_value';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['data'],
 				properties: {
@@ -1310,7 +1310,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			async () => {
 				const table = 'const_boolean_string';
 
-				const schema: JSONSchema = {
+				const schema: JsonSchema = {
 					type: 'object',
 					required: ['data'],
 					properties: {
@@ -1366,7 +1366,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			async () => {
 				const table = 'const_number_string';
 
-				const schema: JSONSchema = {
+				const schema: JsonSchema = {
 					type: 'object',
 					required: ['data'],
 					properties: {
@@ -1422,7 +1422,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			async () => {
 				const table = 'contains_const_string';
 
-				const schema: JSONSchema = {
+				const schema: JsonSchema = {
 					type: 'object',
 					required: ['data'],
 					properties: {
@@ -1481,7 +1481,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			async () => {
 				const table = 'contains_const_string_tl';
 
-				const schema: JSONSchema = {
+				const schema: JsonSchema = {
 					type: 'object',
 					properties: {
 						markers: {
@@ -1528,7 +1528,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 		testFn('items of type object should be handled correctly', async () => {
 			const table = 'contains_object';
 
-			const schema: JSONSchema = {
+			const schema: JsonSchema = {
 				type: 'object',
 				required: ['data'],
 				properties: {
@@ -1812,7 +1812,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 							.replace(/ /g, '_')
 							.replace(/`/g, '');
 
-						const schema: JSONSchema = {
+						const schema: JsonSchema = {
 							properties: {
 								data: {
 									properties: {},
@@ -1863,7 +1863,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			async () => {
 				const table = 'unambiguous_alias';
 
-				const schema: JSONSchema = {
+				const schema: JsonSchema = {
 					properties: {
 						data: {
 							properties: {

@@ -2,7 +2,7 @@ import * as views from '../../lib/views';
 import { CARDS } from '../../lib/cards';
 import * as helpers from './helpers';
 
-let ctx: helpers.KernelContext;
+let ctx: helpers.CoreTestContext;
 
 beforeAll(async () => {
 	ctx = await helpers.before();

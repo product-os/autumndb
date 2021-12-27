@@ -6,7 +6,7 @@ import * as errors from './errors';
 import { CARDS } from './cards';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { DatabaseBackend } from './backend/postgres/types';
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 
 const CARD_CARD_TYPE = `${CARDS.card.slug}@${CARDS.card.version}`;
 const VERSIONED_CARDS = _.mapKeys(CARDS, (value: any, key: any) => {
@@ -17,8 +17,8 @@ const applyMarkers = async (
 	context: Context,
 	backend: DatabaseBackend,
 	actor: Contract,
-	schema: JSONSchema,
-) => {
+	schema: JsonSchema,
+): Promise<JsonSchema> => {
 	// TODO: Find a way to implement this logic without
 	// hardcoding the admin user
 	if (actor.slug === CARDS['user-admin'].slug) {
@@ -67,7 +67,7 @@ const applyMarkers = async (
 		}),
 	);
 
-	const markersQuery =
+	const markersQuery: JsonSchema =
 		markers.length === 0
 			? // If there are no markers provided, only elements with
 			  // no markers are valid
@@ -93,22 +93,16 @@ const applyMarkers = async (
 					},
 			  };
 
-	// The markers must match
-	if (schema.properties && schema.properties.markers) {
-		schema.allOf = schema.allOf || [];
-		schema.allOf.push({
+	return jsonSchema.merge([
+		schema as any,
+		{
 			type: 'object',
 			required: ['markers'],
 			properties: {
 				markers: markersQuery,
 			},
-		} as any);
-	} else {
-		schema.properties = schema.properties || {};
-		(schema as any).properties.markers = markersQuery;
-	}
-
-	return schema;
+		},
+	]) as JsonSchema;
 };
 
 /**
@@ -279,8 +273,8 @@ const getActorMask = async (
 	context: Context,
 	backend: DatabaseBackend,
 	actor: Contract,
-	scope: JSONSchema = {},
-) => {
+	scope: JsonSchema = {},
+): Promise<JsonSchema> => {
 	const permissionFilters = await getRoleViews(context, backend, actor);
 	let mask = await applyMarkers(context, backend, actor, {
 		type: 'object',
@@ -296,7 +290,7 @@ const getActorMask = async (
 
 	// Apply session scope to mask
 	if (!_.isEmpty(scope)) {
-		mask = jsonSchema.merge([mask as any, scope as any]) as JSONSchema;
+		mask = jsonSchema.merge([mask as any, scope as any]) as JsonSchema;
 	}
 
 	return mask;
@@ -323,7 +317,7 @@ export const getMask = async (
 
 // Recursively applies permission mask to $$links queries, ensuring you can't "escape"
 // permissions using a relational query.
-const mergeMaskInLinks = (schema: JSONSchema, mask: JSONSchema) => {
+const mergeMaskInLinks = (schema: JsonSchema, mask: JsonSchema) => {
 	if (Array.isArray(schema)) {
 		for (const item of schema) {
 			mergeMaskInLinks(item, mask);
@@ -334,35 +328,37 @@ const mergeMaskInLinks = (schema: JSONSchema, mask: JSONSchema) => {
 		return;
 	}
 
-	if ('$$links' in schema) {
-		const links = schema.$$links!;
-		for (const [linkType, linkSchema] of Object.entries(links)) {
-			mergeMaskInLinks(linkSchema, mask);
-			links[linkType] = jsonSchema.merge([
-				mask as any,
-				linkSchema as any,
-			]) as JSONSchema;
+	if (schema instanceof Object) {
+		if ('$$links' in schema) {
+			const links = schema.$$links!;
+			for (const [linkType, linkSchema] of Object.entries(links)) {
+				mergeMaskInLinks(linkSchema, mask);
+				links[linkType] = jsonSchema.merge([
+					mask as any,
+					linkSchema as any,
+				]) as JsonSchema;
+			}
 		}
-	}
 
-	if ('properties' in schema) {
-		for (const propertySchema of Object.values(schema.properties!)) {
-			mergeMaskInLinks(propertySchema, mask);
+		if ('properties' in schema) {
+			for (const propertySchema of Object.values(schema.properties!)) {
+				mergeMaskInLinks(propertySchema, mask);
+			}
 		}
-	}
 
-	for (const keyWithSubSchema of [
-		'allOf',
-		'anyOf',
-		'contains',
-		'items',
-		'not',
-	]) {
-		if (keyWithSubSchema in schema) {
-			mergeMaskInLinks(
-				schema[keyWithSubSchema as keyof JSONSchema] as JSONSchema,
-				mask,
-			);
+		for (const keyWithSubSchema of [
+			'allOf',
+			'anyOf',
+			'contains',
+			'items',
+			'not',
+		]) {
+			if (keyWithSubSchema in schema) {
+				mergeMaskInLinks(
+					schema[keyWithSubSchema as keyof JsonSchema] as JsonSchema,
+					mask,
+				);
+			}
 		}
 	}
 };
@@ -376,14 +372,14 @@ const mergeMaskInLinks = (schema: JSONSchema, mask: JSONSchema) => {
  * @param {Object} backend - backend
  * @param {String} session - session id
  * @param {Object} schema - query schema
- * @returns {Promise<JSONSchema>} query
+ * @returns {Promise<JsonSchema>} query
  */
 export const getQuery = async (
 	context: Context,
 	backend: DatabaseBackend,
 	session: string,
-	schema: JSONSchema,
-): Promise<JSONSchema> => {
+	schema: JsonSchema,
+): Promise<JsonSchema> => {
 	const { actor, scope } = await getSessionActor(context, backend, session);
 	const mask = await getActorMask(context, backend, actor, scope);
 
@@ -396,5 +392,5 @@ export const getQuery = async (
 			// TODO: Update views to interpolate "actor" instead of "user"
 			user: actor,
 		}),
-	]) as JSONSchema;
+	]) as JsonSchema;
 };

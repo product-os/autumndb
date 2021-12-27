@@ -1,4 +1,4 @@
-import type { JSONSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type { ViewContract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import jsonSchema from './json-schema';
@@ -13,7 +13,7 @@ import jsonSchema from './json-schema';
  */
 export const getSchema = (
 	card: Partial<ViewContract> & Pick<ViewContract, 'data'>,
-): JSONSchema | null => {
+): JsonSchema | null => {
 	if (card.data && card.data.schema) {
 		return card.data.schema;
 	}
@@ -31,5 +31,5 @@ export const getSchema = (
 		});
 	}
 
-	return jsonSchema.merge(conjunctions as any) as JSONSchema;
+	return jsonSchema.merge(conjunctions as any) as JsonSchema;
 };
