@@ -405,6 +405,7 @@ export class Kernel {
 	 * Drop database tables.
 	 */
 	async drop(mixedContext: MixedContext) {
+		// TODO: we probably want to drop the database itself too.
 		await this.backend.drop(Context.fromMixed(mixedContext));
 	}
 

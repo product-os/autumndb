@@ -1,16 +1,16 @@
 import { Context } from '../../lib/context';
 import * as permissionFilter from '../../lib/permission-filter';
+import { testUtils } from '../../lib';
 import * as errors from '../../lib/errors';
-import * as helpers from './helpers';
 
-let ctx: helpers.CoreTestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await testUtils.newContext();
 });
 
-afterAll(() => {
-	return helpers.after(ctx);
+afterAll(async () => {
+	await testUtils.destroyContext(ctx);
 });
 
 describe('permission-filter', () => {
@@ -30,7 +30,7 @@ describe('permission-filter', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
+					slug: testUtils.generateRandomSlug({
 						prefix: 'session',
 					}),
 					type: 'session@1.0.0',
@@ -55,7 +55,7 @@ describe('permission-filter', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
+					slug: testUtils.generateRandomSlug({
 						prefix: 'user',
 					}),
 					type: 'user@1.0.0',
@@ -88,7 +88,7 @@ describe('permission-filter', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
+					slug: testUtils.generateRandomSlug({
 						prefix: 'session',
 					}),
 					type: 'session@1.0.0',
@@ -123,7 +123,7 @@ describe('permission-filter', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
+					slug: testUtils.generateRandomSlug({
 						prefix: 'user',
 					}),
 					type: 'user@1.0.0',
@@ -143,7 +143,7 @@ describe('permission-filter', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
+					slug: testUtils.generateRandomSlug({
 						prefix: 'session',
 					}),
 					type: 'session@1.0.0',
@@ -169,7 +169,7 @@ describe('permission-filter', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
+					slug: testUtils.generateRandomSlug({
 						prefix: 'user',
 					}),
 					type: 'user@1.0.0',
@@ -186,7 +186,7 @@ describe('permission-filter', () => {
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: ctx.generateRandomSlug({
+					slug: testUtils.generateRandomSlug({
 						prefix: 'session-delete-test',
 					}),
 					active: false,

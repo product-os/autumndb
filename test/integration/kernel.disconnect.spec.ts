@@ -1,18 +1,13 @@
-import * as helpers from './helpers';
+import { testUtils } from '../../lib';
 
-let ctx: helpers.CoreTestContext;
+let ctx: testUtils.TestContext;
 
-/*
- * Tests in this spec file actively disconnect the server. As such they are
- * seperated from other kernel tests, as each test requires a new connection to
- * be established
- */
-beforeEach(async () => {
-	ctx = await helpers.before();
+beforeAll(async () => {
+	ctx = await testUtils.newContext();
 });
 
-afterEach(async () => {
-	await helpers.after(ctx);
+afterAll(async () => {
+	await testUtils.destroyContext(ctx);
 });
 
 describe('Kernel', () => {
