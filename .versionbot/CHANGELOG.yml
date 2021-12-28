@@ -1,4 +1,30 @@
 - commits:
+    - subject: Export a `testUtils` module with utilities for testing against the core
+      hash: 92fefe6b037088a00868d58e454a1c20356d4b27
+      body: |
+        `testUtils` has a `TestContext` that contains the three pieces necessary
+        to run tests against the core:
+
+        - The log context.
+        - The admin session token.
+        - The `Kernel` object.
+
+        `generateRandomId` (notice the change in capitalization) and
+        `generateRandomSlug` are not part of the context anymore. They are now
+        functions exported from the `testUtils` module.
+
+        Other test contexts that depend on the core's should extend
+        `TestContext` and use `newContext` and `destroyContext`.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 11.1.0
+  date: 2021-12-28T09:41:32.478Z
+- commits:
     - subject: Update the API
       hash: dea38774700ced45dd05ded5359240f0132bf681
       body: |
