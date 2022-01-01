@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @types/jest to ^27.4.0'
+      hash: c29a7e547d98b21477180c10bb47fb5331e8de7a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 11.1.1
+  date: 2022-01-01T01:59:08.582Z
+- commits:
     - subject: Export a `testUtils` module with utilities for testing against the core
       hash: 92fefe6b037088a00868d58e454a1c20356d4b27
       body: |
