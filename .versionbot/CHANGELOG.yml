@@ -1,4 +1,36 @@
 - commits:
+    - subject: Update jellyfish-metrics to v2.0.12
+      hash: 7c12456a4e342dfd667d26b95adc1104874721d7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Update metrics calls
+      hash: e272cb7829cdef1337e1b0428b2117e661a7e9d7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-metrics to v2'
+      hash: 770763613f39437ad6c71508ef8742d0c6efceab
+      body: |
+        Update @balena/jellyfish-metrics from 1.0.446 to 2.0.9
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 11.1.5
+  date: 2022-01-03T07:48:41.600Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 57fd3b1bac83c866e7922e8bf25f223210f42010
       body: ''
