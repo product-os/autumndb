@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 4853aba76d00e653e5c72738d1bed2d25a0e4238
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 11.1.6
+  date: 2022-01-03T15:03:04.001Z
+- commits:
     - subject: Update jellyfish-metrics to v2.0.12
       hash: 7c12456a4e342dfd667d26b95adc1104874721d7
       body: ''
