@@ -1193,7 +1193,7 @@ export class PostgresBackend implements Queryable {
 
 		// Mark card read metric.
 		_.forEach(results, (result) => {
-			metrics.markCardReadFromDatabase(result);
+			metrics.markContractReadFromDatabase(result);
 		});
 		return results;
 	}

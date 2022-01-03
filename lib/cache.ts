@@ -298,7 +298,7 @@ export class Cache {
 				element: JSON.parse(result),
 			};
 			if (table === cardsTable) {
-				metrics.markCardReadFromCache(data.element);
+				metrics.markContractReadFromCache(data.element);
 			}
 			return data;
 		}
