@@ -1,6 +1,5 @@
-import { testUtils } from '../../lib';
+import { CARDS, Kernel, testUtils } from '../../lib';
 import * as views from '../../lib/views';
-import { CARDS } from '../../lib/cards';
 
 let ctx: testUtils.TestContext;
 
@@ -21,7 +20,7 @@ describe('views', () => {
 
 		test('should preserve template interpolations in user properties', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					data: {
 						schema: {
@@ -56,7 +55,7 @@ describe('views', () => {
 
 		test('should preserve template interpolations in schema properties', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -90,7 +89,7 @@ describe('views', () => {
 
 		test('should return a schema given a view card with two conjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -142,7 +141,7 @@ describe('views', () => {
 
 		test('should return a schema given a view card with two conjunctions and empty disjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -195,7 +194,7 @@ describe('views', () => {
 
 		test('should return a schema given a view card with two disjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -261,7 +260,7 @@ describe('views', () => {
 
 		test('should return a schema given a view card with two disjunctions and empty conjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -328,7 +327,7 @@ describe('views', () => {
 
 		test('should return a schema given a view card with two disjunctions and two conjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {

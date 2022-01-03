@@ -434,7 +434,7 @@ export class Kernel {
 		context.debug('Upserting minimal required cards');
 
 		const unsafeUpsert = (card: ContractDefinition) => {
-			const element = this.defaults(card);
+			const element = Kernel.defaults(card);
 			return permissionFilter.unsafeUpsertCard(
 				context,
 				this.backend,
@@ -625,7 +625,7 @@ export class Kernel {
 		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
 		const context = Context.fromMixed(mixedContext);
-		const card = this.defaults(object);
+		const card = Kernel.defaults(object);
 
 		context.debug('Inserting card', { slug: card.slug });
 
@@ -660,7 +660,7 @@ export class Kernel {
 			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
 	): Promise<T> {
 		const context = Context.fromMixed(mixedContext);
-		const card = this.defaults(object);
+		const card = Kernel.defaults(object);
 
 		context.debug('Replacing card', { slug: card.slug });
 
@@ -1043,17 +1043,14 @@ export class Kernel {
 	 * @returns {Object} card
 	 *
 	 * @example
-	 * const kernel = new Kernel(backend, { ... })
-	 * await kernel.initialize()
-	 *
-	 * const card = kernel.defaults({
+	 * const card = Kernel.defaults({
 	 *   slug: 'slug',
 	 *   type: 'type'
 	 * })
 	 *
 	 * console.log(card)
 	 */
-	defaults<T extends Contract = Contract>(
+	static defaults<T extends Contract = Contract>(
 		card: Partial<Contract> & Pick<T, 'type'>,
 	): ContractDefinition<T['data']> {
 		// Object.assign is used as it is significantly faster than using lodash
