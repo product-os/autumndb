@@ -274,7 +274,7 @@ export const getById = async (
 		values: [id],
 	});
 	if (results[0]) {
-		metrics.markCardReadFromDatabase(results[0]);
+		metrics.markContractReadFromDatabase(results[0]);
 	}
 	return results[0] || null;
 };
@@ -335,7 +335,7 @@ export const getBySlug = async (
 	}
 	_.forEach(results, utils.convertDatesToISOString);
 	_.forEach(results, (result) => {
-		metrics.markCardReadFromDatabase(result);
+		metrics.markContractReadFromDatabase(result);
 	});
 	return results[0] || null;
 };
@@ -361,7 +361,7 @@ export const getManyById = async (
 	});
 	_.forEach(results, utils.convertDatesToISOString);
 	_.forEach(results, (result) => {
-		metrics.markCardReadFromDatabase(result);
+		metrics.markContractReadFromDatabase(result);
 	});
 	return results;
 };
@@ -531,8 +531,8 @@ export const upsert = async <T extends Contract = Contract>(
 	insertedObject.version = results[0].version;
 	utils.convertDatesToISOString(insertedObject);
 	options.replace
-		? metrics.markCardUpsert(insertedObject as Contract)
-		: metrics.markCardInsert(insertedObject as Contract);
+		? metrics.markContractUpsert(insertedObject as Contract)
+		: metrics.markContractInsert(insertedObject as Contract);
 	return insertedObject as T;
 };
 

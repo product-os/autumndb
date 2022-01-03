@@ -696,7 +696,7 @@ export class Kernel {
 			session,
 		);
 
-		const result = await metrics.measureCardPatch(async () => {
+		const result = await metrics.measureContractPatch(async () => {
 			return this.backend.withTransaction(async () => {
 				// Set options to ensure subsequent queries are a part of the transaction
 				const options = {

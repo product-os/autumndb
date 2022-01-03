@@ -291,7 +291,7 @@ export class Stream extends EventEmitter {
 		});
 		streamer.register(id, this);
 		// TODO: `markStreamOpened` need to be fixed to use the correct type
-		metrics.markStreamOpened(context.getLogContext() as any, streamer.table);
+		metrics.markStreamOpened(context.getLogContext(), streamer.table);
 		// If an EventEmitter does not have at least one listener for the `error` event
 		// an exception will be raised and the nodeJS process will exit. To avoid
 		// this we always add an error listener that will log a warning.
@@ -419,7 +419,10 @@ export class Stream extends EventEmitter {
 				return false;
 			}
 		} catch (error) {
-			metrics.markStreamError(this.context, this.streamer.table);
+			metrics.markStreamError(
+				this.context.getLogContext(),
+				this.streamer.table,
+			);
 			this.emit('error', error);
 		}
 		return true;
@@ -433,10 +436,7 @@ export class Stream extends EventEmitter {
 		});
 		this.streamer.unregister(this.id);
 		// TODO: `markStreamClosed` need to be fixed to use the correct type
-		metrics.markStreamClosed(
-			this.context.getLogContext() as any,
-			this.streamer.table,
-		);
+		metrics.markStreamClosed(this.context.getLogContext(), this.streamer.table);
 		this.emit('closed');
 	}
 }
