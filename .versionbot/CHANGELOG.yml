@@ -1,4 +1,17 @@
 - commits:
+    - subject: Fix Postgres reset statement
+      hash: 4565e933cfbd13e8de355a510393cdf018ef0fd1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 11.1.7
+  date: 2022-01-06T06:37:42.049Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 4853aba76d00e653e5c72738d1bed2d25a0e4238
       body: ''
