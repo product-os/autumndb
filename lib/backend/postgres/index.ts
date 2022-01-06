@@ -794,10 +794,7 @@ export class PostgresBackend implements Queryable {
 	async reset(context: Context) {
 		context.debug('Resetting database', { database: this.database });
 
-		await this.any(`
-			TRUNCATE ${links.TABLE};
-			TRUNCATE ${cards.TABLE};
-		`);
+		await this.any(`TRUNCATE ${links.TABLE}, ${cards.TABLE};`);
 	}
 
 	/*
