@@ -467,8 +467,6 @@ export class Kernel {
 		await Promise.all(
 			[
 				CARDS.card,
-				CARDS.action,
-				CARDS['action-request'],
 				CARDS.org,
 				CARDS.error,
 				CARDS.event,
@@ -478,7 +476,6 @@ export class Kernel {
 				CARDS.loop,
 				CARDS['oauth-provider'],
 				CARDS['oauth-client'],
-				CARDS['scheduled-action'],
 			].map(async (card) => {
 				context.debug('Upserting core card', { slug: card.slug });
 

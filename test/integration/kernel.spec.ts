@@ -1673,7 +1673,7 @@ describe('Kernel', () => {
 		it('should throw an error if the element does not adhere to the type', async () => {
 			await expect(
 				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-					type: 'action@1.0.0',
+					type: 'user@1.0.0',
 					data: {},
 				}),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
