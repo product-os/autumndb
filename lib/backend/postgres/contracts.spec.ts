@@ -207,7 +207,11 @@ describe('contracts', () => {
 
 			expect(() => {
 				// TS-TODO: fix schema casting
-				contracts.parseFullTextSearchFields(TEST_CONTEXT, schema as any, errors);
+				contracts.parseFullTextSearchFields(
+					TEST_CONTEXT,
+					schema as any,
+					errors,
+				);
 			}).toThrow();
 		});
 
@@ -249,7 +253,11 @@ describe('contracts', () => {
 
 			expect(() => {
 				// TS-TODO: fix schema casting
-				contracts.parseFullTextSearchFields(TEST_CONTEXT, schema as any, errors);
+				contracts.parseFullTextSearchFields(
+					TEST_CONTEXT,
+					schema as any,
+					errors,
+				);
 			}).toThrow();
 		});
 
@@ -292,7 +300,11 @@ describe('contracts', () => {
 
 			expect(() => {
 				// TS-TODO: fix schema casting
-				contracts.parseFullTextSearchFields(TEST_CONTEXT, schema as any, errors);
+				contracts.parseFullTextSearchFields(
+					TEST_CONTEXT,
+					schema as any,
+					errors,
+				);
 			}).toThrow();
 		});
 
@@ -338,7 +350,11 @@ describe('contracts', () => {
 
 			expect(() => {
 				// TS-TODO: fix schema casting
-				contracts.parseFullTextSearchFields(TEST_CONTEXT, schema as any, errors);
+				contracts.parseFullTextSearchFields(
+					TEST_CONTEXT,
+					schema as any,
+					errors,
+				);
 			}).toThrow();
 		});
 	});

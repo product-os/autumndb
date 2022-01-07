@@ -304,7 +304,9 @@ export class SelectMap {
 				const linkArgs = [];
 				for (const linkType of Object.keys(this.links)) {
 					linkArgs.push(pgFormat.literal(linkType));
-					linkArgs.push(`${SelectMap.lateralAliasFor(linkType)}.linkedContracts`);
+					linkArgs.push(
+						`${SelectMap.lateralAliasFor(linkType)}.linkedContracts`,
+					);
 				}
 				args.push(`jsonb_build_object(${linkArgs.join(', ')})`);
 			} else if (property in this.base.all) {

@@ -5,6 +5,7 @@ import type { Stream } from '../../../lib/backend/postgres/streams';
 import * as helpers from './helpers';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
+import { TABLE as CONTRACTS_TABLE } from '../../../lib/backend/postgres/contracts';
 
 let ctx: helpers.BackendContext;
 
@@ -64,7 +65,7 @@ describe('backend', () => {
 		it('should return a found element', async () => {
 			const element = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				tags: [],
 				loop: null,
@@ -89,7 +90,7 @@ describe('backend', () => {
 		it('should omit not found elements', async () => {
 			const element = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				tags: [],
 				loop: null,
@@ -114,7 +115,7 @@ describe('backend', () => {
 		it('.getElementsById() should get deterministic results', async () => {
 			const element = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				tags: [],
 				loop: null,
@@ -161,7 +162,7 @@ describe('backend', () => {
 		it('.getElementById() should not break the cache if trying to query a valid slug with it', async () => {
 			const element = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				links: {},
 				data: {},
 				linked_at: {},
@@ -195,7 +196,7 @@ describe('backend', () => {
 		it('should not break the cache if trying to query a valid id with it', async () => {
 			const element = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				linked_at: {},
 				links: {},
@@ -233,7 +234,7 @@ describe('backend', () => {
 		it('should fetch an element given its slug', async () => {
 			const element = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				linked_at: {},
@@ -258,7 +259,7 @@ describe('backend', () => {
 		it('should return null given the wrong version', async () => {
 			const element = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				linked_at: {},
@@ -283,7 +284,7 @@ describe('backend', () => {
 		it('should fetch an element given the correct version', async () => {
 			const element = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				linked_at: {},
@@ -358,7 +359,7 @@ describe('backend', () => {
 					capabilities: [],
 					linked_at: {},
 					created_at: new Date().toISOString(),
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					active: true,
 				}),
 			).rejects.toThrow(errors.JellyfishInvalidSlug);
@@ -378,7 +379,7 @@ describe('backend', () => {
 				capabilities: [],
 				created_at: new Date().toISOString(),
 				active: true,
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 			});
 
 			const element = await ctx.backend.getElementById(ctx.context, result.id);
@@ -402,7 +403,7 @@ describe('backend', () => {
 				linked_at: {},
 				capabilities: [],
 				created_at: new Date().toISOString(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 			});
 
 			expect(result.id).toBe(id);
@@ -430,7 +431,7 @@ describe('backend', () => {
 				capabilities: [],
 				linked_at: {},
 				created_at: new Date().toISOString(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 			});
 
 			await expect(
@@ -448,7 +449,7 @@ describe('backend', () => {
 					linked_at: {},
 					created_at: new Date().toISOString(),
 					active: true,
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 				}),
 			).rejects.toThrow(errors.JellyfishElementAlreadyExists);
 		});
@@ -467,7 +468,7 @@ describe('backend', () => {
 				linked_at: {},
 				created_at: new Date().toISOString(),
 				active: true,
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 			});
 
 			await expect(
@@ -484,7 +485,7 @@ describe('backend', () => {
 					capabilities: [],
 					linked_at: {},
 					created_at: new Date().toISOString(),
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 				}),
 			).rejects.toThrow(errors.JellyfishElementAlreadyExists);
 		});
@@ -503,7 +504,7 @@ describe('backend', () => {
 				linked_at: {},
 				created_at: new Date().toISOString(),
 				active: true,
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 			});
 
 			const id = ctx.generateRandomID();
@@ -512,7 +513,7 @@ describe('backend', () => {
 			await expect(
 				ctx.backend.insertElement(ctx.context, {
 					id,
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					version: '1.0.0',
 					tags: [],
 					loop: null,
@@ -588,7 +589,7 @@ describe('backend', () => {
 		it('should not be able to change a slug', async () => {
 			const slug1 = ctx.generateRandomSlug();
 			const result1 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: slug1,
 				data: {
 					hello: 'world',
@@ -608,7 +609,7 @@ describe('backend', () => {
 			await expect(
 				ctx.backend.upsertElement(ctx.context, {
 					id: result1.id,
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					slug: ctx.generateRandomSlug(),
 					links: {},
 					linked_at: {},
@@ -649,7 +650,7 @@ describe('backend', () => {
 		it('should insert a contract with a slug', async () => {
 			const result = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -672,7 +673,7 @@ describe('backend', () => {
 		it('should replace an element given the slug but no id', async () => {
 			const result1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				data: {},
 				linked_at: {},
 				version: '1.0.0',
@@ -688,7 +689,7 @@ describe('backend', () => {
 
 			const result2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: result1.slug,
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				linked_at: {},
@@ -712,7 +713,7 @@ describe('backend', () => {
 			const id = ctx.generateRandomID();
 			const result = await ctx.backend.upsertElement(ctx.context, {
 				id,
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				active: true,
 				slug: ctx.generateRandomSlug(),
 				links: {},
@@ -772,13 +773,13 @@ describe('backend', () => {
 					requires: [],
 					capabilities: [],
 					created_at: new Date().toISOString(),
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 				});
 
 				const result2 = await ctx.backend.upsertElement(ctx.context, {
 					slug: ctx.generateRandomSlug(),
 					active: true,
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					version: '1.0.0',
 					links: {},
 					tags: [],
@@ -794,7 +795,7 @@ describe('backend', () => {
 				const result3 = await ctx.backend.upsertElement(ctx.context, {
 					id: result2.id,
 					slug: result1.slug,
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					links: {},
 					data: {},
 					version: '1.0.0',
@@ -815,7 +816,7 @@ describe('backend', () => {
 					capabilities: [],
 					active: true,
 					name: null,
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					linked_at: {},
 					version: '1.0.0',
 					links: {},
@@ -831,7 +832,7 @@ describe('backend', () => {
 
 		it('should replace an element with an existing id and the slug of the same element', async () => {
 			const result1 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				links: {},
@@ -848,7 +849,7 @@ describe('backend', () => {
 
 			const result2 = await ctx.backend.upsertElement(ctx.context, {
 				id: result1.id,
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: result1.slug,
 				links: {},
 				data: {},
@@ -872,7 +873,7 @@ describe('backend', () => {
 		it('should ignore the id when inserting an element with a non existing id and the slug of an element', async () => {
 			const result1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				data: {},
@@ -889,7 +890,7 @@ describe('backend', () => {
 			const result2 = await ctx.backend.upsertElement(ctx.context, {
 				id: '9af7cf33-1a29-4f0c-a73b-f6a2b149850c',
 				slug: result1.slug,
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				links: {},
 				version: '1.0.0',
 				linked_at: {},
@@ -920,7 +921,7 @@ describe('backend', () => {
 				capabilities: [],
 				active: true,
 				slug: result1.slug,
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 			});
 		});
 
@@ -1105,24 +1106,24 @@ describe('backend', () => {
 			await Bluebird.delay(2000);
 
 			const indexes = await ctx.backend.any(
-				`SELECT * FROM pg_indexes WHERE tablename = 'contracts';`,
+				`SELECT * FROM pg_indexes WHERE tablename = '${CONTRACTS_TABLE}';`,
 			);
 			const expected = [
 				{
 					indexname: `${typeContract.slug}__name__idx`,
-					indexdef: `CREATE INDEX \"${typeContract.slug}__name__idx\" ON public.contracts USING btree (name) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+					indexdef: `CREATE INDEX \"${typeContract.slug}__name__idx\" ON public.${CONTRACTS_TABLE} USING btree (name) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
 					indexname: `${typeContract.slug}__data_payload_message__idx`,
-					indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_message__idx\" ON public.contracts USING btree (((data #>> '{payload,message}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+					indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_message__idx\" ON public.${CONTRACTS_TABLE} USING btree (((data #>> '{payload,message}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
 					indexname: `${typeContract.slug}__data_payload_mentionsUser__idx`,
-					indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_mentionsUser__idx\" ON public.contracts USING gin (((data #> '{payload,mentionsUser}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+					indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_mentionsUser__idx\" ON public.${CONTRACTS_TABLE} USING gin (((data #> '{payload,mentionsUser}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
 					indexname: `${typeContract.slug}__data_from_id__name__data_to_id__idx`,
-					indexdef: `CREATE INDEX \"test-link__data_from_id__name__data_to_id__idx\" ON public.contracts USING btree (((data #>> '{from,id}'::text[])), name, ((data #>> '{to,id}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+					indexdef: `CREATE INDEX \"test-link__data_from_id__name__data_to_id__idx\" ON public.${CONTRACTS_TABLE} USING btree (((data #>> '{from,id}'::text[])), name, ((data #>> '{to,id}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 			];
 
@@ -1186,16 +1187,16 @@ describe('backend', () => {
 		await Bluebird.delay(2000);
 
 		const indexes = await ctx.backend.any(
-			`SELECT * FROM pg_indexes WHERE tablename = 'contracts' AND indexname LIKE '%__search_idx';`,
+			`SELECT * FROM pg_indexes WHERE tablename = '${CONTRACTS_TABLE}' AND indexname LIKE '%__search_idx';`,
 		);
 		const expected = [
 			{
 				indexname: `${typeContract.slug}__name__search_idx`,
-				indexdef: `CREATE INDEX \"${typeContract.slug}__name__search_idx\" ON public.contracts USING gin (to_tsvector('english'::regconfig, name)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+				indexdef: `CREATE INDEX \"${typeContract.slug}__name__search_idx\" ON public.${CONTRACTS_TABLE} USING gin (to_tsvector('english'::regconfig, name)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 			},
 			{
 				indexname: `${typeContract.slug}__data_payload_message__search_idx`,
-				indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_message__search_idx\" ON public.contracts USING gin (jsonb_to_tsvector('english'::regconfig, (data #> '{payload,message}'::text[]), '["string"]'::jsonb)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+				indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_message__search_idx\" ON public.${CONTRACTS_TABLE} USING gin (jsonb_to_tsvector('english'::regconfig, (data #> '{payload,message}'::text[]), '["string"]'::jsonb)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 			},
 		];
 
@@ -1334,8 +1335,8 @@ describe('backend', () => {
 					ctx.context,
 					{
 						data: {
-							"Robert'); DROP TABLE contracts; --": {
-								"Robert'); DROP TABLE contracts; --": {},
+							[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
+								[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {},
 							},
 						},
 					} as any,
@@ -1345,10 +1346,10 @@ describe('backend', () => {
 							data: {
 								type: 'object',
 								properties: {
-									"Robert'); DROP TABLE contracts; --": {
+									[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
 										type: 'object',
 										properties: {
-											"Robert'); DROP TABLE contracts; --": {
+											[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
 												type: 'string',
 												const: 'foo@1.0.0',
 											},
@@ -1364,7 +1365,7 @@ describe('backend', () => {
 		});
 
 		it('should escape malicious query values', async () => {
-			const injection = 'id FROM contracts; DROP TABLE contracts; COMMIT; SELECT *';
+			const injection = `id FROM ${CONTRACTS_TABLE}; DROP TABLE ${CONTRACTS_TABLE}; COMMIT; SELECT *`;
 			await expect(
 				ctx.backend.query(
 					ctx.context,
@@ -1384,7 +1385,7 @@ describe('backend', () => {
 				),
 			).rejects.toHaveProperty(
 				'message',
-				`column contracts.${injection} does not exist`,
+				`column ${CONTRACTS_TABLE}.${injection} does not exist`,
 			);
 
 			await expect(
@@ -1398,7 +1399,7 @@ describe('backend', () => {
 						properties: {
 							slug: {
 								type: 'string',
-								const: "Robert'; DROP TABLE contracts; --",
+								const: `Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`,
 							},
 						},
 						required: ['slug'],
@@ -1417,7 +1418,7 @@ describe('backend', () => {
 						properties: {
 							name: {
 								type: 'string',
-								const: "Robert'; DROP TABLE contracts; --",
+								const: `Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`,
 							},
 						},
 						required: ['name'],
@@ -1636,7 +1637,7 @@ describe('backend', () => {
 			const slug = ctx.generateRandomSlug();
 			for (const index of _.range(0, 1000)) {
 				await ctx.backend.insertElement(ctx.context, {
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					slug: `${slug}-${index}`,
 					version: '1.0.0',
 					tags: [],
@@ -1664,7 +1665,7 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 					},
 					required: ['type'],
@@ -1688,7 +1689,7 @@ describe('backend', () => {
 						properties: {
 							type: {
 								type: 'string',
-								const: 'contract@1.0.0',
+								const: 'card@1.0.0',
 							},
 						},
 						required: ['type'],
@@ -1704,7 +1705,7 @@ describe('backend', () => {
 			const slug = ctx.generateRandomSlug();
 			for (const index of _.range(0, 1100)) {
 				await ctx.backend.insertElement(ctx.context, {
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					slug: `${slug}-${index}`,
 					version: '1.0.0',
 					tags: [],
@@ -1732,7 +1733,7 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 					},
 					required: ['type'],
@@ -1746,7 +1747,7 @@ describe('backend', () => {
 			const slug = ctx.generateRandomSlug();
 			for (const index of _.range(0, 1000)) {
 				await ctx.backend.insertElement(ctx.context, {
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					slug: `${slug}-${index}`,
 					version: '1.0.0',
 					tags: [],
@@ -1774,7 +1775,7 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 					},
 					required: ['type'],
@@ -1791,7 +1792,7 @@ describe('backend', () => {
 			const slug = ctx.generateRandomSlug();
 			for (const index of _.range(0, 1100)) {
 				await ctx.backend.insertElement(ctx.context, {
-					type: 'contract@1.0.0',
+					type: 'card@1.0.0',
 					slug: `${slug}-${index}`,
 					version: '1.0.0',
 					tags: [],
@@ -1819,7 +1820,7 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 					},
 					required: ['type'],
@@ -1843,7 +1844,7 @@ describe('backend', () => {
 						properties: {
 							type: {
 								type: 'string',
-								const: 'contract@1.0.0',
+								const: 'card@1.0.0',
 							},
 						},
 						required: ['type'],
@@ -1866,7 +1867,7 @@ describe('backend', () => {
 						properties: {
 							type: {
 								type: 'string',
-								const: 'contract@1.0.0',
+								const: 'card@1.0.0',
 							},
 						},
 						required: ['type'],
@@ -1889,7 +1890,7 @@ describe('backend', () => {
 						properties: {
 							type: {
 								type: 'string',
-								const: 'contract@1.0.0',
+								const: 'card@1.0.0',
 							},
 						},
 						required: ['type'],
@@ -1912,7 +1913,7 @@ describe('backend', () => {
 						properties: {
 							type: {
 								type: 'string',
-								const: 'contract@1.0.0',
+								const: 'card@1.0.0',
 							},
 						},
 						required: ['type'],
@@ -1935,7 +1936,7 @@ describe('backend', () => {
 						properties: {
 							type: {
 								type: 'string',
-								const: 'contract@1.0.0',
+								const: 'card@1.0.0',
 							},
 						},
 						required: ['type'],
@@ -1949,7 +1950,7 @@ describe('backend', () => {
 
 		it('should be able to limit the results', async () => {
 			const result1 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				tags: [],
@@ -1972,7 +1973,7 @@ describe('backend', () => {
 			await Bluebird.delay(10);
 
 			const result2 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				links: {},
@@ -1995,7 +1996,7 @@ describe('backend', () => {
 			await Bluebird.delay(10);
 
 			const result3 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				links: {},
@@ -2023,7 +2024,7 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 						slug: {
 							type: 'string',
@@ -2043,7 +2044,7 @@ describe('backend', () => {
 
 		it('should be able to skip the results', async () => {
 			const result1 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				links: {},
@@ -2066,7 +2067,7 @@ describe('backend', () => {
 			await Bluebird.delay(10);
 
 			const result2 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				links: {},
@@ -2089,7 +2090,7 @@ describe('backend', () => {
 			await Bluebird.delay(10);
 
 			const result3 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				links: {},
 				version: '1.0.0',
@@ -2117,7 +2118,7 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 						slug: {
 							type: 'string',
@@ -2137,7 +2138,7 @@ describe('backend', () => {
 
 		it('should be able to skip the results of a one-element query', async () => {
 			const contract = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				links: {},
 				version: '1.0.0',
@@ -2181,7 +2182,7 @@ describe('backend', () => {
 
 		it('should not skip the results of a one-element query if skip is set to zero', async () => {
 			const contract = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				links: {},
@@ -2230,7 +2231,7 @@ describe('backend', () => {
 
 		it('should be able to limit the results of a one-element query to 0', async () => {
 			const contract = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				links: {},
@@ -2274,7 +2275,7 @@ describe('backend', () => {
 
 		it('should not omit the results of a one-element query if limit is set to one', async () => {
 			const contract = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				links: {},
@@ -2323,7 +2324,7 @@ describe('backend', () => {
 
 		it('should be able to limit and skip the results', async () => {
 			const result1 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'foo',
 				}),
@@ -2345,7 +2346,7 @@ describe('backend', () => {
 			});
 
 			const result2 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'bar',
 				}),
@@ -2367,7 +2368,7 @@ describe('backend', () => {
 			});
 
 			const result3 = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'baz',
 				}),
@@ -2397,7 +2398,7 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 						slug: {
 							type: 'string',
@@ -2428,7 +2429,7 @@ describe('backend', () => {
 		it('should be able to sort the query using a key', async () => {
 			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				tags: [],
 				loop: null,
@@ -2446,7 +2447,7 @@ describe('backend', () => {
 
 			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				active: true,
 				version: '1.0.0',
 				links: {},
@@ -2464,7 +2465,7 @@ describe('backend', () => {
 
 			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2482,7 +2483,7 @@ describe('backend', () => {
 
 			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				links: {},
 				active: true,
 				version: '1.0.0',
@@ -2507,11 +2508,16 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 						slug: {
 							type: 'string',
-							enum: [contract1.slug, contract2.slug, contract3.slug, contract4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2527,7 +2533,7 @@ describe('backend', () => {
 		it('should be able to sort the query in descending order', async () => {
 			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2545,7 +2551,7 @@ describe('backend', () => {
 
 			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2563,7 +2569,7 @@ describe('backend', () => {
 
 			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2581,7 +2587,7 @@ describe('backend', () => {
 
 			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				links: {},
 				linked_at: {},
 				version: '1.0.0',
@@ -2606,11 +2612,16 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 						slug: {
 							type: 'string',
-							enum: [contract1.slug, contract2.slug, contract3.slug, contract4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2627,7 +2638,7 @@ describe('backend', () => {
 		it('should be able to sort the query using an array of keys', async () => {
 			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2646,7 +2657,7 @@ describe('backend', () => {
 
 			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2665,7 +2676,7 @@ describe('backend', () => {
 
 			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2684,7 +2695,7 @@ describe('backend', () => {
 
 			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2710,11 +2721,16 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 						slug: {
 							type: 'string',
-							enum: [contract1.slug, contract2.slug, contract3.slug, contract4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2730,7 +2746,7 @@ describe('backend', () => {
 		it('should apply sort before skip', async () => {
 			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2748,7 +2764,7 @@ describe('backend', () => {
 
 			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2766,7 +2782,7 @@ describe('backend', () => {
 
 			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2784,7 +2800,7 @@ describe('backend', () => {
 
 			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2809,11 +2825,16 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 						slug: {
 							type: 'string',
-							enum: [contract1.slug, contract2.slug, contract3.slug, contract4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2830,7 +2851,7 @@ describe('backend', () => {
 		it('should apply sort before limit', async () => {
 			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2848,7 +2869,7 @@ describe('backend', () => {
 
 			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2866,7 +2887,7 @@ describe('backend', () => {
 
 			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2884,7 +2905,7 @@ describe('backend', () => {
 
 			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				version: '1.0.0',
 				links: {},
 				tags: [],
@@ -2909,11 +2930,16 @@ describe('backend', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'contract@1.0.0',
+							const: 'card@1.0.0',
 						},
 						slug: {
 							type: 'string',
-							enum: [contract1.slug, contract2.slug, contract3.slug, contract4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2928,7 +2954,7 @@ describe('backend', () => {
 		});
 
 		it('should escape malicious sortBy statements', async () => {
-			const injection = 'created_at; DROP TABLE contracts; --';
+			const injection = `created_at; DROP TABLE ${CONTRACTS_TABLE}; --`;
 			await expect(
 				ctx.backend.query(
 					ctx.context,
@@ -2939,7 +2965,7 @@ describe('backend', () => {
 						properties: {
 							type: {
 								type: 'string',
-								const: 'contract@1.0.0',
+								const: 'card@1.0.0',
 							},
 						},
 						required: ['type'],
@@ -2950,7 +2976,7 @@ describe('backend', () => {
 				),
 			).rejects.toHaveProperty(
 				'message',
-				`column contracts.${injection} does not exist`,
+				`column ${CONTRACTS_TABLE}.${injection} does not exist`,
 			);
 		});
 
@@ -3288,7 +3314,7 @@ describe('backend', () => {
 
 		it('should correctly build a JSONB object with no selected properties', async () => {
 			const contract = await ctx.backend.upsertElement(ctx.context, {
-				type: 'contract@1.0.0',
+				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				links: {},
 				version: '1.0.0',

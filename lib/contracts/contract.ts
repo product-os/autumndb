@@ -1,5 +1,5 @@
 export const contract = {
-	slug: 'contract',
+	slug: 'card',
 	name: 'Jellyfish Contract',
 	type: 'type@1.0.0',
 	data: {

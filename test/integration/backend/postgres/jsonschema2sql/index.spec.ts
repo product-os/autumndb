@@ -13,6 +13,7 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { DatabaseBackend } from '../../../../../lib/backend/postgres/types';
 import { PostgresBackend } from '../../../../../lib/backend/postgres';
+import { TABLE as CONTRACTS_TABLE } from '../../../../../lib/backend/postgres/contracts';
 
 const IS_POSTGRES = environment.database.type === 'postgres';
 
@@ -381,12 +382,12 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 					data: {
 						type: 'object',
-						required: ["Robert'); DROP TABLE contracts; --"],
+						required: [`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`],
 						properties: {
-							"Robert'); DROP TABLE contracts; --": {
+							[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
 								type: 'object',
 								properties: {
-									"Robert'); DROP TABLE contracts; --": {
+									[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
 										type: 'string',
 										const: 'foo',
 									},
@@ -402,8 +403,8 @@ describe('jsonschema2sql: Postgres specific', () => {
 					version: '1.0.0',
 					type: 'contract',
 					data: {
-						"Robert'); DROP TABLE contracts; --": {
-							"Robert'); DROP TABLE contracts; --": 'foo',
+						[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
+							[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: 'foo',
 						},
 					},
 				},
@@ -436,7 +437,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 						properties: {
 							foo: {
 								type: 'string',
-								const: "Robert'; DROP TABLE contracts; --",
+								const: `Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`,
 							},
 						},
 					},
@@ -448,7 +449,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					version: '1.0.0',
 					type: 'contract',
 					data: {
-						foo: "Robert'; DROP TABLE contracts; --",
+						foo: `Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`,
 					},
 				},
 			];

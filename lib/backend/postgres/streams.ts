@@ -350,7 +350,9 @@ export class Stream extends EventEmitter {
 		this.contractTypes = null;
 		if (schema instanceof Object) {
 			if (_.has(schema, ['properties', 'type', 'const'])) {
-				this.contractTypes = [(schema.properties!.type as any).const.split('@')[0]];
+				this.contractTypes = [
+					(schema.properties!.type as any).const.split('@')[0],
+				];
 			}
 			if (_.has(schema, ['properties', 'type', 'enum'])) {
 				const deversionedTypes = (schema.properties!.type as any).enum.map(

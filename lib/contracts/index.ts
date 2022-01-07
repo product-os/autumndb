@@ -44,11 +44,10 @@ const contracts = [
 	userSettings,
 ];
 
-export const CONTRACTS = contracts.reduce<{ [slug: string]: ContractDefinition }>(
-	(acc, contract) => {
-		const initializedContract = initialize(contract as any);
-		acc[initializedContract.slug] = initializedContract;
-		return acc;
-	},
-	{},
-);
+export const CONTRACTS = contracts.reduce<{
+	[slug: string]: ContractDefinition;
+}>((acc, kontract) => {
+	const initializedContract = initialize(kontract as any);
+	acc[initializedContract.slug] = initializedContract;
+	return acc;
+}, {});

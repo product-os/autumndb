@@ -746,7 +746,11 @@ export class PostgresBackend implements Queryable {
 			}
 
 			try {
-				await streams.setupTrigger(this, contracts.TABLE, contracts.TRIGGER_COLUMNS);
+				await streams.setupTrigger(
+					this,
+					contracts.TABLE,
+					contracts.TRIGGER_COLUMNS,
+				);
 			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;

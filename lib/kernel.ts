@@ -245,7 +245,10 @@ const preUpsert = async (
 		instance.getContractBySlug<TypeContract>(context, session, contract.type),
 		permissionFilter.getMask(context, instance.backend, session),
 		(async () => {
-			return contract.loop && instance.backend.getElementBySlug(context, contract.loop);
+			return (
+				contract.loop &&
+				instance.backend.getElementBySlug(context, contract.loop)
+			);
 		})(),
 	]);
 	const schema = typeContract && typeContract.data && typeContract.data.schema;
@@ -280,7 +283,9 @@ const preUpsert = async (
 		!_.includes((contract.data as any).from.type, '@') &&
 		!_.includes((contract.data as any).to.type, '@')
 	) {
-		(contract.data as any).from.type = `${(contract.data as any).from.type}@1.0.0`;
+		(contract.data as any).from.type = `${
+			(contract.data as any).from.type
+		}@1.0.0`;
 		(contract.data as any).to.type = `${(contract.data as any).to.type}@1.0.0`;
 	}
 	try {
@@ -466,7 +471,7 @@ export class Kernel {
 
 		await Promise.all(
 			[
-				CONTRACTS.contract,
+				CONTRACTS.card,
 				CONTRACTS.action,
 				CONTRACTS['action-request'],
 				CONTRACTS.org,
@@ -704,10 +709,14 @@ export class Kernel {
 				};
 
 				// Fetch necessary data from database
-				const fullContract = await this.backend.getElementBySlug(context, slug, {
-					...options,
-					lock: true,
-				});
+				const fullContract = await this.backend.getElementBySlug(
+					context,
+					slug,
+					{
+						...options,
+						lock: true,
+					},
+				);
 
 				context.assertInternal(
 					fullContract,
@@ -745,7 +754,8 @@ export class Kernel {
 					`No such contract: ${slug}`,
 				);
 
-				const schema = typeContract && typeContract.data && typeContract.data.schema;
+				const schema =
+					typeContract && typeContract.data && typeContract.data.schema;
 
 				context.assertInternal(
 					schema,
@@ -763,9 +773,13 @@ export class Kernel {
 				 * filter.
 				 */
 				// TS-TODO: "filteredContract" might be null here, and we should account for this
-				const patchedFilteredContract = patchContract(filteredContract!, patch, {
-					mutate: true,
-				});
+				const patchedFilteredContract = patchContract(
+					filteredContract!,
+					patch,
+					{
+						mutate: true,
+					},
+				);
 
 				jsonSchema.validate(filter as any, patchedFilteredContract);
 
@@ -802,7 +816,10 @@ export class Kernel {
 				}
 
 				// If the loop field is changing, check that it points to an actual loop contract
-				if (patchedFullContract.loop && patchedFullContract.loop !== fullContract.loop) {
+				if (
+					patchedFullContract.loop &&
+					patchedFullContract.loop !== fullContract.loop
+				) {
 					const loopContract = await this.backend.getElementBySlug(
 						context,
 						patchedFullContract.loop,
