@@ -73,7 +73,7 @@ export class BuilderContext {
 	 *
 	 * @param {String} linkType - The link type.
 	 * @param {SqlFilter} filter - Filter for the link.
-	 * @returns {String} Name of the cards table joined by the link that was
+	 * @returns {String} Name of the contracts table joined by the link that was
 	 *          just added.
 	 */
 	addLink(linkType: string, filter: SqlFilter): string {

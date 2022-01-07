@@ -23,7 +23,7 @@ export const scheduledAction: ContractDefinition = {
 									type: 'string',
 									pattern: '^action-[a-z0-9-]+@\\d+\\.\\d+\\.\\d+$',
 								},
-								card: {
+								contract: {
 									type: 'string',
 								},
 								type: {

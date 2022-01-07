@@ -20,8 +20,8 @@ export const setup = async (
 	backend: PostgresBackend,
 	database: string,
 	options: {
-		// The name of the "cards" table that should be referenced
-		cards: string;
+		// The name of the "contracts" table that should be referenced
+		contracts: string;
 	},
 ) => {
 	context.debug('Creating links table', {
@@ -34,7 +34,7 @@ export const setup = async (
 		BEGIN
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'linkedge') THEN
 				CREATE TYPE linkEdge AS (source UUID, idx INT, sink UUID);
-				CREATE TYPE cardAndLinkEdges AS (cardId UUID, edges linkEdge[]);
+				CREATE TYPE contractAndLinkEdges AS (contractId UUID, edges linkEdge[]);
 			END IF;
 
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'polylinkedge') THEN
@@ -53,9 +53,9 @@ export const setup = async (
 		CREATE TABLE IF NOT EXISTS ${LINK_TABLE} (
 			id UUID,
 			forward BOOL,
-			fromId UUID REFERENCES ${options.cards} (id) NOT NULL,
+			fromId UUID REFERENCES ${options.contracts} (id) NOT NULL,
 			name INTEGER REFERENCES ${STRING_TABLE} (id) NOT NULL,
-			toId UUID REFERENCES ${options.cards} (id) NOT NULL,
+			toId UUID REFERENCES ${options.contracts} (id) NOT NULL,
 			PRIMARY KEY (id, forward)
 		)
 	`);
@@ -141,17 +141,17 @@ export const upsert = async (
 	}
 };
 /**
- * @summary Parse a card link given a link card
+ * @summary Parse a contract link given a link contract
  * @function
  * @private
  *
- * @param {Object} linkCard - link card
- * @param {Object} card - other card
- * @param {Object} joinedCard - the card that is linked via linkCard
+ * @param {Object} linkContract - link contract
+ * @param {Object} contract - other contract
+ * @param {Object} joinedContract - the contract that is linked via linkContract
  * @returns {(Null|Object)} results
  *
  * @example
- * const result = links.parseCard({
+ * const result = links.parseContract({
  *   name: 'is attached to',
  *   data: {
  *     inverseName: 'has attached element',
@@ -171,29 +171,29 @@ export const upsert = async (
  * > 'is attached to'
  * > 'yyy'
  */
-export const parseCard = (
-	linkCard: LinkContract,
-	card: Contract,
-	joinedCard: Partial<Contract> = {},
+export const parseContract = (
+	linkContract: LinkContract,
+	contract: Contract,
+	joinedContract: Partial<Contract> = {},
 ) => {
-	const fromId = linkCard.data.from.id || linkCard.data.from;
-	const toId = linkCard.data.to.id || linkCard.data.to;
-	if (fromId === card.id) {
+	const fromId = linkContract.data.from.id || linkContract.data.from;
+	const toId = linkContract.data.to.id || linkContract.data.to;
+	if (fromId === contract.id) {
 		return {
-			name: linkCard.name as string,
+			name: linkContract.name as string,
 			id: toId,
-			slug: joinedCard.slug,
-			type: joinedCard.type,
-			created_at: linkCard.created_at,
+			slug: joinedContract.slug,
+			type: joinedContract.type,
+			created_at: linkContract.created_at,
 		};
 	}
-	if (toId === card.id) {
+	if (toId === contract.id) {
 		return {
-			name: linkCard.data.inverseName as string,
+			name: linkContract.data.inverseName as string,
 			id: fromId,
-			slug: joinedCard.slug,
-			type: joinedCard.type,
-			created_at: linkCard.created_at,
+			slug: joinedContract.slug,
+			type: joinedContract.type,
+			created_at: linkContract.created_at,
 		};
 	}
 	return null;
@@ -203,13 +203,13 @@ export const parseCard = (
  * @function
  * @public
  *
- * @param {Object} linkCard - link card
- * @param {Object} card - card to modify
- * @param {Object} joinedCard - the card that is linked via linkCard
- * @returns {Object} card
+ * @param {Object} linkContract - link contract
+ * @param {Object} contract - contract to modify
+ * @param {Object} joinedContract - the contract that is linked via linkContract
+ * @returns {Object} contract
  *
  * @example
- * const card = links.addLink({
+ * const contract = links.addLink({
  *   type: 'link',
  *   ...
  * }, {
@@ -217,34 +217,34 @@ export const parseCard = (
  *   ...
  * })
  *
- * console.log(card.links)
+ * console.log(contract.links)
  */
 export const addLink = (
-	linkCard: LinkContract,
-	card: Contract,
-	joinedCard?: Contract,
+	linkContract: LinkContract,
+	contract: Contract,
+	joinedContract?: Contract,
 ) => {
-	const result = parseCard(linkCard, card, joinedCard);
+	const result = parseContract(linkContract, contract, joinedContract);
 	if (!result) {
-		return card;
+		return contract;
 	}
-	if (!card.linked_at) {
-		card.linked_at = {};
+	if (!contract.linked_at) {
+		contract.linked_at = {};
 	}
-	card.linked_at[result.name] = result.created_at;
-	return card;
+	contract.linked_at[result.name] = result.created_at;
+	return contract;
 };
 /**
  * @summary Remove a link from the "links" materialized view
  * @function
  * @public
  *
- * @param {Object} linkCard - link card
- * @param {Object} card - card to modify
- * @returns {Object} card
+ * @param {Object} linkContract - link contract
+ * @param {Object} contract - contract to modify
+ * @returns {Object} contract
  *
  * @example
- * const card = links.removeLink({
+ * const contract = links.removeLink({
  *   type: 'link',
  *   ...
  * }, {
@@ -252,16 +252,16 @@ export const addLink = (
  *   ...
  * })
  *
- * console.log(card.links)
+ * console.log(contract.links)
  */
-export const removeLink = (linkCard: LinkContract, card: Contract) => {
-	const result = parseCard(linkCard, card);
-	if (!result || !card.links || !card.links[result.name]) {
-		return card;
+export const removeLink = (linkContract: LinkContract, contract: Contract) => {
+	const result = parseContract(linkContract, contract);
+	if (!result || !contract.links || !contract.links[result.name]) {
+		return contract;
 	}
-	card.links[result.name] = _.reject(card.links[result.name], [
+	contract.links[result.name] = _.reject(contract.links[result.name], [
 		LINK_ORIGIN_PROPERTY,
-		linkCard.id,
+		linkContract.id,
 	]);
-	return card;
+	return contract;
 };

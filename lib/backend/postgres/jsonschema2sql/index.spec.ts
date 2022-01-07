@@ -33,7 +33,7 @@ describe('jsonschema2sql', () => {
 				new Context({
 					id: 'jsonschema2sql-test',
 				}),
-				'cards',
+				'contracts',
 				{},
 				query,
 				options,

@@ -23,7 +23,7 @@ type StreamConnection = IConnected<{}, IClient>;
 interface EventPayload {
 	id: any;
 	slug: any;
-	cardType?: any;
+	contractType?: any;
 	type?: any;
 }
 
@@ -88,7 +88,7 @@ export const setupTrigger = async (
 				TG_ARGV[0],
 				json_build_object(
 					'id', id,
-					'cardType', type,
+					'contractType', type,
 					'slug', slug,
 					'type', changeType,
 					'table', TG_TABLE_NAME
@@ -259,13 +259,13 @@ export class Streamer {
 }
 
 export class Stream extends EventEmitter {
-	seenCardIds: Set<unknown>;
+	seenContractIds: Set<unknown>;
 	streamer: Streamer;
 	id: string;
 	context: Context;
-	constCardId?: string;
-	constCardSlug?: string;
-	cardTypes: null | string[];
+	constContractId?: string;
+	constContractSlug?: string;
+	contractTypes: null | string[];
 	streamQuery: any;
 
 	constructor(
@@ -278,11 +278,11 @@ export class Stream extends EventEmitter {
 	) {
 		super();
 		this.setMaxListeners(Infinity);
-		this.seenCardIds = new Set();
+		this.seenContractIds = new Set();
 		this.streamer = streamer;
 		this.id = id;
 		this.context = context;
-		this.cardTypes = null;
+		this.contractTypes = null;
 		this.setSchema(select, schema, options);
 		context.info('Attaching new stream', {
 			id,
@@ -311,33 +311,33 @@ export class Stream extends EventEmitter {
 		schema: JsonSchema,
 		options: BackendQueryOptions,
 	) {
-		// Query the cards with the IDs so we can add them to
-		// `this.seenCardIds`
+		// Query the contracts with the IDs so we can add them to
+		// `this.seenContractIds`
 		const selectsId = 'id' in select;
 
 		if (!selectsId) {
 			select.id = {};
 		}
 
-		const cards = await this.streamer.backend.query(
+		const contracts = await this.streamer.backend.query(
 			this.context,
 			select,
 			schema,
 			options,
 		);
 
-		for (const card of cards) {
-			this.seenCardIds.add(card.id);
+		for (const contract of contracts) {
+			this.seenContractIds.add(contract.id);
 		}
 
 		// Remove the ID if that wasn't requested in the first place
 		if (!selectsId && !_.get(schema, ['additionalProperties'], true)) {
-			for (const card of cards) {
-				Reflect.deleteProperty(card, 'id');
+			for (const contract of contracts) {
+				Reflect.deleteProperty(contract, 'id');
 			}
 		}
 
-		return cards;
+		return contracts;
 	}
 
 	setSchema(
@@ -345,12 +345,12 @@ export class Stream extends EventEmitter {
 		schema: JsonSchema,
 		options: SqlQueryOptions = {},
 	) {
-		this.constCardId = _.get(schema, ['properties', 'id', 'const']);
-		this.constCardSlug = _.get(schema, ['properties', 'slug', 'const']);
-		this.cardTypes = null;
+		this.constContractId = _.get(schema, ['properties', 'id', 'const']);
+		this.constContractSlug = _.get(schema, ['properties', 'slug', 'const']);
+		this.contractTypes = null;
 		if (schema instanceof Object) {
 			if (_.has(schema, ['properties', 'type', 'const'])) {
-				this.cardTypes = [(schema.properties!.type as any).const.split('@')[0]];
+				this.contractTypes = [(schema.properties!.type as any).const.split('@')[0]];
 			}
 			if (_.has(schema, ['properties', 'type', 'enum'])) {
 				const deversionedTypes = (schema.properties!.type as any).enum.map(
@@ -358,7 +358,7 @@ export class Stream extends EventEmitter {
 						return typeName.split('@')[0];
 					},
 				);
-				this.cardTypes = deversionedTypes;
+				this.contractTypes = deversionedTypes;
 			}
 		}
 		this.streamQuery = this.streamer.backend.prepareQueryForStream(
@@ -372,11 +372,11 @@ export class Stream extends EventEmitter {
 
 	async push(payload: EventPayload) {
 		if (await this.tryEmitEvent(payload)) {
-			this.seenCardIds.add(payload.id);
-		} else if (this.seenCardIds.delete(payload.id)) {
+			this.seenContractIds.add(payload.id);
+		} else if (this.seenContractIds.delete(payload.id)) {
 			this.emit('data', {
 				id: payload.id,
-				contractType: payload.cardType,
+				contractType: payload.contractType,
 				type: UNMATCH_EVENT,
 				after: null,
 			});
@@ -384,23 +384,23 @@ export class Stream extends EventEmitter {
 	}
 
 	async tryEmitEvent(payload: EventPayload) {
-		if (this.constCardId && payload.id !== this.constCardId) {
+		if (this.constContractId && payload.id !== this.constContractId) {
 			return false;
 		}
-		if (this.constCardSlug && payload.slug !== this.constCardSlug) {
+		if (this.constContractSlug && payload.slug !== this.constContractSlug) {
 			return false;
 		}
 		if (
-			this.cardTypes &&
-			!this.cardTypes.includes(payload.cardType.split('@')[0])
+			this.contractTypes &&
+			!this.contractTypes.includes(payload.contractType.split('@')[0])
 		) {
 			return false;
 		}
 		if (payload.type === DELETE_EVENT) {
-			this.seenCardIds.delete(payload.id);
+			this.seenContractIds.delete(payload.id);
 			this.emit('data', {
 				id: payload.id,
-				contractType: payload.cardType,
+				contractType: payload.contractType,
 				type: payload.type,
 				after: null,
 			});
@@ -411,7 +411,7 @@ export class Stream extends EventEmitter {
 			if (result.length === 1) {
 				this.emit('data', {
 					id: payload.id,
-					contractType: payload.cardType,
+					contractType: payload.contractType,
 					type: payload.type,
 					after: result[0],
 				});

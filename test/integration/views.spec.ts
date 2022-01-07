@@ -1,6 +1,6 @@
 import { testUtils } from '../../lib';
 import * as views from '../../lib/views';
-import { CARDS } from '../../lib/cards';
+import { CONTRACTS } from '../../lib/contracts';
 
 let ctx: testUtils.TestContext;
 
@@ -14,8 +14,8 @@ afterAll(async () => {
 
 describe('views', () => {
 	describe('.getSchema()', () => {
-		test('should return null if the card is not a view', () => {
-			const schema = views.getSchema(CARDS['user-admin']);
+		test('should return null if the contract is not a view', () => {
+			const schema = views.getSchema(CONTRACTS['user-admin']);
 			expect(schema).toEqual(null);
 		});
 
@@ -88,7 +88,7 @@ describe('views', () => {
 			});
 		});
 
-		test('should return a schema given a view card with two conjunctions', () => {
+		test('should return a schema given a view contract with two conjunctions', () => {
 			const schema = views.getSchema(
 				ctx.kernel.defaults({
 					type: 'view@1.0.0',
@@ -140,7 +140,7 @@ describe('views', () => {
 			});
 		});
 
-		test('should return a schema given a view card with two conjunctions and empty disjunctions', () => {
+		test('should return a schema given a view contract with two conjunctions and empty disjunctions', () => {
 			const schema = views.getSchema(
 				ctx.kernel.defaults({
 					type: 'view@1.0.0',
@@ -193,7 +193,7 @@ describe('views', () => {
 			});
 		});
 
-		test('should return a schema given a view card with two disjunctions', () => {
+		test('should return a schema given a view contract with two disjunctions', () => {
 			const schema = views.getSchema(
 				ctx.kernel.defaults({
 					type: 'view@1.0.0',
@@ -259,7 +259,7 @@ describe('views', () => {
 			});
 		});
 
-		test('should return a schema given a view card with two disjunctions and empty conjunctions', () => {
+		test('should return a schema given a view contract with two disjunctions and empty conjunctions', () => {
 			const schema = views.getSchema(
 				ctx.kernel.defaults({
 					type: 'view@1.0.0',
@@ -326,7 +326,7 @@ describe('views', () => {
 			});
 		});
 
-		test('should return a schema given a view card with two disjunctions and two conjunctions', () => {
+		test('should return a schema given a view contract with two disjunctions and two conjunctions', () => {
 			const schema = views.getSchema(
 				ctx.kernel.defaults({
 					type: 'view@1.0.0',
@@ -428,7 +428,7 @@ describe('views', () => {
 			});
 		});
 
-		test('should return null given a view card with no filters', () => {
+		test('should return null given a view contract with no filters', () => {
 			const schema = views.getSchema({
 				type: 'view@1.0.0',
 				version: '1.0.0',

@@ -10,7 +10,7 @@ import * as pgFormat from 'pg-format';
  * @returns {String} to_tsvector function call
  *
  * @example
- * const result = toTSVector('cards.tags', false, true)
+ * const result = toTSVector('contracts.tags', false, true)
  */
 export const toTSVector = (
 	path: string,

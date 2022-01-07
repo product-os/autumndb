@@ -168,7 +168,7 @@ describe('Setup', () => {
 
 describe('.createIndex()', () => {
 	it('should create an index', async () => {
-		const tableName = 'cards';
+		const tableName = 'contracts';
 		const indexName = `foobar_${uuid().split('-')[0]}_idx`;
 		const predicate = 'USING btree (loop)';
 		const version = '1.0.0';
@@ -202,7 +202,7 @@ describe('.createIndex()', () => {
 	});
 
 	it('should create indexes with unique flag', async () => {
-		const tableName = 'cards';
+		const tableName = 'contracts';
 		const indexName = `foobar_${uuid().split('-')[0]}_idx`;
 		const predicate = 'USING btree (loop)';
 		const version = '1.0.0';

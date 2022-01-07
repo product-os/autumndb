@@ -3,7 +3,7 @@ import * as textSearch from './text-search';
 describe('textSearch', () => {
 	describe('.toTSVector()', () => {
 		it('should prepare a correct to_tsvector function call for Postgres text fields', () => {
-			const path = 'cards.name';
+			const path = 'contracts.name';
 			const result = textSearch.toTSVector(path, false, false);
 
 			const expected = `to_tsvector('english', ${path})`;
@@ -12,7 +12,7 @@ describe('textSearch', () => {
 		});
 
 		it('should prepare a correct to_tsvector function call for Postgres text[] fields', () => {
-			const path = 'cards.tags';
+			const path = 'contracts.tags';
 			const result = textSearch.toTSVector(path, false, true);
 
 			const expected = `to_tsvector('english', immutable_array_to_string(${path}, ' '))`;
@@ -21,7 +21,7 @@ describe('textSearch', () => {
 		});
 
 		it('should prepare a correct to_tsvector function call for JSONB text fields', () => {
-			const path = 'cards.data#>\'{"payload", "message"}\'';
+			const path = 'contracts.data#>\'{"payload", "message"}\'';
 			const result = textSearch.toTSVector(path, true, false);
 
 			const expected = `jsonb_to_tsvector('english', ${path}, '["string"]')`;
@@ -30,7 +30,7 @@ describe('textSearch', () => {
 		});
 
 		it('should prepare a correct to_tsvector function call for JSONB array fields', () => {
-			const path = 'cards.data#>\'{"tags"}\'';
+			const path = 'contracts.data#>\'{"tags"}\'';
 			const result = textSearch.toTSVector(path, true, true);
 
 			const expected = `jsonb_to_tsvector('english', ${path}, '["string"]')`;
