@@ -1,7 +1,7 @@
 import uiSchemaDefs = require('./ui-schema-defs.json');
 
-// This mixin defines all common fields in cards that support
-// UI Schemas (i.e. type cards)
+// This mixin defines all common fields in contracts that support
+// UI Schemas (i.e. type contracts)
 export const baseUiSchema = {
 	data: {
 		uiSchema: {

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import { v4 as uuid } from 'uuid';
 import * as errors from '../../lib/errors';
-import { CARDS } from '../../lib/cards';
+import { CONTRACTS } from '../../lib/contracts';
 import type { Stream } from '../../lib/backend/postgres/streams';
 import { once } from 'events';
 import { Contract } from '@balena/jellyfish-types/build/core';
@@ -22,29 +22,29 @@ afterAll(async () => {
 
 describe('Kernel', () => {
 	describe('contracts', () => {
-		for (const key of Object.keys(CARDS)) {
+		for (const key of Object.keys(CONTRACTS)) {
 			it(`should contain the ${key} contract by default`, async () => {
-				const card = await CARDS[key];
-				card.name = _.isString(card.name) ? card.name : null;
-				const element = await ctx.kernel.getCardBySlug(
+				const contract = await CONTRACTS[key];
+				contract.name = _.isString(contract.name) ? contract.name : null;
+				const element = await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 				);
-				expect(card).toEqual(
+				expect(contract).toEqual(
 					_.omit(element, ['created_at', 'id', 'updated_at', 'linked_at']),
 				);
 			});
 		}
 	});
 
-	describe('.patchCardBySlug()', () => {
+	describe('.patchContractBySlug()', () => {
 		it('should throw an error if the element does not exist', async () => {
 			const slug = `${testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			})}@1.0.0`;
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					slug,
@@ -60,22 +60,22 @@ describe('Kernel', () => {
 		});
 
 		it('should apply a single operation', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					tags: [],
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			await ctx.kernel.patchCardBySlug(
+			await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'replace',
@@ -85,27 +85,27 @@ describe('Kernel', () => {
 				],
 			);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
 			expect(result).toEqual({
-				id: card.id,
+				id: contract.id,
 				active: true,
 				name: null,
 				capabilities: [],
-				created_at: card.created_at,
-				linked_at: card.linked_at,
-				links: card.links,
-				markers: card.markers,
-				requires: card.requires,
-				slug: card.slug,
+				created_at: contract.created_at,
+				linked_at: contract.linked_at,
+				links: contract.links,
+				markers: contract.markers,
+				requires: contract.requires,
+				slug: contract.slug,
 				updated_at: result!.updated_at,
 				tags: [],
 				loop: null,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 				version: '1.0.0',
 				data: {
 					foo: 'baz',
@@ -114,21 +114,21 @@ describe('Kernel', () => {
 		});
 
 		it('should add an element to an array', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			await ctx.kernel.patchCardBySlug(
+			await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'add',
@@ -138,27 +138,27 @@ describe('Kernel', () => {
 				],
 			);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
 			expect(result).toEqual({
-				id: card.id,
+				id: contract.id,
 				active: true,
 				name: null,
 				capabilities: [],
-				created_at: card.created_at,
-				linked_at: card.linked_at,
+				created_at: contract.created_at,
+				linked_at: contract.linked_at,
 				links: {},
 				markers: ['test'],
 				requires: [],
-				slug: card.slug,
+				slug: contract.slug,
 				updated_at: result!.updated_at,
 				tags: [],
 				loop: null,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 				version: '1.0.0',
 				data: {
 					foo: 'bar',
@@ -167,11 +167,11 @@ describe('Kernel', () => {
 		});
 
 		it('should delete a property inside data', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						'foo/bla': 'bar',
 						bar: 'baz',
@@ -179,10 +179,10 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.patchCardBySlug(
+			await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'remove',
@@ -191,27 +191,27 @@ describe('Kernel', () => {
 				],
 			);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
 			expect(result).toEqual({
-				id: card.id,
+				id: contract.id,
 				active: true,
 				name: null,
 				capabilities: [],
-				created_at: card.created_at,
-				linked_at: card.linked_at,
-				links: card.links,
-				markers: card.markers,
-				requires: card.requires,
-				slug: card.slug,
+				created_at: contract.created_at,
+				linked_at: contract.linked_at,
+				links: contract.links,
+				markers: contract.markers,
+				requires: contract.requires,
+				slug: contract.slug,
 				updated_at: result!.updated_at,
 				tags: [],
 				loop: null,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 				version: '1.0.0',
 				data: {
 					bar: 'baz',
@@ -220,18 +220,18 @@ describe('Kernel', () => {
 		});
 
 		it('should apply more than one operation', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.patchCardBySlug(
+			await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'add',
@@ -251,27 +251,27 @@ describe('Kernel', () => {
 				],
 			);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
 			expect(result).toEqual({
-				id: card.id,
+				id: contract.id,
 				active: true,
 				name: null,
 				capabilities: [],
-				created_at: card.created_at,
-				linked_at: card.linked_at,
-				links: card.links,
-				markers: card.markers,
-				requires: card.requires,
-				slug: card.slug,
+				created_at: contract.created_at,
+				linked_at: contract.linked_at,
+				links: contract.links,
+				markers: contract.markers,
+				requires: contract.requires,
+				slug: contract.slug,
 				updated_at: result!.updated_at,
 				tags: [],
 				loop: null,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 				version: '1.0.0',
 				data: {
 					foo: {
@@ -283,21 +283,21 @@ describe('Kernel', () => {
 		});
 
 		it('should not be able to delete an id', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const patched = await ctx.kernel.patchCardBySlug(
+			const patched = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'remove',
@@ -306,22 +306,22 @@ describe('Kernel', () => {
 				],
 			);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(patched).toEqual(card);
-			expect(result).toEqual(card);
+			expect(patched).toEqual(contract);
+			expect(result).toEqual(contract);
 		});
 
 		it('should not be able to delete a top level property', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -329,10 +329,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'remove',
@@ -342,21 +342,21 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(result).toEqual(card);
+			expect(result).toEqual(contract);
 		});
 
 		it('should throw given an operation without a path', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -364,10 +364,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'add',
@@ -379,11 +379,11 @@ describe('Kernel', () => {
 		});
 
 		it('should throw if adding to non existent property', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -391,10 +391,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'add',
@@ -405,21 +405,21 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishInvalidPatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(result).toEqual(card);
+			expect(result).toEqual(contract);
 		});
 
 		it('should throw given an invalid operation', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -427,10 +427,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'bar',
@@ -441,21 +441,21 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishInvalidPatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(result).toEqual(card);
+			expect(result).toEqual(contract);
 		});
 
 		it('should not apply half matching patches', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -463,10 +463,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'add',
@@ -482,17 +482,17 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishInvalidPatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(result).toEqual(card);
+			expect(result).toEqual(contract);
 		});
 
 		it('should not break the type schema', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -506,10 +506,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'remove',
@@ -519,34 +519,34 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 			if (result !== null) {
-				result.linked_at = card.linked_at;
+				result.linked_at = contract.linked_at;
 			}
 
-			expect(result).toEqual(card);
+			expect(result).toEqual(contract);
 		});
 
 		it('should apply a no-op patch', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const patched = await ctx.kernel.patchCardBySlug(
+			const patched = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'replace',
@@ -556,61 +556,61 @@ describe('Kernel', () => {
 				],
 			);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(patched).toEqual(card);
-			expect(result).toEqual(card);
+			expect(patched).toEqual(contract);
+			expect(result).toEqual(contract);
 		});
 
 		it('should apply an empty set of patches', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const patched = await ctx.kernel.patchCardBySlug(
+			const patched = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[],
 			);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(patched).toEqual(card);
-			expect(result).toEqual(card);
+			expect(patched).toEqual(contract);
+			expect(result).toEqual(contract);
 		});
 
 		it('should ignore changes to read-only properties', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const patched = await ctx.kernel.patchCardBySlug(
+			const patched = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'add',
@@ -630,21 +630,21 @@ describe('Kernel', () => {
 				],
 			);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(patched).toEqual(card);
-			expect(result).toEqual(card);
+			expect(patched).toEqual(contract);
+			expect(result).toEqual(contract);
 		});
 
-		it('should be able to patch cards hidden to the user', async () => {
+		it('should be able to patch contracts hidden to the user', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
 				data: {
@@ -669,7 +669,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const userCard = await ctx.kernel.insertCard(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -683,30 +683,30 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					type: 'session@1.0.0',
 					data: {
-						actor: userCard.id,
+						actor: userContract.id,
 					},
 				},
 			);
 
 			expect(
-				await ctx.kernel.getCardBySlug(
+				await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					session.id,
-					`${userCard.slug}@${userCard.version}`,
+					`${userContract.slug}@${userContract.version}`,
 				),
 			).toBeFalsy();
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					session.id,
-					`${userCard.slug}@${userCard.version}`,
+					`${userContract.slug}@${userContract.version}`,
 					[
 						{
 							op: 'add',
@@ -717,23 +717,23 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishNoElement);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 			if (result !== null) {
-				result.linked_at = userCard.linked_at;
+				result.linked_at = userContract.linked_at;
 			}
 
-			expect(result).toEqual(userCard);
+			expect(result).toEqual(userContract);
 		});
 
 		it('should not allow updates in hidden fields', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
 				version: '1.0.0',
@@ -785,7 +785,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const userCard = await ctx.kernel.insertCard(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -799,21 +799,21 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					type: 'session@1.0.0',
 					data: {
-						actor: userCard.id,
+						actor: userContract.id,
 					},
 				},
 			);
 
-			const filteredUser = await ctx.kernel.getCardBySlug(
+			const filteredUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				session.id,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 
 			expect(filteredUser!.data).toEqual({
@@ -821,10 +821,10 @@ describe('Kernel', () => {
 			});
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					session.id,
-					`${userCard.slug}@${userCard.version}`,
+					`${userContract.slug}@${userContract.version}`,
 					[
 						{
 							op: 'replace',
@@ -835,23 +835,23 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 			if (result !== null) {
-				result.linked_at = userCard.linked_at;
+				result.linked_at = userContract.linked_at;
 			}
 
-			expect(result).toEqual(userCard);
+			expect(result).toEqual(userContract);
 		});
 
-		it('should not return the full card', async () => {
+		it('should not return the full contract', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
 				version: '1.0.0',
@@ -903,7 +903,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const userCard = await ctx.kernel.insertCard(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -917,31 +917,31 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					type: 'session@1.0.0',
 					data: {
-						actor: userCard.id,
+						actor: userContract.id,
 					},
 				},
 			);
 
-			const filteredUser = await ctx.kernel.getCardBySlug(
+			const filteredUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				session.id,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 
 			expect(filteredUser!.data).toEqual({
 				email: 'johndoe@example.com',
 			});
 
-			const patched = await ctx.kernel.patchCardBySlug(
+			const patched = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				session.id,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 				[
 					{
 						op: 'replace',
@@ -955,10 +955,10 @@ describe('Kernel', () => {
 				email: 'johndoe@gmail.com',
 			});
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 
 			expect(result!.data).toEqual({
@@ -968,11 +968,11 @@ describe('Kernel', () => {
 			});
 		});
 
-		it('should not allow a patch that makes a card inaccessible', async () => {
+		it('should not allow a patch that makes a contract inaccessible', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
 				data: {
@@ -1001,7 +1001,7 @@ describe('Kernel', () => {
 								properties: {
 									slug: {
 										type: 'string',
-										enum: ['card', 'user', 'type'],
+										enum: ['contract', 'user', 'type'],
 									},
 									type: {
 										type: 'string',
@@ -1018,7 +1018,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const userCard = await ctx.kernel.insertCard(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -1032,22 +1032,22 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					type: 'session@1.0.0',
 					data: {
-						actor: userCard.id,
+						actor: userContract.id,
 					},
 				},
 			);
 
-			const randomCard = await ctx.kernel.insertCard(
+			const randomContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						hello: 'world',
 						foo: 7,
@@ -1055,19 +1055,19 @@ describe('Kernel', () => {
 				},
 			);
 
-			const filteredCard = await ctx.kernel.getCardBySlug(
+			const filteredContract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				session.id,
-				`${randomCard.slug}@${randomCard.version}`,
+				`${randomContract.slug}@${randomContract.version}`,
 			);
 
-			expect(filteredCard).toEqual(randomCard);
+			expect(filteredContract).toEqual(randomContract);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					session.id,
-					`${randomCard.slug}@${randomCard.version}`,
+					`${randomContract.slug}@${randomContract.version}`,
 					[
 						{
 							op: 'replace',
@@ -1078,20 +1078,20 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${randomCard.slug}@${randomCard.version}`,
+				`${randomContract.slug}@${randomContract.version}`,
 			);
 
-			expect(result).toEqual(randomCard);
+			expect(result).toEqual(randomContract);
 		});
 
 		it('should not remove inaccessible fields', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
 				version: '1.0.0',
@@ -1143,7 +1143,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const userCard = await ctx.kernel.insertCard(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -1157,21 +1157,21 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					type: 'session@1.0.0',
 					data: {
-						actor: userCard.id,
+						actor: userContract.id,
 					},
 				},
 			);
 
-			const filteredUser = await ctx.kernel.getCardBySlug(
+			const filteredUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				session.id,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 
 			expect(filteredUser!.data).toEqual({
@@ -1179,10 +1179,10 @@ describe('Kernel', () => {
 			});
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					session.id,
-					`${userCard.slug}@${userCard.version}`,
+					`${userContract.slug}@${userContract.version}`,
 					[
 						{
 							op: 'remove',
@@ -1192,23 +1192,23 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 			if (result !== null) {
-				result.linked_at = userCard.linked_at;
+				result.linked_at = userContract.linked_at;
 			}
 
-			expect(result).toEqual(userCard);
+			expect(result).toEqual(userContract);
 		});
 
 		it('should not add an inaccesible field', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
 				data: {
@@ -1259,7 +1259,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const userCard = await ctx.kernel.insertCard(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -1273,21 +1273,21 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					type: 'session@1.0.0',
 					data: {
-						actor: userCard.id,
+						actor: userContract.id,
 					},
 				},
 			);
 
-			const filteredUser = await ctx.kernel.getCardBySlug(
+			const filteredUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				session.id,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 
 			expect(filteredUser!.data).toEqual({
@@ -1295,10 +1295,10 @@ describe('Kernel', () => {
 			});
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					session.id,
-					`${userCard.slug}@${userCard.version}`,
+					`${userContract.slug}@${userContract.version}`,
 					[
 						{
 							op: 'add',
@@ -1309,23 +1309,23 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${userCard.slug}@${userCard.version}`,
+				`${userContract.slug}@${userContract.version}`,
 			);
 			if (result !== null) {
-				result.linked_at = userCard.linked_at;
+				result.linked_at = userContract.linked_at;
 			}
 
-			expect(result).toEqual(userCard);
+			expect(result).toEqual(userContract);
 		});
 
 		it('should not throw when adding a loop field referencing a loop that does exist', async () => {
 			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
 			});
@@ -1333,22 +1333,22 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const patchedCard = await ctx.kernel.patchCardBySlug(
+			const patchedContract = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'add',
@@ -1358,34 +1358,34 @@ describe('Kernel', () => {
 				],
 			);
 
-			expect(patchedCard.loop).toBe(`${loopSlug}@1.0.0`);
+			expect(patchedContract.loop).toBe(`${loopSlug}@1.0.0`);
 		});
 
 		it('should not throw when removing the loop field value', async () => {
 			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
 			});
 
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					loop: `${loopSlug}@1.0.0`,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const patchedCard = await ctx.kernel.patchCardBySlug(
+			const patchedContract = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'remove',
@@ -1394,19 +1394,19 @@ describe('Kernel', () => {
 				],
 			);
 
-			expect(patchedCard.loop).toBeUndefined();
+			expect(patchedContract.loop).toBeUndefined();
 		});
 
 		it('should not throw when replacing a loop field with a value referencing a loop that does exist', async () => {
 			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
 				version: '1.0.1',
@@ -1415,23 +1415,23 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
 					loop: `${loopSlug}@1.0.0`,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const patchedCard = await ctx.kernel.patchCardBySlug(
+			const patchedContract = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 				[
 					{
 						op: 'replace',
@@ -1441,19 +1441,19 @@ describe('Kernel', () => {
 				],
 			);
 
-			expect(patchedCard.loop).toBe(`${loopSlug}@1.0.1`);
+			expect(patchedContract.loop).toBe(`${loopSlug}@1.0.1`);
 		});
 
 		it('should throw if trying to add a loop field referencing a loop that does not exist', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1461,10 +1461,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'add',
@@ -1475,25 +1475,25 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishNoElement);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(result).toEqual(card);
+			expect(result).toEqual(contract);
 		});
 
-		it('should throw if trying to add a loop field referencing a loop that is not a loop card', async () => {
+		it('should throw if trying to add a loop field referencing a loop that is not a loop contract', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1501,10 +1501,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'add',
@@ -1515,20 +1515,20 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishNoElement);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(result).toEqual(card);
+			expect(result).toEqual(contract);
 		});
 
 		it('should throw if trying to replace the loop field with a value referencing a loop that does not exist', async () => {
 			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: loopSlug,
 				type: 'loop@1.0.0',
 			});
@@ -1536,13 +1536,13 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
 					loop: `${loopSlug}@1.0.0`,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
@@ -1550,10 +1550,10 @@ describe('Kernel', () => {
 			);
 
 			await expect(
-				ctx.kernel.patchCardBySlug(
+				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
-					`${card.slug}@${card.version}`,
+					`${contract.slug}@${contract.version}`,
 					[
 						{
 							op: 'replace',
@@ -1564,33 +1564,33 @@ describe('Kernel', () => {
 				),
 			).rejects.toThrow(errors.JellyfishNoElement);
 
-			const result = await ctx.kernel.getCardBySlug(
+			const result = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card.slug}@${card.version}`,
+				`${contract.slug}@${contract.version}`,
 			);
 
-			expect(result).toEqual(card);
+			expect(result).toEqual(contract);
 		});
 	});
 
-	describe('.insertCard()', () => {
+	describe('.insertContract()', () => {
 		it('should not be able to set links', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					links: {
 						foo: 'bar',
 					} as any,
 				},
 			);
 
-			const element = await ctx.kernel.getCardById(
+			const element = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				card.id,
+				contract.id,
 			);
 
 			assert(element !== null);
@@ -1599,7 +1599,7 @@ describe('Kernel', () => {
 		});
 
 		it('should create a user with two email addressses', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -1612,7 +1612,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			expect(card.data.email).toEqual([
+			expect(contract.data.email).toEqual([
 				'johndoe@example.com',
 				'johndoe@gmail.com',
 			]);
@@ -1620,7 +1620,7 @@ describe('Kernel', () => {
 
 		it('should not create a user with an empty email list', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					type: 'user@1.0.0',
 					data: {
 						email: [],
@@ -1633,7 +1633,7 @@ describe('Kernel', () => {
 
 		it('should not create a user with an invalid email', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					type: 'user@1.0.0',
 					data: {
 						email: ['foo'],
@@ -1646,7 +1646,7 @@ describe('Kernel', () => {
 
 		it('should not create a user with an invalid and a valid email', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					type: 'user@1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'foo'],
@@ -1659,7 +1659,7 @@ describe('Kernel', () => {
 
 		it('should not create a user with duplicated emails', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					type: 'user@1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'johndoe@example.com'],
@@ -1672,7 +1672,7 @@ describe('Kernel', () => {
 
 		it('should throw an error if the element does not adhere to the type', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					type: 'action@1.0.0',
 					data: {},
 				}),
@@ -1681,54 +1681,54 @@ describe('Kernel', () => {
 
 		it('should throw an error if the slug contains @latest', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					slug: 'test-1@latest',
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				}),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 		});
 
 		it('should throw an error if the slug contains a version', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					slug: 'test-1@1.0.0',
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				}),
 			).rejects.toThrow(errors.JellyfishSchemaMismatch);
 		});
 
-		it('should throw an error if the card type does not exist', async () => {
+		it('should throw an error if the contract type does not exist', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					type: 'foobarbazqux@1.0.0',
 				}),
-			).rejects.toThrow(errors.JellyfishUnknownCardType);
+			).rejects.toThrow(errors.JellyfishUnknownContractType);
 		});
 
 		it('should not throw an error if the referenced loop exists', async () => {
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: 'loop/product-os',
 				type: 'loop@1.0.0',
 			});
 
 			const slug = testUtils.generateRandomSlug();
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					loop: 'loop/product-os@1.0.0',
 				},
 			);
 
-			expect(card.slug).toBe(slug);
+			expect(contract.slug).toBe(slug);
 		});
 
 		it('should throw an error if the referenced loop does not exist', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-					type: 'card@1.0.0',
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+					type: 'contract@1.0.0',
 					loop: 'saywhat@1.0.0',
 				}),
 			).rejects.toThrow(errors.JellyfishNoElement);
@@ -1736,36 +1736,36 @@ describe('Kernel', () => {
 
 		it('should throw an error if the referenced loop is not a loop contract', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-					type: 'card@1.0.0',
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+					type: 'contract@1.0.0',
 					loop: 'user@1.0.0',
 				}),
 			).rejects.toThrow(errors.JellyfishNoElement);
 		});
 
-		it('should be able to insert two versions of the same card', async () => {
+		it('should be able to insert two versions of the same contract', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'hello-world',
 			});
 
-			const card1 = await ctx.kernel.insertCard(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const card2 = await ctx.kernel.insertCard(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					version: '1.0.1',
 					data: {
 						foo: 'baz',
@@ -1773,41 +1773,41 @@ describe('Kernel', () => {
 				},
 			);
 
-			expect(card1.slug).toBe(card2.slug);
+			expect(contract1.slug).toBe(contract2.slug);
 
-			const element1 = await ctx.kernel.getCardBySlug(
+			const element1 = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card1.slug}@1.0.0`,
+				`${contract1.slug}@1.0.0`,
 			);
 			expect(element1!.data.foo).toBe('bar');
 
-			const element2 = await ctx.kernel.getCardBySlug(
+			const element2 = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card1.slug}@1.0.1`,
+				`${contract1.slug}@1.0.1`,
 			);
 			expect(element2!.data.foo).toBe('baz');
 
-			expect(element1).toEqual(card1);
-			expect(element2).toEqual(card2);
+			expect(element1).toEqual(contract1);
+			expect(element2).toEqual(contract2);
 		});
 
 		it('should insert an element with pre-release version data', async () => {
 			const version = '1.0.0-alpha';
 			const slug = testUtils.generateRandomSlug({
-				prefix: 'card',
+				prefix: 'contract',
 			});
-			const result = await ctx.kernel.insertCard(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					version,
 				},
 			);
-			const element = await ctx.kernel.getCardBySlug(
+			const element = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				`${result.slug}@${version}`,
@@ -1818,15 +1818,15 @@ describe('Kernel', () => {
 
 		it('should insert an element with pre-release and build version data', async () => {
 			const version = '1.0.0-alpha+001';
-			const result = await ctx.kernel.insertCard(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					version,
 				},
 			);
-			const element = await ctx.kernel.getCardBySlug(
+			const element = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				`${result.slug}@${version}`,
@@ -1840,41 +1840,41 @@ describe('Kernel', () => {
 			const version1 = '1.0.0-alpha';
 			const version2 = '1.0.0-beta';
 			const results = [
-				await ctx.kernel.insertCard(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					{
 						slug,
-						type: 'card@1.0.0',
+						type: 'contract@1.0.0',
 						version: version1,
 						data: {},
 					},
 				),
-				await ctx.kernel.insertCard(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					{
 						slug,
-						type: 'card@1.0.0',
+						type: 'contract@1.0.0',
 						version: version2,
 						data: {},
 					},
 				),
 			];
 			const elements = [
-				await ctx.kernel.getCardBySlug(
+				await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					`${results[0].slug}@${version1}`,
 				),
-				await ctx.kernel.getCardBySlug(
+				await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					`${results[1].slug}@${version2}`,
 				),
 			];
 
-			// Check that the cards have the same slug, but different versions
+			// Check that the contracts have the same slug, but different versions
 			expect(elements[0]!.slug).toEqual(elements[1]!.slug);
 			expect(elements[0]!.version).toEqual(version1);
 			expect(elements[1]!.version).toEqual(version2);
@@ -1884,113 +1884,113 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug();
 			const version1 = '1.0.0-alpha+001';
 			const version2 = '1.0.0-alpha+002';
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 				version: version1,
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 				version: version2,
 			});
 			const elements = [
-				await ctx.kernel.getCardBySlug(
+				await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					`${slug}@${version1}`,
 				),
-				await ctx.kernel.getCardBySlug(
+				await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					`${slug}@${version2}`,
 				),
 			];
 
-			// Check that the cards have the same slug, but different versions
+			// Check that the contracts have the same slug, but different versions
 			expect(elements[0]!.slug).toEqual(elements[1]!.slug);
 			expect(elements[0]!.version).toEqual(version1);
 			expect(elements[1]!.version).toEqual(version2);
 		});
 
-		it('should be able to insert a card', async () => {
-			const card = await ctx.kernel.insertCard(
+		it('should be able to insert a contract', async () => {
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const element = await ctx.kernel.getCardById(
+			const element = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				card.id,
+				contract.id,
 			);
-			expect(element).toEqual(card);
+			expect(element).toEqual(contract);
 		});
 
 		it('should be able to set a tag with a colon', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					tags: ['foo:bar'],
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const element = await ctx.kernel.getCardById(
+			const element = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				card.id,
+				contract.id,
 			);
-			expect(element).toEqual(card);
+			expect(element).toEqual(contract);
 		});
 
 		it('should be able to set a tag with a space and a slash', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					tags: ['CUSTOM HARDWARE/OS'],
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const element = await ctx.kernel.getCardById(
+			const element = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				card.id,
+				contract.id,
 			);
-			expect(element).toEqual(card);
+			expect(element).toEqual(contract);
 		});
 
 		it('should use defaults if required keys are missing', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			expect(card).toEqual({
-				id: card.id,
-				created_at: card.created_at,
+			expect(contract).toEqual({
+				id: contract.id,
+				created_at: contract.created_at,
 				updated_at: null,
 				linked_at: {},
-				slug: card.slug,
-				type: 'card@1.0.0',
+				slug: contract.slug,
+				type: 'contract@1.0.0',
 				name: null,
 				active: true,
 				version: '1.0.0',
@@ -2005,78 +2005,78 @@ describe('Kernel', () => {
 		});
 
 		it('should generate a slug if one is not provided', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			expect(card.slug).toBeTruthy();
+			expect(contract.slug).toBeTruthy();
 		});
 
-		it('should throw if the card slug already exists', async () => {
+		it('should throw if the contract slug already exists', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'hello-world',
 			});
-			const card = {
+			const contract = {
 				slug,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 			};
 
-			await ctx.kernel.insertCard(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				card,
+				contract,
 			);
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, card),
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, contract),
 			).rejects.toThrow(errors.JellyfishElementAlreadyExists);
 		});
 
-		it('should be able to create a link between two valid cards', async () => {
-			const card1 = await ctx.kernel.insertCard(
+		it('should be able to create a link between two valid contracts', async () => {
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card2 = await ctx.kernel.insertCard(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const linkCard = await ctx.kernel.insertCard(
+			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
+					slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
 					type: 'link@1.0.0',
 					name: 'is attached to',
 					data: {
 						inverseName: 'has attached element',
 						from: {
-							id: card1.id,
-							type: card1.type,
+							id: contract1.id,
+							type: contract1.type,
 						},
 						to: {
-							id: card2.id,
-							type: card2.type,
+							id: contract2.id,
+							type: contract2.type,
 						},
 					},
 				},
 			);
 
-			const element = await ctx.kernel.getCardById(
+			const element = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				linkCard.id,
+				linkContract.id,
 			);
 
 			assert(element !== null);
@@ -2084,134 +2084,134 @@ describe('Kernel', () => {
 			expect(element.data.from).not.toBe(element.data.to);
 		});
 
-		it('should be able to create a direction-less link between two valid cards', async () => {
-			const card1 = await ctx.kernel.insertCard(
+		it('should be able to create a direction-less link between two valid contracts', async () => {
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card2 = await ctx.kernel.insertCard(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const linkCard = await ctx.kernel.insertCard(
+			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `link-${card1.slug}-is-linked-to-${card2.slug}`,
+					slug: `link-${contract1.slug}-is-linked-to-${contract2.slug}`,
 					type: 'link@1.0.0',
 					name: 'is linked to',
 					data: {
 						inverseName: 'is linked to',
 						from: {
-							id: card1.id,
-							type: card1.type,
+							id: contract1.id,
+							type: contract1.type,
 						},
 						to: {
-							id: card2.id,
-							type: card2.type,
+							id: contract2.id,
+							type: contract2.type,
 						},
 					},
 				},
 			);
 
-			const element = await ctx.kernel.getCardById(
+			const element = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				linkCard.id,
+				linkContract.id,
 			);
 			assert(element !== null);
 			expect(element.data.from).not.toBe(element.data.to);
 			expect(element.name).toBe(element.data.inverseName);
 		});
 
-		it('should be able to create two different links between two valid cards', async () => {
-			const card1 = await ctx.kernel.insertCard(
+		it('should be able to create two different links between two valid contracts', async () => {
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card2 = await ctx.kernel.insertCard(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const linkCard1 = await ctx.kernel.insertCard(
+			const linkContract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `link-${card1.slug}-is-linked-to-${card2.slug}`,
+					slug: `link-${contract1.slug}-is-linked-to-${contract2.slug}`,
 					type: 'link@1.0.0',
 					version: '1.0.0',
 					name: 'is linked to',
 					data: {
 						inverseName: 'has been linked to',
 						from: {
-							id: card1.id,
-							type: card1.type,
+							id: contract1.id,
+							type: contract1.type,
 						},
 						to: {
-							id: card2.id,
-							type: card2.type,
+							id: contract2.id,
+							type: contract2.type,
 						},
 					},
 				},
 			);
 
-			const linkCard2 = await ctx.kernel.insertCard(
+			const linkContract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
+					slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
 					type: 'link@1.0.0',
 					version: '1.0.0',
 					name: 'is attached to',
 					data: {
 						inverseName: 'has attached element',
 						from: {
-							id: card1.id,
-							type: card1.type,
+							id: contract1.id,
+							type: contract1.type,
 						},
 						to: {
-							id: card2.id,
-							type: card2.type,
+							id: contract2.id,
+							type: contract2.type,
 						},
 					},
 				},
 			);
 
-			expect((linkCard1 as any).data.from.id).toBe(
-				(linkCard2 as any).data.from.id,
+			expect((linkContract1 as any).data.from.id).toBe(
+				(linkContract2 as any).data.from.id,
 			);
-			expect((linkCard1 as any).data.to.id).toBe((linkCard2 as any).data.to.id);
+			expect((linkContract1 as any).data.to.id).toBe((linkContract2 as any).data.to.id);
 		});
 
-		it('should not add a link if not inserting a card with a target', async () => {
-			const card1 = await ctx.kernel.insertCard(
+		it('should not add a link if not inserting a contract with a target', async () => {
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
-					foo: card1.id,
+					foo: contract1.id,
 				},
 			});
 
@@ -2234,11 +2234,11 @@ describe('Kernel', () => {
 			expect(results).toEqual([]);
 		});
 
-		it('.insertCard() read access on a property should not allow to write other properties', async () => {
+		it('.insertContract() read access on a property should not allow to write other properties', async () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${slug}`,
 				type: 'role@1.0.0',
 				version: '1.0.0',
@@ -2290,7 +2290,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const userCard = await ctx.kernel.insertCard(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -2305,7 +2305,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const targetUserCard = await ctx.kernel.insertCard(
+			const targetUserContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -2322,21 +2322,21 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					type: 'session@1.0.0',
 					data: {
-						actor: userCard.id,
+						actor: userContract.id,
 					},
 				},
 			);
 
 			await expect(
-				ctx.kernel.replaceCard(ctx.logContext, session.id, {
-					id: targetUserCard.id,
-					slug: targetUserCard.slug,
+				ctx.kernel.replaceContract(ctx.logContext, session.id, {
+					id: targetUserContract.id,
+					slug: targetUserContract.slug,
 					type: 'user@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -2348,9 +2348,9 @@ describe('Kernel', () => {
 			).rejects.toThrow(errors.JellyfishPermissionsError);
 		});
 
-		it('.insertCard() should not insert a link if any of the two target cards does not exist', async () => {
+		it('.insertContract() should not insert a link if any of the two target contracts does not exist', async () => {
 			await expect(
-				ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 					slug: `link-${testUtils.generateRandomSlug()}-is-attached-to-${testUtils.generateRandomSlug()}`,
 					name: 'is attached to',
 					type: 'link@1.0.0',
@@ -2359,11 +2359,11 @@ describe('Kernel', () => {
 						inverseName: 'has attached',
 						from: {
 							id: testUtils.generateRandomId(),
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 						},
 						to: {
 							id: testUtils.generateRandomId(),
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 						},
 					},
 				}),
@@ -2371,98 +2371,98 @@ describe('Kernel', () => {
 		});
 	});
 
-	describe('.replaceCard()', () => {
+	describe('.replaceContract()', () => {
 		it('should replace an element', async () => {
-			const card1 = await ctx.kernel.insertCard(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card2 = await ctx.kernel.replaceCard(
+			const contract2 = await ctx.kernel.replaceContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: card1.slug,
-					type: 'card@1.0.0',
+					slug: contract1.slug,
+					type: 'contract@1.0.0',
 					data: {
 						replaced: true,
 					},
 				},
 			);
 
-			expect(card1.id).toBe(card2.id);
-			const element = await ctx.kernel.getCardById(
+			expect(contract1.id).toBe(contract2.id);
+			const element = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				card1.id,
+				contract1.id,
 			);
-			expect(element).toEqual(card2);
+			expect(element).toEqual(contract2);
 		});
 
-		it('should not overwrite the "created_at" field when overriding a card', async () => {
-			const card = await ctx.kernel.insertCard(
+		it('should not overwrite the "created_at" field when overriding a contract', async () => {
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const update = await ctx.kernel.replaceCard(
+			const update = await ctx.kernel.replaceContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: card.slug,
-					type: 'card@1.0.0',
+					slug: contract.slug,
+					type: 'contract@1.0.0',
 					created_at: new Date(633009018000).toISOString(),
 				},
 			);
 
-			expect(card.created_at).toBe(update.created_at);
+			expect(contract.created_at).toBe(update.created_at);
 		});
 
-		it('should not overwrite the "linked_at" field when overriding a card', async () => {
-			const card = await ctx.kernel.insertCard(
+		it('should not overwrite the "linked_at" field when overriding a contract', async () => {
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const update = await ctx.kernel.replaceCard(
+			const update = await ctx.kernel.replaceContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: card.slug,
-					type: 'card@1.0.0',
+					slug: contract.slug,
+					type: 'contract@1.0.0',
 					linked_at: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			expect(card.linked_at).toEqual(update.linked_at);
+			expect(contract.linked_at).toEqual(update.linked_at);
 		});
 
-		it('should not be able to set links when overriding a card', async () => {
-			const card = await ctx.kernel.insertCard(
+		it('should not be able to set links when overriding a contract', async () => {
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const update = await ctx.kernel.replaceCard(
+			const update = await ctx.kernel.replaceContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: card.slug,
-					type: 'card@1.0.0',
+					slug: contract.slug,
+					type: 'contract@1.0.0',
 					links: {
 						foo: 'bar',
 					} as any,
@@ -2473,97 +2473,97 @@ describe('Kernel', () => {
 		});
 	});
 
-	describe('.getCardBySlug()', () => {
-		it('.getCardBySlug() there should be an admin card', async () => {
-			const card = await ctx.kernel.getCardBySlug(
+	describe('.getContractBySlug()', () => {
+		it('.getContractBySlug() there should be an admin contract', async () => {
+			const contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				'user-admin@latest',
 			);
-			expect(card).toBeTruthy();
+			expect(contract).toBeTruthy();
 		});
 
-		it('.getCardBySlug() should find an active card by its slug', async () => {
-			const result = await ctx.kernel.insertCard(
+		it('.getContractBySlug() should find an active contract by its slug', async () => {
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card = await ctx.kernel.getCardBySlug(
+			const contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				`${result.slug}@${result.version}`,
 			);
-			expect(card).toEqual(result);
+			expect(contract).toEqual(result);
 		});
 
-		it('.getCardBySlug() should not find an active card by its slug and the wrong version', async () => {
-			const result = await ctx.kernel.insertCard(
+		it('.getContractBySlug() should not find an active contract by its slug and the wrong version', async () => {
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card = await ctx.kernel.getCardBySlug(
+			const contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				`${result.slug}@1.0.1`,
 			);
 
-			expect(card).toBeFalsy();
+			expect(contract).toBeFalsy();
 		});
 
-		it('.getCardBySlug() should not find an invalid slug when using @latest', async () => {
-			const card = await ctx.kernel.getCardBySlug(
+		it('.getContractBySlug() should not find an invalid slug when using @latest', async () => {
+			const contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				'foo-bar@latest',
 			);
 
-			expect(card).toBeFalsy();
+			expect(contract).toBeFalsy();
 		});
 
-		it('.getCardBySlug() should find an active card by its slug using @latest', async () => {
-			const result = await ctx.kernel.insertCard(
+		it('.getContractBySlug() should find an active contract by its slug using @latest', async () => {
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card = await ctx.kernel.getCardBySlug(
+			const contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				`${result.slug}@${result.version}`,
 			);
 
-			expect(card).toEqual(result);
+			expect(contract).toEqual(result);
 		});
 
-		it('.getCardBySlug() should find the latest version of a card', async () => {
-			const card1 = await ctx.kernel.insertCard(
+		it('.getContractBySlug() should find the latest version of a contract', async () => {
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						foo: 'bar',
 					},
 				},
 			);
 
-			const card2 = await ctx.kernel.insertCard(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					slug: card1.slug,
-					type: 'card@1.0.0',
+					slug: contract1.slug,
+					type: 'contract@1.0.0',
 					version: '2.0.1',
 					data: {
 						foo: 'baz',
@@ -2571,95 +2571,95 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: card1.slug,
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: contract1.slug,
+				type: 'contract@1.0.0',
 				version: '1.2.1',
 				data: {
 					foo: 'qux',
 				},
 			});
 
-			const element = await ctx.kernel.getCardBySlug(
+			const element = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
-				`${card1.slug}@latest`,
+				`${contract1.slug}@latest`,
 			);
 
 			expect(element!.data.foo).toBe('baz');
-			expect(element).toEqual(card2);
+			expect(element).toEqual(contract2);
 		});
 
-		it('.getCardBySlug() should find an active card by its slug and its type', async () => {
-			const result = await ctx.kernel.insertCard(
+		it('.getContractBySlug() should find an active contract by its slug and its type', async () => {
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card = await ctx.kernel.getCardBySlug(
+			const contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				`${result.slug}@${result.version}`,
 			);
 
-			expect(card).toEqual(result);
+			expect(contract).toEqual(result);
 		});
 	});
 
-	describe('.getCardById()', () => {
-		it('should find an active card by its id', async () => {
-			const result = await ctx.kernel.insertCard(
+	describe('.getContractById()', () => {
+		it('should find an active contract by its id', async () => {
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card = await ctx.kernel.getCardById(
+			const contract = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				result.id,
 			);
-			expect(card).toEqual(result);
+			expect(contract).toEqual(result);
 		});
 
-		it('should find an active card by its id and type', async () => {
-			const result = await ctx.kernel.insertCard(
+		it('should find an active contract by its id and type', async () => {
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card = await ctx.kernel.getCardById(
+			const contract = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				result.id,
 			);
 
-			expect(card).toEqual(result);
+			expect(contract).toEqual(result);
 		});
 
-		it('should return an inactive card by its id', async () => {
-			const result = await ctx.kernel.insertCard(
+		it('should return an inactive contract by its id', async () => {
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const card = await ctx.kernel.getCardById(
+			const contract = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				result.id,
 			);
-			expect(card).toEqual(result);
+			expect(contract).toEqual(result);
 		});
 	});
 
@@ -2726,11 +2726,11 @@ describe('Kernel', () => {
 
 		it('should be able to limit the results', async () => {
 			const ref = uuid();
-			const result1 = await ctx.kernel.insertCard(
+			const result1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						ref,
 						test: 1,
@@ -2739,11 +2739,11 @@ describe('Kernel', () => {
 				},
 			);
 
-			const result2 = await ctx.kernel.insertCard(
+			const result2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						ref,
 						test: 2,
@@ -2752,8 +2752,8 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					ref,
 					test: 3,
@@ -2793,8 +2793,8 @@ describe('Kernel', () => {
 		it('should be able to skip the results', async () => {
 			const ref = uuid();
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					ref,
 					test: 1,
@@ -2802,8 +2802,8 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					ref,
 					test: 2,
@@ -2811,11 +2811,11 @@ describe('Kernel', () => {
 				},
 			});
 
-			const result3 = await ctx.kernel.insertCard(
+			const result3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						ref,
 						test: 3,
@@ -2856,8 +2856,8 @@ describe('Kernel', () => {
 		it('should be able to limit and skip the results', async () => {
 			const ref = uuid();
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					ref,
 					test: 1,
@@ -2865,11 +2865,11 @@ describe('Kernel', () => {
 				},
 			});
 
-			const result2 = await ctx.kernel.insertCard(
+			const result2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						ref,
 						test: 2,
@@ -2878,8 +2878,8 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					ref,
 					test: 3,
@@ -2917,38 +2917,38 @@ describe('Kernel', () => {
 			expect(results).toEqual([result2]);
 		});
 
-		it('should be able to sort linked cards', async () => {
-			const parent = await ctx.kernel.insertCard(
+		it('should be able to sort linked contracts', async () => {
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const child1 = await ctx.kernel.insertCard(
+			const child1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 1,
 					},
 				},
 			);
 
-			const child2 = await ctx.kernel.insertCard(
+			const child2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 0,
 					},
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child1.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				name: 'is child of',
@@ -2965,7 +2965,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child2.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				name: 'is child of',
@@ -3007,9 +3007,9 @@ describe('Kernel', () => {
 			);
 
 			expect(
-				results.map((card) => {
+				results.map((contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
@@ -3018,9 +3018,9 @@ describe('Kernel', () => {
 				},
 			]);
 			expect(
-				(results as any)[0].links['has child'].map((card: Contract) => {
+				(results as any)[0].links['has child'].map((contract: Contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
@@ -3033,38 +3033,38 @@ describe('Kernel', () => {
 			]);
 		});
 
-		it('should be able to skip linked cards', async () => {
-			const parent = await ctx.kernel.insertCard(
+		it('should be able to skip linked contracts', async () => {
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const child1 = await ctx.kernel.insertCard(
+			const child1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 1,
 					},
 				},
 			);
 
-			const child2 = await ctx.kernel.insertCard(
+			const child2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 0,
 					},
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child1.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				name: 'is child of',
@@ -3081,7 +3081,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child2.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				name: 'is child of',
@@ -3123,9 +3123,9 @@ describe('Kernel', () => {
 			);
 
 			expect(
-				results.map((card) => {
+				results.map((contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
@@ -3134,9 +3134,9 @@ describe('Kernel', () => {
 				},
 			]);
 			expect(
-				(results as any)[0].links['has child'].map((card: Contract) => {
+				(results as any)[0].links['has child'].map((contract: Contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
@@ -3146,38 +3146,38 @@ describe('Kernel', () => {
 			]);
 		});
 
-		it('should be able to limit linked cards', async () => {
-			const parent = await ctx.kernel.insertCard(
+		it('should be able to limit linked contracts', async () => {
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const child1 = await ctx.kernel.insertCard(
+			const child1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 1,
 					},
 				},
 			);
 
-			const child2 = await ctx.kernel.insertCard(
+			const child2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 0,
 					},
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child1.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				name: 'is child of',
@@ -3194,7 +3194,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child2.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				name: 'is child of',
@@ -3236,9 +3236,9 @@ describe('Kernel', () => {
 			);
 
 			expect(
-				results.map((card) => {
+				results.map((contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
@@ -3247,9 +3247,9 @@ describe('Kernel', () => {
 				},
 			]);
 			expect(
-				results[0].links!['has child']!.map((card) => {
+				results[0].links!['has child']!.map((contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
@@ -3259,12 +3259,12 @@ describe('Kernel', () => {
 			]);
 		});
 
-		it('should filter cards by the options.mask schema if set', async () => {
-			const insertedCard = await ctx.kernel.insertCard(
+		it('should filter contracts by the options.mask schema if set', async () => {
+			const insertedContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 1,
 					},
@@ -3275,7 +3275,7 @@ describe('Kernel', () => {
 				type: 'object',
 				properties: {
 					id: {
-						const: insertedCard.id,
+						const: insertedContract.id,
 					},
 				},
 			};
@@ -3297,14 +3297,14 @@ describe('Kernel', () => {
 			);
 
 			expect(
-				resultWithNoMask.map((card) => {
+				resultWithNoMask.map((contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
 				{
-					id: insertedCard.id,
+					id: insertedContract.id,
 				},
 			]);
 
@@ -3320,38 +3320,38 @@ describe('Kernel', () => {
 			expect(resultWithMask.length).toBe(0);
 		});
 
-		it('should be able to skip and limit linked cards', async () => {
-			const parent = await ctx.kernel.insertCard(
+		it('should be able to skip and limit linked contracts', async () => {
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const child1 = await ctx.kernel.insertCard(
+			const child1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 1,
 					},
 				},
 			);
 
-			const child2 = await ctx.kernel.insertCard(
+			const child2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						sequence: 0,
 					},
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child1.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				name: 'is child of',
@@ -3368,7 +3368,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child2.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				name: 'is child of',
@@ -3411,9 +3411,9 @@ describe('Kernel', () => {
 			);
 
 			expect(
-				results.map((card) => {
+				results.map((contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
@@ -3422,9 +3422,9 @@ describe('Kernel', () => {
 				},
 			]);
 			expect(
-				results[0].links!['has child']!.map((card) => {
+				results[0].links!['has child']!.map((contract) => {
 					return {
-						id: card.id,
+						id: contract.id,
 					};
 				}),
 			).toEqual([
@@ -3434,20 +3434,20 @@ describe('Kernel', () => {
 			]);
 		});
 
-		it('should return the cards that match a schema', async () => {
-			const result1 = await ctx.kernel.insertCard(
+		it('should return the contracts that match a schema', async () => {
+			const result1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 					},
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					email: 'johnsmith@example.io',
 				},
@@ -3488,7 +3488,7 @@ describe('Kernel', () => {
 				{
 					id: result1.id,
 					slug: result1.slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 					},
@@ -3497,11 +3497,11 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to describe a property that starts with $', async () => {
-			const result1 = await ctx.kernel.insertCard(
+			const result1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						$foo: 'bar',
 					},
@@ -3544,11 +3544,11 @@ describe('Kernel', () => {
 
 		it('should take roles into account', async () => {
 			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
-			const actor = await ctx.kernel.insertCard(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -3556,7 +3556,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -3567,7 +3567,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${role}`,
 				type: 'role@1.0.0',
 				version: '1.0.0',
@@ -3618,17 +3618,17 @@ describe('Kernel', () => {
 			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
-				_.pick(await CARDS.user, ['type', 'slug', 'active', 'data']),
+				_.pick(await CONTRACTS.user, ['type', 'slug', 'active', 'data']),
 			]);
 		});
 
-		it('should take roles into account when querying for linked cards', async () => {
+		it('should take roles into account when querying for linked contracts', async () => {
 			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
-			const actor = await ctx.kernel.insertCard(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -3636,7 +3636,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -3647,7 +3647,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${role}`,
 				type: 'role@1.0.0',
 				version: '1.0.0',
@@ -3667,7 +3667,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			const org = await ctx.kernel.insertCard(
+			const org = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -3676,7 +3676,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${actor.slug}-is-part-of-${org.slug}`,
 				type: 'link@1.0.0',
 				name: 'is part of',
@@ -3693,16 +3693,16 @@ describe('Kernel', () => {
 				},
 			});
 
-			const attachment = await ctx.kernel.insertCard(
+			const attachment = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: testUtils.generateRandomSlug(),
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${actor.slug}-is-attached-to-${attachment.slug}`,
 				type: 'link@1.0.0',
 				name: 'is attached to',
@@ -3744,11 +3744,11 @@ describe('Kernel', () => {
 			const role = testUtils.generateRandomSlug({
 				prefix: 'foo',
 			});
-			const actor = await ctx.kernel.insertCard(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -3756,7 +3756,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -3767,7 +3767,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${role}`,
 				type: 'role@1.0.0',
 				data: {
@@ -3814,11 +3814,11 @@ describe('Kernel', () => {
 
 		it('should ignore $id properties in roles', async () => {
 			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
-			const actor = await ctx.kernel.insertCard(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -3826,7 +3826,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -3837,7 +3837,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${role}`,
 				type: 'role@1.0.0',
 				version: '1.0.0',
@@ -3887,11 +3887,11 @@ describe('Kernel', () => {
 
 		it('should ignore queries to disallowed properties with additionalProperties: true', async () => {
 			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
-			const actor = await ctx.kernel.insertCard(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
@@ -3899,7 +3899,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -3910,7 +3910,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `role-${role}`,
 				type: 'role@1.0.0',
 				data: {
@@ -3956,12 +3956,12 @@ describe('Kernel', () => {
 			]);
 		});
 
-		it('should return inactive cards', async () => {
-			const card = await ctx.kernel.insertCard(
+		it('should return inactive contracts', async () => {
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					active: false,
 					data: {
 						email: 'johnsmith@example.io',
@@ -3978,7 +3978,7 @@ describe('Kernel', () => {
 					additionalProperties: false,
 					properties: {
 						slug: {
-							const: card.slug,
+							const: contract.slug,
 						},
 					},
 					required: ['slug'],
@@ -3987,22 +3987,22 @@ describe('Kernel', () => {
 
 			expect(results).toEqual([
 				{
-					slug: card.slug,
+					slug: contract.slug,
 				},
 			]);
 		});
 
-		it('should take a view card with two filters', async () => {
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+		it('should take a view contract with two filters', async () => {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				tags: ['foo'],
 				data: {
 					number: 1,
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					number: 1,
 				},
@@ -4069,12 +4069,12 @@ describe('Kernel', () => {
 			]);
 		});
 
-		it('should be able to request all cards (with no properties) linked to a card', async () => {
-			const parent = await ctx.kernel.insertCard(
+		it('should be able to request all contracts (with no properties) linked to a contract', async () => {
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: true,
 						number: 1,
@@ -4082,11 +4082,11 @@ describe('Kernel', () => {
 				},
 			);
 
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: false,
 						count: 1,
@@ -4094,8 +4094,8 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: `link-${card.slug}-is-appended-to-${parent.slug}`,
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: `link-${contract.slug}-is-appended-to-${parent.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
 				name: 'is appended to',
@@ -4103,8 +4103,8 @@ describe('Kernel', () => {
 				data: {
 					inverseName: 'has appended element',
 					from: {
-						id: card.id,
-						type: card.type,
+						id: contract.id,
+						type: contract.type,
 					},
 					to: {
 						id: parent.id,
@@ -4144,7 +4144,7 @@ describe('Kernel', () => {
 			expect(results).toEqual([{}]);
 		});
 
-		it('should get all properties of all cards', async () => {
+		it('should get all properties of all contracts', async () => {
 			const results = await ctx.kernel.query(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
@@ -4177,11 +4177,11 @@ describe('Kernel', () => {
 		});
 
 		it('should not consider inactive links', async () => {
-			const parent1 = await ctx.kernel.insertCard(
+			const parent1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: true,
 						number: 1,
@@ -4189,11 +4189,11 @@ describe('Kernel', () => {
 				},
 			);
 
-			const parent2 = await ctx.kernel.insertCard(
+			const parent2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: true,
 						number: 2,
@@ -4201,11 +4201,11 @@ describe('Kernel', () => {
 				},
 			);
 
-			const card1 = await ctx.kernel.insertCard(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: false,
 						count: 1,
@@ -4213,8 +4213,8 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: `link-${card1.slug}-is-attached-to-${parent1.slug}`,
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: `link-${contract1.slug}-is-attached-to-${parent1.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
 				name: 'is attached to',
@@ -4222,8 +4222,8 @@ describe('Kernel', () => {
 				data: {
 					inverseName: 'has attached element',
 					from: {
-						id: card1.id,
-						type: card1.type,
+						id: contract1.id,
+						type: contract1.type,
 					},
 					to: {
 						id: parent1.id,
@@ -4232,11 +4232,11 @@ describe('Kernel', () => {
 				},
 			});
 
-			const card2 = await ctx.kernel.insertCard(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: false,
 						count: 2,
@@ -4244,16 +4244,16 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: `link-${card2.slug}-is-attached-to-${parent2.slug}`,
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: `link-${contract2.slug}-is-attached-to-${parent2.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
 				name: 'is attached to',
 				data: {
 					inverseName: 'has attached element',
 					from: {
-						id: card2.id,
-						type: card2.type,
+						id: contract2.id,
+						type: contract2.type,
 					},
 					to: {
 						id: parent2.id,
@@ -4294,7 +4294,7 @@ describe('Kernel', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'card@1.0.0',
+							const: 'contract@1.0.0',
 						},
 						links: {
 							type: 'object',
@@ -4316,7 +4316,7 @@ describe('Kernel', () => {
 
 			expect(results).toEqual([
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					links: {
 						'is attached to': [
 							{
@@ -4337,11 +4337,11 @@ describe('Kernel', () => {
 
 		it('should be able to query using links', async () => {
 			const ref = uuid();
-			const parent1 = await ctx.kernel.insertCard(
+			const parent1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: true,
 						number: 1,
@@ -4349,11 +4349,11 @@ describe('Kernel', () => {
 				},
 			);
 
-			const parent2 = await ctx.kernel.insertCard(
+			const parent2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: true,
 						number: 2,
@@ -4361,19 +4361,19 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					thread: true,
 					number: 3,
 				},
 			});
 
-			const card1 = await ctx.kernel.insertCard(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: false,
 						count: 1,
@@ -4382,16 +4382,16 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: `link-${card1.slug}-is-attached-to-${parent1.slug}`,
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: `link-${contract1.slug}-is-attached-to-${parent1.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
 				name: 'is attached to',
 				data: {
 					inverseName: 'has attached element',
 					from: {
-						id: card1.id,
-						type: card1.type,
+						id: contract1.id,
+						type: contract1.type,
 					},
 					to: {
 						id: parent1.id,
@@ -4400,11 +4400,11 @@ describe('Kernel', () => {
 				},
 			});
 
-			const card2 = await ctx.kernel.insertCard(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: false,
 						count: 2,
@@ -4413,16 +4413,16 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: `link-${card2.slug}-is-attached-to-${parent1.slug}`,
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: `link-${contract2.slug}-is-attached-to-${parent1.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
 				name: 'is attached to',
 				data: {
 					inverseName: 'has attached element',
 					from: {
-						id: card2.id,
-						type: card2.type,
+						id: contract2.id,
+						type: contract2.type,
 					},
 					to: {
 						id: parent1.id,
@@ -4431,11 +4431,11 @@ describe('Kernel', () => {
 				},
 			});
 
-			const card3 = await ctx.kernel.insertCard(
+			const contract3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						thread: false,
 						count: 3,
@@ -4444,16 +4444,16 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: `link-${card3.slug}-is-attached-to-${parent2.slug}`,
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: `link-${contract3.slug}-is-attached-to-${parent2.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
 				name: 'is attached to',
 				data: {
 					inverseName: 'has attached element',
 					from: {
-						id: card3.id,
-						type: card3.type,
+						id: contract3.id,
+						type: contract3.type,
 					},
 					to: {
 						id: parent2.id,
@@ -4495,7 +4495,7 @@ describe('Kernel', () => {
 					properties: {
 						type: {
 							type: 'string',
-							const: 'card@1.0.0',
+							const: 'contract@1.0.0',
 						},
 						links: {
 							type: 'object',
@@ -4524,7 +4524,7 @@ describe('Kernel', () => {
 
 			expect(results).toEqual([
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					links: {
 						'is attached to': [
 							{
@@ -4541,7 +4541,7 @@ describe('Kernel', () => {
 					},
 				},
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					links: {
 						'is attached to': [
 							{
@@ -4558,7 +4558,7 @@ describe('Kernel', () => {
 					},
 				},
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					links: {
 						'is attached to': [
 							{
@@ -4578,31 +4578,31 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query using multiple link types', async () => {
-			const parent = await ctx.kernel.insertCard(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const ownedCard = await ctx.kernel.insertCard(
+			const ownedContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: `link-${ownedCard.slug}-is-owned-by-${parent.slug}`,
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: `link-${ownedContract.slug}-is-owned-by-${parent.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
 				name: 'is owned by',
 				data: {
 					inverseName: 'owns',
 					from: {
-						id: ownedCard.id,
-						type: ownedCard.type,
+						id: ownedContract.id,
+						type: ownedContract.type,
 					},
 					to: {
 						id: parent.id,
@@ -4611,23 +4611,23 @@ describe('Kernel', () => {
 				},
 			});
 
-			const attachedCard = await ctx.kernel.insertCard(
+			const attachedContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				slug: `link-${attachedCard.slug}-is-attached-to-${parent.slug}`,
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				slug: `link-${attachedContract.slug}-is-attached-to-${parent.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
 				name: 'is attached to',
 				data: {
 					inverseName: 'has attached element',
 					from: {
-						id: attachedCard.id,
-						type: attachedCard.type,
+						id: attachedContract.id,
+						type: attachedContract.type,
 					},
 					to: {
 						id: parent.id,
@@ -4679,43 +4679,43 @@ describe('Kernel', () => {
 			expect(results[0].links).toEqual({
 				'has attached element': [
 					{
-						id: attachedCard.id,
+						id: attachedContract.id,
 					},
 				],
 				owns: [
 					{
-						id: ownedCard.id,
+						id: ownedContract.id,
 					},
 				],
 			});
 		});
 
 		it('should be able to query $$links inside $$links', async () => {
-			const parent = await ctx.kernel.insertCard(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const child = await ctx.kernel.insertCard(
+			const child = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const grandchild = await ctx.kernel.insertCard(
+			const grandchild = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${child.slug}-is-child-of-${parent.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -4733,7 +4733,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${grandchild.slug}-is-child-of-${child.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -4751,16 +4751,16 @@ describe('Kernel', () => {
 				},
 			});
 
-			const santa = await ctx.kernel.insertCard(
+			const santa = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
 			for (const eternalChild of [parent, child, grandchild]) {
-				await ctx.kernel.insertCard(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					{
@@ -4857,45 +4857,45 @@ describe('Kernel', () => {
 		});
 
 		test.skip('should be able to query $$links inside an allOf', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: true,
 					},
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: false,
 					},
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertCard(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -4913,7 +4913,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker2.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -4931,7 +4931,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker3.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5001,48 +5001,48 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside an anyOf', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: false,
 					},
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: true,
 					},
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-				type: 'card@1.0.0',
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+				type: 'contract@1.0.0',
 				data: {
 					isStressed: false,
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5124,37 +5124,37 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query an optional $$links inside another optional $$links', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						order: 0,
 					},
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						order: 1,
 					},
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5172,7 +5172,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker2.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5190,7 +5190,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-reports-to-${worker2.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5277,45 +5277,45 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside a contains', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						stressedDays: [1, 3, 5],
 					},
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						stressedDays: [1, 2, 4],
 					},
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertCard(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5333,7 +5333,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker2.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5351,7 +5351,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker3.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5422,45 +5422,45 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside an items', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						stressedDays: [1, 3, 5],
 					},
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						stressedDays: [1, 'INVALID DAY', 4],
 					},
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertCard(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5478,7 +5478,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker2.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5496,7 +5496,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker3.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5567,31 +5567,31 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside a not', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5644,45 +5644,45 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside a property', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: true,
 					},
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: false,
 					},
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertCard(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5700,7 +5700,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker2.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5718,7 +5718,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker3.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5786,22 +5786,22 @@ describe('Kernel', () => {
 		});
 
 		it('should not ignore $$links optimized out by constant folding', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: testUtils.generateRandomSlug(),
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					version: '1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: testUtils.generateRandomSlug(),
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					version: '1.0.0',
 					data: {
 						idx: 0,
@@ -5810,11 +5810,11 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						idx: 1,
 						isWorking: true,
@@ -5822,7 +5822,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5910,48 +5910,48 @@ describe('Kernel', () => {
 		});
 
 		test.skip('should handle the same link type in multiple $$links', async () => {
-			const office = await ctx.kernel.insertCard(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertCard(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: true,
 					},
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertCard(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: false,
 					},
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertCard(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						isStressed: false,
 					},
 				},
 			);
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker1.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -5969,7 +5969,7 @@ describe('Kernel', () => {
 				},
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug: `link-${worker2.slug}-works-at-${office.slug}`,
 				type: 'link@1.0.0',
 				version: '1.0.0',
@@ -6059,30 +6059,30 @@ describe('Kernel', () => {
 		});
 
 		it('should filter results based on session scope', async () => {
-			// Insert cards to query for.
-			const foo = await ctx.kernel.insertCard(
+			// Insert contracts to query for.
+			const foo = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
-			const bar = await ctx.kernel.insertCard(
+			const bar = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
 			// Create scoped session for admin user.
-			const adminSession = await ctx.kernel.getCardById(
+			const adminSession = await ctx.kernel.getContractById(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				ctx.kernel.sessions!.admin,
 			);
 			assert(adminSession !== null);
-			const scopedSession = await ctx.kernel.insertCard(
+			const scopedSession = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6149,23 +6149,23 @@ describe('Kernel', () => {
 		});
 
 		it('should work with optional prerelease and build version data', async () => {
-			const cards = [
-				await ctx.kernel.insertCard(
+			const contracts = [
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					{
-						type: 'card@1.0.0',
+						type: 'contract@1.0.0',
 						version: '3.0.1',
 						data: {
 							foo: 1,
 						},
 					},
 				),
-				await ctx.kernel.insertCard(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					{
-						type: 'card@1.0.0',
+						type: 'contract@1.0.0',
 						version: '3.0.2',
 						data: {
 							foo: 1,
@@ -6186,7 +6186,7 @@ describe('Kernel', () => {
 						},
 						version: {
 							type: 'string',
-							enum: [cards[0].version, cards[1].version],
+							enum: [contracts[0].version, contracts[1].version],
 						},
 					},
 					required: ['slug', 'version'],
@@ -6198,18 +6198,18 @@ describe('Kernel', () => {
 
 			expect(results).toEqual([
 				{
-					slug: cards[0].slug,
-					version: cards[0].version,
+					slug: contracts[0].slug,
+					version: contracts[0].version,
 				},
 				{
-					slug: cards[1].slug,
-					version: cards[1].version,
+					slug: contracts[1].slug,
+					version: contracts[1].version,
 				},
 			]);
 		});
 
 		it('should throw if the session is not active', async () => {
-			const adminUser = await ctx.kernel.getCardBySlug(
+			const adminUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				'user-admin@1.0.0',
@@ -6218,7 +6218,7 @@ describe('Kernel', () => {
 			assert(adminUser !== null);
 
 			// Create a new inactive session
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6231,7 +6231,7 @@ describe('Kernel', () => {
 			);
 
 			expect(
-				ctx.kernel.getCardBySlug(
+				ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					session.id,
 					'user-admin@1.0.0',
@@ -6241,7 +6241,7 @@ describe('Kernel', () => {
 
 		it('should be able to query root level string fields using full text search', async () => {
 			const name = 'lorem ipsum dolor sit amet';
-			const type = await ctx.kernel.insertCard(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6260,7 +6260,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6268,7 +6268,7 @@ describe('Kernel', () => {
 					name,
 				},
 			);
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				type: `${type.slug}@${type.version}`,
 				name: 'foobar',
 			});
@@ -6300,7 +6300,7 @@ describe('Kernel', () => {
 
 		it('should be able to query root level array fields using full text search', async () => {
 			const tag = 'lorem';
-			const type = await ctx.kernel.insertCard(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6322,7 +6322,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6330,7 +6330,7 @@ describe('Kernel', () => {
 					tags: [tag],
 				},
 			);
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				type: `${type.slug}@${type.version}`,
 			});
 
@@ -6359,7 +6359,7 @@ describe('Kernel', () => {
 
 		it('should be able to query nested string fields using full text search', async () => {
 			const description = 'lorem ipsum dolor sit amet';
-			const type = await ctx.kernel.insertCard(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6383,7 +6383,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6393,7 +6393,7 @@ describe('Kernel', () => {
 					},
 				},
 			);
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				type: `${type.slug}@${type.version}`,
 			});
 
@@ -6431,7 +6431,7 @@ describe('Kernel', () => {
 
 		it('should be able to query nested array fields using full text search', async () => {
 			const label = 'lorem';
-			const type = await ctx.kernel.insertCard(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6458,7 +6458,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6468,7 +6468,7 @@ describe('Kernel', () => {
 					},
 				},
 			);
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				type: `${type.slug}@${type.version}`,
 			});
 
@@ -6507,7 +6507,7 @@ describe('Kernel', () => {
 
 		it('should be able to query deeply nested string fields using full text search', async () => {
 			const description = 'lorem ipsum dolor sit amet';
-			const type = await ctx.kernel.insertCard(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6546,7 +6546,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6562,7 +6562,7 @@ describe('Kernel', () => {
 					},
 				},
 			);
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				type: `${type.slug}@${type.version}`,
 			});
 
@@ -6620,7 +6620,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query nested array fields inside oneOf using full text search', async () => {
-			const type = await ctx.kernel.insertCard(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6655,7 +6655,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
@@ -6665,7 +6665,7 @@ describe('Kernel', () => {
 					},
 				},
 			);
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				type: `${type.slug}@${type.version}`,
 				data: {
 					labels: ['consecteur dis'],
@@ -6709,7 +6709,7 @@ describe('Kernel', () => {
 	describe('.stream()', () => {
 		it('should include data if additionalProperties true', (done) => {
 			const slug = testUtils.generateRandomSlug({
-				prefix: 'card',
+				prefix: 'contract',
 			});
 
 			ctx.kernel
@@ -6728,7 +6728,7 @@ describe('Kernel', () => {
 						},
 						type: {
 							type: 'string',
-							const: 'card@1.0.0',
+							const: 'contract@1.0.0',
 						},
 					},
 				})
@@ -6740,11 +6740,11 @@ describe('Kernel', () => {
 						expect(change).toEqual({
 							id: change.after.id,
 							type: 'insert',
-							contractType: 'card@1.0.0',
+							contractType: 'contract@1.0.0',
 							after: {
 								id: change.after.id,
 								slug,
-								type: 'card@1.0.0',
+								type: 'contract@1.0.0',
 								active: true,
 								version: '1.0.0',
 								tags: [],
@@ -6766,9 +6766,9 @@ describe('Kernel', () => {
 						emitter.close();
 					});
 
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 						slug,
-						type: 'card@1.0.0',
+						type: 'contract@1.0.0',
 						data: {
 							test: 1,
 						},
@@ -6778,7 +6778,7 @@ describe('Kernel', () => {
 
 		it('should report back new elements that match a certain slug', (done) => {
 			const slug = testUtils.generateRandomSlug({
-				prefix: 'card',
+				prefix: 'contract',
 			});
 
 			ctx.kernel
@@ -6816,7 +6816,7 @@ describe('Kernel', () => {
 				.then((emitter: Stream) => {
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							slug,
 							active: true,
 							links: {},
@@ -6832,17 +6832,17 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 						slug,
-						type: 'card@1.0.0',
+						type: 'contract@1.0.0',
 						version: '1.0.0',
 						data: {
 							test: 1,
 						},
 					});
 
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-						type: 'card@1.0.0',
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+						type: 'contract@1.0.0',
 						data: {
 							test: 2,
 						},
@@ -6863,7 +6863,7 @@ describe('Kernel', () => {
 						},
 						type: {
 							type: 'string',
-							const: 'card@1.0.0',
+							const: 'contract@1.0.0',
 						},
 						data: {
 							type: 'object',
@@ -6881,7 +6881,7 @@ describe('Kernel', () => {
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
 							slug,
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							data: {
 								email: 'johndoe@example.com',
 							},
@@ -6893,15 +6893,15 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-						type: 'card@1.0.0',
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+						type: 'contract@1.0.0',
 						data: {
 							test: 1,
 						},
 					});
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 						slug,
-						type: 'card@1.0.0',
+						type: 'contract@1.0.0',
 						data: {
 							email: 'johndoe@example.com',
 						},
@@ -6920,7 +6920,7 @@ describe('Kernel', () => {
 					},
 					type: {
 						type: 'string',
-						const: 'card@1.0.0',
+						const: 'contract@1.0.0',
 					},
 					data: {
 						type: 'object',
@@ -6965,9 +6965,9 @@ describe('Kernel', () => {
 				});
 			});
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 				data: {
 					email: 'johndoe@example.com',
 				},
@@ -6984,10 +6984,10 @@ describe('Kernel', () => {
 					times,
 					_.constant({
 						type: 'insert',
-						contractType: 'card@1.0.0',
+						contractType: 'contract@1.0.0',
 						after: {
 							slug,
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							data: {
 								email: 'johndoe@example.com',
 							},
@@ -7035,11 +7035,11 @@ describe('Kernel', () => {
 							data: {
 								context: ctx.logContext,
 								epoch: 1521170969543,
-								action: 'action-delete-card@1.0.0',
+								action: 'action-delete-contract@1.0.0',
 								actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 								input: {
 									id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-									type: 'card@1.0.0',
+									type: 'contract@1.0.0',
 								},
 								timestamp: '2018-03-16T03:29:29.543Z',
 								arguments: {},
@@ -7052,23 +7052,23 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 						type: 'action-request@1.0.0',
 						data: {
 							context: ctx.logContext,
-							action: 'action-delete-card@1.0.0',
+							action: 'action-delete-contract@1.0.0',
 							actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 							epoch: 1521170969543,
 							timestamp: '2018-03-16T03:29:29.543Z',
 							input: {
 								id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-								type: 'card@1.0.0',
+								type: 'contract@1.0.0',
 							},
 							arguments: {},
 						},
 					});
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-						type: 'card@1.0.0',
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+						type: 'contract@1.0.0',
 						data: {
 							email: 'johndoe@example.com',
 						},
@@ -7109,7 +7109,7 @@ describe('Kernel', () => {
 						},
 						type: {
 							type: 'string',
-							const: 'card@1.0.0',
+							const: 'contract@1.0.0',
 						},
 					},
 					required: ['type'],
@@ -7117,7 +7117,7 @@ describe('Kernel', () => {
 				.then((emitter: Stream) => {
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							slug,
 						});
 
@@ -7127,10 +7127,10 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 						slug,
 						active: false,
-						type: 'card@1.0.0',
+						type: 'contract@1.0.0',
 						data: {
 							test: 2,
 						},
@@ -7138,7 +7138,7 @@ describe('Kernel', () => {
 				});
 		});
 
-		it('should be able to resolve links on an update to the base card', (done) => {
+		it('should be able to resolve links on an update to the base contract', (done) => {
 			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
@@ -7163,18 +7163,18 @@ describe('Kernel', () => {
 						},
 						type: {
 							type: 'string',
-							const: 'card@1.0.0',
+							const: 'contract@1.0.0',
 						},
 					},
 					required: ['type', 'links'],
 				})
 				.then(async (emitter: Stream) => {
-					const card1 = await ctx.kernel.insertCard(
+					const contract1 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						{
 							slug,
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							version: '1.0.0',
 							data: {
 								test: 1,
@@ -7182,34 +7182,34 @@ describe('Kernel', () => {
 						},
 					);
 
-					const card2 = await ctx.kernel.insertCard(
+					const contract2 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						{
 							active: false,
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							data: {
 								test: 2,
 							},
 						},
 					);
 
-					await ctx.kernel.insertCard(
+					await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						{
-							slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
+							slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
 							type: 'link@1.0.0',
 							name: 'is attached to',
 							data: {
 								inverseName: 'has attached element',
 								from: {
-									id: card1.id,
-									type: card1.type,
+									id: contract1.id,
+									type: contract1.type,
 								},
 								to: {
-									id: card2.id,
-									type: card2.type,
+									id: contract2.id,
+									type: contract2.type,
 								},
 							},
 						},
@@ -7217,12 +7217,12 @@ describe('Kernel', () => {
 
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							slug,
 							links: {
 								'is attached to': [
 									{
-										slug: card2.slug,
+										slug: contract2.slug,
 									},
 								],
 							},
@@ -7234,10 +7234,10 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.patchCardBySlug(
+					ctx.kernel.patchContractBySlug(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
-						`${card1.slug}@${card1.version}`,
+						`${contract1.slug}@${contract1.version}`,
 						[
 							{
 								op: 'replace',
@@ -7274,30 +7274,30 @@ describe('Kernel', () => {
 						},
 						type: {
 							type: 'string',
-							const: 'card@1.0.0',
+							const: 'contract@1.0.0',
 						},
 					},
 					required: ['type', 'links'],
 				})
 				.then(async (emitter: Stream) => {
-					const card1 = await ctx.kernel.insertCard(
+					const contract1 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						{
 							slug,
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							data: {
 								test: 1,
 							},
 						},
 					);
 
-					const card2 = await ctx.kernel.insertCard(
+					const contract2 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						{
 							active: false,
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							data: {
 								test: 2,
 							},
@@ -7306,12 +7306,12 @@ describe('Kernel', () => {
 
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							slug,
 							links: {
 								'is attached to': [
 									{
-										slug: card2.slug,
+										slug: contract2.slug,
 									},
 								],
 							},
@@ -7323,19 +7323,19 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
-						slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
+					ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
+						slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
 						type: 'link@1.0.0',
 						name: 'is attached to',
 						data: {
 							inverseName: 'has attached element',
 							from: {
-								id: card1.id,
-								type: card1.type,
+								id: contract1.id,
+								type: contract1.type,
 							},
 							to: {
-								id: card2.id,
-								type: card2.type,
+								id: contract2.id,
+								type: contract2.type,
 							},
 						},
 					});
@@ -7343,7 +7343,7 @@ describe('Kernel', () => {
 		});
 
 		// TODO: Get this working, but in a performant way.
-		test.skip('should be able to resolve links on an update to the linked card', (done) => {
+		test.skip('should be able to resolve links on an update to the linked contract', (done) => {
 			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
@@ -7371,18 +7371,18 @@ describe('Kernel', () => {
 						},
 						type: {
 							type: 'string',
-							const: 'card@1.0.0',
+							const: 'contract@1.0.0',
 						},
 					},
 					required: ['type'],
 				})
 				.then(async (emitter: Stream) => {
-					const card1 = await ctx.kernel.insertCard(
+					const contract1 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						{
 							slug,
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							version: '1.0.0',
 							data: {
 								test: 1,
@@ -7390,34 +7390,34 @@ describe('Kernel', () => {
 						},
 					);
 
-					const card2 = await ctx.kernel.insertCard(
+					const contract2 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						{
 							active: false,
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							data: {
 								test: 2,
 							},
 						},
 					);
 
-					await ctx.kernel.insertCard(
+					await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						{
-							slug: `link-${card1.slug}-is-attached-to-${card2.slug}`,
+							slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
 							type: 'link@1.0.0',
 							name: 'is attached to',
 							data: {
 								inverseName: 'has attached element',
 								from: {
-									id: card1.id,
-									type: card1.type,
+									id: contract1.id,
+									type: contract1.type,
 								},
 								to: {
-									id: card2.id,
-									type: card2.type,
+									id: contract2.id,
+									type: contract2.type,
 								},
 							},
 						},
@@ -7425,12 +7425,12 @@ describe('Kernel', () => {
 
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
-							type: 'card@1.0.0',
+							type: 'contract@1.0.0',
 							slug,
 							links: {
 								'is attached to': [
 									{
-										slug: card2.slug,
+										slug: contract2.slug,
 									},
 								],
 							},
@@ -7442,10 +7442,10 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.patchCardBySlug(
+					ctx.kernel.patchContractBySlug(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
-						`${card2.slug}@${card1.version}`,
+						`${contract2.slug}@${contract1.version}`,
 						[
 							{
 								op: 'replace',
@@ -7457,7 +7457,7 @@ describe('Kernel', () => {
 				});
 		});
 
-		it('should send the unmatch event when a previously matching card does not match anymore', async () => {
+		it('should send the unmatch event when a previously matching contract does not match anymore', async () => {
 			const slug = testUtils.generateRandomSlug();
 			const stream = await ctx.kernel.stream(
 				ctx.logContext,
@@ -7487,7 +7487,7 @@ describe('Kernel', () => {
 					expect(change).toEqual({
 						id,
 						type: 'insert',
-						contractType: 'card@1.0.0',
+						contractType: 'contract@1.0.0',
 						after: {
 							slug,
 							data: {
@@ -7497,7 +7497,7 @@ describe('Kernel', () => {
 					});
 
 					stage = 1;
-					await ctx.kernel.patchCardBySlug(
+					await ctx.kernel.patchContractBySlug(
 						ctx.logContext,
 						ctx.kernel.sessions!.admin,
 						`${slug}@1.0.0`,
@@ -7513,7 +7513,7 @@ describe('Kernel', () => {
 					expect(change).toEqual({
 						id,
 						type: 'unmatch',
-						contractType: 'card@1.0.0',
+						contractType: 'contract@1.0.0',
 						after: null,
 					});
 
@@ -7523,9 +7523,9 @@ describe('Kernel', () => {
 
 			const end = once(stream, 'closed');
 
-			await ctx.kernel.insertCard(ctx.logContext, ctx.kernel.sessions!.admin, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.kernel.sessions!.admin, {
 				slug,
-				type: 'card@1.0.0',
+				type: 'contract@1.0.0',
 				data: {
 					status: 'open',
 				},
@@ -7534,14 +7534,14 @@ describe('Kernel', () => {
 			await end;
 		});
 
-		it('should send the dataset event on a query request and support the unmatch event for these cards', async () => {
+		it('should send the dataset event on a query request and support the unmatch event for these contracts', async () => {
 			const slug = testUtils.generateRandomSlug();
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug,
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 					data: {
 						status: 'open',
 					},
@@ -7575,11 +7575,11 @@ describe('Kernel', () => {
 				expect(stage).toEqual(0);
 				expect(payload).toEqual({
 					id: queryId,
-					cards: [card],
+					contracts: [contract],
 				});
 
 				stage = 1;
-				await ctx.kernel.patchCardBySlug(
+				await ctx.kernel.patchContractBySlug(
 					ctx.logContext,
 					ctx.kernel.sessions!.admin,
 					`${slug}@1.0.0`,
@@ -7596,9 +7596,9 @@ describe('Kernel', () => {
 			stream.on('data', (change) => {
 				expect(stage).toEqual(1);
 				expect(change).toEqual({
-					id: card.id,
+					id: contract.id,
 					type: 'unmatch',
-					contractType: 'card@1.0.0',
+					contractType: 'contract@1.0.0',
 					after: null,
 				});
 
@@ -7620,12 +7620,12 @@ describe('Kernel', () => {
 		});
 
 		it('issue #1128: should be able to query for two nested optional links', async () => {
-			const card = await ctx.kernel.insertCard(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.sessions!.admin,
 				{
 					slug: testUtils.generateRandomSlug(),
-					type: 'card@1.0.0',
+					type: 'contract@1.0.0',
 				},
 			);
 
@@ -7635,7 +7635,7 @@ describe('Kernel', () => {
 				{
 					properties: {
 						id: {
-							const: card.id,
+							const: contract.id,
 						},
 					},
 					anyOf: [
@@ -7658,7 +7658,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			expect(results).toEqual([card]);
+			expect(results).toEqual([contract]);
 		});
 	});
 });

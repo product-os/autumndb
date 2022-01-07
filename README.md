@@ -1,7 +1,7 @@
 # Jellyfish Core
 
-The Jellyfish core is a low-level internal SDK to interact with cards in the
-database, providing functions like `.getCardById()` or `.insertCard()`. The
+The Jellyfish core is a low-level internal SDK to interact with contracts in the
+database, providing functions like `.getContractById()` or `.insertContract()`. The
 core provides the foundation library for the rest of system.
 
 ## Goals
@@ -17,13 +17,13 @@ core provides the foundation library for the rest of system.
 
 The Jellyfish core provides the following features
 
-### The card data model
+### The contract data model
 
 Every entity in the system is a data structure we call
-a "card". Cards are an implementation of the [contracts data model](https://github.com/balena-io/balena/pull/1002).
+a "contract". Contracts are an implementation of the [contracts data model](https://github.com/balena-io/balena/pull/1002).
 
-Every card has a `type` field that specifies type that the card is an instance
-of. Card type definitions are indicated by having a `type` of `type`, e.g.
+Every contract has a `type` field that specifies type that the contract is an instance
+of. Contract type definitions are indicated by having a `type` of `type`, e.g.
 
 ```json
 {
@@ -33,34 +33,34 @@ of. Card type definitions are indicated by having a `type` of `type`, e.g.
 }
 ```
 
-These "type" cards contain model definitions in the form of a JSON schema. The
-slug of a type card is the value used in the type property of instances of the
+These "type" contracts contain model definitions in the form of a JSON schema. The
+slug of a type contract is the value used in the type property of instances of the
 type.
-As an example, you can look at the [type card for a "message"](https://github.com/product-os/jellyfish-plugin-default/blob/master/lib/cards/contrib/message.json). You can see that under the `data` key, there is a `schema` value that defines the shape of a card of type "message".
+As an example, you can look at the [type contract for a "message"](https://github.com/product-os/jellyfish-plugin-default/blob/master/lib/contracts/contrib/message.json). You can see that under the `data` key, there is a `schema` value that defines the shape of a contract of type "message".
 We follow the JSON schema spec, so if the schema allows, additional fields can
-be added to a card that are not defined in the type schema.
+be added to a contract that are not defined in the type schema.
 
 ### JSON schema based querying
 
-JSON schema is used to query the API, with any cards that match the provided JSON
+JSON schema is used to query the API, with any contracts that match the provided JSON
 schema being returned in the result set.
 
 ### JSON patch
 
-Card updates are made using [JSON patch](http://jsonpatch.com/), allowing fine
+Contract updates are made using [JSON patch](http://jsonpatch.com/), allowing fine
 grained updates to made to JSON data.
 
 ### User system
 
-User cards model the actors that interact with the system.
-There are two default users, the admin And the guest. The admin user is typically used for system level operations or operations that require unrestricted access. The guest user represents an unauthorised user interacting with the system. Users authorize function calls using a session, which corresponds to the ID of a "session" card in the system.
-The data that a user has access to is defined using "role" cards. All user cards
+User contracts model the actors that interact with the system.
+There are two default users, the admin And the guest. The admin user is typically used for system level operations or operations that require unrestricted access. The guest user represents an unauthorised user interacting with the system. Users authorize function calls using a session, which corresponds to the ID of a "session" contract in the system.
+The data that a user has access to is defined using "role" contracts. All user contracts
 define a list of roles that they have.
 
 ### Role based permissions
 
-Every user in the system must have at least one role, which corresponds to a card
-of type "role". Role cards contain a schema that defines which cards the user
+Every user in the system must have at least one role, which corresponds to a contract
+of type "role". Role contracts contain a schema that defines which contracts the user
 with that role can read and write.
 When a query is made, the schemas in the user's roles are combined
 with the user's query using an AND operator.
@@ -75,9 +75,9 @@ This behaviour is based on the [AJV "removeAdditional" option](https://ajv.js.or
 ### Marker based permissions
 
 The roles system is complemented by another permissions system called "markers".
-Markers allow individual cards to be restricted to one or more users. A marker
+Markers allow individual contracts to be restricted to one or more users. A marker
 is a string that corresponds to either a user or organisation slug and they
-appear as an array at the top level of a card under the key `markers`.
+appear as an array at the top level of a contract under the key `markers`.
 
 ```json
 {
@@ -87,16 +87,16 @@ appear as an array at the top level of a card under the key `markers`.
 }
 ```
 
-To view a card, a user must have access to all the markers on that card. A user
-has access to their marker (which is the slug of their user card) and the
+To view a contract, a user must have access to all the markers on that contract. A user
+has access to their marker (which is the slug of their user contract) and the
 markers for each organisation they are a member of. Markers can also be in the
 form of a compound marker, which is 2 or more markers concatenated with a `+`
-symbol. A user has access to a card with a compound marker if they have access
+symbol. A user has access to a contract with a compound marker if they have access
 to at least one of the markers that make up the compound marker.
-If a card has no markers on it, then the card is unrestricted by the markers system.
+If a contract has no markers on it, then the contract is unrestricted by the markers system.
 
 For example, if my user slug is `user-lucianbuzzo` and I am a member of the `org-balena` org, then I would be able to
-view cards with the markers:
+view contracts with the markers:
 
 - `[]` (i.e. no markers defined)
 - `[ "org-balena", "user-lucianbuzzo" ]`
@@ -105,7 +105,7 @@ view cards with the markers:
 - `[ "foobar+user-lucianbuzzo" ]`
 - `[ "org-balena+user-foobar" ]`
 
-However, I wouldn't be able to view cards with the markers
+However, I wouldn't be able to view contracts with the markers
 
 - `[ "user-foobar" ]`
 - `[ "user-foobar", "user-lucianbuzzo" ]`
@@ -118,11 +118,11 @@ Users can belong to organisations.
 
 ### Streaming
 
-A query can be streamed, creating an event emitter that will emit an event on any insert or update to a card.
+A query can be streamed, creating an event emitter that will emit an event on any insert or update to a contract.
 
 ### Soft delete
 
-When a card is deleted, it is not removed from the database but has it's "active" field set to false. It is recommended that users should not be able to view inactive cards.
+When a contract is deleted, it is not removed from the database but has it's "active" field set to false. It is recommended that users should not be able to view inactive contracts.
 
 ### Rich logging
 
@@ -134,11 +134,11 @@ Measurable are gathered and observed using prometheus/grafana.
 
 ### Data relationships
 
-Cards can be linked together by creating a card of type "link" that references both cards and describes their relationship. Relationships can be traversed when querying data using the `$$links` syntax.
+Contracts can be linked together by creating a contract of type "link" that references both contracts and describes their relationship. Relationships can be traversed when querying data using the `$$links` syntax.
 
 ### Caching
 
-Requests for individual cards by id or slug are cached, reducing DB load and
+Requests for individual contracts by id or slug are cached, reducing DB load and
 improving query speed.
 This library contains email integration functionality for use in Jellyfish.
 

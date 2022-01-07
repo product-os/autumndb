@@ -3,7 +3,7 @@ import { mergeProperties } from './transformer-merge-properties';
 export const type = {
 	slug: 'type',
 	type: 'type@1.0.0',
-	name: 'Jellyfish Card Type',
+	name: 'Jellyfish Contract Type',
 	data: {
 		schema: {
 			type: 'object',

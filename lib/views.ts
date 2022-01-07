@@ -4,22 +4,22 @@ import * as _ from 'lodash';
 import jsonSchema from './json-schema';
 
 /**
- * @summary Get the schema of a view card
+ * @summary Get the schema of a view contract
  * @function
  * @public
  *
- * @param {Object} card - view card
+ * @param {Object} contract - view contract
  * @returns {(Object|Null)} schema
  */
 export const getSchema = (
-	card: Partial<ViewContract> & Pick<ViewContract, 'data'>,
+	contract: Partial<ViewContract> & Pick<ViewContract, 'data'>,
 ): JsonSchema | null => {
-	if (card.data && card.data.schema) {
-		return card.data.schema;
+	if (contract.data && contract.data.schema) {
+		return contract.data.schema;
 	}
 
-	const conjunctions = _.map(_.get(card, ['data', 'allOf']), 'schema');
-	const disjunctions = _.map(_.get(card, ['data', 'anyOf']), 'schema');
+	const conjunctions = _.map(_.get(contract, ['data', 'allOf']), 'schema');
+	const disjunctions = _.map(_.get(contract, ['data', 'anyOf']), 'schema');
 
 	if (_.isEmpty(conjunctions) && _.isEmpty(disjunctions)) {
 		return null;

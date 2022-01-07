@@ -1,7 +1,7 @@
 import { initialize } from './mixins';
 import { actionRequest } from './action-request';
 import { action } from './action';
-import { card } from './card';
+import { contract } from './contract';
 import { role } from './role';
 import { org } from './org';
 import { error } from './error';
@@ -21,10 +21,10 @@ import { authentication } from './authentication';
 import { userSettings } from './user-settings';
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 
-const cards = [
+const contracts = [
 	actionRequest,
 	action,
-	card,
+	contract,
 	role,
 	org,
 	event,
@@ -44,7 +44,7 @@ const cards = [
 	userSettings,
 ];
 
-export const CARDS = cards.reduce<{ [slug: string]: ContractDefinition }>(
+export const CONTRACTS = contracts.reduce<{ [slug: string]: ContractDefinition }>(
 	(acc, contract) => {
 		const initializedContract = initialize(contract as any);
 		acc[initializedContract.slug] = initializedContract;

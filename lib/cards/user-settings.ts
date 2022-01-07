@@ -48,7 +48,7 @@ export const userSettings = {
 						},
 						viewSettings: {
 							description:
-								'A map of settings for view cards, keyed by the view id',
+								'A map of settings for view contracts, keyed by the view id',
 							type: 'object',
 							patternProperties: {
 								'^.*$': {
