@@ -4,6 +4,7 @@ import * as helpers from '../helpers';
 import { version as packageVersion } from '../../../../package.json';
 import { INDEX_TABLE, PostgresBackend } from '../../../../lib/backend/postgres';
 import { Context } from '../../../../lib/context';
+import { TABLE as CONTRACTS_TABLE } from '../../../../lib/backend/postgres/contracts';
 
 let ctx: helpers.BackendContext;
 
@@ -168,7 +169,7 @@ describe('Setup', () => {
 
 describe('.createIndex()', () => {
 	it('should create an index', async () => {
-		const tableName = 'contracts';
+		const tableName = 'cards';
 		const indexName = `foobar_${uuid().split('-')[0]}_idx`;
 		const predicate = 'USING btree (loop)';
 		const version = '1.0.0';
@@ -202,7 +203,7 @@ describe('.createIndex()', () => {
 	});
 
 	it('should create indexes with unique flag', async () => {
-		const tableName = 'contracts';
+		const tableName = CONTRACTS_TABLE;
 		const indexName = `foobar_${uuid().split('-')[0]}_idx`;
 		const predicate = 'USING btree (loop)';
 		const version = '1.0.0';

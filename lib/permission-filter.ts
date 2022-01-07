@@ -8,7 +8,7 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { DatabaseBackend } from './backend/postgres/types';
 import type { JsonSchema } from '@balena/jellyfish-types';
 
-const CONTRACT_CONTRACT_TYPE = `${CONTRACTS.contract.slug}@${CONTRACTS.contract.version}`;
+const CONTRACT_CONTRACT_TYPE = `${CONTRACTS.card.slug}@${CONTRACTS.card.version}`;
 const VERSIONED_CONTRACTS = _.mapKeys(CONTRACTS, (value: any, key: any) => {
 	return `${key}@${value.version}`;
 });
@@ -141,8 +141,14 @@ export const unsafeUpsertContract = async (
 	backend: DatabaseBackend,
 	contract: Contract,
 ) => {
-	jsonSchema.validate(VERSIONED_CONTRACTS[CONTRACT_CONTRACT_TYPE].data.schema as any, contract);
-	jsonSchema.validate(VERSIONED_CONTRACTS[contract.type].data.schema as any, contract);
+	jsonSchema.validate(
+		VERSIONED_CONTRACTS[CONTRACT_CONTRACT_TYPE].data.schema as any,
+		contract,
+	);
+	jsonSchema.validate(
+		VERSIONED_CONTRACTS[contract.type].data.schema as any,
+		contract,
+	);
 	return backend.upsertElement(context, contract);
 };
 
@@ -185,7 +191,10 @@ export const getSessionActor = async (
 		`Session expired at: ${sessionContract.data.expiration}`,
 	);
 
-	const actor = await backend.getElementById(context, sessionContract.data.actor);
+	const actor = await backend.getElementById(
+		context,
+		sessionContract.data.actor,
+	);
 
 	context.assertInternal(
 		actor,

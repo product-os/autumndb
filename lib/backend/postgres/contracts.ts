@@ -19,7 +19,7 @@ import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
 
-const CONTRACTS_TABLE = 'contracts';
+const CONTRACTS_TABLE = 'cards';
 const CONTRACTS_TRIGGER_COLUMNS = [
 	'active',
 	'version_major',
