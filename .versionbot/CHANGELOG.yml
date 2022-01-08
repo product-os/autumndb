@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: b56c7a567c9b5f4d2a3117238403967f0fbaba02
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 11.1.8
+  date: 2022-01-08T02:01:32.820Z
+- commits:
     - subject: Fix Postgres reset statement
       hash: 4565e933cfbd13e8de355a510393cdf018ef0fd1
       body: ''
