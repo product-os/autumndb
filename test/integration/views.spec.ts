@@ -1,6 +1,6 @@
 import { testUtils } from '../../lib';
 import * as views from '../../lib/views';
-import { CONTRACTS } from '../../lib/contracts';
+import { CARDS } from '../../lib/contracts';
 
 let ctx: testUtils.TestContext;
 
@@ -15,7 +15,7 @@ afterAll(async () => {
 describe('views', () => {
 	describe('.getSchema()', () => {
 		test('should return null if the contract is not a view', () => {
-			const schema = views.getSchema(CONTRACTS['user-admin']);
+			const schema = views.getSchema(CARDS['user-admin']);
 			expect(schema).toEqual(null);
 		});
 

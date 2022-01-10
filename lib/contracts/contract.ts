@@ -1,4 +1,4 @@
-export const contract = {
+export const card = {
 	slug: 'card',
 	name: 'Jellyfish Contract',
 	type: 'type@1.0.0',

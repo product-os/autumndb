@@ -37,4 +37,4 @@ export class JellyfishNoView extends BaseTypedError {}
 export class JellyfishPermissionsError extends BaseTypedError {}
 export class JellyfishSchemaMismatch extends BaseTypedError {}
 export class JellyfishSessionExpired extends BaseTypedError {}
-export class JellyfishUnknownContractType extends BaseTypedError {}
+export class JellyfishUnknownCardType extends BaseTypedError {}
