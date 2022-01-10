@@ -4,7 +4,7 @@ import * as helpers from '../helpers';
 import { version as packageVersion } from '../../../../package.json';
 import { INDEX_TABLE, PostgresBackend } from '../../../../lib/backend/postgres';
 import { Context } from '../../../../lib/context';
-import { TABLE as CONTRACTS_TABLE } from '../../../../lib/backend/postgres/contracts';
+import { TABLE as CONTRACTS_TABLE } from '../../../../lib/backend/postgres/cards';
 
 let ctx: helpers.BackendContext;
 

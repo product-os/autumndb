@@ -2,7 +2,7 @@ import type { SqlFragmentBuilder } from './fragment-builder';
 import { SqlFilter } from './sql-filter';
 
 /**
- * Filter asserting that there exists a linked contract through a link type that
+ * Filter asserting that there exists a linked card through a link type that
  * passes a filter.
  */
 export class LinkFilter extends SqlFilter {

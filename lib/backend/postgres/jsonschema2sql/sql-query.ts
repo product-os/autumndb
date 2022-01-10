@@ -30,7 +30,7 @@ import type { SqlQueryOptions } from '../types';
 
 const FENCE_REWRAP = new LiteralSql(`
 	SELECT
-		unaggregated.contractId,
+		unaggregated.cardId,
 		array(
 			SELECT row(
 				edges.source,
@@ -42,19 +42,19 @@ const FENCE_REWRAP = new LiteralSql(`
 		) AS linkEdges
 	FROM (
 		SELECT
-			unwrapped.contractId,
+			unwrapped.cardId,
 			array_agg(unwrapped.edges) AS edges
 		FROM (
 			SELECT (unnest(fence.arr)).*
 			FROM fence
 		) AS unwrapped
-		GROUP BY unwrapped.contractId
+		GROUP BY unwrapped.cardId
 	) AS unaggregated
 `);
-// Columns of the `contracts` table
+// Columns of the `cards` table
 // TODO: probably worth taking this as an argument and remove the implicit
 // assumptions on the table structure from the `SqlQuery` and `SqlPath` classes
-const CONTRACT_FIELDS = {
+const CARD_FIELDS = {
 	id: {
 		type: 'string',
 	},
@@ -171,7 +171,7 @@ const pushLinkedJoins = (
 	},
 	innerSelect: SqlSelectBuilder,
 	parentTable: string,
-	contractsTable: string,
+	cardsTable: string,
 ) => {
 	const linksFilter = new LiteralSql(`
 		${linked.linksAlias}.fromId = ${parentTable}.id AND
@@ -192,7 +192,7 @@ const pushLinkedJoins = (
 	) AND (
 		${linked.sqlFilter}
 	)`);
-	innerSelect.pushLeftJoin(contractsTable, joinFilter, linked.joinAlias);
+	innerSelect.pushLeftJoin(cardsTable, joinFilter, linked.joinAlias);
 };
 
 const pushLinkedLateral = (
@@ -207,7 +207,7 @@ const pushLinkedLateral = (
 		sortBy: string | string[];
 		sortDir: string;
 	},
-	contractsTable: string,
+	cardsTable: string,
 	laterals: any[][],
 ) => {
 	const lateralJoinFilter = new ExpressionFilter(
@@ -245,7 +245,7 @@ const pushLinkedLateral = (
 		)
 		.pushFrom('unnest(main.linkEdges)', 'edges')
 		.pushLeftJoin(
-			contractsTable,
+			cardsTable,
 			new LiteralSql('linked.id = edges.sink'),
 			'linked',
 		)
@@ -273,10 +273,10 @@ const pushLinkedLateral = (
 					'{}'::jsonb[]
 				)
 			`,
-			'linkedContracts',
+			'linkedCards',
 		)
 		.pushFrom(orderedEdges, 'orderedEdges')
-		.pushLeftJoin(contractsTable, lateralJoinFilter, 'linked')
+		.pushLeftJoin(cardsTable, lateralJoinFilter, 'linked')
 		.pushGroupBy('orderedEdges', SqlPath.fromArray(['source']));
 	for (const [nestedLateral, nestedLateralAlias] of nestedLaterals) {
 		lateral.pushLeftJoin(
@@ -295,7 +295,7 @@ const linkedToSql = (
 		variants: Array<{ nested: any; linked: any }>;
 		options: any;
 		parentTable: any;
-		contractsTable: any;
+		cardsTable: any;
 	},
 	state: { innerSelect: any; linkEdges: any; laterals: any },
 ) => {
@@ -307,7 +307,7 @@ const linkedToSql = (
 			linked,
 			state.innerSelect,
 			data.parentTable,
-			data.contractsTable,
+			data.cardsTable,
 		);
 		const edgeIdx = state.linkEdges.length;
 		const edge = `row(${data.parentTable}.id, ${edgeIdx}, ${linked.joinAlias}.id)::linkEdge`;
@@ -323,7 +323,7 @@ const linkedToSql = (
 					variants: nestedVariants as any,
 					options: _.get(data.options.links, [nestedLinkType], {}),
 					parentTable: linked.joinAlias,
-					contractsTable: data.contractsTable,
+					cardsTable: data.cardsTable,
 				},
 				{
 					innerSelect: state.innerSelect,
@@ -341,7 +341,7 @@ const linkedToSql = (
 		nestedLaterals,
 		lateralAlias,
 		data.options,
-		data.contractsTable,
+		data.cardsTable,
 		state.laterals,
 	);
 };
@@ -474,7 +474,7 @@ export class SqlQuery {
 			this.path.isProcessingColumn &&
 			!this.path.isProcessingJsonProperty
 		) {
-			const columnType = _.get(CONTRACT_FIELDS, [
+			const columnType = _.get(CARD_FIELDS, [
 				// TS-TODO: remove this cast
 				this.path.getLast() as string,
 				'type',
@@ -483,7 +483,7 @@ export class SqlQuery {
 				this.types = [columnType];
 			}
 		} else if (this.path.isProcessingSubColumn) {
-			const itemsType = _.get(CONTRACT_FIELDS, [
+			const itemsType = _.get(CARD_FIELDS, [
 				// TS-TODO: remove this cast
 				this.path.getSecondToLast() as string,
 				'items',
@@ -1102,7 +1102,7 @@ export class SqlQuery {
 		if (
 			this.path.isProcessingColumn &&
 			// TS-TODO: remove this cast
-			!_.get(CONTRACT_FIELDS, [this.path.getLast() as string, 'nullable'])
+			!_.get(CARD_FIELDS, [this.path.getLast() as string, 'nullable'])
 		) {
 			return null;
 		}
@@ -1161,7 +1161,7 @@ export class SqlQuery {
 	}
 
 	// Linked schemas are almost completely independent schemas. They denote
-	// contracts that are linked to the current schema
+	// cards that are linked to the current schema
 	buildQueryFromLinkedSchema(
 		linkType: string,
 		schema: JsonSchema,
@@ -1211,10 +1211,10 @@ export class SqlQuery {
 			// serves as an optimization barrier to avoid bad query plans (at
 			// least with PG 12) and to reorganize the data produced by the
 			// inner `SELECT` for consumption by the outer part.
-			// This inner `SELECT` only duty is to fetch the IDs of all contracts
-			// and all linked contracts that matches the filters. The IDs are
-			// organized as a list of `(<parentContract>, <linkType>, <childContract>)`
-			// tuples representing graph edges, plus the root contract ID so that
+			// This inner `SELECT` only duty is to fetch the IDs of all cards
+			// and all linked cards that matches the filters. The IDs are
+			// organized as a list of `(<parentCard>, <linkType>, <childCard>)`
+			// tuples representing graph edges, plus the root card ID so that
 			// the correct structure can be reconstructed by the outer select.
 			// This is because fetching anything but the primary key has the
 			// potential to send PG's query planner right out of the happy
@@ -1237,7 +1237,7 @@ export class SqlQuery {
 						variants: variants as any,
 						options: _.get(this.options.links, [linkType], {}),
 						parentTable: table,
-						contractsTable: table,
+						cardsTable: table,
 					},
 					{
 						innerSelect,
@@ -1254,7 +1254,7 @@ export class SqlQuery {
 						array[
 							${linkEdges.join(', ')}
 						]
-					)::contractAndLinkEdges
+					)::cardAndLinkEdges
 				)`,
 				'arr',
 			);
@@ -1265,7 +1265,7 @@ export class SqlQuery {
 			select
 				.pushSelect(this.select.toSql(table), 'payload')
 				.pushFrom(fence, 'main')
-				.setFilter(new LiteralSql(`${table}.id = main.contractId`));
+				.setFilter(new LiteralSql(`${table}.id = main.cardId`));
 			for (const [lateral, alias] of laterals) {
 				select.pushFrom(lateral, alias, true);
 			}

@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import pgp from '../../../../../lib/backend/postgres/pg-promise';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import * as jsonschema2sql from '../../../../../lib/backend/postgres/jsonschema2sql';
-import * as contracts from '../../../../../lib/backend/postgres/contracts';
+import * as cards from '../../../../../lib/backend/postgres/cards';
 import * as links from '../../../../../lib/backend/postgres/links';
 import { Context } from '../../../../../lib/context';
 import regexpTestSuite from './regexp';
@@ -13,7 +13,6 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { DatabaseBackend } from '../../../../../lib/backend/postgres/types';
 import { PostgresBackend } from '../../../../../lib/backend/postgres';
-import { TABLE as CONTRACTS_TABLE } from '../../../../../lib/backend/postgres/contracts';
 
 const IS_POSTGRES = environment.database.type === 'postgres';
 
@@ -99,18 +98,18 @@ const runner = async ({
 	/*
 	 * 1. Create the necessary tables for the test.
 	 */
-	await contracts.setup(context, backend, database, {
+	await cards.setup(context, backend, database, {
 		table,
 	});
 	await links.setup(context, backend, database, {
-		contracts: table,
+		cards: table,
 	});
 
 	/*
 	 * 2. Insert the elements we will try to query.
 	 */
 	for (const item of elements) {
-		await contracts.upsert(
+		await cards.upsert(
 			context,
 			backend.errors,
 			backend,
@@ -382,12 +381,12 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 					data: {
 						type: 'object',
-						required: [`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`],
+						required: [`Robert'); DROP TABLE ${cards.TABLE}; --`],
 						properties: {
-							[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
+							[`Robert'); DROP TABLE ${cards.TABLE}; --`]: {
 								type: 'object',
 								properties: {
-									[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
+									[`Robert'); DROP TABLE ${cards.TABLE}; --`]: {
 										type: 'string',
 										const: 'foo',
 									},
@@ -403,8 +402,8 @@ describe('jsonschema2sql: Postgres specific', () => {
 					version: '1.0.0',
 					type: 'contract',
 					data: {
-						[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
-							[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: 'foo',
+						[`Robert'); DROP TABLE ${cards.TABLE}; --`]: {
+							[`Robert'); DROP TABLE ${cards.TABLE}; --`]: 'foo',
 						},
 					},
 				},
@@ -437,7 +436,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 						properties: {
 							foo: {
 								type: 'string',
-								const: `Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`,
+								const: `Robert'); DROP TABLE ${cards.TABLE}; --`,
 							},
 						},
 					},
@@ -449,7 +448,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					version: '1.0.0',
 					type: 'contract',
 					data: {
-						foo: `Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`,
+						foo: `Robert'); DROP TABLE ${cards.TABLE}; --`,
 					},
 				},
 			];

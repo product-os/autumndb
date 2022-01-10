@@ -299,7 +299,7 @@ export class ExpressionFilter extends SqlFilter {
 			builder.push(')');
 		}
 
-		// SQLize all optional links but discontract the SQL as we only need the
+		// SQLize all optional links but discard the SQL as we only need the
 		// modifications to the context
 		const context = builder.getContext();
 		const dummyBuilder = new SqlFragmentBuilder(context);

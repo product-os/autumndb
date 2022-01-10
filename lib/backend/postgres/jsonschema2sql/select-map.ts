@@ -112,9 +112,9 @@ export class SelectMap {
 	}
 
 	/**
-	 * Build an SQL expression yielding the JSONB contract described by `this`.
+	 * Build an SQL expression yielding the JSONB card described by `this`.
 	 *
-	 * @param {String} table - The table the contract is being selected from.
+	 * @param {String} table - The table the card is being selected from.
 	 * @returns {String} The SQL expression.
 	 */
 	toSql(table: string): string {
@@ -304,9 +304,7 @@ export class SelectMap {
 				const linkArgs = [];
 				for (const linkType of Object.keys(this.links)) {
 					linkArgs.push(pgFormat.literal(linkType));
-					linkArgs.push(
-						`${SelectMap.lateralAliasFor(linkType)}.linkedContracts`,
-					);
+					linkArgs.push(`${SelectMap.lateralAliasFor(linkType)}.linkedCards`);
 				}
 				args.push(`jsonb_build_object(${linkArgs.join(', ')})`);
 			} else if (property in this.base.all) {

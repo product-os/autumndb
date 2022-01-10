@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as jsonschema2sql from './jsonschema2sql';
 import type { Context } from '../../context';
 import * as links from './links';
-import * as contracts from './contracts';
+import * as cards from './cards';
 import * as streams from './streams';
 import * as utils from './utils';
 import pgp from './pg-promise';
@@ -158,26 +158,26 @@ const runQuery = async (
 	};
 };
 
-const postProcessContract = (contract: Contract) => {
-	if ('links' in contract) {
-		const contractLinks = contract.links!;
-		for (const [linkType, linked] of Object.entries(contractLinks)) {
+const postProcessCard = (card: Contract) => {
+	if ('links' in card) {
+		const cardLinks = card.links!;
+		for (const [linkType, linked] of Object.entries(cardLinks)) {
 			if (linked.length === 0) {
-				Reflect.deleteProperty(contractLinks, linkType);
+				Reflect.deleteProperty(cardLinks, linkType);
 			} else {
-				contractLinks[linkType] = linked.map((linkedContract: any) => {
-					return postProcessContract(linkedContract);
+				cardLinks[linkType] = linked.map((linkedCard: any) => {
+					return postProcessCard(linkedCard);
 				});
 			}
 		}
 	}
-	return removeVersionFields(utils.convertDatesToISOString(contract));
+	return removeVersionFields(utils.convertDatesToISOString(card));
 };
 
 const postProcessResults = (results: Array<{ payload: any }>) => {
 	const postProcessStart = performance.now();
 	const elements = results.map((wrapper: { payload: any }) => {
-		return postProcessContract(wrapper.payload);
+		return postProcessCard(wrapper.payload);
 	});
 	const postProcessEnd = performance.now();
 	const postProcessTime = postProcessEnd - postProcessStart;
@@ -248,7 +248,7 @@ const upsertObject = async <T extends Contract = Contract>(
 		replace?: boolean;
 	} = {},
 ): Promise<T> => {
-	const insertedObject = await contracts.upsert<T>(
+	const insertedObject = await cards.upsert<T>(
 		context,
 		backend.errors,
 		backend,
@@ -258,7 +258,7 @@ const upsertObject = async <T extends Contract = Contract>(
 		},
 	);
 	if (backend.cache) {
-		await backend.cache.set(contracts.TABLE, insertedObject);
+		await backend.cache.set(cards.TABLE, insertedObject);
 	}
 	const baseType = insertedObject.type.split('@')[0];
 	if (baseType === 'link') {
@@ -269,13 +269,13 @@ const upsertObject = async <T extends Contract = Contract>(
 		// come up with a better way to traverse links while streaming.
 		// Ideally we should leverage the database, using joins, rather
 		// than doing all this client side.
-		const { fromContract, toContract } = await Bluebird.props({
-			fromContract: backend.getElementById(
+		const { fromCard, toCard } = await Bluebird.props({
+			fromCard: backend.getElementById(
 				context,
 				(insertedObject as any).data.from.id ||
 					(insertedObject as any).data.from,
 			),
-			toContract: backend.getElementById(
+			toCard: backend.getElementById(
 				context,
 				(insertedObject as any).data.to.id || insertedObject.data.to,
 			),
@@ -284,38 +284,38 @@ const upsertObject = async <T extends Contract = Contract>(
 		// The reversed array is used so that links are parsed in both directions
 		await Bluebird.map(
 			[
-				[fromContract, toContract],
-				[toContract, fromContract],
+				[fromCard, toCard],
+				[toCard, fromCard],
 			],
-			async (linkContracts) => {
-				if (!linkContracts[0] || !linkContracts[1]) {
+			async (linkCards) => {
+				if (!linkCards[0] || !linkCards[1]) {
 					return;
 				}
 
-				const updatedContract = insertedObject.active
+				const updatedCard = insertedObject.active
 					? links.addLink(
 							insertedObject as any as LinkContract,
-							linkContracts[0],
-							linkContracts[1],
+							linkCards[0],
+							linkCards[1],
 					  )
 					: links.removeLink(
 							insertedObject as any as LinkContract,
-							linkContracts[0],
+							linkCards[0],
 					  );
 
-				await contracts.materializeLink(
+				await cards.materializeLink(
 					context,
 					backend.errors,
 					backend,
-					updatedContract,
+					updatedCard,
 				);
 				if (backend.cache) {
-					await backend.cache.unset(updatedContract);
+					await backend.cache.unset(updatedCard);
 				}
 			},
 		);
 	}
-	// If a type was inserted, any indexed fields declared on the type contract should be
+	// If a type was inserted, any indexed fields declared on the type card should be
 	// created
 	if (baseType === 'type') {
 		if (insertedObject.data.indexed_fields) {
@@ -323,8 +323,8 @@ const upsertObject = async <T extends Contract = Contract>(
 				await backend.createTypeIndex(context, fields, insertedObject);
 			}
 		}
-		// Find full-text search fields for type contracts and create search indexes
-		const fullTextSearchFields = contracts.parseFullTextSearchFields(
+		// Find full-text search fields for type cards and create search indexes
+		const fullTextSearchFields = cards.parseFullTextSearchFields(
 			context,
 			(insertedObject as any).data.schema,
 			backend.errors,
@@ -482,9 +482,9 @@ const defaultPgOptions: Partial<PostgresBackendOptions> = {
 
 /*
  * This class implements various low-level methods to interact
- * with contracts on PostgreSQL, such as:
+ * with cards on PostgreSQL, such as:
  *
- * - Getting contracts by their primary keys
+ * - Getting cards by their primary keys
  * - Querying a database with JSON Schema
  * - Maintaining and traversing link relationships
  * - Streaming from a database using JSON Schema
@@ -659,8 +659,8 @@ export class PostgresBackend implements Queryable {
 			context,
 			this,
 			this.connection,
-			contracts.TABLE,
-			contracts.TRIGGER_COLUMNS,
+			cards.TABLE,
+			cards.TRIGGER_COLUMNS,
 		);
 
 		return true;
@@ -728,7 +728,7 @@ export class PostgresBackend implements Queryable {
 		}
 		await this.executeIfDbSchemaIsOutdated(context, async () => {
 			try {
-				await contracts.setup(context, this, this.database);
+				await cards.setup(context, this, this.database);
 			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
@@ -737,7 +737,7 @@ export class PostgresBackend implements Queryable {
 
 			try {
 				await links.setup(context, this, this.database, {
-					contracts: contracts.TABLE,
+					cards: cards.TABLE,
 				});
 			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
@@ -746,11 +746,7 @@ export class PostgresBackend implements Queryable {
 			}
 
 			try {
-				await streams.setupTrigger(
-					this,
-					contracts.TABLE,
-					contracts.TRIGGER_COLUMNS,
-				);
+				await streams.setupTrigger(this, cards.TABLE, cards.TRIGGER_COLUMNS);
 			} catch (error: any) {
 				if (!isIgnorableInitError(error.code)) {
 					throw error;
@@ -789,7 +785,7 @@ export class PostgresBackend implements Queryable {
 
 		context.debug('Dropping database tables', { database: this.database });
 
-		await this.any(`DROP TABLE ${contracts.TABLE}, ${links.TABLE} CASCADE`);
+		await this.any(`DROP TABLE ${cards.TABLE}, ${links.TABLE} CASCADE`);
 	}
 
 	/*
@@ -798,12 +794,12 @@ export class PostgresBackend implements Queryable {
 	async reset(context: Context) {
 		context.debug('Resetting database', { database: this.database });
 
-		await this.any(`TRUNCATE ${links.TABLE}, ${contracts.TABLE};`);
+		await this.any(`TRUNCATE ${links.TABLE}, ${cards.TABLE};`);
 	}
 
 	/*
-	 * Insert a contract to the database, and throw an error
-	 * if a contract with the same id or slug already exists.
+	 * Insert a card to the database, and throw an error
+	 * if a card with the same id or slug already exists.
 	 */
 	async insertElement<T extends Contract = Contract>(
 		context: Context,
@@ -815,8 +811,8 @@ export class PostgresBackend implements Queryable {
 	}
 
 	/*
-	 * Insert a contract to the database, or replace it
-	 * if a contract with the same id or slug already exists.
+	 * Insert a card to the database, or replace it
+	 * if a card with the same id or slug already exists.
 	 */
 	async upsertElement<T extends Contract = Contract>(
 		context: Context,
@@ -879,7 +875,7 @@ export class PostgresBackend implements Queryable {
 	 * @param {Boolean} unique - declare index as UNIQUE (optional)
 	 *
 	 * @example
-	 * await backend.createIndex(context, 'contracts', 'example_idx', '1.0.0', 'USING btree (updated_at)');
+	 * await backend.createIndex(context, 'cards', 'example_idx', '1.0.0', 'USING btree (updated_at)');
 	 */
 	async createIndex(
 		context: Context,
@@ -968,7 +964,7 @@ export class PostgresBackend implements Queryable {
 	}
 
 	/*
-	 * Get a contract from the database by id and table.
+	 * Get a card from the database by id and table.
 	 */
 	async getElementById(context: Context, id: string) {
 		/*
@@ -976,7 +972,7 @@ export class PostgresBackend implements Queryable {
 		 * making a full-blown query to the database.
 		 */
 		if (this.cache) {
-			const cacheResult = await this.cache.getById(contracts.TABLE, id);
+			const cacheResult = await this.cache.getById(cards.TABLE, id);
 			if (cacheResult.hit) {
 				return cacheResult.element;
 			}
@@ -986,28 +982,28 @@ export class PostgresBackend implements Queryable {
 		 * Make a database request if we didn't have luck with
 		 * the cache.
 		 */
-		const result = await contracts.getById(context, this, id);
+		const result = await cards.getById(context, this, id);
 		if (this.cache) {
 			if (result) {
 				/*
 				 * If we found the element, then update the cache
 				 * so we can fetch it from there next time.
 				 */
-				await this.cache.set(contracts.TABLE, result);
+				await this.cache.set(cards.TABLE, result);
 			} else {
 				/*
 				 * If we didn't, then let the cache know that this
 				 * id doesn't exist on that table, so that we can
 				 * also avoid another query in vain in the future.
 				 */
-				await this.cache.setMissingId(contracts.TABLE, id);
+				await this.cache.setMissingId(cards.TABLE, id);
 			}
 		}
 		return result || null;
 	}
 
 	/*
-	 * Get a contract from the database by slug and table.
+	 * Get a card from the database by slug and table.
 	 */
 	async getElementBySlug(
 		context: Context,
@@ -1030,7 +1026,7 @@ export class PostgresBackend implements Queryable {
 		 */
 		if (this.cache && !options.skipCache && !options.lock) {
 			const cacheResult = await this.cache.getBySlug(
-				contracts.TABLE,
+				cards.TABLE,
 				base,
 				version,
 			);
@@ -1043,28 +1039,28 @@ export class PostgresBackend implements Queryable {
 		 * Make a database request if we didn't have luck with
 		 * the cache.
 		 */
-		const result = await contracts.getBySlug(context, this, slug, options);
+		const result = await cards.getBySlug(context, this, slug, options);
 		if (this.cache) {
 			if (result) {
 				/*
 				 * If we found the element, then update the cache
 				 * so we can fetch it from there next time.
 				 */
-				await this.cache.set(contracts.TABLE, result);
+				await this.cache.set(cards.TABLE, result);
 			} else {
 				/*
 				 * If we didn't, then let the cache know that this
 				 * id doesn't exist on that table, so that we can
 				 * also avoid another query in vain in the future.
 				 */
-				await this.cache.setMissingSlug(contracts.TABLE, base, version);
+				await this.cache.setMissingSlug(cards.TABLE, base, version);
 			}
 		}
 		return result || null;
 	}
 
 	/*
-	 * Get a set of contracts by id from a single table in one shot.
+	 * Get a set of cards by id from a single table in one shot.
 	 */
 	async getElementsById(context: Context, ids: string[]) {
 		/*
@@ -1093,7 +1089,7 @@ export class PostgresBackend implements Queryable {
 		 */
 		if (this.cache) {
 			for (const id of ids) {
-				const cacheResult = await this.cache.getById(contracts.TABLE, id);
+				const cacheResult = await this.cache.getById(cards.TABLE, id);
 				if (cacheResult.hit) {
 					/*
 					 * If the cache knows about the id and it indeed exists,
@@ -1131,13 +1127,13 @@ export class PostgresBackend implements Queryable {
 		 * so lets ask the database for them.
 		 */
 
-		const elements = await contracts.getManyById(context, this, uncached);
+		const elements = await cards.getManyById(context, this, uncached);
 		if (this.cache) {
 			/*
 			 * Store the ones we found in the in-memory cache.
 			 */
 			for (const element of elements) {
-				await this.cache.set(contracts.TABLE, element);
+				await this.cache.set(cards.TABLE, element);
 				uncachedSet.delete(element.id);
 			}
 			/*
@@ -1146,7 +1142,7 @@ export class PostgresBackend implements Queryable {
 			 * table.
 			 */
 			for (const id of uncachedSet) {
-				await this.cache.setMissingId(contracts.TABLE, id);
+				await this.cache.setMissingId(cards.TABLE, id);
 			}
 		}
 		return elements.concat(cached);
@@ -1186,13 +1182,13 @@ export class PostgresBackend implements Queryable {
 		const results = await queryTable(
 			context,
 			this,
-			contracts.TABLE,
+			cards.TABLE,
 			select,
 			schema,
 			options as BackendQueryOptions,
 		);
 
-		// Mark contract read metric.
+		// Mark card read metric.
 		_.forEach(results, (result) => {
 			metrics.markContractReadFromDatabase(result);
 		});
@@ -1208,12 +1204,12 @@ export class PostgresBackend implements Queryable {
 	) {
 		const { query, queryGenTime } = compileSchema(
 			context,
-			contracts.TABLE,
+			cards.TABLE,
 			select,
 			schema,
 			{
 				limit: 1,
-				extraFilter: `${contracts.TABLE}.id = $1`,
+				extraFilter: `${cards.TABLE}.id = $1`,
 				...options,
 			},
 			this.errors,
@@ -1225,7 +1221,7 @@ export class PostgresBackend implements Queryable {
 		});
 
 		context.debug('Prepared stream query for table', {
-			table: contracts.TABLE,
+			table: cards.TABLE,
 			database: this.database,
 			preProcessingTime: queryGenTime,
 		});
@@ -1242,7 +1238,7 @@ export class PostgresBackend implements Queryable {
 			const { elements, postProcessTime } = postProcessResults(results);
 
 			context.debug('Prepared query database response', {
-				table: contracts.TABLE,
+				table: cards.TABLE,
 				database: this.database,
 				count: elements.length,
 				queryTime,
@@ -1265,8 +1261,8 @@ export class PostgresBackend implements Queryable {
 	 *
 	 * The "data" event has an object payload with the following properties:
 	 *
-	 * - before: The past state of the contract (might be null)
-	 * - after: The present state of the contract
+	 * - before: The past state of the card (might be null)
+	 * - after: The present state of the card
 	 * - type: The type of change, which can be "insert" or "update"
 	 *
 	 * The event emitter has a `.close()` method that clients should
@@ -1313,7 +1309,7 @@ export class PostgresBackend implements Queryable {
 		fields: string[],
 		schema: ContractDefinition<any>,
 	) {
-		await contracts.createTypeIndex(context, this, fields, schema);
+		await cards.createTypeIndex(context, this, fields, schema);
 	}
 	/*
 	 * Creates a partial index on fields denoted as being targets for full-text searches
@@ -1323,7 +1319,7 @@ export class PostgresBackend implements Queryable {
 		type: string,
 		fields: SearchFieldDef[],
 	) {
-		await contracts.createFullTextSearchIndex(context, this, type, fields);
+		await cards.createFullTextSearchIndex(context, this, type, fields);
 	}
 
 	private getConnection() {
