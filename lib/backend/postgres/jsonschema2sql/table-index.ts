@@ -30,7 +30,7 @@ export function isArrayField(
 /**
  *
  * @param fields - fields to index
- * @param schema - contract schema
+ * @param schema - card schema
  * @returns generated predicate for CREATE INDEX statement
  */
 export function generateTypeIndexPredicate(

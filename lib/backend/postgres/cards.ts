@@ -19,8 +19,8 @@ import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
 
-const CONTRACTS_TABLE = 'cards';
-const CONTRACTS_TRIGGER_COLUMNS = [
+const CARDS_TABLE = 'cards';
+const CARDS_TRIGGER_COLUMNS = [
 	'active',
 	'version_major',
 	'version_minor',
@@ -37,7 +37,7 @@ const CONTRACTS_TRIGGER_COLUMNS = [
 	'data',
 	'linked_at',
 ];
-const CONTRACTS_SELECT = [
+const CARDS_SELECT = [
 	'id',
 	'slug',
 	'type',
@@ -93,15 +93,15 @@ export const parseVersionedSlug = (slug: string) => {
 	};
 };
 
-export const TABLE = CONTRACTS_TABLE;
-export const TRIGGER_COLUMNS = CONTRACTS_TRIGGER_COLUMNS;
+export const TABLE = CARDS_TABLE;
+export const TRIGGER_COLUMNS = CARDS_TRIGGER_COLUMNS;
 
 export const setup = async (
 	context: Context,
 	backend: PostgresBackend,
 	_database: string,
 	options: {
-		// The name of the "contracts" table, defaults to the TABLE constant
+		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 		// TS-TODO: This option appears to be completely unused and can possibly be removed
 		noIndexes?: boolean;
@@ -259,7 +259,7 @@ export const getById = async (
 	connection: Queryable,
 	id: string,
 	options: {
-		// The name of the "contracts" table, defaults to the TABLE constant
+		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 	} = {},
 ) => {
@@ -269,8 +269,8 @@ export const getById = async (
 		table,
 	});
 	const results = await connection.any({
-		name: `contracts-getbyid-${table}`,
-		text: `SELECT ${CONTRACTS_SELECT} FROM ${table} WHERE id = $1 LIMIT 1;`,
+		name: `cards-getbyid-${table}`,
+		text: `SELECT ${CARDS_SELECT} FROM ${table} WHERE id = $1 LIMIT 1;`,
 		values: [id],
 	});
 	if (results[0]) {
@@ -284,7 +284,7 @@ export const getBySlug = async (
 	connection: Queryable,
 	slug: string,
 	options: {
-		// The name of the "contracts" table, defaults to the TABLE constant
+		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 		lock?: boolean;
 	} = {},
@@ -309,8 +309,8 @@ export const getBySlug = async (
 
 	if (latest) {
 		results = await connection.any({
-			name: `contracts-getbyslug-latest-${table}${lockSuffix}`,
-			text: `SELECT ${CONTRACTS_SELECT} FROM ${table}
+			name: `cards-getbyslug-latest-${table}${lockSuffix}`,
+			text: `SELECT ${CARDS_SELECT} FROM ${table}
 				WHERE slug = $1 AND version_prerelease = ''
 				ORDER BY version_major DESC,
 								 version_minor DESC,
@@ -321,8 +321,8 @@ export const getBySlug = async (
 		});
 	} else {
 		results = await connection.any({
-			name: `contracts-getbyslug-version-${table}${lockSuffix}`,
-			text: `SELECT ${CONTRACTS_SELECT} FROM ${table}
+			name: `cards-getbyslug-version-${table}${lockSuffix}`,
+			text: `SELECT ${CARDS_SELECT} FROM ${table}
 				WHERE slug = $1 AND
 				      version_major = $2 AND
 				      version_minor = $3 AND
@@ -345,7 +345,7 @@ export const getManyById = async (
 	connection: Queryable,
 	ids: string[],
 	options: {
-		// The name of the "contracts" table, defaults to the TABLE constant
+		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 	} = {},
 ) => {
@@ -355,8 +355,8 @@ export const getManyById = async (
 		table,
 	});
 	const results = await connection.any({
-		name: 'contracts-getmanybyid',
-		text: `SELECT ${CONTRACTS_SELECT} FROM ${table} WHERE id = ANY ($1)`,
+		name: 'cards-getmanybyid',
+		text: `SELECT ${CARDS_SELECT} FROM ${table} WHERE id = ANY ($1)`,
 		values: [ids],
 	});
 	_.forEach(results, utils.convertDatesToISOString);
@@ -372,7 +372,7 @@ export const upsert = async <T extends Contract = Contract>(
 	connection: Queryable,
 	object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 	options: {
-		// The name of the "contracts" table, defaults to the TABLE constant
+		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 		// Optional UUID to be used for this contract
 		id?: string;
@@ -465,9 +465,9 @@ export const upsert = async <T extends Contract = Contract>(
 					created_at = ${table}.created_at,
 					updated_at = $19,
 					loop = $20
-				RETURNING ${CONTRACTS_SELECT}`;
+				RETURNING ${CARDS_SELECT}`;
 			results = await connection.any({
-				name: `contracts-upsert-replace-${table}`,
+				name: `cards-upsert-replace-${table}`,
 				text: sql,
 				values: payload,
 			});
@@ -484,9 +484,9 @@ export const upsert = async <T extends Contract = Contract>(
 					$9, $10, $11, $12, $13, $14,
 					$15, $16, $17, $18, $19,
 					$20)
-				RETURNING ${CONTRACTS_SELECT}`;
+				RETURNING ${CARDS_SELECT}`;
 			results = await connection.any({
-				name: `contracts-upsert-insert-${table}`,
+				name: `cards-upsert-insert-${table}`,
 				text: sql,
 				values: payload,
 			});
@@ -540,9 +540,9 @@ export const materializeLink = async (
 	_context: Context,
 	errors: DatabaseBackend['errors'],
 	connection: Queryable,
-	contract: Contract,
+	card: Contract,
 	options: {
-		// The name of the "contracts" table, defaults to the TABLE constant
+		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 	} = {},
 ) => {
@@ -552,19 +552,19 @@ export const materializeLink = async (
 				SET linked_at = $1::jsonb
 			WHERE id = $2;`;
 		await connection.any({
-			name: `contracts-materializelink-${table}`,
+			name: `cards-materializelink-${table}`,
 			text: sql,
-			values: [contract.linked_at, contract.id],
+			values: [card.linked_at, card.id],
 		});
 	} catch (error: any) {
 		if (/^duplicate key value/.test(error.message)) {
 			throw new errors.JellyfishElementAlreadyExists(
-				`There is already an element with the slug ${contract.slug}`,
+				`There is already an element with the slug ${card.slug}`,
 			);
 		}
 		if (/^value too long/.test(error.message)) {
 			throw new errors.JellyfishInvalidSlug(
-				`The primary key is too long: ${contract.slug}`,
+				`The primary key is too long: ${card.slug}`,
 			);
 		}
 		throw new errors.JellyfishDatabaseError(error.message);
@@ -575,11 +575,11 @@ export const materializeLink = async (
  * @param {Context} context - Session context
  * @param {BackendConnection} connection - Database connection
  * @param {String[]} fields - Fields to use as an index
- * @param {Object} schema - The contract schema
+ * @param {Object} schema - The card schema
  *
  * @example
  * const fields = [ 'name',	'data.from.id',	'data.to.id' ];
- * await contracts.createTypeIndex(context, connection, 'contracts', fields, 'link', {...});
+ * await cards.createTypeIndex(context, connection, 'cards', fields, 'link', {...});
  */
 export const createTypeIndex = async (
 	context: Context,
@@ -607,7 +607,7 @@ export const createTypeIndex = async (
 	try {
 		await connection.createIndex(
 			context,
-			CONTRACTS_TABLE,
+			CARDS_TABLE,
 			fullyQualifiedIndexName,
 			schema.version!,
 			generateTypeIndexPredicate(fields, schema),
@@ -636,7 +636,7 @@ export const createTypeIndex = async (
  *     isArray: true
  *   }
  * ]
- * await contracts.createFullTextSearchIndex(context, connection, type, fields)
+ * await cards.createFullTextSearchIndex(context, connection, type, fields)
  */
 export const createFullTextSearchIndex = async (
 	context: Context,
@@ -659,11 +659,11 @@ export const createFullTextSearchIndex = async (
 			const name = `${type.split('@')[0]}__${field.path.join('_')}__search_idx`;
 			await connection.createIndex(
 				context,
-				CONTRACTS_TABLE,
+				CARDS_TABLE,
 				name,
 				type.split('@')[1],
 				`USING GIN(${textSearch.toTSVector(
-					path.toSql(CONTRACTS_TABLE),
+					path.toSql(CARDS_TABLE),
 					isJson,
 					field.isArray,
 				)})
@@ -693,7 +693,7 @@ export const createFullTextSearchIndex = async (
  * @function
  *
  * @param {Object} context - session context
- * @param {Object} schema - type contract schema to traverse
+ * @param {Object} schema - type card schema to traverse
  * @param {Object} errors - a set of rich error classes
  * @returns {Array} list of objects containing field path information
  *
@@ -753,15 +753,15 @@ export const parseFullTextSearchFields = (
 };
 
 /**
- * @summary Convert field path in type contract to path used inside of contracts of that type
+ * @summary Convert field path in type card to path used inside of cards of that type
  * @function
  *
- * @param {Array} from - full path to field as defined in the type contract
- * @returns {Array} path to same field but in the context of non-type contract
+ * @param {Array} from - full path to field as defined in the type card
+ * @returns {Array} path to same field but in the context of non-type card
  *
  * @example
  * const from = [ 'data', 'schema', 'properties', 'data', 'properties', 'tags' ]
- * const path = contracts.fromTypePath(from)
+ * const path = cards.fromTypePath(from)
  */
 export const fromTypePath = (from: string[]): string[] => {
 	const path = from

@@ -1,7 +1,7 @@
 import * as Bluebird from 'bluebird';
 import * as errors from './errors';
 // TODO: This violates encapsulation of the backend
-import { TABLE as contractsTable } from './backend/postgres/contracts';
+import { TABLE as CONTRACTS_TABLE } from './backend/postgres/cards';
 import * as metrics from '@balena/jellyfish-metrics';
 import * as redismock from 'redis-mock';
 import * as redis from 'redis';
@@ -297,7 +297,7 @@ export class Cache {
 				hit: true,
 				element: JSON.parse(result),
 			};
-			if (table === contractsTable) {
+			if (table === CONTRACTS_TABLE) {
 				metrics.markContractReadFromCache(data.element);
 			}
 			return data;

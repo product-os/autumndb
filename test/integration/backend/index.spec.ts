@@ -5,7 +5,7 @@ import type { Stream } from '../../../lib/backend/postgres/streams';
 import * as helpers from './helpers';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
-import { TABLE as CONTRACTS_TABLE } from '../../../lib/backend/postgres/contracts';
+import { TABLE as CONTRACTS_TABLE } from '../../../lib/backend/postgres/cards';
 
 let ctx: helpers.BackendContext;
 
