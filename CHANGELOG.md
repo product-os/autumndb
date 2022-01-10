@@ -503,7 +503,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 7.0.13 - 2021-10-25
 
-* fix: patched contracts didn't contain correct updated_at [Martin Rauscher]
+* fix: patched cards didn't contain correct updated_at [Martin Rauscher]
 
 ## 7.0.12 - 2021-10-23
 
@@ -731,7 +731,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 5.8.0 - 2021-09-13
 
-* Remove the `contracts_markers` materialized view. [Carol Schulze]
+* Remove the `cards_markers` materialized view. [Carol Schulze]
 
 ## 5.7.6 - 2021-09-12
 
@@ -747,7 +747,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 5.7.3 - 2021-09-07
 
-* Improve typings for insertContract [Lucian Buzzo]
+* Improve typings for insertCard [Lucian Buzzo]
 
 ## 5.7.2 - 2021-09-06
 
@@ -1826,7 +1826,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.13.30 - 2021-04-29
 
-* Add title to user contract email property [Josh Bowling]
+* Add title to user card email property [Josh Bowling]
 
 ## 2.13.29 - 2021-04-28
 
@@ -2359,7 +2359,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.12.0 - 2021-03-18
 
 * remove test for changing version as that was not supported [Martin Rauscher]
-* allow complete semver pattern for contract meta-type [Martin Rauscher]
+* allow complete semver pattern for card meta-type [Martin Rauscher]
 * Add more optional version data integration tests [Josh Bowling]
 * Add build/prerelease to version sorting tests [Josh Bowling]
 * Fix unique constraint name for links table [Josh Bowling]
@@ -2372,9 +2372,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * change orderBy definition creation to allow per path ordering [Martin Rauscher]
 * centralize definition for computed `version` field [Martin Rauscher]
 * Remove comments, add unit tests, return version ints [Josh Bowling]
-* add prerelease and build version info for contracts [Martin Rauscher]
+* add prerelease and build version info for cards [Martin Rauscher]
 * add prerelease versions to links [Martin Rauscher]
-* add prerelease and build version info for contracts [Martin Rauscher]
+* add prerelease and build version info for cards [Martin Rauscher]
 
 ## 2.11.3 - 2021-03-17
 
@@ -2414,7 +2414,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.9.8 - 2021-03-12
 
-* Remove new version columns from returned contracts [Josh Bowling]
+* Remove new version columns from returned cards [Josh Bowling]
 
 ## 2.9.7 - 2021-03-12
 
@@ -2450,7 +2450,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.8.3 - 2021-03-11
 
-* Export contracts in a DRY way. [Graham McCulloch]
+* Export cards in a DRY way. [Graham McCulloch]
 
 ## 2.8.2 - 2021-03-11
 
@@ -2474,7 +2474,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.6.0 - 2021-03-09
 
-* Add index on name field to link type contract [Graham McCulloch]
+* Add index on name field to link type card [Graham McCulloch]
 
 ## 2.5.5 - 2021-03-06
 
@@ -2498,7 +2498,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.5.0 - 2021-03-03
 
-* Add oauth provider contract [Kakhaber]
+* Add oauth provider card [Kakhaber]
 
 ## 2.4.0 - 2021-03-03
 
@@ -3107,7 +3107,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.1.1 - 2021-01-21
 
-* Add logs on link contract patches [Josh Bowling]
+* Add logs on link card patches [Josh Bowling]
 
 ## 1.1.0 - 2021-01-20
 
@@ -3127,7 +3127,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.0.0 - 2021-01-19
 
-* Patch contracts in transactions [Josh Bowling]
+* Patch cards in transactions [Josh Bowling]
 
 ## 0.2.95 - 2021-01-18
 
@@ -3212,7 +3212,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.2.75 - 2021-01-13
 
-* Capture metrics for contract patches [Josh Bowling]
+* Capture metrics for card patches [Josh Bowling]
 
 ## 0.2.74 - 2021-01-13
 
@@ -3774,7 +3774,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.1.95 - 2020-11-06
 
-* Add slug field to the to and from object in the link contract [Lucy-Jane]
+* Add slug field to the to and from object in the link card [Lucy-Jane]
 
 ## 0.1.94 - 2020-11-06
 
@@ -3871,7 +3871,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.1.73 - 2020-10-16
 
-* By default, contract types should have no snippet UI schema [Graham McCulloch]
+* By default, card types should have no snippet UI schema [Graham McCulloch]
 
 ## 0.1.72 - 2020-10-16
 
@@ -4113,7 +4113,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.1.14 - 2020-09-15
 
-* Merge views of linked contracts in SQL [Carol Schulze]
+* Merge views of linked cards in SQL [Carol Schulze]
 
 ## 0.1.13 - 2020-09-15
 
@@ -4238,11 +4238,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.0.22 - 2020-09-04
 
-* Don't error out in post-query processing if `linkedContracts` is nullish [Carol Schulze]
+* Don't error out in post-query processing if `linkedCards` is nullish [Carol Schulze]
 
 ## 0.0.21 - 2020-09-04
 
-* Handle case where "linkedContracts" is undefined [Lucian Buzzo]
+* Handle case where "linkedCards" is undefined [Lucian Buzzo]
 
 ## 0.0.20 - 2020-09-04
 
