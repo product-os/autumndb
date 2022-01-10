@@ -8,7 +8,7 @@ import { Context, MixedContext } from './context';
 import jsonSchema from './json-schema';
 import * as errors from './errors';
 import * as views from './views';
-import { CONTRACTS } from './contracts';
+import { CARDS } from './contracts';
 import * as permissionFilter from './permission-filter';
 import metrics = require('@balena/jellyfish-metrics');
 import type { JsonSchema } from '@balena/jellyfish-types';
@@ -151,7 +151,7 @@ const getQueryFromSchema = async (
 	// TS-TODO: Refactor this to avoid type coercion
 	let finalSchema: JsonSchema = (
 		schema instanceof Object &&
-		schema.type === `${CONTRACTS.view.slug}@${CONTRACTS.view.version}`
+		schema.type === `${CARDS.view.slug}@${CARDS.view.version}`
 			? views.getSchema(schema as ViewContract)
 			: schema
 	) as JsonSchema;
@@ -242,7 +242,7 @@ const preUpsert = async (
 	);
 	// Fetch necessary objects concurrently
 	const [typeContract, filter, loop] = await Promise.all([
-		instance.getContractBySlug<TypeContract>(context, session, contract.type),
+		instance.getCardBySlug<TypeContract>(context, session, contract.type),
 		permissionFilter.getMask(context, instance.backend, session),
 		(async () => {
 			return (
@@ -264,7 +264,7 @@ const preUpsert = async (
 
 	context.assertInternal(
 		schema,
-		instance.errors.JellyfishUnknownContractType,
+		instance.errors.JellyfishUnknownCardType,
 		`Unknown type: ${contract.type}`,
 	);
 	// TODO: Remove this once we completely migrate links
@@ -317,7 +317,7 @@ const preUpsert = async (
 
 		await Promise.all(
 			targetContractIds.map(async (targetContractId) => {
-				const targetContract = await instance.getContractById(
+				const targetContract = await instance.getCardById(
 					context,
 					session,
 					targetContractId,
@@ -340,7 +340,7 @@ const preUpsert = async (
 export class Kernel {
 	backend: DatabaseBackend;
 	errors: typeof errors;
-	contracts: typeof CONTRACTS;
+	cards: typeof CARDS;
 	sessions?: { admin: string };
 
 	/**
@@ -364,7 +364,7 @@ export class Kernel {
 	private constructor(backend: DatabaseBackend) {
 		this.backend = backend;
 		this.errors = errors;
-		this.contracts = CONTRACTS;
+		this.cards = CARDS;
 	}
 
 	/**
@@ -440,7 +440,7 @@ export class Kernel {
 
 		const unsafeUpsert = (contract: ContractDefinition) => {
 			const element = this.defaults(contract);
-			return permissionFilter.unsafeUpsertContract(
+			return permissionFilter.unsafeUpsertCard(
 				context,
 				this.backend,
 				element as Contract,
@@ -448,18 +448,18 @@ export class Kernel {
 		};
 
 		await Promise.all([
-			unsafeUpsert(CONTRACTS.type),
-			unsafeUpsert(CONTRACTS.session),
-			unsafeUpsert(CONTRACTS.authentication),
-			unsafeUpsert(CONTRACTS.user),
-			unsafeUpsert(CONTRACTS['user-settings']),
-			unsafeUpsert(CONTRACTS['role-user-admin']),
+			unsafeUpsert(CARDS.type),
+			unsafeUpsert(CARDS.session),
+			unsafeUpsert(CARDS.authentication),
+			unsafeUpsert(CARDS.user),
+			unsafeUpsert(CARDS['user-settings']),
+			unsafeUpsert(CARDS['role-user-admin']),
 		]);
 
-		const adminUser = await unsafeUpsert(CONTRACTS['user-admin']);
+		const adminUser = await unsafeUpsert(CARDS['user-admin']);
 		const adminSession = await unsafeUpsert({
 			slug: 'session-admin-kernel',
-			type: `${CONTRACTS.session.slug}@${CONTRACTS.session.version}`,
+			type: `${CARDS.session.slug}@${CARDS.session.version}`,
 			data: {
 				actor: adminUser.id,
 			},
@@ -471,19 +471,19 @@ export class Kernel {
 
 		await Promise.all(
 			[
-				CONTRACTS.card,
-				CONTRACTS.action,
-				CONTRACTS['action-request'],
-				CONTRACTS.org,
-				CONTRACTS.error,
-				CONTRACTS.event,
-				CONTRACTS.view,
-				CONTRACTS.role,
-				CONTRACTS.link,
-				CONTRACTS.loop,
-				CONTRACTS['oauth-provider'],
-				CONTRACTS['oauth-client'],
-				CONTRACTS['scheduled-action'],
+				CARDS.card,
+				CARDS.action,
+				CARDS['action-request'],
+				CARDS.org,
+				CARDS.error,
+				CARDS.event,
+				CARDS.view,
+				CARDS.role,
+				CARDS.link,
+				CARDS.loop,
+				CARDS['oauth-provider'],
+				CARDS['oauth-client'],
+				CARDS['scheduled-action'],
 			].map(async (contract) => {
 				context.debug('Upserting core contract', { slug: contract.slug });
 
@@ -502,7 +502,7 @@ export class Kernel {
 	 * @param {String} id - contract id
 	 * @returns {(Object|Null)} contract
 	 */
-	async getContractById<T extends Contract = Contract>(
+	async getCardById<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		id: string,
@@ -546,7 +546,7 @@ export class Kernel {
 	 * @param {Object} options - optional set of extra options
 	 * @returns {(Object|Null)} contract
 	 */
-	async getContractBySlug<T extends Contract = Contract>(
+	async getCardBySlug<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		slug: string,
@@ -624,7 +624,7 @@ export class Kernel {
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(contract.id)
 	 */
-	async insertContract<T extends Contract = Contract>(
+	async insertCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
@@ -688,7 +688,7 @@ export class Kernel {
 	 * @param {Object[]} patch - JSON Patch operations
 	 * @returns {Object} the patched contract
 	 */
-	async patchContractBySlug<T = Contract>(
+	async patchCardBySlug<T = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		slug: string,
@@ -732,7 +732,7 @@ export class Kernel {
 					});
 				}
 
-				const filteredContract = await this.getContractBySlug(
+				const filteredContract = await this.getCardBySlug(
 					context,
 					session,
 					`${fullContract.slug}@${fullContract.version}`,
@@ -742,7 +742,7 @@ export class Kernel {
 					return filteredContract;
 				}
 
-				const typeContract = await this.getContractBySlug<TypeContract>(
+				const typeContract = await this.getCardBySlug<TypeContract>(
 					context,
 					session,
 					fullContract.type,
@@ -759,7 +759,7 @@ export class Kernel {
 
 				context.assertInternal(
 					schema,
-					this.errors.JellyfishUnknownContractType,
+					this.errors.JellyfishUnknownCardType,
 					`Unknown type: ${fullContract.type}`,
 				);
 

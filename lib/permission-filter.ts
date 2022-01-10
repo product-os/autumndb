@@ -3,13 +3,13 @@ import * as _ from 'lodash';
 import type { Context } from './context';
 import jsonSchema from './json-schema';
 import * as errors from './errors';
-import { CONTRACTS } from './contracts';
+import { CARDS } from './contracts';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { DatabaseBackend } from './backend/postgres/types';
 import type { JsonSchema } from '@balena/jellyfish-types';
 
-const CONTRACT_CONTRACT_TYPE = `${CONTRACTS.card.slug}@${CONTRACTS.card.version}`;
-const VERSIONED_CONTRACTS = _.mapKeys(CONTRACTS, (value: any, key: any) => {
+const CONTRACT_CONTRACT_TYPE = `${CARDS.card.slug}@${CARDS.card.version}`;
+const VERSIONED_CONTRACTS = _.mapKeys(CARDS, (value: any, key: any) => {
 	return `${key}@${value.version}`;
 });
 
@@ -21,7 +21,7 @@ const applyMarkers = async (
 ): Promise<JsonSchema> => {
 	// TODO: Find a way to implement this logic without
 	// hardcoding the admin user
-	if (actor.slug === CONTRACTS['user-admin'].slug) {
+	if (actor.slug === CARDS['user-admin'].slug) {
 		return schema;
 	}
 
@@ -136,7 +136,7 @@ const applyMarkers = async (
  *
  * console.log(contract.id)
  */
-export const unsafeUpsertContract = async (
+export const unsafeUpsertCard = async (
 	context: Context,
 	backend: DatabaseBackend,
 	contract: Contract,
