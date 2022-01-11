@@ -1,4 +1,54 @@
 - commits:
+    - subject: Add the PG to the exported test context
+      hash: a6df7233954e2c068b151223e0b9d28bf90c93b7
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 12.1.0
+  date: 2022-01-11T16:51:34.051Z
+- commits:
+    - subject: Rationalize how database connections and transactions are used
+      hash: 41f458b874db826bc9f94ad00a70e35d8eb101f5
+      body: |
+        The current connection or transaction is now part of the `Context` class
+        along with the log context, and the database can only be interacted with
+        through a `Context` object.
+
+        There are some incidental changes related to this work:
+
+        - Refer to a connection pool as a pool instead of a "connection" in the
+          backend.
+        - Replace `pg-promise` with `pg`. `pg-promise` is a thin layer on top of
+          `pg` and it is causing problems with its incomplete typings and, uh,
+          unique approach to transactions: you cannot use a connection after
+          ending a transaction with it.
+
+        And to reduce the number of major versions this also includes:
+
+        - Removal of the `Kernel.errors` and `Kernel.cards` fields and
+          privatization of the `sessions` field. Access to first two fields can
+          be replaced by by the exported `errors` module and `CARDS` constant.
+          The admin session can be retrieved through the `adminSession` method.
+        - The `Kernel.backend` field is now private. `withPostgres` returns the
+          connection pool that can be used by external code that must connect to
+          the same database.
+
+        Plus some minor internal reorganization.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 12.0.0
+  date: 2022-01-11T14:31:56.736Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^2.0.19'
       hash: c9d4586d682724316c8feae15ce2f22f63abe6c7
       body: ''

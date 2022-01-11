@@ -1,16 +1,5 @@
-import { testUtils } from '../../lib';
+import { CARDS, Kernel } from '../../lib';
 import * as views from '../../lib/views';
-import { CARDS } from '../../lib/contracts';
-
-let ctx: testUtils.TestContext;
-
-beforeAll(async () => {
-	ctx = await testUtils.newContext();
-});
-
-afterAll(async () => {
-	await testUtils.destroyContext(ctx);
-});
 
 describe('views', () => {
 	describe('.getSchema()', () => {
@@ -21,7 +10,7 @@ describe('views', () => {
 
 		test('should preserve template interpolations in user properties', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					data: {
 						schema: {
@@ -56,7 +45,7 @@ describe('views', () => {
 
 		test('should preserve template interpolations in schema properties', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -90,7 +79,7 @@ describe('views', () => {
 
 		test('should return a schema given a view contract with two conjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -142,7 +131,7 @@ describe('views', () => {
 
 		test('should return a schema given a view contract with two conjunctions and empty disjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -195,7 +184,7 @@ describe('views', () => {
 
 		test('should return a schema given a view contract with two disjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -261,7 +250,7 @@ describe('views', () => {
 
 		test('should return a schema given a view contract with two disjunctions and empty conjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
@@ -328,7 +317,7 @@ describe('views', () => {
 
 		test('should return a schema given a view contract with two disjunctions and two conjunctions', () => {
 			const schema = views.getSchema(
-				ctx.kernel.defaults({
+				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {

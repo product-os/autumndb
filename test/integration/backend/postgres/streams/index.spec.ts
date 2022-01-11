@@ -1,41 +1,31 @@
-import * as _ from 'lodash';
-import * as Bluebird from 'bluebird';
-import { v4 as uuid } from 'uuid';
-import pgp from '../../../../../lib/backend/postgres/pg-promise';
-import * as streams from '../../../../../lib/backend/postgres/streams';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
-import { PostgresBackend } from '../../../../../lib/backend/postgres/index';
+import * as Bluebird from 'bluebird';
+import * as _ from 'lodash';
+import { Pool, PoolClient } from 'pg';
+import { v4 as uuid } from 'uuid';
+import * as streams from '../../../../../lib/backend/postgres/streams';
 import { Context } from '../../../../../lib/context';
-import type { DatabaseConnection } from '../../../../../lib/backend/postgres/types';
 
 let ctx: {
-	connection: DatabaseConnection | null;
 	context: Context;
-	createConnection: () => Promise<DatabaseConnection>;
+	connectToDatabase: () => Promise<Pool>;
 	database: string;
-	destroyConnection: (con: DatabaseConnection) => Promise<void>;
+	destroyDatabaseConnection: (con: Pool) => Promise<void>;
 	table: string;
 	triggerColumns: string[];
 };
 
-const backend = new PostgresBackend(
-	null,
-	{},
-	{
-		database: 'test',
-		user: environment.postgres.user,
-	},
-);
+const destroyDatabaseConnection = async (pool: Pool) => {
+	await pool.end();
+};
 
 beforeEach(async () => {
 	const id = uuid();
 	const database = `test_streams_${id.replace(/-/g, '')}`;
 
-	const context = new Context({ id: `TEST-STREAMS-${id}` });
-
 	const table = 'test_table';
 
-	const bootstrapConnection = pgp({
+	const bootstrapConnection = new Pool({
 		user: environment.postgres.user,
 		password: environment.postgres.password,
 		database: 'postgres',
@@ -44,16 +34,14 @@ beforeEach(async () => {
 		port: environment.postgres.port as any,
 	});
 
-	await bootstrapConnection.any(`
+	await bootstrapConnection.query(`
 		CREATE DATABASE ${database}
 		OWNER = ${environment.postgres.user}`);
 
-	await bootstrapConnection.$pool.end();
-	// TS-TODO: add $destroy to connection typings
-	await (bootstrapConnection as any).$destroy();
+	await bootstrapConnection.end();
 
-	const createConnection = async () => {
-		return pgp({
+	const connectToDatabase = async (): Promise<Pool> => {
+		return new Pool({
 			user: environment.postgres.user,
 			database,
 			password: environment.postgres.password,
@@ -63,51 +51,45 @@ beforeEach(async () => {
 		});
 	};
 
-	const destroyConnection = async (con: DatabaseConnection) => {
-		await con.$pool.end();
-		// TS-TODO: add $destroy to connection typings
-		await (con as any).$destroy();
-	};
-
-	const connection = await createConnection();
-	await connection.any(`
+	const pool = await connectToDatabase();
+	await pool.query(`
 		CREATE TABLE IF NOT EXISTS ${table} (
 			id UUID PRIMARY KEY NOT NULL,
 			slug VARCHAR (255) UNIQUE NOT NULL
-		)`);
+		)
+	`);
+	const context = new Context(
+		{ id: `TEST-STREAMS-${id}` },
+		{
+			getConnection: () => {
+				return pool!.connect();
+			},
+			releaseConnection: (connection: PoolClient) => {
+				connection.release();
+
+				return Promise.resolve();
+			},
+		},
+	);
 
 	const triggerColumns = ['id', 'slug'];
 
 	ctx = {
-		connection,
 		context,
-		createConnection,
+		connectToDatabase,
 		database,
-		destroyConnection,
+		destroyDatabaseConnection,
 		table,
 		triggerColumns,
 	};
-});
-
-afterEach(async () => {
-	if (ctx.connection) {
-		await ctx.destroyConnection(ctx.connection);
-	}
-	ctx.connection = null;
 });
 
 describe('streams', () => {
 	it('should be able to setup and teardown', async () => {
 		await expect(
 			(async () => {
-				const client = await streams.start(
-					ctx.context,
-					backend,
-					ctx.connection!,
-					ctx.table,
-					ctx.triggerColumns,
-				);
-				await client.close();
+				const client = await streams.start(ctx.context, ctx.table);
+				await client.disconnect();
 			})(),
 		).resolves.not.toThrow();
 	});
@@ -115,70 +97,40 @@ describe('streams', () => {
 	it('should be able to create two instances on the same connection', async () => {
 		await expect(
 			(async () => {
-				const client1 = await streams.start(
-					ctx.context,
-					backend,
-					ctx.connection!,
-					ctx.table,
-					ctx.triggerColumns,
-				);
-				const client2 = await streams.start(
-					ctx.context,
-					backend,
-					ctx.connection!,
-					ctx.table,
-					ctx.triggerColumns,
-				);
-				await client1.close();
-				await client2.close();
+				const client1 = await streams.start(ctx.context, ctx.table);
+				const client2 = await streams.start(ctx.context, ctx.table);
+				await client1.disconnect();
+				await client2.disconnect();
 			})(),
 		).resolves.not.toThrow();
 	});
 
 	it('should be able to create two instances different connections', async () => {
-		const connection1 = await ctx.createConnection();
-		const connection2 = await ctx.createConnection();
+		const connection1 = await ctx.connectToDatabase();
+		const connection2 = await ctx.connectToDatabase();
 
 		await expect(
 			(async () => {
-				const client1 = await streams.start(
-					ctx.context,
-					backend,
-					connection1,
-					ctx.table,
-					ctx.triggerColumns,
-				);
-				const client2 = await streams.start(
-					ctx.context,
-					backend,
-					connection2,
-					ctx.table,
-					ctx.triggerColumns,
-				);
-				await client1.close();
-				await client2.close();
+				const client1 = await streams.start(ctx.context, ctx.table);
+				const client2 = await streams.start(ctx.context, ctx.table);
+				await client1.disconnect();
+				await client2.disconnect();
 			})(),
 		).resolves.not.toThrow();
 
-		await ctx.destroyConnection(connection1);
-		await ctx.destroyConnection(connection2);
+		await ctx.destroyDatabaseConnection(connection1);
+		await ctx.destroyDatabaseConnection(connection2);
 	});
 
 	it('should survive parallel setups', async () => {
 		const run = async () => {
 			await Bluebird.delay(_.random(0, 1000));
-			const connection = await ctx.createConnection();
-			const client = await streams.start(
-				ctx.context,
-				backend,
-				connection,
-				ctx.table,
-				ctx.triggerColumns,
-			);
+			const connection = await ctx.connectToDatabase();
+			const client = await streams.start(ctx.context, ctx.table);
 			await Bluebird.delay(_.random(0, 1000));
-			await client.close();
+			await client.disconnect();
 			await Bluebird.delay(_.random(0, 1000));
-			await ctx.destroyConnection(connection);
+			await ctx.destroyDatabaseConnection(connection);
 		};
 
 		await expect(
@@ -213,11 +165,11 @@ describe('streams', () => {
 		).resolves.not.toThrow();
 	});
 
-	it('should automatically reconnect on disconnect', async () => {
+	// TODO: this is not done in the stream code anymore
+	/*it('should automatically reconnect on disconnect', async () => {
 		// Set up backend, which comes with its own stream client
 		const testBackend = new PostgresBackend(
 			null,
-			{},
 			{
 				user: environment.postgres.user,
 				database: ctx.database,
@@ -229,7 +181,7 @@ describe('streams', () => {
 
 		await testBackend.connect(ctx.context);
 
-		// Disconnect client from database without using streams.close(),
+		// Disconnect client from database without using streams.disconnect(),
 		// simulating an unexpected client end event.
 		await testBackend.streamClient!.connection!.done(true);
 
@@ -240,5 +192,5 @@ describe('streams', () => {
 		);
 
 		expect(result).toBeTruthy();
-	});
+	});*/
 });

@@ -1,16 +1,7 @@
-import * as pgPromise from 'pg-promise';
-import * as pg from 'pg-promise/typescript/pg-subset';
-import type { PostgresBackend } from '.';
 import type { SqlPath } from './jsonschema2sql/sql-path';
+import type { PostgresBackend } from '.';
 
-export type DatabaseConnection = pgPromise.IDatabase<{}, pg.IClient>;
 export type DatabaseBackend = PostgresBackend;
-
-export interface Queryable {
-	any<T = any>(...args: Parameters<DatabaseConnection['any']>): Promise<T[]>;
-	one<T = any>(...args: [pgPromise.QueryParam, any?]): Promise<T>;
-	task<T>(cb: (t: pgPromise.ITask<{}>) => Promise<T>): Promise<T>;
-}
 
 export interface SearchFieldDef {
 	path: string[];

@@ -1,6 +1,6 @@
-import { Context } from '../../../context';
 import type { JsonSchema } from '@balena/jellyfish-types';
-import * as jsonschema2sql from './index';
+import { Context } from '../../../context';
+import * as jsonschema2sql from '.';
 
 describe('jsonschema2sql', () => {
 	describe('.compile()', () => {

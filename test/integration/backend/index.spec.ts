@@ -1,10 +1,10 @@
-import * as _ from 'lodash';
-import * as Bluebird from 'bluebird';
-import * as errors from '../../../lib/errors';
-import type { Stream } from '../../../lib/backend/postgres/streams';
-import * as helpers from './helpers';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
+import * as Bluebird from 'bluebird';
+import * as _ from 'lodash';
+import { errors } from '../../../lib';
+import type { Stream } from '../../../lib/backend/postgres/streams';
+import * as helpers from './helpers';
 import { TABLE as CONTRACTS_TABLE } from '../../../lib/backend/postgres/cards';
 
 let ctx: helpers.BackendContext;
@@ -39,7 +39,6 @@ describe('backend', () => {
 			await expect(
 				(async () => {
 					await localCTX.backend.stream(
-						localCTX.context,
 						{},
 						{
 							type: 'object',
@@ -1105,8 +1104,8 @@ describe('backend', () => {
 			await ctx.backend.upsertElement(ctx.context, typeContract);
 			await Bluebird.delay(2000);
 
-			const indexes = await ctx.backend.any(
-				`SELECT * FROM pg_indexes WHERE tablename = '${CONTRACTS_TABLE}';`,
+			const indexes = await ctx.context.query(
+				`SELECT * FROM pg_indexes WHERE tablename = '${CONTRACTS_TABLE}'`,
 			);
 			const expected = [
 				{
@@ -1186,8 +1185,12 @@ describe('backend', () => {
 		await ctx.backend.upsertElement(ctx.context, typeContract);
 		await Bluebird.delay(2000);
 
-		const indexes = await ctx.backend.any(
-			`SELECT * FROM pg_indexes WHERE tablename = '${CONTRACTS_TABLE}' AND indexname LIKE '%__search_idx';`,
+		const indexes = await ctx.context.query(
+			`
+			SELECT *
+			FROM pg_indexes
+			WHERE tablename = '${CONTRACTS_TABLE}' AND indexname LIKE '%__search_idx'
+			`,
 		);
 		const expected = [
 			{
@@ -4710,7 +4713,6 @@ describe('backend', () => {
 			const randString = ctx.generateRandomSlug();
 			ctx.backend
 				.stream(
-					ctx.context,
 					{
 						type: {},
 						data: {},
@@ -4800,7 +4802,6 @@ describe('backend', () => {
 
 			ctx.backend
 				.stream(
-					ctx.context,
 					{
 						slug: {},
 						type: {},
@@ -4939,7 +4940,6 @@ describe('backend', () => {
 
 			ctx.backend
 				.stream(
-					ctx.context,
 					{
 						slug: {},
 						type: {},
@@ -5053,7 +5053,6 @@ describe('backend', () => {
 		it('should close without finding anything', (done) => {
 			ctx.backend
 				.stream(
-					ctx.context,
 					{
 						slug: {},
 					},
@@ -5079,7 +5078,6 @@ describe('backend', () => {
 			const slug = ctx.generateRandomSlug();
 			ctx.backend
 				.stream(
-					ctx.context,
 					{
 						slug: {},
 						type: {},
@@ -5173,7 +5171,6 @@ describe('backend', () => {
 
 				ctx.backend
 					.stream(
-						ctx.context,
 						{
 							slug: {},
 							type: {},
@@ -5286,7 +5283,6 @@ describe('backend', () => {
 		it('should throw if the schema is invalid', async () => {
 			await expect(
 				ctx.backend.stream(
-					ctx.context,
 					{},
 					{
 						type: 'object',

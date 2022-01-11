@@ -1,16 +1,9 @@
-import { PostgresBackend, PostgresBackendOptions } from './backend';
 import type { LogContext } from '@balena/jellyfish-logger';
-import type { Cache } from './cache';
 import * as _ from 'lodash';
 import * as jsonpatch from 'fast-json-patch';
 import * as fastEquals from 'fast-equals';
-import { Context, MixedContext } from './context';
-import jsonSchema from './json-schema';
-import * as errors from './errors';
-import * as views from './views';
 import { CARDS } from './contracts';
-import * as permissionFilter from './permission-filter';
-import metrics = require('@balena/jellyfish-metrics');
+import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	Contract,
@@ -19,12 +12,20 @@ import type {
 	TypeContract,
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
+import { Pool } from 'pg';
+import * as stopword from 'stopword';
+import { v4 as uuidv4 } from 'uuid';
+import { PostgresBackend, PostgresBackendOptions } from './backend';
 import type {
 	BackendQueryOptions,
 	DatabaseBackend,
 } from './backend/postgres/types';
-import * as stopword from 'stopword';
-import { v4 as uuidv4 } from 'uuid';
+import type { Cache } from './cache';
+import { Context, MixedContext, TransactionIsolation } from './context';
+import * as errors from './errors';
+import jsonSchema from './json-schema';
+import * as permissionFilter from './permission-filter';
+import * as views from './views';
 
 interface KernelQueryOptions extends Partial<BackendQueryOptions> {
 	mask?: JsonSchema;
@@ -229,119 +230,9 @@ const patchContract = (
 	}, contract);
 };
 
-const preUpsert = async (
-	instance: Kernel,
-	context: Context,
-	session: string,
-	contract: Contract,
-) => {
-	context.assertInternal(
-		contract.type,
-		instance.errors.JellyfishSchemaMismatch,
-		'No type in contract',
-	);
-	// Fetch necessary objects concurrently
-	const [typeContract, filter, loop] = await Promise.all([
-		instance.getCardBySlug<TypeContract>(context, session, contract.type),
-		permissionFilter.getMask(context, instance.backend, session),
-		(async () => {
-			return (
-				contract.loop &&
-				instance.backend.getElementBySlug(context, contract.loop)
-			);
-		})(),
-	]);
-	const schema = typeContract && typeContract.data && typeContract.data.schema;
-
-	// If the loop field is specified, it should be a valid loop contract
-	if (contract.loop) {
-		context.assertInternal(
-			loop && loop.type.split('@')[0] === 'loop',
-			errors.JellyfishNoElement,
-			`No such loop: ${contract.loop}`,
-		);
-	}
-
-	context.assertInternal(
-		schema,
-		instance.errors.JellyfishUnknownCardType,
-		`Unknown type: ${contract.type}`,
-	);
-	// TODO: Remove this once we completely migrate links
-	// to have versioned types in the "from" and the "to"
-	// We put this check here, before we type-check the
-	// upsert, so we don't cause violations to the type
-	// if the from/to have no versions.
-	// See: https://github.com/product-os/jellyfish/pull/3088
-	if (
-		contract.type === 'link@1.0.0' &&
-		contract.data &&
-		contract.data.from &&
-		contract.data.to &&
-		(contract.data as any).from.type &&
-		(contract.data as any).to.type &&
-		!_.includes((contract.data as any).from.type, '@') &&
-		!_.includes((contract.data as any).to.type, '@')
-	) {
-		(contract.data as any).from.type = `${
-			(contract.data as any).from.type
-		}@1.0.0`;
-		(contract.data as any).to.type = `${(contract.data as any).to.type}@1.0.0`;
-	}
-	try {
-		jsonSchema.validate(schema as any, contract);
-	} catch (error) {
-		if (error instanceof errors.JellyfishSchemaMismatch) {
-			error.expected = true;
-		}
-		throw error;
-	}
-	try {
-		jsonSchema.validate(filter as any, contract);
-	} catch (error) {
-		// Failing to match the filter schema is a permissions error
-		if (error instanceof errors.JellyfishSchemaMismatch) {
-			const newError = new errors.JellyfishPermissionsError(error.message);
-			newError.expected = true;
-			throw newError;
-		}
-		throw error;
-	}
-
-	// Validate that both sides of the link contract are readable before inserting
-	if (contract.type === 'link@1.0.0') {
-		const targetContractIds = [
-			(contract as LinkContract).data.from.id,
-			(contract as LinkContract).data.to.id,
-		];
-
-		await Promise.all(
-			targetContractIds.map(async (targetContractId) => {
-				const targetContract = await instance.getCardById(
-					context,
-					session,
-					targetContractId,
-				);
-
-				if (!targetContract) {
-					const newError = new errors.JellyfishNoLinkTarget(
-						`Link target does not exist: ${targetContractId}`,
-					);
-					newError.expected = true;
-					throw newError;
-				}
-			}),
-		);
-	}
-
-	return filter;
-};
-
 export class Kernel {
-	backend: DatabaseBackend;
-	errors: typeof errors;
-	cards: typeof CARDS;
-	sessions?: { admin: string };
+	private backend: DatabaseBackend;
+	private sessions?: { admin: string };
 
 	/**
 	 * @summary The Jellyfish Kernel
@@ -363,24 +254,31 @@ export class Kernel {
 	 */
 	private constructor(backend: DatabaseBackend) {
 		this.backend = backend;
-		this.errors = errors;
-		this.cards = CARDS;
 	}
 
 	/**
 	 * Create a new [[`Kernel`]] object backed by a PostgreSQL database and
-	 * optionally use the specified cache.
+	 * optionally use the specified cache. Return the new `Kernel` and also the
+	 * underlying database handler.
 	 */
 	public static async withPostgres(
 		logContext: LogContext,
 		cache: Cache | null,
 		options: PostgresBackendOptions,
-	): Promise<Kernel> {
-		const backend = new PostgresBackend(cache, errors, options);
+	): Promise<{ kernel: Kernel; pool: Pool }> {
+		const backend = new PostgresBackend(cache, options);
 		const kernel = new Kernel(backend);
 		await kernel.initialize(logContext);
 
-		return kernel;
+		return { kernel, pool: backend.pool! };
+	}
+
+	/**
+	 * Get the admin session token. Returns null if this `Kernel` is not
+	 * connected.
+	 */
+	public adminSession(): string | null {
+		return this.sessions?.admin || null;
 	}
 
 	/**
@@ -395,15 +293,15 @@ export class Kernel {
 	 * await kernel.initialize()
 	 * await kernel.disconnect()
 	 */
-	async disconnect(mixedContext: MixedContext) {
-		await this.backend.disconnect(Context.fromMixed(mixedContext));
+	async disconnect(logContext: LogContext) {
+		await this.backend.disconnect(new Context(logContext));
 	}
 
 	/**
 	 * Truncate database tables.
 	 */
 	async reset(mixedContext: MixedContext) {
-		await this.backend.reset(Context.fromMixed(mixedContext));
+		await this.backend.reset(Context.fromMixed(mixedContext, this.backend));
 	}
 
 	/**
@@ -411,7 +309,7 @@ export class Kernel {
 	 */
 	async drop(mixedContext: MixedContext) {
 		// TODO: we probably want to drop the database itself too.
-		await this.backend.drop(Context.fromMixed(mixedContext));
+		await this.backend.drop(Context.fromMixed(mixedContext, this.backend));
 	}
 
 	/**
@@ -430,7 +328,7 @@ export class Kernel {
 	 * await kernel.initialize()
 	 */
 	async initialize(logContext: LogContext) {
-		const context = new Context(logContext);
+		const context = new Context(logContext, this.backend);
 		await this.backend.connect(context);
 
 		// TODO: all of this bootstrapping should be in the same transaction as the DB setup
@@ -439,7 +337,7 @@ export class Kernel {
 		context.debug('Upserting minimal required contracts');
 
 		const unsafeUpsert = (contract: ContractDefinition) => {
-			const element = this.defaults(contract);
+			const element = Kernel.defaults(contract);
 			return permissionFilter.unsafeUpsertCard(
 				context,
 				this.backend,
@@ -487,7 +385,7 @@ export class Kernel {
 			].map(async (contract) => {
 				context.debug('Upserting core contract', { slug: contract.slug });
 
-				return this.replaceContract(context, this.sessions!.admin, contract);
+				return this.replaceCard(context, this.adminSession()!, contract);
 			}),
 		);
 	}
@@ -507,9 +405,8 @@ export class Kernel {
 		session: string,
 		id: string,
 	): Promise<T | null> {
-		const context = Context.fromMixed(mixedContext);
-		context.debug('Fetching contract by id', { id });
-
+		const context = Context.fromMixed(mixedContext, this.backend);
+		context.debug('Fetching conctract by id', { id });
 		const schema: JsonSchema = {
 			type: 'object',
 			properties: {
@@ -551,7 +448,8 @@ export class Kernel {
 		session: string,
 		slug: string,
 	): Promise<T | null> {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
+
 		context.debug('Fetching contract by slug', { slug });
 
 		context.assertInternal(
@@ -629,12 +527,12 @@ export class Kernel {
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
-		const context = Context.fromMixed(mixedContext);
-		const contract = this.defaults(object);
+		const context = Context.fromMixed(mixedContext, this.backend);
+		const contract = Kernel.defaults(object);
 
 		context.debug('Inserting contract', { slug: contract.slug });
 
-		await preUpsert(this, context, session, contract as Contract);
+		await this.preUpsert(context, session, contract as Contract);
 
 		return this.backend.insertElement<T>(context, contract as Contract);
 	}
@@ -653,25 +551,134 @@ export class Kernel {
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 *
-	 * const contract = await kernel.replaceContract(
+	 * const contract = await kernel.replaceCard(
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(contract.id)
 	 */
-	async replaceContract<T extends Contract = Contract>(
+	async replaceCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<Contract> &
 			Pick<Contract, 'type'> &
 			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
 	): Promise<T> {
-		const context = Context.fromMixed(mixedContext);
-		const contract = this.defaults(object);
+		const context = Context.fromMixed(mixedContext, this.backend);
+		const contract = Kernel.defaults(object);
 
 		context.debug('Replacing contract', { slug: contract.slug });
 
-		await preUpsert(this, context, session, contract as Contract);
+		await this.preUpsert(context, session, contract as Contract);
 
 		return this.backend.upsertElement(context, contract as Contract);
+	}
+
+	private async preUpsert(
+		context: Context,
+		session: string,
+		contract: Contract,
+	) {
+		context.assertInternal(
+			contract.type,
+			errors.JellyfishSchemaMismatch,
+			'No type in card',
+		);
+		// Fetch necessary objects concurrently
+		const [typeContract, filter, loop] = await Promise.all([
+			this.getCardBySlug<TypeContract>(context, session, contract.type),
+			permissionFilter.getMask(context, this.backend, session),
+			(async () => {
+				return (
+					contract.loop && this.backend.getElementBySlug(context, contract.loop)
+				);
+			})(),
+		]);
+		const schema =
+			typeContract && typeContract.data && typeContract.data.schema;
+
+		// If the loop field is specified, it should be a valid loop contract
+		if (contract.loop) {
+			context.assertInternal(
+				loop && loop.type.split('@')[0] === 'loop',
+				errors.JellyfishNoElement,
+				`No such loop: ${contract.loop}`,
+			);
+		}
+
+		context.assertInternal(
+			schema,
+			errors.JellyfishUnknownCardType,
+			`Unknown type: ${contract.type}`,
+		);
+		// TODO: Remove this once we completely migrate links
+		// to have versioned types in the "from" and the "to"
+		// We put this check here, before we type-check the
+		// upsert, so we don't cause violations to the type
+		// if the from/to have no versions.
+		// See: https://github.com/product-os/jellyfish/pull/3088
+		if (
+			contract.type === 'link@1.0.0' &&
+			contract.data &&
+			contract.data.from &&
+			contract.data.to &&
+			(contract.data as any).from.type &&
+			(contract.data as any).to.type &&
+			!_.includes((contract.data as any).from.type, '@') &&
+			!_.includes((contract.data as any).to.type, '@')
+		) {
+			(contract.data as any).from.type = `${
+				(contract.data as any).from.type
+			}@1.0.0`;
+			(contract.data as any).to.type = `${
+				(contract.data as any).to.type
+			}@1.0.0`;
+		}
+		try {
+			jsonSchema.validate(schema as any, contract);
+		} catch (error) {
+			if (error instanceof errors.JellyfishSchemaMismatch) {
+				error.expected = true;
+			}
+			throw error;
+		}
+		try {
+			jsonSchema.validate(filter as any, contract);
+		} catch (error) {
+			// Failing to match the filter schema is a permissions error
+			if (error instanceof errors.JellyfishSchemaMismatch) {
+				const newError = new errors.JellyfishPermissionsError(error.message);
+				newError.expected = true;
+				throw newError;
+			}
+			throw error;
+		}
+
+		// Validate that both sides of the link contract are readable before inserting
+		if (contract.type === 'link@1.0.0') {
+			const targetContractIds = [
+				(contract as LinkContract).data.from.id,
+				(contract as LinkContract).data.to.id,
+			];
+
+			await Promise.all(
+				targetContractIds.map(async (targetContractId) => {
+					const targetCard = await this.getCardById(
+						context,
+						session,
+						targetContractId,
+					);
+
+					if (!targetCard) {
+						const newError = new errors.JellyfishNoLinkTarget(
+							`Link target does not exist: ${targetContractId}`,
+						);
+						newError.expected = true;
+						throw newError;
+					}
+				}),
+			);
+		}
+
+		return filter;
 	}
 
 	/**
@@ -694,7 +701,7 @@ export class Kernel {
 		slug: string,
 		patch: jsonpatch.Operation[],
 	): Promise<T> {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
 		const filter = await permissionFilter.getMask(
 			context,
 			this.backend,
@@ -702,150 +709,148 @@ export class Kernel {
 		);
 
 		const result = await metrics.measureContractPatch(async () => {
-			return this.backend.withTransaction(async () => {
-				// Set options to ensure subsequent queries are a part of the transaction
-				const options = {
-					skipCache: true,
-				};
+			return context.withTransaction(
+				TransactionIsolation.Atomic,
+				async (transactionContext: Context) => {
+					// Set options to ensure subsequent queries are a part of the transaction
+					const options = {
+						skipCache: true,
+					};
 
-				// Fetch necessary data from database
-				const fullContract = await this.backend.getElementBySlug(
-					context,
-					slug,
-					{
-						...options,
-						lock: true,
-					},
-				);
+					// Fetch necessary data from database
+					const fullContract = await this.backend.getElementBySlug(
+						transactionContext,
+						slug,
+						{
+							...options,
+							lock: true,
+						},
+					);
 
-				context.assertInternal(
-					fullContract,
-					this.errors.JellyfishNoElement,
-					`No such contract: ${slug}`,
-				);
+					transactionContext.assertInternal(
+						fullContract,
+						errors.JellyfishNoElement,
+						`No such card: ${slug}`,
+					);
 
-				// TODO: Remove this log once we understand why we are having link contract patch requests.
-				if (fullContract.type === 'link@1.0.0') {
-					context.info('Received request to patch a link contract', {
-						contract: fullContract,
-						patch,
-					});
-				}
-
-				const filteredContract = await this.getCardBySlug(
-					context,
-					session,
-					`${fullContract.slug}@${fullContract.version}`,
-				);
-
-				if (patch.length === 0) {
-					return filteredContract;
-				}
-
-				const typeContract = await this.getCardBySlug<TypeContract>(
-					context,
-					session,
-					fullContract.type,
-				);
-
-				context.assertInternal(
-					filteredContract,
-					this.errors.JellyfishNoElement,
-					`No such contract: ${slug}`,
-				);
-
-				const schema =
-					typeContract && typeContract.data && typeContract.data.schema;
-
-				context.assertInternal(
-					schema,
-					this.errors.JellyfishUnknownCardType,
-					`Unknown type: ${fullContract.type}`,
-				);
-
-				/*
-				 * The idea of this algorithm is that we get the full contract
-				 * as stored in the database and the contract as the current actor
-				 * can see it. Then we apply the patch to both the full and
-				 * the filtered contract, aborting if it fails on any. If it succeeds
-				 * then we upsert the full contract to the database, but only
-				 * if the resulting filtered contract still matches the permissions
-				 * filter.
-				 */
-				// TS-TODO: "filteredContract" might be null here, and we should account for this
-				const patchedFilteredContract = patchContract(
-					filteredContract!,
-					patch,
-					{
-						mutate: true,
-					},
-				);
-
-				jsonSchema.validate(filter as any, patchedFilteredContract);
-
-				const patchedFullContract = patchContract(fullContract, patch, {
-					mutate: false,
-				});
-
-				try {
-					jsonSchema.validate(schema as any, patchedFullContract);
-				} catch (error) {
-					if (error instanceof errors.JellyfishSchemaMismatch) {
-						error.expected = true;
-
-						// Because the "full" unrestricted contract is being validated there is
-						// potential for an error message to leak private data. To prevent this,
-						// override the detailed error message with a generic one.
-						error.message = 'The updated contract is invalid';
+					// TODO: Remove this log once we understand why we are having link card patch requests.
+					if (fullContract.type === 'link@1.0.0') {
+						transactionContext.info('Received request to patch a link card', {
+							card: fullContract,
+							patch,
+						});
 					}
 
-					throw error;
-				}
-
-				// Don't do a pointless update
-				if (fastEquals.deepEqual(patchedFullContract, fullContract)) {
-					return fullContract;
-				}
-
-				// TODO: Remove this log once we understand why we are having link contract patch requests.
-				if (fullContract.type === 'link@1.0.0') {
-					context.info('Upserting link contract after patch', {
-						contract: patchedFullContract,
-						patch,
-					});
-				}
-
-				// If the loop field is changing, check that it points to an actual loop contract
-				if (
-					patchedFullContract.loop &&
-					patchedFullContract.loop !== fullContract.loop
-				) {
-					const loopContract = await this.backend.getElementBySlug(
-						context,
-						patchedFullContract.loop,
+					const filteredCard = await this.getCardBySlug(
+						transactionContext,
+						session,
+						`${fullContract.slug}@${fullContract.version}`,
 					);
-					context.assertInternal(
-						loopContract && loopContract.type.split('@')[0] === 'loop',
+
+					if (patch.length === 0) {
+						return filteredCard;
+					}
+
+					const typeCard = await this.getCardBySlug<TypeContract>(
+						transactionContext,
+						session,
+						fullContract.type,
+					);
+
+					transactionContext.assertInternal(
+						filteredCard,
 						errors.JellyfishNoElement,
-						`No such loop: ${patchedFullContract.loop}`,
+						`No such contract: ${slug}`,
 					);
-				}
 
-				const upsertedContract = await this.backend.upsertElement(
-					context,
-					patchedFullContract,
-				);
+					const schema = typeCard && typeCard.data && typeCard.data.schema;
 
-				// Otherwise a person that patches a contract gets
-				// to see the full contract, but we also need to get back the stuff, the kernel
-				// update on the root of the contract
-				// This will get removed once we get rid of field-level permissions.
-				return {
-					...patchedFilteredContract,
-					created_at: upsertedContract.created_at,
-					updated_at: upsertedContract.updated_at,
-				};
-			});
+					transactionContext.assertInternal(
+						schema,
+						errors.JellyfishUnknownCardType,
+						`Unknown type: ${fullContract.type}`,
+					);
+
+					/*
+					 * The idea of this algorithm is that we get the full card
+					 * as stored in the database and the card as the current actor
+					 * can see it. Then we apply the patch to both the full and
+					 * the filtered card, aborting if it fails on any. If it succeeds
+					 * then we upsert the full card to the database, but only
+					 * if the resulting filtered card still matches the permissions
+					 * filter.
+					 */
+					// TS-TODO: "filteredCard" might be null here, and we should account for this
+					const patchedFilteredCard = patchContract(filteredCard!, patch, {
+						mutate: true,
+					});
+
+					jsonSchema.validate(filter as any, patchedFilteredCard);
+
+					const patchedFullCard = patchContract(fullContract, patch, {
+						mutate: false,
+					});
+
+					try {
+						jsonSchema.validate(schema as any, patchedFullCard);
+					} catch (error) {
+						if (error instanceof errors.JellyfishSchemaMismatch) {
+							error.expected = true;
+
+							// Because the "full" unrestricted card is being validated there is
+							// potential for an error message to leak private data. To prevent this,
+							// override the detailed error message with a generic one.
+							error.message = 'The updated card is invalid';
+						}
+
+						throw error;
+					}
+
+					// Don't do a pointless update
+					if (fastEquals.deepEqual(patchedFullCard, fullContract)) {
+						return fullContract;
+					}
+
+					// TODO: Remove this log once we understand why we are having link card patch requests.
+					if (fullContract.type === 'link@1.0.0') {
+						transactionContext.info('Upserting link card after patch', {
+							card: patchedFullCard,
+							patch,
+						});
+					}
+
+					// If the loop field is changing, check that it points to an actual loop contract
+					if (
+						patchedFullCard.loop &&
+						patchedFullCard.loop !== fullContract.loop
+					) {
+						const loopCard = await this.backend.getElementBySlug(
+							transactionContext,
+							patchedFullCard.loop,
+						);
+						transactionContext.assertInternal(
+							loopCard && loopCard.type.split('@')[0] === 'loop',
+							errors.JellyfishNoElement,
+							`No such loop: ${patchedFullCard.loop}`,
+						);
+					}
+
+					const upsertedCard = await this.backend.upsertElement(
+						transactionContext,
+						patchedFullCard,
+					);
+
+					// Otherwise a person that patches a card gets
+					// to see the full card, but we also need to get back the stuff, the kernel
+					// update on the root of the card
+					// This will get removed once we get rid of field-level permissions.
+					return {
+						...patchedFilteredCard,
+						created_at: upsertedCard.created_at,
+						updated_at: upsertedCard.updated_at,
+					};
+				},
+			);
 		});
 
 		return result;
@@ -888,7 +893,7 @@ export class Kernel {
 		schema: JsonSchema | ViewContract,
 		options: KernelQueryOptions = {},
 	): Promise<T[]> {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
 		const { selected, filteredQuery } = await getQueryFromSchema(
 			context,
 			this.backend,
@@ -998,7 +1003,7 @@ export class Kernel {
 		schema: JsonSchema,
 		options: KernelQueryOptions = {},
 	) {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
 		const { selected, filteredQuery } = await getQueryFromSchema(
 			context,
 			this.backend,
@@ -1009,12 +1014,7 @@ export class Kernel {
 
 		context.debug('Opening stream');
 
-		const stream = await this.backend.stream(
-			context,
-			selected,
-			filteredQuery,
-			options,
-		);
+		const stream = await this.backend.stream(selected, filteredQuery, options);
 
 		// Attach event handlers. We got to do this here and not in any lower
 		// levels because of the whole permissions handling
@@ -1060,17 +1060,14 @@ export class Kernel {
 	 * @returns {Object} contract
 	 *
 	 * @example
-	 * const kernel = new Kernel(backend, { ... })
-	 * await kernel.initialize()
-	 *
-	 * const contract = kernel.defaults({
+	 * const conctract = Kernel.defaults({
 	 *   slug: 'slug',
 	 *   type: 'type'
 	 * })
 	 *
 	 * console.log(contract)
 	 */
-	defaults<T extends Contract = Contract>(
+	static defaults<T extends Contract = Contract>(
 		contract: Partial<Contract> & Pick<T, 'type'>,
 	): ContractDefinition<T['data']> {
 		// Object.assign is used as it is significantly faster than using lodash

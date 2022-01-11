@@ -1,10 +1,9 @@
-import { v4 as uuid } from 'uuid';
-import { defaultBackend as Backend } from '../../../lib/backend';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
-import { Cache } from '../../../lib/cache';
-import * as errors from '../../../lib/errors';
-import { Context } from '../../../lib/context';
+import { v4 as uuid } from 'uuid';
+import { PostgresBackend } from '../../../lib/backend';
 import type { DatabaseBackend } from '../../../lib/backend/postgres/types';
+import { Cache } from '../../../lib/cache';
+import { Context } from '../../../lib/context';
 
 export interface BackendContext {
 	cache: Cache;
@@ -42,19 +41,18 @@ export const before = async (
 		} as any),
 	);
 
-	ctx.context = new Context({ id: `CORE-TEST-${uuid()}` });
-
 	if (ctx.cache) {
 		await ctx.cache.connect();
 	}
 
-	ctx.backend = new Backend(
+	ctx.backend = new PostgresBackend(
 		ctx.cache,
-		errors,
 		Object.assign({}, environment.database.options, {
 			database: dbName,
 		}),
 	);
+
+	ctx.context = new Context({ id: `CORE-TEST-${uuid()}` }, ctx.backend);
 
 	ctx.generateRandomSlug = generateRandomSlug;
 	ctx.generateRandomID = generateRandomID;

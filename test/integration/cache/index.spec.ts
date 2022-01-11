@@ -19,12 +19,9 @@ describe('Cache', () => {
 				slug: 'test',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
+			await ctx.cache.set('test', element1 as any);
 
-			const el: any = await ctx.kernel.backend.cache!.getById(
-				'test',
-				element1.id,
-			);
+			const el: any = await ctx.cache.getById('test', element1.id);
 
 			expect(element1).toEqual(el.element);
 		});
@@ -36,9 +33,9 @@ describe('Cache', () => {
 				slug: 'test',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
+			await ctx.cache.set('test', element1 as any);
 
-			const el: any = await ctx.kernel.backend.cache!.getBySlug(
+			const el: any = await ctx.cache.getBySlug(
 				'test',
 				element1.slug,
 				element1.version,
@@ -54,13 +51,9 @@ describe('Cache', () => {
 				slug: 'test',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
+			await ctx.cache.set('test', element1 as any);
 
-			const el: any = await ctx.kernel.backend.cache!.getBySlug(
-				'test',
-				element1.slug,
-				'2.0.0',
-			);
+			const el: any = await ctx.cache.getBySlug('test', element1.slug, '2.0.0');
 
 			expect(el.hit).toBeFalsy();
 			expect(el.element).toBeFalsy();
@@ -75,12 +68,9 @@ describe('Cache', () => {
 				slug: 'test',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
-			await ctx.kernel.backend.cache!.setMissingId('test', element1.id);
-			const el: any = await ctx.kernel.backend.cache!.getById(
-				'test',
-				element1.id,
-			);
+			await ctx.cache.set('test', element1 as any);
+			await ctx.cache.setMissingId('test', element1.id);
+			const el: any = await ctx.cache.getById('test', element1.id);
 
 			expect(el.hit).toBeTruthy();
 			expect(el.element).toBeFalsy();
@@ -95,13 +85,9 @@ describe('Cache', () => {
 				slug: 'test',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
-			await ctx.kernel.backend.cache!.setMissingSlug(
-				'test',
-				element1.slug,
-				element1.version,
-			);
-			const el: any = await ctx.kernel.backend.cache!.getBySlug(
+			await ctx.cache.set('test', element1 as any);
+			await ctx.cache.setMissingSlug('test', element1.slug, element1.version);
+			const el: any = await ctx.cache.getBySlug(
 				'test',
 				element1.slug,
 				element1.version,
@@ -124,15 +110,11 @@ describe('Cache', () => {
 				slug: 'test',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
-			await ctx.kernel.backend.cache!.set('test', element2 as any);
-			await ctx.kernel.backend.cache!.setMissingSlug(
-				'test',
-				element1.slug,
-				element1.version,
-			);
+			await ctx.cache.set('test', element1 as any);
+			await ctx.cache.set('test', element2 as any);
+			await ctx.cache.setMissingSlug('test', element1.slug, element1.version);
 
-			const result1: any = await ctx.kernel.backend.cache!.getBySlug(
+			const result1: any = await ctx.cache.getBySlug(
 				'test',
 				element2.slug,
 				element2.version,
@@ -140,7 +122,7 @@ describe('Cache', () => {
 			expect(result1.hit).toBeTruthy();
 			expect(result1.element).toEqual(element2);
 
-			const result2: any = await ctx.kernel.backend.cache!.getBySlug(
+			const result2: any = await ctx.cache.getBySlug(
 				'test',
 				element1.slug,
 				element1.version,
@@ -164,17 +146,11 @@ describe('Cache', () => {
 				slug: 'test2',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
-			await ctx.kernel.backend.cache!.set('test', element2 as any);
+			await ctx.cache.set('test', element1 as any);
+			await ctx.cache.set('test', element2 as any);
 
-			const el1: any = await ctx.kernel.backend.cache!.getById(
-				'test',
-				element1.id,
-			);
-			const el2: any = await ctx.kernel.backend.cache!.getById(
-				'test',
-				element2.id,
-			);
+			const el1: any = await ctx.cache.getById('test', element1.id);
+			const el2: any = await ctx.cache.getById('test', element2.id);
 
 			expect(element1).toEqual(el1.element);
 			expect(element2).toEqual(el2.element);
@@ -195,15 +171,15 @@ describe('Cache', () => {
 				slug: 'test2',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
-			await ctx.kernel.backend.cache!.set('test', element2 as any);
+			await ctx.cache.set('test', element1 as any);
+			await ctx.cache.set('test', element2 as any);
 
-			const el1: any = await ctx.kernel.backend.cache!.getBySlug(
+			const el1: any = await ctx.cache.getBySlug(
 				'test',
 				element1.slug,
 				element1.version,
 			);
-			const el2: any = await ctx.kernel.backend.cache!.getBySlug(
+			const el2: any = await ctx.cache.getBySlug(
 				'test',
 				element2.slug,
 				element2.version,
@@ -228,16 +204,16 @@ describe('Cache', () => {
 				slug: 'test2',
 			};
 
-			await ctx.kernel.backend.cache!.set('test', element1 as any);
-			await ctx.kernel.backend.cache!.set('test', element2 as any);
+			await ctx.cache.set('test', element1 as any);
+			await ctx.cache.set('test', element2 as any);
 
-			await ctx.kernel.backend.cache!.unset(element1 as any);
-			const el1: any = await ctx.kernel.backend.cache!.getBySlug(
+			await ctx.cache.unset(element1 as any);
+			const el1: any = await ctx.cache.getBySlug(
 				'test',
 				element1.slug,
 				element1.version,
 			);
-			const el2: any = await ctx.kernel.backend.cache!.getBySlug(
+			const el2: any = await ctx.cache.getBySlug(
 				'test',
 				element2.slug,
 				element2.version,

@@ -1,5 +1,6 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import type { LogContext } from '@balena/jellyfish-logger';
+import { Pool } from 'pg';
 import { v4 as uuid } from 'uuid';
 import { Cache } from './cache';
 import { Kernel } from './kernel';
@@ -10,7 +11,9 @@ import { Kernel } from './kernel';
 export interface TestContext {
 	logContext: LogContext;
 	session: string;
+	cache: Cache;
 	kernel: Kernel;
+	pool: Pool;
 }
 
 /**
@@ -30,7 +33,7 @@ export const newContext = async (
 
 	const logContext = { id: `CORE-TEST-${uuid()}` };
 
-	const kernel = await Kernel.withPostgres(
+	const { kernel, pool } = await Kernel.withPostgres(
 		logContext,
 		cache,
 		Object.assign({}, defaultEnvironment.database.options, {
@@ -40,8 +43,10 @@ export const newContext = async (
 
 	return {
 		logContext,
-		session: kernel.sessions!.admin,
+		session: kernel.adminSession()!,
+		cache,
 		kernel,
+		pool,
 	};
 };
 
@@ -62,8 +67,7 @@ export interface NewContextOptions {
 export const destroyContext = async (context: TestContext) => {
 	await context.kernel.drop(context.logContext);
 	await context.kernel.disconnect(context.logContext);
-	// TODO: we shouldn't need to do this to disconnect from the cache
-	await context.kernel.backend.cache?.disconnect();
+	await context.cache.disconnect();
 };
 
 /**

@@ -1,7 +1,6 @@
-import * as errors from '../../errors';
+import { v4 as uuid } from 'uuid';
 import * as cards from './cards';
 import { Context } from '../../context';
-import { v4 as uuid } from 'uuid';
 
 const TEST_CONTEXT = new Context({ id: `UNIT-TEST-${uuid()}` });
 
@@ -139,7 +138,6 @@ describe('cards', () => {
 				TEST_CONTEXT,
 				// TS-TODO: Fix this "any" cast
 				schema as any,
-				errors,
 			);
 
 			const expected = [
@@ -207,7 +205,7 @@ describe('cards', () => {
 
 			expect(() => {
 				// TS-TODO: fix schema casting
-				cards.parseFullTextSearchFields(TEST_CONTEXT, schema as any, errors);
+				cards.parseFullTextSearchFields(TEST_CONTEXT, schema as any);
 			}).toThrow();
 		});
 
@@ -249,7 +247,7 @@ describe('cards', () => {
 
 			expect(() => {
 				// TS-TODO: fix schema casting
-				cards.parseFullTextSearchFields(TEST_CONTEXT, schema as any, errors);
+				cards.parseFullTextSearchFields(TEST_CONTEXT, schema as any);
 			}).toThrow();
 		});
 
@@ -292,7 +290,7 @@ describe('cards', () => {
 
 			expect(() => {
 				// TS-TODO: fix schema casting
-				cards.parseFullTextSearchFields(TEST_CONTEXT, schema as any, errors);
+				cards.parseFullTextSearchFields(TEST_CONTEXT, schema as any);
 			}).toThrow();
 		});
 
@@ -338,7 +336,7 @@ describe('cards', () => {
 
 			expect(() => {
 				// TS-TODO: fix schema casting
-				cards.parseFullTextSearchFields(TEST_CONTEXT, schema as any, errors);
+				cards.parseFullTextSearchFields(TEST_CONTEXT, schema as any);
 			}).toThrow();
 		});
 	});
