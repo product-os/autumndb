@@ -41,7 +41,7 @@ export const initialize = <TData = ContractData>(
 	// "by accident" because deref will iterate over any object not just schemas.
 	// Ideally we need to stop using deref completely, in favor of mixin functions, as the
 	// current implementation leads to abominated deep linking.
-	// See https://github.com/product-os/jellyfish-plugin-default/blob/2e15d57ec8b362d899b1957b4ad6fcab5e618b11/lib/contracts/mixins/index.js#L12
+	// See https://github.com/product-os/jellyfish-plugin-default/blob/2e15d57ec8b362d899b1957b4ad6fcab5e618b11/lib/cards/mixins/index.js#L12
 	// Dereference all $ref values
 	return deref(intializedContract, {
 		failOnMissing: true,

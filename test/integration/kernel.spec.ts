@@ -7581,7 +7581,7 @@ describe('Kernel', () => {
 				expect(stage).toEqual(0);
 				expect(payload).toEqual({
 					id: queryId,
-					contracts: [contract],
+					cards: [contract],
 				});
 
 				stage = 1;

@@ -1033,7 +1033,7 @@ export class Kernel {
 			);
 			stream.emit('dataset', {
 				id: payload.id,
-				contracts,
+				cards: contracts,
 			});
 		});
 
