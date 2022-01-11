@@ -1,5 +1,6 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import type { LogContext } from '@balena/jellyfish-logger';
+import { Pool } from 'pg';
 import { v4 as uuid } from 'uuid';
 import { Cache } from './cache';
 import { Kernel } from './kernel';
@@ -12,6 +13,7 @@ export interface TestContext {
 	session: string;
 	cache: Cache;
 	kernel: Kernel;
+	pool: Pool;
 }
 
 /**
@@ -31,7 +33,7 @@ export const newContext = async (
 
 	const logContext = { id: `CORE-TEST-${uuid()}` };
 
-	const { kernel } = await Kernel.withPostgres(
+	const { kernel, pool } = await Kernel.withPostgres(
 		logContext,
 		cache,
 		Object.assign({}, defaultEnvironment.database.options, {
@@ -44,6 +46,7 @@ export const newContext = async (
 		session: kernel.adminSession()!,
 		cache,
 		kernel,
+		pool,
 	};
 };
 

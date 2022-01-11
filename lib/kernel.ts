@@ -265,12 +265,12 @@ export class Kernel {
 		logContext: LogContext,
 		cache: Cache | null,
 		options: PostgresBackendOptions,
-	): Promise<{ pool: Pool; kernel: Kernel }> {
+	): Promise<{ kernel: Kernel; pool: Pool }> {
 		const backend = new PostgresBackend(cache, options);
 		const kernel = new Kernel(backend);
 		await kernel.initialize(logContext);
 
-		return { pool: backend.pool!, kernel };
+		return { kernel, pool: backend.pool! };
 	}
 
 	/**
