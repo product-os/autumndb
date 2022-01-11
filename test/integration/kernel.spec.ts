@@ -38,7 +38,7 @@ describe('Kernel', () => {
 		}
 	});
 
-	describe('.patchContractBySlug()', () => {
+	describe('.patchCardBySlug()', () => {
 		it('should throw an error if the element does not exist', async () => {
 			const slug = `${testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
