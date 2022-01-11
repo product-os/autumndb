@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add the PG to the exported test context
+      hash: a6df7233954e2c068b151223e0b9d28bf90c93b7
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 12.1.0
+  date: 2022-01-11T16:51:34.051Z
+- commits:
     - subject: Rationalize how database connections and transactions are used
       hash: 41f458b874db826bc9f94ad00a70e35d8eb101f5
       body: |
