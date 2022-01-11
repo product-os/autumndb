@@ -1,9 +1,9 @@
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { v4 as uuid } from 'uuid';
-import * as helpers from '../helpers';
-import { version as packageVersion } from '../../../../package.json';
 import { INDEX_TABLE, PostgresBackend } from '../../../../lib/backend/postgres';
 import { Context } from '../../../../lib/context';
+import { version as packageVersion } from '../../../../package.json';
+import * as helpers from '../helpers';
 
 let ctx: helpers.BackendContext;
 
@@ -19,7 +19,7 @@ describe('Setup', () => {
 	// the helpers.before() call performs a call to .connect()
 	describe('after .connect()', () => {
 		it('should have run migrations and stored the version info', async () => {
-			const { version, updated_at } = await ctx.backend.one(
+			const { version, updated_at } = await ctx.context.queryOne(
 				`SELECT id, version, updated_at FROM jf_db_migrations WHERE id=0`,
 			);
 
@@ -32,7 +32,7 @@ describe('Setup', () => {
 		});
 
 		it('index state table should exist and be populated', async () => {
-			const { count } = await ctx.backend.one(
+			const { count } = await ctx.context.queryOne(
 				`SELECT count(index_name) FROM ${INDEX_TABLE}`,
 			);
 			expect(parseInt(count, 10)).toBeGreaterThan(0);
@@ -45,9 +45,8 @@ describe('Setup', () => {
 			const makeBackend = () => {
 				const backend = new PostgresBackend(
 					null,
-					{},
 					Object.assign({}, environment.database.options, {
-						database: dbName,
+						databaseName: dbName,
 					}),
 				);
 				return backend.connect(new Context({ id: `CORE-DB-TEST-${uuid()}` }));
@@ -95,7 +94,6 @@ describe('Setup', () => {
 			const makeBackend = async () => {
 				const backend = new PostgresBackend(
 					null,
-					{},
 					Object.assign({}, environment.database.options, {
 						database: dbName,
 					}),
@@ -137,7 +135,6 @@ describe('Setup', () => {
 			const makeBackend = async () => {
 				const backend = new PostgresBackend(
 					null,
-					{},
 					Object.assign({}, environment.database.options, {
 						database: dbName,
 					}),
@@ -182,19 +179,28 @@ describe('.createIndex()', () => {
 
 		// Check that the index exists.
 		expect(
-			await ctx.backend.one({
-				text: 'SELECT indexdef FROM pg_indexes WHERE tablename=$1 AND indexname=$2',
-				values: [tableName, indexName],
-			}),
+			await ctx.context.queryOne(
+				`
+				SELECT indexdef
+				FROM pg_indexes
+				WHERE tablename=$1 AND indexname=$2
+				`,
+				[tableName, indexName],
+			),
 		).toEqual({
 			indexdef: `CREATE INDEX ${indexName} ON public.${tableName} ${predicate}`,
 		});
-		expect(
-			await ctx.backend.one({
-				text: `SELECT table_name,sql,version FROM ${INDEX_TABLE} WHERE index_name=$1`,
-				values: [indexName],
-			}),
-		).toEqual({
+
+		const res = await ctx.context.queryOne(
+			`
+			SELECT table_name, sql, version
+			FROM ${INDEX_TABLE}
+			WHERE index_name=$1
+			`,
+			[indexName],
+		);
+		res.sql = res.sql.replaceAll(/\s+/g, ' ').trim();
+		expect(res).toEqual({
 			table_name: tableName,
 			sql: `CREATE INDEX IF NOT EXISTS "${indexName}" ON ${tableName} ${predicate}`,
 			version,
@@ -218,19 +224,28 @@ describe('.createIndex()', () => {
 
 		// Check that the index exists.
 		expect(
-			await ctx.backend.one({
-				text: 'SELECT indexdef FROM pg_indexes WHERE tablename=$1 AND indexname=$2',
-				values: [tableName, indexName],
-			}),
+			await ctx.context.queryOne(
+				`
+				SELECT indexdef
+				FROM pg_indexes
+				WHERE tablename=$1 AND indexname=$2
+				`,
+				[tableName, indexName],
+			),
 		).toEqual({
 			indexdef: `CREATE UNIQUE INDEX ${indexName} ON public.${tableName} ${predicate}`,
 		});
-		expect(
-			await ctx.backend.one({
-				text: `SELECT table_name,sql,version FROM ${INDEX_TABLE} WHERE index_name=$1`,
-				values: [indexName],
-			}),
-		).toEqual({
+
+		const res = await ctx.context.queryOne(
+			`
+			SELECT table_name, sql, version
+			FROM ${INDEX_TABLE}
+			WHERE index_name=$1
+			`,
+			[indexName],
+		);
+		res.sql = res.sql.replaceAll(/\s+/g, ' ').trim();
+		expect(res).toEqual({
 			table_name: tableName,
 			sql: `CREATE UNIQUE INDEX IF NOT EXISTS "${indexName}" ON ${tableName} ${predicate}`,
 			version,

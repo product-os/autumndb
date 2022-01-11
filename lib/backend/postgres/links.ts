@@ -1,10 +1,9 @@
-import * as _ from 'lodash';
 import type {
 	Contract,
 	LinkContract,
 } from '@balena/jellyfish-types/build/core';
-import type { Context } from '../../context';
-import type { Queryable } from './types';
+import * as _ from 'lodash';
+import { Context } from '../../context';
 import type { PostgresBackend } from '.';
 
 // tslint:disable-next-line: no-var-requires
@@ -18,7 +17,7 @@ export const TABLE = LINK_TABLE;
 export const setup = async (
 	context: Context,
 	backend: PostgresBackend,
-	database: string,
+	databaseName: string,
 	options: {
 		// The name of the "cards" table that should be referenced
 		cards: string;
@@ -26,11 +25,26 @@ export const setup = async (
 ) => {
 	context.debug('Creating links table', {
 		table: LINK_TABLE,
-		database,
+		databaseName,
 	});
-	const initTasks = [
-		backend.any(
-			`DO $$
+
+	await context.runQuery(`
+		CREATE TABLE IF NOT EXISTS ${STRING_TABLE} (
+			id SERIAL PRIMARY KEY,
+			string TEXT UNIQUE NOT NULL
+		);
+
+		CREATE TABLE IF NOT EXISTS ${LINK_TABLE} (
+			id UUID,
+			forward BOOL,
+			fromId UUID REFERENCES ${options.cards} (id) NOT NULL,
+			name INTEGER REFERENCES ${STRING_TABLE} (id) NOT NULL,
+			toId UUID REFERENCES ${options.cards} (id) NOT NULL,
+			PRIMARY KEY (id, forward)
+		);
+
+		-- Create types used during queries with links
+		DO $$
 		BEGIN
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'linkedge') THEN
 				CREATE TYPE linkEdge AS (source UUID, idx INT, sink UUID);
@@ -40,25 +54,9 @@ export const setup = async (
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'polylinkedge') THEN
 				CREATE TYPE polyLinkEdge AS (source UUID, sink UUID, idxs INT[]);
 			END IF;
-		END$$;`,
-		),
-	];
-	await backend.any(`
-		CREATE TABLE IF NOT EXISTS ${STRING_TABLE} (
-			id SERIAL PRIMARY KEY,
-			string TEXT UNIQUE NOT NULL
-		)
+		END$$
 	`);
-	await backend.any(`
-		CREATE TABLE IF NOT EXISTS ${LINK_TABLE} (
-			id UUID,
-			forward BOOL,
-			fromId UUID REFERENCES ${options.cards} (id) NOT NULL,
-			name INTEGER REFERENCES ${STRING_TABLE} (id) NOT NULL,
-			toId UUID REFERENCES ${options.cards} (id) NOT NULL,
-			PRIMARY KEY (id, forward)
-		)
-	`);
+
 	for (const [name, column] of [
 		['idx_links2_fromid_name_toid', 'fromid, name, toid'],
 		['idx_links2_toid_name_fromid', 'toid, name, fromid'],
@@ -71,75 +69,74 @@ export const setup = async (
 			`USING BTREE (${column})`,
 		);
 	}
-	await Promise.all(initTasks);
 };
 
-export const upsert = async (
-	_context: Context,
-	connection: Queryable,
-	link: LinkContract,
-) => {
+const insertStringQuery = Context.prepareQuery(`
+	INSERT INTO ${STRING_TABLE} (string)
+	VALUES ($1), ($2)
+	ON CONFLICT DO NOTHING
+`);
+
+const insertLinkQuery = Context.prepareQuery(`
+	INSERT INTO ${LINK_TABLE} (
+		id,
+		forward,
+		fromId,
+		name,
+		toId
+	)
+	VALUES
+		(
+			$1,
+			true,
+			$2,
+			(
+				SELECT id
+				FROM ${STRING_TABLE}
+				WHERE string = $3
+			),
+			$4
+		),
+		(
+			$1,
+			false,
+			$4,
+			(
+				SELECT id
+				FROM ${STRING_TABLE}
+				WHERE string = $5
+			),
+			$2
+		)
+	ON CONFLICT (id, forward) DO UPDATE SET
+		fromId = EXCLUDED.fromId,
+		name = EXCLUDED.name,
+		toId = EXCLUDED.toId
+`);
+
+const deleteLinkQuery = Context.prepareQuery(`
+	DELETE FROM ${LINK_TABLE}
+	WHERE id = $1
+`);
+
+export const upsert = async (context: Context, link: LinkContract) => {
 	if (link.active) {
-		await connection.any({
-			text: `
-				INSERT INTO ${STRING_TABLE} (string)
-				VALUES ($1), ($2)
-				ON CONFLICT DO NOTHING
-			`,
-			values: [link.name, link.data.inverseName],
-		});
-		await connection.any({
-			text: `
-				INSERT INTO ${LINK_TABLE} (
-					id,
-					forward,
-					fromId,
-					name,
-					toId
-				)
-				VALUES
-					(
-						$1,
-						true,
-						$2,
-						(
-							SELECT id
-							FROM ${STRING_TABLE}
-							WHERE string = $3
-						),
-						$4
-					),
-					(
-						$1,
-						false,
-						$4,
-						(
-							SELECT id
-							FROM ${STRING_TABLE}
-							WHERE string = $5
-						),
-						$2
-					)
-				ON CONFLICT (id, forward) DO UPDATE SET
-					fromId = EXCLUDED.fromId,
-					name = EXCLUDED.name,
-					toId = EXCLUDED.toId
-			`,
-			values: [
-				link.id,
-				link.data.from.id,
-				link.name,
-				link.data.to.id,
-				link.data.inverseName,
-			],
-		});
+		await context.runQuery(insertStringQuery, [
+			link.name,
+			link.data.inverseName,
+		]);
+		await context.runQuery(insertLinkQuery, [
+			link.id,
+			link.data.from.id,
+			link.name,
+			link.data.to.id,
+			link.data.inverseName,
+		]);
 	} else {
-		await connection.any({
-			text: `DELETE FROM ${LINK_TABLE} WHERE id = $1`,
-			values: [link.id],
-		});
+		await context.runQuery(deleteLinkQuery, [link.id]);
 	}
 };
+
 /**
  * @summary Parse a card link given a link card
  * @function

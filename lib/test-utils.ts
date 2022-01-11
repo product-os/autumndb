@@ -10,6 +10,7 @@ import { Kernel } from './kernel';
 export interface TestContext {
 	logContext: LogContext;
 	session: string;
+	cache: Cache;
 	kernel: Kernel;
 }
 
@@ -30,7 +31,7 @@ export const newContext = async (
 
 	const logContext = { id: `CORE-TEST-${uuid()}` };
 
-	const kernel = await Kernel.withPostgres(
+	const { kernel } = await Kernel.withPostgres(
 		logContext,
 		cache,
 		Object.assign({}, defaultEnvironment.database.options, {
@@ -40,7 +41,8 @@ export const newContext = async (
 
 	return {
 		logContext,
-		session: kernel.sessions!.admin,
+		session: kernel.adminSession()!,
+		cache,
 		kernel,
 	};
 };
@@ -62,8 +64,7 @@ export interface NewContextOptions {
 export const destroyContext = async (context: TestContext) => {
 	await context.kernel.drop(context.logContext);
 	await context.kernel.disconnect(context.logContext);
-	// TODO: we shouldn't need to do this to disconnect from the cache
-	await context.kernel.backend.cache?.disconnect();
+	await context.cache.disconnect();
 };
 
 /**

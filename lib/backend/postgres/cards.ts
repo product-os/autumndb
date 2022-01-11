@@ -1,20 +1,22 @@
-import * as _ from 'lodash';
-import * as Bluebird from 'bluebird';
-import * as pgFormat from 'pg-format';
-import { v4 as uuidv4 } from 'uuid';
 import * as metrics from '@balena/jellyfish-metrics';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type {
+	Contract,
+	ContractDefinition,
+} from '@balena/jellyfish-types/build/core';
+import * as Bluebird from 'bluebird';
+import * as _ from 'lodash';
+import * as pgFormat from 'pg-format';
 import * as traverse from 'traverse';
-import type { PostgresBackend } from '.';
-import * as utils from './utils';
+import { v4 as uuidv4 } from 'uuid';
+import { errors } from '../../';
 import type { Context } from '../../context';
-import * as textSearch from './jsonschema2sql/text-search';
 import { SqlPath } from './jsonschema2sql/sql-path';
 import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
-import type { DatabaseBackend, SearchFieldDef, Queryable } from './types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
-import type { TypedError } from 'typed-error';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import * as textSearch from './jsonschema2sql/text-search';
+import type { SearchFieldDef } from './types';
+import * as utils from './utils';
+import type { PostgresBackend } from '.';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
@@ -99,24 +101,23 @@ export const TRIGGER_COLUMNS = CARDS_TRIGGER_COLUMNS;
 export const setup = async (
 	context: Context,
 	backend: PostgresBackend,
-	_database: string,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
-		// TS-TODO: This option appears to be completely unused and can possibly be removed
-		noIndexes?: boolean;
 	} = {},
 ) => {
 	const table = options.table || TABLE;
 	const tables = _.map(
-		await backend.any(
-			`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`,
-		),
+		await context.query(`
+			SELECT table_name
+			FROM information_schema.tables
+			WHERE table_schema = 'public'
+		`),
 		'table_name',
 	);
 	if (!tables.includes(table)) {
-		await backend.any(
-			`CREATE TABLE IF NOT EXISTS ${table} (
+		await context.runQuery(`
+			CREATE TABLE IF NOT EXISTS ${table} (
 				id UUID PRIMARY KEY NOT NULL,
 				slug VARCHAR (255) NOT NULL,
 				type TEXT NOT NULL,
@@ -140,7 +141,8 @@ export const setup = async (
 				CONSTRAINT ${table}_slug_version_key
 					UNIQUE (slug, version_major, version_minor, version_patch, version_prerelease, version_build),
 				CONSTRAINT version_positive
-					CHECK (version_major >= 0 AND version_minor >= 0 AND version_patch >= 0));
+					CHECK (version_major >= 0 AND version_minor >= 0 AND version_patch >= 0)
+			);
 
 			-- Disable compression on the jsonb columns so we can access its
 			-- properties faster.
@@ -150,21 +152,33 @@ export const setup = async (
 			ALTER COLUMN links SET STORAGE EXTERNAL,
 			ALTER COLUMN linked_at SET STORAGE EXTERNAL;
 
-		`,
-		);
+			-- Recursive function to merge JSONB objects. This function assumes
+			-- both objects are just views into the same underlying object
+			CREATE OR REPLACE FUNCTION merge_jsonb_views(x jsonb, y jsonb) RETURNS jsonb AS $$
+				SELECT coalesce(merged.payload, '{}'::jsonb)
+				FROM (
+					SELECT jsonb_object_agg(
+						coalesce(x_key, y_key),
+						CASE
+							WHEN jsonb_typeof(x_value) = 'object' OR jsonb_typeof(x_value) = 'object'
+							THEN merge_jsonb_views(x_value, y_value)
+							ELSE coalesce(x_value, y_value)
+						END
+					) AS payload
+					FROM jsonb_each(x) AS f1(x_key, x_value)
+					FULL OUTER JOIN jsonb_each(y) AS f2(y_key, y_value)
+					ON x_key = y_key
+				) AS merged
+			$$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE;
+
+			 -- Create function that allows us to create tsvector indexes from
+			 -- text[] fields
+			CREATE OR REPLACE FUNCTION immutable_array_to_string(arr text[], sep text) RETURNS text AS $$
+				SELECT array_to_string(arr, sep);
+			$$ LANGUAGE SQL IMMUTABLE;
+		`);
 	}
 
-	if (options.noIndexes) {
-		return;
-	}
-
-	/*
-	 * Increase work memory for better performance
-	 * TODO: Set this value in k8s configuration instead of here
-	 */
-	await backend.any(`
-		SET work_mem TO '256 MB';
-	`);
 	await Promise.all([
 		Bluebird.map(
 			[
@@ -221,42 +235,11 @@ export const setup = async (
 				concurrency: 1,
 			},
 		),
-		/*
-		 * Create function that allows us to create tsvector indexes from text[] fields.
-		 */
-		backend.any(
-			`CREATE OR REPLACE FUNCTION immutable_array_to_string(arr text[], sep text) RETURNS text AS $$
-				SELECT array_to_string(arr, sep);
-			$$ LANGUAGE SQL IMMUTABLE;`,
-		),
-		// Recursive function to merge JSONB objects. This function assumes both
-		// objects are just views into the same underlying object
-		backend.any(
-			`CREATE OR REPLACE FUNCTION merge_jsonb_views(x jsonb, y jsonb) RETURNS jsonb AS $$
-				SELECT coalesce(merged.payload, '{}'::jsonb)
-				FROM (
-					SELECT jsonb_object_agg(
-						coalesce(x_key, y_key),
-						CASE
-							WHEN jsonb_typeof(x_value) = 'object' OR jsonb_typeof(x_value) = 'object' THEN
-								merge_jsonb_views(x_value, y_value)
-							ELSE coalesce(x_value, y_value)
-						END
-					) AS payload
-					FROM jsonb_each(x) AS f1(x_key, x_value)
-					FULL OUTER JOIN jsonb_each(y) AS f2(y_key, y_value)
-					ON x_key = y_key
-				) AS merged
-			$$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE;
-
-		`,
-		),
 	]);
 };
 
 export const getById = async (
 	context: Context,
-	connection: Queryable,
 	id: string,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -268,11 +251,15 @@ export const getById = async (
 		id,
 		table,
 	});
-	const results = await connection.any({
-		name: `cards-getbyid-${table}`,
-		text: `SELECT ${CARDS_SELECT} FROM ${table} WHERE id = $1 LIMIT 1;`,
-		values: [id],
-	});
+	const results = await context.query(
+		`
+		SELECT ${CARDS_SELECT}
+		FROM ${table}
+		WHERE id = $1
+		LIMIT 1
+		`,
+		[id],
+	);
 	if (results[0]) {
 		metrics.markContractReadFromDatabase(results[0]);
 	}
@@ -281,7 +268,6 @@ export const getById = async (
 
 export const getBySlug = async (
 	context: Context,
-	connection: Queryable,
 	slug: string,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -305,33 +291,40 @@ export const getBySlug = async (
 	// We don't test if we're in a transaction here because FOR UPDATE simply
 	// won't have an effect then. Might still be worth to add a warning though
 	const lockSql = options.lock ? 'FOR UPDATE' : '';
-	const lockSuffix = options.lock ? '-lock' : '';
 
 	if (latest) {
-		results = await connection.any({
-			name: `cards-getbyslug-latest-${table}${lockSuffix}`,
-			text: `SELECT ${CARDS_SELECT} FROM ${table}
-				WHERE slug = $1 AND version_prerelease = ''
-				ORDER BY version_major DESC,
-								 version_minor DESC,
-								 version_patch DESC,
-								 version_build DESC;
-				LIMIT 1 ${lockSql};`,
-			values: [base],
-		});
+		results = await context.query(
+			`
+			SELECT ${CARDS_SELECT}
+			FROM ${table}
+			WHERE slug = $1 AND version_prerelease = ''
+			ORDER BY
+				version_major DESC,
+				version_minor DESC,
+				version_patch DESC,
+				version_build DESC
+			LIMIT 1
+			${lockSql}
+			`,
+			[base],
+		);
 	} else {
-		results = await connection.any({
-			name: `cards-getbyslug-version-${table}${lockSuffix}`,
-			text: `SELECT ${CARDS_SELECT} FROM ${table}
-				WHERE slug = $1 AND
-				      version_major = $2 AND
-				      version_minor = $3 AND
-				      version_patch = $4 AND
-				      version_prerelease = $5 AND
-				      version_build = $6
-				LIMIT 1 ${lockSql};`,
-			values: [base, major, minor, patch, prerelease, build],
-		});
+		results = await context.query(
+			`
+			SELECT ${CARDS_SELECT}
+			FROM ${table}
+			WHERE
+				slug = $1 AND
+				version_major = $2 AND
+				version_minor = $3 AND
+				version_patch = $4 AND
+				version_prerelease = $5 AND
+				version_build = $6
+			LIMIT 1
+			${lockSql}
+			`,
+			[base, major, minor, patch, prerelease, build],
+		);
 	}
 	_.forEach(results, utils.convertDatesToISOString);
 	_.forEach(results, (result) => {
@@ -342,7 +335,6 @@ export const getBySlug = async (
 
 export const getManyById = async (
 	context: Context,
-	connection: Queryable,
 	ids: string[],
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -354,11 +346,14 @@ export const getManyById = async (
 		count: ids.length,
 		table,
 	});
-	const results = await connection.any({
-		name: 'cards-getmanybyid',
-		text: `SELECT ${CARDS_SELECT} FROM ${table} WHERE id = ANY ($1)`,
-		values: [ids],
-	});
+	const results = await context.query(
+		`
+		SELECT ${CARDS_SELECT}
+		FROM ${table}
+		WHERE id = ANY ($1)
+		`,
+		[ids],
+	);
 	_.forEach(results, utils.convertDatesToISOString);
 	_.forEach(results, (result) => {
 		metrics.markContractReadFromDatabase(result);
@@ -368,8 +363,6 @@ export const getManyById = async (
 
 export const upsert = async <T extends Contract = Contract>(
 	context: Context,
-	errors: DatabaseBackend['errors'],
-	connection: Queryable,
 	object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -437,21 +430,60 @@ export const upsert = async <T extends Contract = Contract>(
 	// querying the database before proceeding with the insertion.
 	try {
 		if (options.replace) {
-			const sql = `INSERT INTO ${table}
-					(id, slug, type, active,
-					version_major, version_minor, version_patch,
-					version_prerelease, version_build,
-					name, tags, markers, links, requires,
-					capabilities, data, linked_at, created_at, updated_at,
-					loop)
-				VALUES
-					($1, $2, $3, $4,
-					$5, $6, $7,
-					$8, $9,
-					$10, $11, $12, $13, $14,
-					$15, $16, $17, $18, NULL,
-					$20)
-				ON CONFLICT (slug, version_major, version_minor, version_patch, version_prerelease, version_build) DO UPDATE SET
+			results = await context.query(
+				`
+				INSERT INTO ${table} (
+					id,
+					slug,
+					type,
+					active,
+					version_major,
+					version_minor,
+					version_patch,
+					version_prerelease,
+					version_build,
+					name,
+					tags,
+					markers,
+					links,
+					requires,
+					capabilities,
+					data,
+					linked_at,
+					created_at,
+					updated_at,
+					loop
+				)
+				VALUES (
+					$1,
+					$2,
+					$3,
+					$4,
+					$5,
+					$6,
+					$7,
+					$8,
+					$9,
+					$10,
+					$11,
+					$12,
+					$13,
+					$14,
+					$15,
+					$16,
+					$17,
+					$18,
+					NULL,
+					$20
+				)
+				ON CONFLICT (
+					slug,
+					version_major,
+					version_minor,
+					version_patch,
+					version_prerelease,
+					version_build
+				) DO UPDATE SET
 					id = ${table}.id,
 					active = $4,
 					name = $10,
@@ -465,31 +497,61 @@ export const upsert = async <T extends Contract = Contract>(
 					created_at = ${table}.created_at,
 					updated_at = $19,
 					loop = $20
-				RETURNING ${CARDS_SELECT}`;
-			results = await connection.any({
-				name: `cards-upsert-replace-${table}`,
-				text: sql,
-				values: payload,
-			});
+				RETURNING ${CARDS_SELECT}
+				`,
+				payload,
+			);
 		} else {
-			const sql = `INSERT INTO ${table}
-					(id, slug, type, active,
-					version_major, version_minor, version_patch,
-					version_prerelease, version_build,
-					name, tags, markers, links, requires,
-					capabilities, data, linked_at, created_at, updated_at,
-					loop)
-				VALUES
-					($1, $2, $3, $4, $5, $6, $7, $8,
-					$9, $10, $11, $12, $13, $14,
-					$15, $16, $17, $18, $19,
-					$20)
-				RETURNING ${CARDS_SELECT}`;
-			results = await connection.any({
-				name: `cards-upsert-insert-${table}`,
-				text: sql,
-				values: payload,
-			});
+			results = await context.query(
+				`
+				INSERT INTO ${table} (
+					id,
+					slug,
+					type,
+					active,
+					version_major,
+					version_minor,
+					version_patch,
+					version_prerelease,
+					version_build,
+					name,
+					tags,
+					markers,
+					links,
+					requires,
+					capabilities,
+					data,
+					linked_at,
+					created_at,
+					updated_at,
+					loop
+				)
+				VALUES (
+					$1,
+					$2,
+					$3,
+					$4,
+					$5,
+					$6,
+					$7,
+					$8,
+					$9,
+					$10,
+					$11,
+					$12,
+					$13,
+					$14,
+					$15,
+					$16,
+					$17,
+					$18,
+					$19,
+					$20
+				)
+				RETURNING ${CARDS_SELECT}
+				`,
+				payload,
+			);
 		}
 	} catch (error: any) {
 		if (/^duplicate key value/.test(error.message)) {
@@ -537,9 +599,7 @@ export const upsert = async <T extends Contract = Contract>(
 };
 
 export const materializeLink = async (
-	_context: Context,
-	errors: DatabaseBackend['errors'],
-	connection: Queryable,
+	context: Context,
 	card: Contract,
 	options: {
 		// The name of the "cards" table, defaults to the TABLE constant
@@ -548,14 +608,14 @@ export const materializeLink = async (
 ) => {
 	const table = options.table || TABLE;
 	try {
-		const sql = `UPDATE ${table}
-				SET linked_at = $1::jsonb
-			WHERE id = $2;`;
-		await connection.any({
-			name: `cards-materializelink-${table}`,
-			text: sql,
-			values: [card.linked_at, card.id],
-		});
+		await context.runQuery(
+			`
+			UPDATE ${table}
+			SET linked_at = $1::jsonb
+			WHERE id = $2
+			`,
+			[card.linked_at, card.id],
+		);
 	} catch (error: any) {
 		if (/^duplicate key value/.test(error.message)) {
 			throw new errors.JellyfishElementAlreadyExists(
@@ -640,7 +700,7 @@ export const createTypeIndex = async (
  */
 export const createFullTextSearchIndex = async (
 	context: Context,
-	connection: PostgresBackend,
+	database: PostgresBackend,
 	type: string,
 	fields: SearchFieldDef[],
 	retries: number = 1,
@@ -657,7 +717,7 @@ export const createFullTextSearchIndex = async (
 			const path = SqlPath.fromArray(_.clone(field.path));
 			const isJson = path.isProcessingJsonProperty;
 			const name = `${type.split('@')[0]}__${field.path.join('_')}__search_idx`;
-			await connection.createIndex(
+			await database.createIndex(
 				context,
 				CARDS_TABLE,
 				name,
@@ -681,7 +741,7 @@ export const createFullTextSearchIndex = async (
 		} else {
 			return createFullTextSearchIndex(
 				context,
-				connection,
+				database,
 				type,
 				fields,
 				retries - 1,
@@ -703,7 +763,6 @@ export const createFullTextSearchIndex = async (
 export const parseFullTextSearchFields = (
 	context: Context,
 	schema: JsonSchema,
-	errors: { [key: string]: typeof TypedError },
 ) => {
 	const fields: SearchFieldDef[] = [];
 	const combinators = ['anyOf', 'allOf', 'oneOf'];

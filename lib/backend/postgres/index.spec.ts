@@ -1,4 +1,4 @@
-import * as backend from './index';
+import * as backend from '.';
 
 describe('backend.isIgnorableInitError()', () => {
 	it('should return true for expected codes', () => {

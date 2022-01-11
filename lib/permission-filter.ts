@@ -1,12 +1,12 @@
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type { Contract } from '@balena/jellyfish-types/build/core';
 import jsone = require('json-e');
 import * as _ from 'lodash';
-import type { Context } from './context';
-import jsonSchema from './json-schema';
-import * as errors from './errors';
-import { CARDS } from './cards';
-import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { DatabaseBackend } from './backend/postgres/types';
-import type { JsonSchema } from '@balena/jellyfish-types';
+import { CARDS } from './cards';
+import type { Context } from './context';
+import * as errors from './errors';
+import jsonSchema from './json-schema';
 
 const CARD_CARD_TYPE = `${CARDS.card.slug}@${CARDS.card.version}`;
 const VERSIONED_CARDS = _.mapKeys(CARDS, (value: any, key: any) => {

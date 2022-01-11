@@ -1,16 +1,5 @@
-import { PostgresBackend, PostgresBackendOptions } from './backend';
 import type { LogContext } from '@balena/jellyfish-logger';
-import type { Cache } from './cache';
-import * as _ from 'lodash';
-import * as jsonpatch from 'fast-json-patch';
-import * as fastEquals from 'fast-equals';
-import { Context, MixedContext } from './context';
-import jsonSchema from './json-schema';
-import * as errors from './errors';
-import * as views from './views';
-import { CARDS } from './cards';
-import * as permissionFilter from './permission-filter';
-import metrics = require('@balena/jellyfish-metrics');
+import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	Contract,
@@ -19,12 +8,24 @@ import type {
 	TypeContract,
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
+import * as fastEquals from 'fast-equals';
+import * as jsonpatch from 'fast-json-patch';
+import * as _ from 'lodash';
+import { Pool } from 'pg';
+import * as stopword from 'stopword';
+import { v4 as uuidv4 } from 'uuid';
+import { PostgresBackend, PostgresBackendOptions } from './backend';
 import type {
 	BackendQueryOptions,
 	DatabaseBackend,
 } from './backend/postgres/types';
-import * as stopword from 'stopword';
-import { v4 as uuidv4 } from 'uuid';
+import type { Cache } from './cache';
+import { CARDS } from './cards';
+import { Context, MixedContext, TransactionIsolation } from './context';
+import * as errors from './errors';
+import jsonSchema from './json-schema';
+import * as permissionFilter from './permission-filter';
+import * as views from './views';
 
 interface KernelQueryOptions extends Partial<BackendQueryOptions> {
 	mask?: JsonSchema;
@@ -229,114 +230,9 @@ const patchCard = (
 	}, card);
 };
 
-const preUpsert = async (
-	instance: Kernel,
-	context: Context,
-	session: string,
-	card: Contract,
-) => {
-	context.assertInternal(
-		card.type,
-		instance.errors.JellyfishSchemaMismatch,
-		'No type in card',
-	);
-	// Fetch necessary objects concurrently
-	const [typeCard, filter, loop] = await Promise.all([
-		instance.getCardBySlug<TypeContract>(context, session, card.type),
-		permissionFilter.getMask(context, instance.backend, session),
-		(async () => {
-			return card.loop && instance.backend.getElementBySlug(context, card.loop);
-		})(),
-	]);
-	const schema = typeCard && typeCard.data && typeCard.data.schema;
-
-	// If the loop field is specified, it should be a valid loop contract
-	if (card.loop) {
-		context.assertInternal(
-			loop && loop.type.split('@')[0] === 'loop',
-			errors.JellyfishNoElement,
-			`No such loop: ${card.loop}`,
-		);
-	}
-
-	context.assertInternal(
-		schema,
-		instance.errors.JellyfishUnknownCardType,
-		`Unknown type: ${card.type}`,
-	);
-	// TODO: Remove this once we completely migrate links
-	// to have versioned types in the "from" and the "to"
-	// We put this check here, before we type-check the
-	// upsert, so we don't cause violations to the type
-	// if the from/to have no versions.
-	// See: https://github.com/product-os/jellyfish/pull/3088
-	if (
-		card.type === 'link@1.0.0' &&
-		card.data &&
-		card.data.from &&
-		card.data.to &&
-		(card.data as any).from.type &&
-		(card.data as any).to.type &&
-		!_.includes((card.data as any).from.type, '@') &&
-		!_.includes((card.data as any).to.type, '@')
-	) {
-		(card.data as any).from.type = `${(card.data as any).from.type}@1.0.0`;
-		(card.data as any).to.type = `${(card.data as any).to.type}@1.0.0`;
-	}
-	try {
-		jsonSchema.validate(schema as any, card);
-	} catch (error) {
-		if (error instanceof errors.JellyfishSchemaMismatch) {
-			error.expected = true;
-		}
-		throw error;
-	}
-	try {
-		jsonSchema.validate(filter as any, card);
-	} catch (error) {
-		// Failing to match the filter schema is a permissions error
-		if (error instanceof errors.JellyfishSchemaMismatch) {
-			const newError = new errors.JellyfishPermissionsError(error.message);
-			newError.expected = true;
-			throw newError;
-		}
-		throw error;
-	}
-
-	// Validate that both sides of the link contract are readable before inserting
-	if (card.type === 'link@1.0.0') {
-		const targetCardIds = [
-			(card as LinkContract).data.from.id,
-			(card as LinkContract).data.to.id,
-		];
-
-		await Promise.all(
-			targetCardIds.map(async (targetCardId) => {
-				const targetCard = await instance.getCardById(
-					context,
-					session,
-					targetCardId,
-				);
-
-				if (!targetCard) {
-					const newError = new errors.JellyfishNoLinkTarget(
-						`Link target does not exist: ${targetCardId}`,
-					);
-					newError.expected = true;
-					throw newError;
-				}
-			}),
-		);
-	}
-
-	return filter;
-};
-
 export class Kernel {
-	backend: DatabaseBackend;
-	errors: typeof errors;
-	cards: typeof CARDS;
-	sessions?: { admin: string };
+	private backend: DatabaseBackend;
+	private sessions?: { admin: string };
 
 	/**
 	 * @summary The Jellyfish Kernel
@@ -358,24 +254,31 @@ export class Kernel {
 	 */
 	private constructor(backend: DatabaseBackend) {
 		this.backend = backend;
-		this.errors = errors;
-		this.cards = CARDS;
 	}
 
 	/**
 	 * Create a new [[`Kernel`]] object backed by a PostgreSQL database and
-	 * optionally use the specified cache.
+	 * optionally use the specified cache. Return the new `Kernel` and also the
+	 * underlying database handler.
 	 */
 	public static async withPostgres(
 		logContext: LogContext,
 		cache: Cache | null,
 		options: PostgresBackendOptions,
-	): Promise<Kernel> {
-		const backend = new PostgresBackend(cache, errors, options);
+	): Promise<{ pool: Pool; kernel: Kernel }> {
+		const backend = new PostgresBackend(cache, options);
 		const kernel = new Kernel(backend);
 		await kernel.initialize(logContext);
 
-		return kernel;
+		return { pool: backend.pool!, kernel };
+	}
+
+	/**
+	 * Get the admin session token. Returns null if this `Kernel` is not
+	 * connected.
+	 */
+	public adminSession(): string | null {
+		return this.sessions?.admin || null;
 	}
 
 	/**
@@ -390,15 +293,15 @@ export class Kernel {
 	 * await kernel.initialize()
 	 * await kernel.disconnect()
 	 */
-	async disconnect(mixedContext: MixedContext) {
-		await this.backend.disconnect(Context.fromMixed(mixedContext));
+	async disconnect(logContext: LogContext) {
+		await this.backend.disconnect(new Context(logContext));
 	}
 
 	/**
 	 * Truncate database tables.
 	 */
 	async reset(mixedContext: MixedContext) {
-		await this.backend.reset(Context.fromMixed(mixedContext));
+		await this.backend.reset(Context.fromMixed(mixedContext, this.backend));
 	}
 
 	/**
@@ -406,7 +309,7 @@ export class Kernel {
 	 */
 	async drop(mixedContext: MixedContext) {
 		// TODO: we probably want to drop the database itself too.
-		await this.backend.drop(Context.fromMixed(mixedContext));
+		await this.backend.drop(Context.fromMixed(mixedContext, this.backend));
 	}
 
 	/**
@@ -425,7 +328,7 @@ export class Kernel {
 	 * await kernel.initialize()
 	 */
 	async initialize(logContext: LogContext) {
-		const context = new Context(logContext);
+		const context = new Context(logContext, this.backend);
 		await this.backend.connect(context);
 
 		// TODO: all of this bootstrapping should be in the same transaction as the DB setup
@@ -434,7 +337,7 @@ export class Kernel {
 		context.debug('Upserting minimal required cards');
 
 		const unsafeUpsert = (card: ContractDefinition) => {
-			const element = this.defaults(card);
+			const element = Kernel.defaults(card);
 			return permissionFilter.unsafeUpsertCard(
 				context,
 				this.backend,
@@ -482,7 +385,7 @@ export class Kernel {
 			].map(async (card) => {
 				context.debug('Upserting core card', { slug: card.slug });
 
-				return this.replaceCard(context, this.sessions!.admin, card);
+				return this.replaceCard(context, this.adminSession()!, card);
 			}),
 		);
 	}
@@ -502,7 +405,7 @@ export class Kernel {
 		session: string,
 		id: string,
 	): Promise<T | null> {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
 		context.debug('Fetching card by id', { id });
 
 		const schema: JsonSchema = {
@@ -546,7 +449,7 @@ export class Kernel {
 		session: string,
 		slug: string,
 	): Promise<T | null> {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
 		context.debug('Fetching card by slug', { slug });
 
 		context.assertInternal(
@@ -624,12 +527,12 @@ export class Kernel {
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
-		const context = Context.fromMixed(mixedContext);
-		const card = this.defaults(object);
+		const context = Context.fromMixed(mixedContext, this.backend);
+		const card = Kernel.defaults(object);
 
 		context.debug('Inserting card', { slug: card.slug });
 
-		await preUpsert(this, context, session, card as Contract);
+		await this.preUpsert(context, session, card as Contract);
 
 		return this.backend.insertElement<T>(context, card as Contract);
 	}
@@ -659,14 +562,112 @@ export class Kernel {
 			Pick<Contract, 'type'> &
 			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
 	): Promise<T> {
-		const context = Context.fromMixed(mixedContext);
-		const card = this.defaults(object);
+		const context = Context.fromMixed(mixedContext, this.backend);
+		const card = Kernel.defaults(object);
 
 		context.debug('Replacing card', { slug: card.slug });
 
-		await preUpsert(this, context, session, card as Contract);
+		await this.preUpsert(context, session, card as Contract);
 
 		return this.backend.upsertElement(context, card as Contract);
+	}
+
+	private async preUpsert(context: Context, session: string, card: Contract) {
+		context.assertInternal(
+			card.type,
+			errors.JellyfishSchemaMismatch,
+			'No type in card',
+		);
+		// Fetch necessary objects concurrently
+		const [typeCard, filter, loop] = await Promise.all([
+			this.getCardBySlug<TypeContract>(context, session, card.type),
+			permissionFilter.getMask(context, this.backend, session),
+			(async () => {
+				return card.loop && this.backend.getElementBySlug(context, card.loop);
+			})(),
+		]);
+		const schema = typeCard && typeCard.data && typeCard.data.schema;
+
+		// If the loop field is specified, it should be a valid loop contract
+		if (card.loop) {
+			context.assertInternal(
+				loop && loop.type.split('@')[0] === 'loop',
+				errors.JellyfishNoElement,
+				`No such loop: ${card.loop}`,
+			);
+		}
+
+		context.assertInternal(
+			schema,
+			errors.JellyfishUnknownCardType,
+			`Unknown type: ${card.type}`,
+		);
+		// TODO: Remove this once we completely migrate links
+		// to have versioned types in the "from" and the "to"
+		// We put this check here, before we type-check the
+		// upsert, so we don't cause violations to the type
+		// if the from/to have no versions.
+		// See: https://github.com/product-os/jellyfish/pull/3088
+		if (
+			card.type === 'link@1.0.0' &&
+			card.data &&
+			card.data.from &&
+			card.data.to &&
+			(card.data as any).from.type &&
+			(card.data as any).to.type &&
+			!_.includes((card.data as any).from.type, '@') &&
+			!_.includes((card.data as any).to.type, '@')
+		) {
+			(card.data as any).from.type = `${(card.data as any).from.type}@1.0.0`;
+			(card.data as any).to.type = `${(card.data as any).to.type}@1.0.0`;
+		}
+		try {
+			jsonSchema.validate(schema as any, card);
+		} catch (error) {
+			if (error instanceof errors.JellyfishSchemaMismatch) {
+				error.expected = true;
+			}
+			throw error;
+		}
+		try {
+			jsonSchema.validate(filter as any, card);
+		} catch (error) {
+			// Failing to match the filter schema is a permissions error
+			if (error instanceof errors.JellyfishSchemaMismatch) {
+				const newError = new errors.JellyfishPermissionsError(error.message);
+				newError.expected = true;
+				throw newError;
+			}
+			throw error;
+		}
+
+		// Validate that both sides of the link contract are readable before inserting
+		if (card.type === 'link@1.0.0') {
+			const targetCardIds = [
+				(card as LinkContract).data.from.id,
+				(card as LinkContract).data.to.id,
+			];
+
+			await Promise.all(
+				targetCardIds.map(async (targetCardId) => {
+					const targetCard = await this.getCardById(
+						context,
+						session,
+						targetCardId,
+					);
+
+					if (!targetCard) {
+						const newError = new errors.JellyfishNoLinkTarget(
+							`Link target does not exist: ${targetCardId}`,
+						);
+						newError.expected = true;
+						throw newError;
+					}
+				}),
+			);
+		}
+
+		return filter;
 	}
 
 	/**
@@ -689,7 +690,7 @@ export class Kernel {
 		slug: string,
 		patch: jsonpatch.Operation[],
 	): Promise<T> {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
 		const filter = await permissionFilter.getMask(
 			context,
 			this.backend,
@@ -697,138 +698,145 @@ export class Kernel {
 		);
 
 		const result = await metrics.measureContractPatch(async () => {
-			return this.backend.withTransaction(async () => {
-				// Set options to ensure subsequent queries are a part of the transaction
-				const options = {
-					skipCache: true,
-				};
+			return context.withTransaction(
+				TransactionIsolation.Atomic,
+				async (transactionContext: Context) => {
+					// Set options to ensure subsequent queries are a part of the transaction
+					const options = {
+						skipCache: true,
+					};
 
-				// Fetch necessary data from database
-				const fullCard = await this.backend.getElementBySlug(context, slug, {
-					...options,
-					lock: true,
-				});
+					// Fetch necessary data from database
+					const fullCard = await this.backend.getElementBySlug(
+						transactionContext,
+						slug,
+						{
+							...options,
+							lock: true,
+						},
+					);
 
-				context.assertInternal(
-					fullCard,
-					this.errors.JellyfishNoElement,
-					`No such card: ${slug}`,
-				);
+					transactionContext.assertInternal(
+						fullCard,
+						errors.JellyfishNoElement,
+						`No such card: ${slug}`,
+					);
 
-				// TODO: Remove this log once we understand why we are having link card patch requests.
-				if (fullCard.type === 'link@1.0.0') {
-					context.info('Received request to patch a link card', {
-						card: fullCard,
-						patch,
-					});
-				}
-
-				const filteredCard = await this.getCardBySlug(
-					context,
-					session,
-					`${fullCard.slug}@${fullCard.version}`,
-				);
-
-				if (patch.length === 0) {
-					return filteredCard;
-				}
-
-				const typeCard = await this.getCardBySlug<TypeContract>(
-					context,
-					session,
-					fullCard.type,
-				);
-
-				context.assertInternal(
-					filteredCard,
-					this.errors.JellyfishNoElement,
-					`No such card: ${slug}`,
-				);
-
-				const schema = typeCard && typeCard.data && typeCard.data.schema;
-
-				context.assertInternal(
-					schema,
-					this.errors.JellyfishUnknownCardType,
-					`Unknown type: ${fullCard.type}`,
-				);
-
-				/*
-				 * The idea of this algorithm is that we get the full card
-				 * as stored in the database and the card as the current actor
-				 * can see it. Then we apply the patch to both the full and
-				 * the filtered card, aborting if it fails on any. If it succeeds
-				 * then we upsert the full card to the database, but only
-				 * if the resulting filtered card still matches the permissions
-				 * filter.
-				 */
-				// TS-TODO: "filteredCard" might be null here, and we should account for this
-				const patchedFilteredCard = patchCard(filteredCard!, patch, {
-					mutate: true,
-				});
-
-				jsonSchema.validate(filter as any, patchedFilteredCard);
-
-				const patchedFullCard = patchCard(fullCard, patch, {
-					mutate: false,
-				});
-
-				try {
-					jsonSchema.validate(schema as any, patchedFullCard);
-				} catch (error) {
-					if (error instanceof errors.JellyfishSchemaMismatch) {
-						error.expected = true;
-
-						// Because the "full" unrestricted card is being validated there is
-						// potential for an error message to leak private data. To prevent this,
-						// override the detailed error message with a generic one.
-						error.message = 'The updated card is invalid';
+					// TODO: Remove this log once we understand why we are having link card patch requests.
+					if (fullCard.type === 'link@1.0.0') {
+						transactionContext.info('Received request to patch a link card', {
+							card: fullCard,
+							patch,
+						});
 					}
 
-					throw error;
-				}
-
-				// Don't do a pointless update
-				if (fastEquals.deepEqual(patchedFullCard, fullCard)) {
-					return fullCard;
-				}
-
-				// TODO: Remove this log once we understand why we are having link card patch requests.
-				if (fullCard.type === 'link@1.0.0') {
-					context.info('Upserting link card after patch', {
-						card: patchedFullCard,
-						patch,
-					});
-				}
-
-				// If the loop field is changing, check that it points to an actual loop contract
-				if (patchedFullCard.loop && patchedFullCard.loop !== fullCard.loop) {
-					const loopCard = await this.backend.getElementBySlug(
-						context,
-						patchedFullCard.loop,
+					const filteredCard = await this.getCardBySlug(
+						transactionContext,
+						session,
+						`${fullCard.slug}@${fullCard.version}`,
 					);
-					context.assertInternal(
-						loopCard && loopCard.type.split('@')[0] === 'loop',
+
+					if (patch.length === 0) {
+						return filteredCard;
+					}
+
+					const typeCard = await this.getCardBySlug<TypeContract>(
+						transactionContext,
+						session,
+						fullCard.type,
+					);
+
+					transactionContext.assertInternal(
+						filteredCard,
 						errors.JellyfishNoElement,
-						`No such loop: ${patchedFullCard.loop}`,
+						`No such card: ${slug}`,
 					);
-				}
 
-				const upsertedCard = await this.backend.upsertElement(
-					context,
-					patchedFullCard,
-				);
+					const schema = typeCard && typeCard.data && typeCard.data.schema;
 
-				// Otherwise a person that patches a card gets
-				// to see the full card, but we also need to get back the stuff, the kernel
-				// update on the root of the card
-				// This will get removed once we get rid of field-level permissions.
-				return {
-					...patchedFilteredCard,
-					created_at: upsertedCard.created_at,
-					updated_at: upsertedCard.updated_at,
-				};
-			});
+					transactionContext.assertInternal(
+						schema,
+						errors.JellyfishUnknownCardType,
+						`Unknown type: ${fullCard.type}`,
+					);
+
+					/*
+					 * The idea of this algorithm is that we get the full card
+					 * as stored in the database and the card as the current actor
+					 * can see it. Then we apply the patch to both the full and
+					 * the filtered card, aborting if it fails on any. If it succeeds
+					 * then we upsert the full card to the database, but only
+					 * if the resulting filtered card still matches the permissions
+					 * filter.
+					 */
+					// TS-TODO: "filteredCard" might be null here, and we should account for this
+					const patchedFilteredCard = patchCard(filteredCard!, patch, {
+						mutate: true,
+					});
+
+					jsonSchema.validate(filter as any, patchedFilteredCard);
+
+					const patchedFullCard = patchCard(fullCard, patch, {
+						mutate: false,
+					});
+
+					try {
+						jsonSchema.validate(schema as any, patchedFullCard);
+					} catch (error) {
+						if (error instanceof errors.JellyfishSchemaMismatch) {
+							error.expected = true;
+
+							// Because the "full" unrestricted card is being validated there is
+							// potential for an error message to leak private data. To prevent this,
+							// override the detailed error message with a generic one.
+							error.message = 'The updated card is invalid';
+						}
+
+						throw error;
+					}
+
+					// Don't do a pointless update
+					if (fastEquals.deepEqual(patchedFullCard, fullCard)) {
+						return fullCard;
+					}
+
+					// TODO: Remove this log once we understand why we are having link card patch requests.
+					if (fullCard.type === 'link@1.0.0') {
+						transactionContext.info('Upserting link card after patch', {
+							card: patchedFullCard,
+							patch,
+						});
+					}
+
+					// If the loop field is changing, check that it points to an actual loop contract
+					if (patchedFullCard.loop && patchedFullCard.loop !== fullCard.loop) {
+						const loopCard = await this.backend.getElementBySlug(
+							transactionContext,
+							patchedFullCard.loop,
+						);
+						transactionContext.assertInternal(
+							loopCard && loopCard.type.split('@')[0] === 'loop',
+							errors.JellyfishNoElement,
+							`No such loop: ${patchedFullCard.loop}`,
+						);
+					}
+
+					const upsertedCard = await this.backend.upsertElement(
+						transactionContext,
+						patchedFullCard,
+					);
+
+					// Otherwise a person that patches a card gets
+					// to see the full card, but we also need to get back the stuff, the kernel
+					// update on the root of the card
+					// This will get removed once we get rid of field-level permissions.
+					return {
+						...patchedFilteredCard,
+						created_at: upsertedCard.created_at,
+						updated_at: upsertedCard.updated_at,
+					};
+				},
+			);
 		});
 
 		return result;
@@ -871,7 +879,7 @@ export class Kernel {
 		schema: JsonSchema | ViewContract,
 		options: KernelQueryOptions = {},
 	): Promise<T[]> {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
 		const { selected, filteredQuery } = await getQueryFromSchema(
 			context,
 			this.backend,
@@ -981,7 +989,7 @@ export class Kernel {
 		schema: JsonSchema,
 		options: KernelQueryOptions = {},
 	) {
-		const context = Context.fromMixed(mixedContext);
+		const context = Context.fromMixed(mixedContext, this.backend);
 		const { selected, filteredQuery } = await getQueryFromSchema(
 			context,
 			this.backend,
@@ -992,12 +1000,7 @@ export class Kernel {
 
 		context.debug('Opening stream');
 
-		const stream = await this.backend.stream(
-			context,
-			selected,
-			filteredQuery,
-			options,
-		);
+		const stream = await this.backend.stream(selected, filteredQuery, options);
 
 		// Attach event handlers. We got to do this here and not in any lower
 		// levels because of the whole permissions handling
@@ -1043,17 +1046,14 @@ export class Kernel {
 	 * @returns {Object} card
 	 *
 	 * @example
-	 * const kernel = new Kernel(backend, { ... })
-	 * await kernel.initialize()
-	 *
-	 * const card = kernel.defaults({
+	 * const card = Kernel.defaults({
 	 *   slug: 'slug',
 	 *   type: 'type'
 	 * })
 	 *
 	 * console.log(card)
 	 */
-	defaults<T extends Contract = Contract>(
+	static defaults<T extends Contract = Contract>(
 		card: Partial<Contract> & Pick<T, 'type'>,
 	): ContractDefinition<T['data']> {
 		// Object.assign is used as it is significantly faster than using lodash
