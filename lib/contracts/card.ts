@@ -1,6 +1,6 @@
 export const card = {
 	slug: 'card',
-	name: 'Jellyfish Contract',
+	name: 'Jellyfish Card',
 	type: 'type@1.0.0',
 	data: {
 		schema: {

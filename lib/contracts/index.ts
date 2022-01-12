@@ -2,7 +2,7 @@ import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import { initialize } from './mixins';
 import { actionRequest } from './action-request';
 import { action } from './action';
-import { card } from './contract';
+import { card } from './card';
 import { role } from './role';
 import { org } from './org';
 import { error } from './error';
