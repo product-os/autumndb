@@ -2,7 +2,7 @@
 <a href="#jellyfish-core" id="jellyfish-core" style="color: inherit; text-decoration: none;">
   <h1>Jellyfish Core</h1>
 </a>
-<p>The Jellyfish core is a low-level internal SDK to interact with cards in the
+<p>The Jellyfish core is a low-level internal SDK to interact with contracts in the
 database, providing functions like <code>.getCardById()</code> or <code>.insertCard()</code>. The
 core provides the foundation library for the rest of system.</p>
 
@@ -23,47 +23,47 @@ with the database</li>
 </a>
 <p>The Jellyfish core provides the following features</p>
 
-<a href="#the-card-data-model" id="the-card-data-model" style="color: inherit; text-decoration: none;">
-  <h3>The card data model</h3>
+<a href="#the-contract-data-model" id="the-contract-data-model" style="color: inherit; text-decoration: none;">
+  <h3>The contract data model</h3>
 </a>
 <p>Every entity in the system is a data structure we call
-a &quot;card&quot;. Cards are an implementation of the <a href="https://github.com/balena-io/balena/pull/1002">contracts data model</a>.</p>
-<p>Every card has a <code>type</code> field that specifies type that the card is an instance
-of. Card type definitions are indicated by having a <code>type</code> of <code>type</code>, e.g.</p>
+a &quot;contract&quot;. Contracts are an implementation of the <a href="https://github.com/balena-io/balena/pull/1002">contracts data model</a>.</p>
+<p>Every contract has a <code>type</code> field that specifies type that the contract is an instance
+of. Contract type definitions are indicated by having a <code>type</code> of <code>type</code>, e.g.</p>
 <pre><code class="language-json"><span class="hl-0">{</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;slug&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;message&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;type&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;type&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-3">...</span><br/><span class="hl-0">}</span>
 </code></pre>
-<p>These &quot;type&quot; cards contain model definitions in the form of a JSON schema. The
-slug of a type card is the value used in the type property of instances of the
+<p>These &quot;type&quot; contracts contain model definitions in the form of a JSON schema. The
+slug of a type contract is the value used in the type property of instances of the
 type.
-As an example, you can look at the <a href="https://github.com/product-os/jellyfish-plugin-default/blob/master/lib/cards/contrib/message.json">type card for a &quot;message&quot;</a>. You can see that under the <code>data</code> key, there is a <code>schema</code> value that defines the shape of a card of type &quot;message&quot;.
+As an example, you can look at the <a href="https://github.com/product-os/jellyfish-plugin-default/blob/master/lib/contracts/contrib/message.json">type contract for a &quot;message&quot;</a>. You can see that under the <code>data</code> key, there is a <code>schema</code> value that defines the shape of a contract of type &quot;message&quot;.
 We follow the JSON schema spec, so if the schema allows, additional fields can
-be added to a card that are not defined in the type schema.</p>
+be added to a contract that are not defined in the type schema.</p>
 
 <a href="#json-schema-based-querying" id="json-schema-based-querying" style="color: inherit; text-decoration: none;">
   <h3>JSON schema based querying</h3>
 </a>
-<p>JSON schema is used to query the API, with any cards that match the provided JSON
+<p>JSON schema is used to query the API, with any contracts that match the provided JSON
 schema being returned in the result set.</p>
 
 <a href="#json-patch" id="json-patch" style="color: inherit; text-decoration: none;">
   <h3>JSON patch</h3>
 </a>
-<p>Card updates are made using <a href="http://jsonpatch.com/">JSON patch</a>, allowing fine
+<p>Contract updates are made using <a href="http://jsonpatch.com/">JSON patch</a>, allowing fine
 grained updates to made to JSON data.</p>
 
 <a href="#user-system" id="user-system" style="color: inherit; text-decoration: none;">
   <h3>User system</h3>
 </a>
-<p>User cards model the actors that interact with the system.
-There are two default users, the admin And the guest. The admin user is typically used for system level operations or operations that require unrestricted access. The guest user represents an unauthorised user interacting with the system. Users authorize function calls using a session, which corresponds to the ID of a &quot;session&quot; card in the system.
-The data that a user has access to is defined using &quot;role&quot; cards. All user cards
+<p>User contracts model the actors that interact with the system.
+There are two default users, the admin And the guest. The admin user is typically used for system level operations or operations that require unrestricted access. The guest user represents an unauthorised user interacting with the system. Users authorize function calls using a session, which corresponds to the ID of a &quot;session&quot; contract in the system.
+The data that a user has access to is defined using &quot;role&quot; contracts. All user contracts
 define a list of roles that they have.</p>
 
 <a href="#role-based-permissions" id="role-based-permissions" style="color: inherit; text-decoration: none;">
   <h3>Role based permissions</h3>
 </a>
-<p>Every user in the system must have at least one role, which corresponds to a card
-of type &quot;role&quot;. Role cards contain a schema that defines which cards the user
+<p>Every user in the system must have at least one role, which corresponds to a contract
+of type &quot;role&quot;. Role contracts contain a schema that defines which contracts the user
 with that role can read and write.
 When a query is made, the schemas in the user&#39;s roles are combined
 with the user&#39;s query using an AND operator.
@@ -79,20 +79,20 @@ This behaviour is based on the <a href="https://ajv.js.org/#filtering-data">AJV 
   <h3>Marker based permissions</h3>
 </a>
 <p>The roles system is complemented by another permissions system called &quot;markers&quot;.
-Markers allow individual cards to be restricted to one or more users. A marker
+Markers allow individual contracts to be restricted to one or more users. A marker
 is a string that corresponds to either a user or organisation slug and they
-appear as an array at the top level of a card under the key <code>markers</code>.</p>
+appear as an array at the top level of a contract under the key <code>markers</code>.</p>
 <pre><code class="language-json"><span class="hl-0">{</span><br/><span class="hl-0">    </span><span class="hl-3">...</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;markers&quot;</span><span class="hl-0">: [ </span><span class="hl-2">&quot;user-lucianbuzzo&quot;</span><span class="hl-0">, </span><span class="hl-2">&quot;org-balena&quot;</span><span class="hl-0"> ]</span><br/><span class="hl-0">    </span><span class="hl-3">...</span><br/><span class="hl-0">}</span>
 </code></pre>
-<p>To view a card, a user must have access to all the markers on that card. A user
-has access to their marker (which is the slug of their user card) and the
+<p>To view a contract, a user must have access to all the markers on that contract. A user
+has access to their marker (which is the slug of their user contract) and the
 markers for each organisation they are a member of. Markers can also be in the
 form of a compound marker, which is 2 or more markers concatenated with a <code>+</code>
-symbol. A user has access to a card with a compound marker if they have access
+symbol. A user has access to a contract with a compound marker if they have access
 to at least one of the markers that make up the compound marker.
-If a card has no markers on it, then the card is unrestricted by the markers system.</p>
+If a contract has no markers on it, then the contract is unrestricted by the markers system.</p>
 <p>For example, if my user slug is <code>user-lucianbuzzo</code> and I am a member of the <code>org-balena</code> org, then I would be able to
-view cards with the markers:</p>
+view contracts with the markers:</p>
 <ul>
 <li><code>[]</code> (i.e. no markers defined)</li>
 <li><code>[ &quot;org-balena&quot;, &quot;user-lucianbuzzo&quot; ]</code></li>
@@ -101,7 +101,7 @@ view cards with the markers:</p>
 <li><code>[ &quot;foobar+user-lucianbuzzo&quot; ]</code></li>
 <li><code>[ &quot;org-balena+user-foobar&quot; ]</code></li>
 </ul>
-<p>However, I wouldn&#39;t be able to view cards with the markers</p>
+<p>However, I wouldn&#39;t be able to view contracts with the markers</p>
 <ul>
 <li><code>[ &quot;user-foobar&quot; ]</code></li>
 <li><code>[ &quot;user-foobar&quot;, &quot;user-lucianbuzzo&quot; ]</code></li>
@@ -117,12 +117,12 @@ view cards with the markers:</p>
 <a href="#streaming" id="streaming" style="color: inherit; text-decoration: none;">
   <h3>Streaming</h3>
 </a>
-<p>A query can be streamed, creating an event emitter that will emit an event on any insert or update to a card.</p>
+<p>A query can be streamed, creating an event emitter that will emit an event on any insert or update to a contract.</p>
 
 <a href="#soft-delete" id="soft-delete" style="color: inherit; text-decoration: none;">
   <h3>Soft delete</h3>
 </a>
-<p>When a card is deleted, it is not removed from the database but has it&#39;s &quot;active&quot; field set to false. It is recommended that users should not be able to view inactive cards.</p>
+<p>When a contract is deleted, it is not removed from the database but has it&#39;s &quot;active&quot; field set to false. It is recommended that users should not be able to view inactive contracts.</p>
 
 <a href="#rich-logging" id="rich-logging" style="color: inherit; text-decoration: none;">
   <h3>Rich logging</h3>
@@ -137,12 +137,12 @@ view cards with the markers:</p>
 <a href="#data-relationships" id="data-relationships" style="color: inherit; text-decoration: none;">
   <h3>Data relationships</h3>
 </a>
-<p>Cards can be linked together by creating a card of type &quot;link&quot; that references both cards and describes their relationship. Relationships can be traversed when querying data using the <code>$$links</code> syntax.</p>
+<p>Contracts can be linked together by creating a contract of type &quot;link&quot; that references both contracts and describes their relationship. Relationships can be traversed when querying data using the <code>$$links</code> syntax.</p>
 
 <a href="#caching" id="caching" style="color: inherit; text-decoration: none;">
   <h3>Caching</h3>
 </a>
-<p>Requests for individual cards by id or slug are cached, reducing DB load and
+<p>Requests for individual contracts by id or slug are cached, reducing DB load and
 improving query speed.
 This library contains email integration functionality for use in Jellyfish.</p>
 
