@@ -61,7 +61,7 @@ describe('Cache', () => {
 	});
 
 	describe('.setMissingId()', () => {
-		it('should prevent card from being fetched by ID', async () => {
+		it('should prevent contract from being fetched by ID', async () => {
 			const element1 = {
 				id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				version: '1.0.0',
@@ -78,7 +78,7 @@ describe('Cache', () => {
 	});
 
 	describe('.setMissingSlug()', () => {
-		it('should prevent card from being fetched by slug', async () => {
+		it('should prevent contract from being fetched by slug', async () => {
 			const element1 = {
 				id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				version: '1.0.0',

@@ -1,4 +1,8 @@
 import type { LogContext } from '@balena/jellyfish-logger';
+import * as _ from 'lodash';
+import * as jsonpatch from 'fast-json-patch';
+import * as fastEquals from 'fast-equals';
+import { CARDS } from './contracts';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
@@ -8,9 +12,6 @@ import type {
 	TypeContract,
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
-import * as fastEquals from 'fast-equals';
-import * as jsonpatch from 'fast-json-patch';
-import * as _ from 'lodash';
 import { Pool } from 'pg';
 import * as stopword from 'stopword';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,7 +21,6 @@ import type {
 	DatabaseBackend,
 } from './backend/postgres/types';
 import type { Cache } from './cache';
-import { CARDS } from './cards';
 import { Context, MixedContext, TransactionIsolation } from './context';
 import * as errors from './errors';
 import jsonSchema from './json-schema';
@@ -189,8 +189,8 @@ const getQueryFromSchema = async (
 	};
 };
 
-const patchCard = (
-	card: Contract,
+const patchContract = (
+	contract: Contract,
 	patch: jsonpatch.Operation[],
 	options: { mutate?: boolean } = {},
 ) => {
@@ -220,14 +220,14 @@ const patchCard = (
 			).newDocument;
 		} catch (error) {
 			const newError = new errors.JellyfishInvalidPatch(
-				`Patch does not apply to ${card.slug}: ${JSON.stringify(patch)}`,
+				`Patch does not apply to ${contract.slug}: ${JSON.stringify(patch)}`,
 			);
 
 			newError.expected = true;
 
 			throw newError;
 		}
-	}, card);
+	}, contract);
 };
 
 export class Kernel {
@@ -334,10 +334,10 @@ export class Kernel {
 		// TODO: all of this bootstrapping should be in the same transaction as the DB setup
 		// happening in the connect() call above
 
-		context.debug('Upserting minimal required cards');
+		context.debug('Upserting minimal required contracts');
 
-		const unsafeUpsert = (card: ContractDefinition) => {
-			const element = Kernel.defaults(card);
+		const unsafeUpsert = (contract: ContractDefinition) => {
+			const element = Kernel.defaults(contract);
 			return permissionFilter.unsafeUpsertCard(
 				context,
 				this.backend,
@@ -382,23 +382,23 @@ export class Kernel {
 				CARDS['oauth-provider'],
 				CARDS['oauth-client'],
 				CARDS['scheduled-action'],
-			].map(async (card) => {
-				context.debug('Upserting core card', { slug: card.slug });
+			].map(async (contract) => {
+				context.debug('Upserting core contract', { slug: contract.slug });
 
-				return this.replaceCard(context, this.adminSession()!, card);
+				return this.replaceCard(context, this.adminSession()!, contract);
 			}),
 		);
 	}
 
 	/**
-	 * @summary Get a card by its id
+	 * @summary Get a contract by its id
 	 * @function
 	 * @public
 	 *
 	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
-	 * @param {String} id - card id
-	 * @returns {(Object|Null)} card
+	 * @param {String} id - contract id
+	 * @returns {(Object|Null)} contract
 	 */
 	async getCardById<T extends Contract = Contract>(
 		mixedContext: MixedContext,
@@ -406,8 +406,7 @@ export class Kernel {
 		id: string,
 	): Promise<T | null> {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		context.debug('Fetching card by id', { id });
-
+		context.debug('Fetching conctract by id', { id });
 		const schema: JsonSchema = {
 			type: 'object',
 			properties: {
@@ -427,22 +426,22 @@ export class Kernel {
 		context.assertInternal(
 			results.length <= 1,
 			errors.JellyfishDatabaseError,
-			`More than one card with id ${id}`,
+			`More than one contract with id ${id}`,
 		);
 
 		return results[0] || null;
 	}
 
 	/**
-	 * @summary Get a card by its slug
+	 * @summary Get a contract by its slug
 	 * @function
 	 * @public
 	 *
 	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
-	 * @param {String} slug - card slug
+	 * @param {String} slug - contract slug
 	 * @param {Object} options - optional set of extra options
-	 * @returns {(Object|Null)} card
+	 * @returns {(Object|Null)} contract
 	 */
 	async getCardBySlug<T extends Contract = Contract>(
 		mixedContext: MixedContext,
@@ -450,7 +449,8 @@ export class Kernel {
 		slug: string,
 	): Promise<T | null> {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		context.debug('Fetching card by slug', { slug });
+
+		context.debug('Fetching contract by slug', { slug });
 
 		context.assertInternal(
 			slug,
@@ -498,29 +498,29 @@ export class Kernel {
 		context.assertInternal(
 			results.length <= 1,
 			errors.JellyfishDatabaseError,
-			`More than one card with id slug ${slug}`,
+			`More than one contract with id slug ${slug}`,
 		);
 
 		return results[0] || null;
 	}
 
 	/**
-	 * @summary Insert a card to the kernel
+	 * @summary Insert a contract to the kernel
 	 * @function
 	 * @public
 	 *
 	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
-	 * @param {Object} object - card object
-	 * @returns {Object} the inserted card
+	 * @param {Object} object - contract object
+	 * @returns {Object} the inserted contract
 	 *
 	 * @example
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 *
-	 * const card = await kernel.insertCard(
+	 * const contract = await kernel.insertContract(
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
-	 * console.log(card.id)
+	 * console.log(contract.id)
 	 */
 	async insertCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
@@ -528,32 +528,32 @@ export class Kernel {
 		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		const card = Kernel.defaults(object);
+		const contract = Kernel.defaults(object);
 
-		context.debug('Inserting card', { slug: card.slug });
+		context.debug('Inserting contract', { slug: contract.slug });
 
-		await this.preUpsert(context, session, card as Contract);
+		await this.preUpsert(context, session, contract as Contract);
 
-		return this.backend.insertElement<T>(context, card as Contract);
+		return this.backend.insertElement<T>(context, contract as Contract);
 	}
 
 	/**
-	 * @summary Replace a card in the kernel
+	 * @summary Replace a contract in the kernel
 	 * @function
 	 * @public
 	 *
 	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
-	 * @param {Object} object - card object, the slug or ID must be supplied
-	 * @returns {Object} the replaced card
+	 * @param {Object} object - contract object, the slug or ID must be supplied
+	 * @returns {Object} the replaced contract
 	 *
 	 * @example
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 *
-	 * const card = await kernel.replaceCard(
+	 * const contract = await kernel.replaceCard(
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
-	 * console.log(card.id)
+	 * console.log(contract.id)
 	 */
 	async replaceCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
@@ -563,44 +563,51 @@ export class Kernel {
 			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
 	): Promise<T> {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		const card = Kernel.defaults(object);
+		const contract = Kernel.defaults(object);
 
-		context.debug('Replacing card', { slug: card.slug });
+		context.debug('Replacing contract', { slug: contract.slug });
 
-		await this.preUpsert(context, session, card as Contract);
+		await this.preUpsert(context, session, contract as Contract);
 
-		return this.backend.upsertElement(context, card as Contract);
+		return this.backend.upsertElement(context, contract as Contract);
 	}
 
-	private async preUpsert(context: Context, session: string, card: Contract) {
+	private async preUpsert(
+		context: Context,
+		session: string,
+		contract: Contract,
+	) {
 		context.assertInternal(
-			card.type,
+			contract.type,
 			errors.JellyfishSchemaMismatch,
 			'No type in card',
 		);
 		// Fetch necessary objects concurrently
-		const [typeCard, filter, loop] = await Promise.all([
-			this.getCardBySlug<TypeContract>(context, session, card.type),
+		const [typeContract, filter, loop] = await Promise.all([
+			this.getCardBySlug<TypeContract>(context, session, contract.type),
 			permissionFilter.getMask(context, this.backend, session),
 			(async () => {
-				return card.loop && this.backend.getElementBySlug(context, card.loop);
+				return (
+					contract.loop && this.backend.getElementBySlug(context, contract.loop)
+				);
 			})(),
 		]);
-		const schema = typeCard && typeCard.data && typeCard.data.schema;
+		const schema =
+			typeContract && typeContract.data && typeContract.data.schema;
 
 		// If the loop field is specified, it should be a valid loop contract
-		if (card.loop) {
+		if (contract.loop) {
 			context.assertInternal(
 				loop && loop.type.split('@')[0] === 'loop',
 				errors.JellyfishNoElement,
-				`No such loop: ${card.loop}`,
+				`No such loop: ${contract.loop}`,
 			);
 		}
 
 		context.assertInternal(
 			schema,
 			errors.JellyfishUnknownCardType,
-			`Unknown type: ${card.type}`,
+			`Unknown type: ${contract.type}`,
 		);
 		// TODO: Remove this once we completely migrate links
 		// to have versioned types in the "from" and the "to"
@@ -609,20 +616,24 @@ export class Kernel {
 		// if the from/to have no versions.
 		// See: https://github.com/product-os/jellyfish/pull/3088
 		if (
-			card.type === 'link@1.0.0' &&
-			card.data &&
-			card.data.from &&
-			card.data.to &&
-			(card.data as any).from.type &&
-			(card.data as any).to.type &&
-			!_.includes((card.data as any).from.type, '@') &&
-			!_.includes((card.data as any).to.type, '@')
+			contract.type === 'link@1.0.0' &&
+			contract.data &&
+			contract.data.from &&
+			contract.data.to &&
+			(contract.data as any).from.type &&
+			(contract.data as any).to.type &&
+			!_.includes((contract.data as any).from.type, '@') &&
+			!_.includes((contract.data as any).to.type, '@')
 		) {
-			(card.data as any).from.type = `${(card.data as any).from.type}@1.0.0`;
-			(card.data as any).to.type = `${(card.data as any).to.type}@1.0.0`;
+			(contract.data as any).from.type = `${
+				(contract.data as any).from.type
+			}@1.0.0`;
+			(contract.data as any).to.type = `${
+				(contract.data as any).to.type
+			}@1.0.0`;
 		}
 		try {
-			jsonSchema.validate(schema as any, card);
+			jsonSchema.validate(schema as any, contract);
 		} catch (error) {
 			if (error instanceof errors.JellyfishSchemaMismatch) {
 				error.expected = true;
@@ -630,7 +641,7 @@ export class Kernel {
 			throw error;
 		}
 		try {
-			jsonSchema.validate(filter as any, card);
+			jsonSchema.validate(filter as any, contract);
 		} catch (error) {
 			// Failing to match the filter schema is a permissions error
 			if (error instanceof errors.JellyfishSchemaMismatch) {
@@ -642,23 +653,23 @@ export class Kernel {
 		}
 
 		// Validate that both sides of the link contract are readable before inserting
-		if (card.type === 'link@1.0.0') {
-			const targetCardIds = [
-				(card as LinkContract).data.from.id,
-				(card as LinkContract).data.to.id,
+		if (contract.type === 'link@1.0.0') {
+			const targetContractIds = [
+				(contract as LinkContract).data.from.id,
+				(contract as LinkContract).data.to.id,
 			];
 
 			await Promise.all(
-				targetCardIds.map(async (targetCardId) => {
+				targetContractIds.map(async (targetContractId) => {
 					const targetCard = await this.getCardById(
 						context,
 						session,
-						targetCardId,
+						targetContractId,
 					);
 
 					if (!targetCard) {
 						const newError = new errors.JellyfishNoLinkTarget(
-							`Link target does not exist: ${targetCardId}`,
+							`Link target does not exist: ${targetContractId}`,
 						);
 						newError.expected = true;
 						throw newError;
@@ -671,7 +682,7 @@ export class Kernel {
 	}
 
 	/**
-	 * @summary Patch a card in the kernel
+	 * @summary Patch a contract in the kernel
 	 * @function
 	 * @public
 	 *
@@ -680,9 +691,9 @@ export class Kernel {
 	 *
 	 * @param {MixedContext} context - execution context
 	 * @param {String} session - session id
-	 * @param {String} slug - card slug
+	 * @param {String} slug - contract slug
 	 * @param {Object[]} patch - JSON Patch operations
-	 * @returns {Object} the patched card
+	 * @returns {Object} the patched contract
 	 */
 	async patchCardBySlug<T = Contract>(
 		mixedContext: MixedContext,
@@ -707,7 +718,7 @@ export class Kernel {
 					};
 
 					// Fetch necessary data from database
-					const fullCard = await this.backend.getElementBySlug(
+					const fullContract = await this.backend.getElementBySlug(
 						transactionContext,
 						slug,
 						{
@@ -717,15 +728,15 @@ export class Kernel {
 					);
 
 					transactionContext.assertInternal(
-						fullCard,
+						fullContract,
 						errors.JellyfishNoElement,
 						`No such card: ${slug}`,
 					);
 
 					// TODO: Remove this log once we understand why we are having link card patch requests.
-					if (fullCard.type === 'link@1.0.0') {
+					if (fullContract.type === 'link@1.0.0') {
 						transactionContext.info('Received request to patch a link card', {
-							card: fullCard,
+							card: fullContract,
 							patch,
 						});
 					}
@@ -733,7 +744,7 @@ export class Kernel {
 					const filteredCard = await this.getCardBySlug(
 						transactionContext,
 						session,
-						`${fullCard.slug}@${fullCard.version}`,
+						`${fullContract.slug}@${fullContract.version}`,
 					);
 
 					if (patch.length === 0) {
@@ -743,13 +754,13 @@ export class Kernel {
 					const typeCard = await this.getCardBySlug<TypeContract>(
 						transactionContext,
 						session,
-						fullCard.type,
+						fullContract.type,
 					);
 
 					transactionContext.assertInternal(
 						filteredCard,
 						errors.JellyfishNoElement,
-						`No such card: ${slug}`,
+						`No such contract: ${slug}`,
 					);
 
 					const schema = typeCard && typeCard.data && typeCard.data.schema;
@@ -757,7 +768,7 @@ export class Kernel {
 					transactionContext.assertInternal(
 						schema,
 						errors.JellyfishUnknownCardType,
-						`Unknown type: ${fullCard.type}`,
+						`Unknown type: ${fullContract.type}`,
 					);
 
 					/*
@@ -770,13 +781,13 @@ export class Kernel {
 					 * filter.
 					 */
 					// TS-TODO: "filteredCard" might be null here, and we should account for this
-					const patchedFilteredCard = patchCard(filteredCard!, patch, {
+					const patchedFilteredCard = patchContract(filteredCard!, patch, {
 						mutate: true,
 					});
 
 					jsonSchema.validate(filter as any, patchedFilteredCard);
 
-					const patchedFullCard = patchCard(fullCard, patch, {
+					const patchedFullCard = patchContract(fullContract, patch, {
 						mutate: false,
 					});
 
@@ -796,12 +807,12 @@ export class Kernel {
 					}
 
 					// Don't do a pointless update
-					if (fastEquals.deepEqual(patchedFullCard, fullCard)) {
-						return fullCard;
+					if (fastEquals.deepEqual(patchedFullCard, fullContract)) {
+						return fullContract;
 					}
 
 					// TODO: Remove this log once we understand why we are having link card patch requests.
-					if (fullCard.type === 'link@1.0.0') {
+					if (fullContract.type === 'link@1.0.0') {
 						transactionContext.info('Upserting link card after patch', {
 							card: patchedFullCard,
 							patch,
@@ -809,7 +820,10 @@ export class Kernel {
 					}
 
 					// If the loop field is changing, check that it points to an actual loop contract
-					if (patchedFullCard.loop && patchedFullCard.loop !== fullCard.loop) {
+					if (
+						patchedFullCard.loop &&
+						patchedFullCard.loop !== fullContract.loop
+					) {
 						const loopCard = await this.backend.getElementBySlug(
 							transactionContext,
 							patchedFullCard.loop,
@@ -915,21 +929,21 @@ export class Kernel {
 	 *
 	 * - data: when there is a change. The payload is an object with the
 	 *   following keys:
-	 *   - id: ID of the card that was changed
+	 *   - id: ID of the contract that was changed
 	 *   - type: change type. One of:
 	 *     - insert: on insertion
 	 *     - update: on update
 	 *     - delete: on deletion
-	 *     - unmatch: on an update to a previously seen card (either from `data`
-	 *       or `dataset` events) that makes the card not match the schema
+	 *     - unmatch: on an update to a previously seen contract (either from `data`
+	 *       or `dataset` events) that makes the contract not match the schema
 	 *       anymore
 	 *   - after: the result of running a query for this stream's schema on the
-	 *     relevant card after an insertion or update. `null` on delete or
+	 *     relevant contract after an insertion or update. `null` on delete or
 	 *     unmatch
 	 * - dataset: in response to the `query` event. The payload is an object with
 	 *   the following keys:
 	 *   - id: the query ID
-	 *   - cards: the array of cards
+	 *   - contracts: the array of contracts
 	 * - error: when there is an error. The payload is the error
 	 * - closed: when the connection is closed after calling `.close()`
 	 *
@@ -937,7 +951,7 @@ export class Kernel {
 	 *
 	 * - query: query with a schema. This is almost the same as calling `query()`
 	 *   with the stream's context and session. The only difference is that the
-	 *   resulting cards become eligible for the `unmatch` event type. The query
+	 *   resulting contracts become eligible for the `unmatch` event type. The query
 	 *   results are returned through the `dataset` event. The payload is an
 	 *   object with the following keys:
 	 *   - id: a free-form ID for this query. Optional
@@ -1012,14 +1026,14 @@ export class Kernel {
 				payload.schema,
 				payload.options?.mask,
 			);
-			const cards = await stream.query(
+			const contracts = await stream.query(
 				query.selected,
 				query.filteredQuery,
 				payload.options,
 			);
 			stream.emit('dataset', {
 				id: payload.id,
-				cards,
+				cards: contracts,
 			});
 		});
 
@@ -1037,27 +1051,27 @@ export class Kernel {
 	}
 
 	/**
-	 * @summary Extends a card with default values
+	 * @summary Extends a contract with default values
 	 * @function
 	 * @public
 	 *
 	 *
-	 * @param {Object} card - card
-	 * @returns {Object} card
+	 * @param {Object} contract - contract
+	 * @returns {Object} contract
 	 *
 	 * @example
-	 * const card = Kernel.defaults({
+	 * const conctract = Kernel.defaults({
 	 *   slug: 'slug',
 	 *   type: 'type'
 	 * })
 	 *
-	 * console.log(card)
+	 * console.log(contract)
 	 */
 	static defaults<T extends Contract = Contract>(
-		card: Partial<Contract> & Pick<T, 'type'>,
+		contract: Partial<Contract> & Pick<T, 'type'>,
 	): ContractDefinition<T['data']> {
 		// Object.assign is used as it is significantly faster than using lodash
-		const defaultCard = Object.assign(
+		const defaultContract = Object.assign(
 			{
 				updated_at: null,
 				linked_at: {},
@@ -1071,20 +1085,20 @@ export class Kernel {
 				capabilities: [],
 				data: {},
 			},
-			card,
+			contract,
 		);
 
 		// Only create a timestamp if it's necessary
-		if (!defaultCard.created_at) {
-			defaultCard.created_at = new Date().toISOString();
+		if (!defaultContract.created_at) {
+			defaultContract.created_at = new Date().toISOString();
 		}
 
 		// Only create a slug if it's necessary
-		if (!defaultCard.slug) {
-			defaultCard.slug = generateSlug(defaultCard);
+		if (!defaultContract.slug) {
+			defaultContract.slug = generateSlug(defaultContract);
 		}
 
-		return defaultCard as ContractDefinition<T['data']>;
+		return defaultContract as ContractDefinition<T['data']>;
 	}
 
 	/**

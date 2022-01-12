@@ -24,15 +24,15 @@ export const mixin = (...mixins: ContractDefinition[]) => {
 };
 
 export const initialize = <TData = ContractData>(
-	card: ContractDefinition<TData>,
+	contract: ContractDefinition<TData>,
 ): ContractDefinition<TData> => {
-	const snippets = [{}, sensibleDefaults, card];
+	const snippets = [{}, sensibleDefaults, contract];
 
-	// All type cards should have a UI schema
-	if (card.type.split('@')[0] === 'type') {
+	// All type contracts should have a UI schema
+	if (contract.type.split('@')[0] === 'type') {
 		snippets.push(baseUiSchema);
 	}
-	const intializedCard = (_.mergeWith as any)(
+	const intializedContract = (_.mergeWith as any)(
 		...snippets,
 		mergeWithUniqConcatArrays,
 	);
@@ -43,7 +43,7 @@ export const initialize = <TData = ContractData>(
 	// current implementation leads to abominated deep linking.
 	// See https://github.com/product-os/jellyfish-plugin-default/blob/2e15d57ec8b362d899b1957b4ad6fcab5e618b11/lib/cards/mixins/index.js#L12
 	// Dereference all $ref values
-	return deref(intializedCard, {
+	return deref(intializedContract, {
 		failOnMissing: true,
 		mergeAdditionalProperties: true,
 	}) as ContractDefinition<TData>;

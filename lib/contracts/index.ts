@@ -21,7 +21,7 @@ import { scheduledAction } from './scheduled-action';
 import { authentication } from './authentication';
 import { userSettings } from './user-settings';
 
-const cards = [
+const contracts = [
 	actionRequest,
 	action,
 	card,
@@ -44,11 +44,10 @@ const cards = [
 	userSettings,
 ];
 
-export const CARDS = cards.reduce<{ [slug: string]: ContractDefinition }>(
-	(acc, contract) => {
-		const initializedContract = initialize(contract as any);
-		acc[initializedContract.slug] = initializedContract;
-		return acc;
-	},
-	{},
-);
+export const CARDS = contracts.reduce<{
+	[slug: string]: ContractDefinition;
+}>((acc, kontract) => {
+	const initializedContract = initialize(kontract as any);
+	acc[initializedContract.slug] = initializedContract;
+	return acc;
+}, {});

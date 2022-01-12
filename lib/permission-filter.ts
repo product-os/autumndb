@@ -3,13 +3,13 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import jsone = require('json-e');
 import * as _ from 'lodash';
 import type { DatabaseBackend } from './backend/postgres/types';
-import { CARDS } from './cards';
+import { CARDS } from './contracts';
 import type { Context } from './context';
 import * as errors from './errors';
 import jsonSchema from './json-schema';
 
-const CARD_CARD_TYPE = `${CARDS.card.slug}@${CARDS.card.version}`;
-const VERSIONED_CARDS = _.mapKeys(CARDS, (value: any, key: any) => {
+const CONTRACT_CONTRACT_TYPE = `${CARDS.card.slug}@${CARDS.card.version}`;
+const VERSIONED_CONTRACTS = _.mapKeys(CARDS, (value: any, key: any) => {
 	return `${key}@${value.version}`;
 });
 
@@ -62,8 +62,8 @@ const applyMarkers = async (
 	);
 
 	const markers = _.uniq(
-		[actor, ...orgs].map((card) => {
-			return card.slug;
+		[actor, ...orgs].map((contract) => {
+			return contract.slug;
 		}),
 	);
 
@@ -106,7 +106,7 @@ const applyMarkers = async (
 };
 
 /**
- * @summary Upsert a card in an unsafe way (DANGEROUS)
+ * @summary Upsert a contract in an unsafe way (DANGEROUS)
  * @function
  * @public
  *
@@ -114,15 +114,15 @@ const applyMarkers = async (
  * This bypasses the whole permission system, so use with care.
  *
  * This function has the added limitation that you can only insert
- * cards of types that are defined in the Jellyfish core.
+ * contracts of types that are defined in the Jellyfish core.
  *
  * @param {Object} context - exectuion context
  * @param {Object} backend - backend
- * @param {Object} card - card
- * @returns {Object} card
+ * @param {Object} contract - contract
+ * @returns {Object} contract
  *
  * @example
- * const card = await permissionFilter.unsafeUpsertCard(backend, {
+ * const contract = await permissionFilter.unsafeUpsertContract(backend, {
  *   type: 'foo',
  *   links: {},
  *   requires: [],
@@ -134,16 +134,22 @@ const applyMarkers = async (
  *   }
  * })
  *
- * console.log(card.id)
+ * console.log(contract.id)
  */
 export const unsafeUpsertCard = async (
 	context: Context,
 	backend: DatabaseBackend,
-	card: Contract,
+	contract: Contract,
 ) => {
-	jsonSchema.validate(VERSIONED_CARDS[CARD_CARD_TYPE].data.schema as any, card);
-	jsonSchema.validate(VERSIONED_CARDS[card.type].data.schema as any, card);
-	return backend.upsertElement(context, card);
+	jsonSchema.validate(
+		VERSIONED_CONTRACTS[CONTRACT_CONTRACT_TYPE].data.schema as any,
+		contract,
+	);
+	jsonSchema.validate(
+		VERSIONED_CONTRACTS[contract.type].data.schema as any,
+		contract,
+	);
+	return backend.upsertElement(context, contract);
 };
 
 /**
@@ -154,8 +160,8 @@ export const unsafeUpsertCard = async (
  * @param {Object} context - execution context
  * @param {Object} backend - backend
  * @param {String} session - session id
- * @returns {Object} sessionActor - actor card and session scope
- * @returns {Object} sessionActor.actor - the actor card
+ * @returns {Object} sessionActor - actor contract and session scope
+ * @returns {Object} sessionActor.actor - the actor contract
  * @returns {Object} sessionActor.scope - the session scope
  */
 export const getSessionActor = async (
@@ -163,39 +169,42 @@ export const getSessionActor = async (
 	backend: DatabaseBackend,
 	session: string,
 ) => {
-	const sessionCard = await backend.getElementById(context, session);
+	const sessionContract = await backend.getElementById(context, session);
 
 	context.assertUser(
-		sessionCard,
+		sessionContract,
 		errors.JellyfishInvalidSession,
 		`Invalid session: ${session}`,
 	);
 
 	// Don't allow inactive sessions to be used
 	context.assertUser(
-		sessionCard.active,
+		sessionContract.active,
 		errors.JellyfishInvalidSession,
 		`Invalid session: ${session}`,
 	);
 
 	context.assertUser(
-		!sessionCard.data.expiration ||
-			new Date() <= new Date(sessionCard.data.expiration),
+		!sessionContract.data.expiration ||
+			new Date() <= new Date(sessionContract.data.expiration),
 		errors.JellyfishSessionExpired,
-		`Session expired at: ${sessionCard.data.expiration}`,
+		`Session expired at: ${sessionContract.data.expiration}`,
 	);
 
-	const actor = await backend.getElementById(context, sessionCard.data.actor);
+	const actor = await backend.getElementById(
+		context,
+		sessionContract.data.actor,
+	);
 
 	context.assertInternal(
 		actor,
 		errors.JellyfishNoElement,
-		`Invalid actor: ${sessionCard.data.actor}`,
+		`Invalid actor: ${sessionContract.data.actor}`,
 	);
 
 	return {
 		actor,
-		scope: sessionCard.data.scope || {},
+		scope: sessionContract.data.scope || {},
 	};
 };
 
@@ -206,7 +215,7 @@ export const getSessionActor = async (
  *
  * @param {Object} context - execution context
  * @param {Object} backend - backend
- * @param {Object} actor - actor card
+ * @param {Object} actor - actor contract
  * @returns {Object[]} role schemas
  */
 const getRoleViews = async (
@@ -219,16 +228,16 @@ const getRoleViews = async (
 	const actorRoles: string[] = (actor.data?.roles as string[]) || [];
 
 	for (const role of [actor.slug, ...actorRoles]) {
-		const roleCard = await backend.getElementBySlug(
+		const roleContract = await backend.getElementBySlug(
 			context,
 			`role-${role}@1.0.0`,
 		);
 
-		if (!roleCard) {
+		if (!roleContract) {
 			continue;
 		}
 
-		viewSchemas.push(roleCard.data.read);
+		viewSchemas.push(roleContract.data.read);
 	}
 
 	// A default schema that will not match anything

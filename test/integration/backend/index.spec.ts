@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { errors } from '../../../lib';
 import type { Stream } from '../../../lib/backend/postgres/streams';
 import * as helpers from './helpers';
+import { TABLE as CONTRACTS_TABLE } from '../../../lib/backend/postgres/cards';
 
 let ctx: helpers.BackendContext;
 
@@ -645,7 +646,7 @@ describe('backend', () => {
 			).rejects.toThrow(errors.JellyfishDatabaseError);
 		});
 
-		it('should insert a card with a slug', async () => {
+		it('should insert a contract with a slug', async () => {
 			const result = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
@@ -998,9 +999,9 @@ describe('backend', () => {
 			}
 		});
 
-		it('should create indexes for type cards with the indexed_fields field', async () => {
+		it('should create indexes for type contracts with the indexed_fields field', async () => {
 			expect.hasAssertions();
-			const typeCard = {
+			const typeContract = {
 				slug: 'test-link',
 				type: 'type@1.0.0',
 				version: '1.0.1',
@@ -1100,28 +1101,28 @@ describe('backend', () => {
 				capabilities: [],
 			};
 
-			await ctx.backend.upsertElement(ctx.context, typeCard);
+			await ctx.backend.upsertElement(ctx.context, typeContract);
 			await Bluebird.delay(2000);
 
 			const indexes = await ctx.context.query(
-				"SELECT * FROM pg_indexes WHERE tablename = 'cards'",
+				`SELECT * FROM pg_indexes WHERE tablename = '${CONTRACTS_TABLE}'`,
 			);
 			const expected = [
 				{
-					indexname: `${typeCard.slug}__name__idx`,
-					indexdef: `CREATE INDEX \"${typeCard.slug}__name__idx\" ON public.cards USING btree (name) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+					indexname: `${typeContract.slug}__name__idx`,
+					indexdef: `CREATE INDEX \"${typeContract.slug}__name__idx\" ON public.${CONTRACTS_TABLE} USING btree (name) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
-					indexname: `${typeCard.slug}__data_payload_message__idx`,
-					indexdef: `CREATE INDEX \"${typeCard.slug}__data_payload_message__idx\" ON public.cards USING btree (((data #>> '{payload,message}'::text[]))) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+					indexname: `${typeContract.slug}__data_payload_message__idx`,
+					indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_message__idx\" ON public.${CONTRACTS_TABLE} USING btree (((data #>> '{payload,message}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
-					indexname: `${typeCard.slug}__data_payload_mentionsUser__idx`,
-					indexdef: `CREATE INDEX \"${typeCard.slug}__data_payload_mentionsUser__idx\" ON public.cards USING gin (((data #> '{payload,mentionsUser}'::text[]))) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+					indexname: `${typeContract.slug}__data_payload_mentionsUser__idx`,
+					indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_mentionsUser__idx\" ON public.${CONTRACTS_TABLE} USING gin (((data #> '{payload,mentionsUser}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
-					indexname: `${typeCard.slug}__data_from_id__name__data_to_id__idx`,
-					indexdef: `CREATE INDEX \"test-link__data_from_id__name__data_to_id__idx\" ON public.cards USING btree (((data #>> '{from,id}'::text[])), name, ((data #>> '{to,id}'::text[]))) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+					indexname: `${typeContract.slug}__data_from_id__name__data_to_id__idx`,
+					indexdef: `CREATE INDEX \"test-link__data_from_id__name__data_to_id__idx\" ON public.${CONTRACTS_TABLE} USING btree (((data #>> '{from,id}'::text[])), name, ((data #>> '{to,id}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 			];
 
@@ -1135,9 +1136,9 @@ describe('backend', () => {
 		});
 	});
 
-	it('should create full text search indexes for type cards with flagged fields', async () => {
+	it('should create full text search indexes for type contracts with flagged fields', async () => {
 		expect.hasAssertions();
-		const typeCard = {
+		const typeContract = {
 			slug: 'search-test',
 			type: 'type@1.0.0',
 			version: '1.0.1',
@@ -1181,24 +1182,24 @@ describe('backend', () => {
 			capabilities: [],
 		};
 
-		await ctx.backend.upsertElement(ctx.context, typeCard);
+		await ctx.backend.upsertElement(ctx.context, typeContract);
 		await Bluebird.delay(2000);
 
 		const indexes = await ctx.context.query(
 			`
 			SELECT *
 			FROM pg_indexes
-			WHERE tablename = 'cards' AND indexname LIKE '%__search_idx'
+			WHERE tablename = '${CONTRACTS_TABLE}' AND indexname LIKE '%__search_idx'
 			`,
 		);
 		const expected = [
 			{
-				indexname: `${typeCard.slug}__name__search_idx`,
-				indexdef: `CREATE INDEX \"${typeCard.slug}__name__search_idx\" ON public.cards USING gin (to_tsvector('english'::regconfig, name)) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+				indexname: `${typeContract.slug}__name__search_idx`,
+				indexdef: `CREATE INDEX \"${typeContract.slug}__name__search_idx\" ON public.${CONTRACTS_TABLE} USING gin (to_tsvector('english'::regconfig, name)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 			},
 			{
-				indexname: `${typeCard.slug}__data_payload_message__search_idx`,
-				indexdef: `CREATE INDEX \"${typeCard.slug}__data_payload_message__search_idx\" ON public.cards USING gin (jsonb_to_tsvector('english'::regconfig, (data #> '{payload,message}'::text[]), '["string"]'::jsonb)) WHERE (type = '${typeCard.slug}@${typeCard.version}'::text)`,
+				indexname: `${typeContract.slug}__data_payload_message__search_idx`,
+				indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_message__search_idx\" ON public.${CONTRACTS_TABLE} USING gin (jsonb_to_tsvector('english'::regconfig, (data #> '{payload,message}'::text[]), '["string"]'::jsonb)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 			},
 		];
 
@@ -1337,8 +1338,8 @@ describe('backend', () => {
 					ctx.context,
 					{
 						data: {
-							"Robert'); DROP TABLE cards; --": {
-								"Robert'); DROP TABLE cards; --": {},
+							[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
+								[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {},
 							},
 						},
 					} as any,
@@ -1348,10 +1349,10 @@ describe('backend', () => {
 							data: {
 								type: 'object',
 								properties: {
-									"Robert'); DROP TABLE cards; --": {
+									[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
 										type: 'object',
 										properties: {
-											"Robert'); DROP TABLE cards; --": {
+											[`Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`]: {
 												type: 'string',
 												const: 'foo@1.0.0',
 											},
@@ -1367,7 +1368,7 @@ describe('backend', () => {
 		});
 
 		it('should escape malicious query values', async () => {
-			const injection = 'id FROM cards; DROP TABLE cards; COMMIT; SELECT *';
+			const injection = `id FROM ${CONTRACTS_TABLE}; DROP TABLE ${CONTRACTS_TABLE}; COMMIT; SELECT *`;
 			await expect(
 				ctx.backend.query(
 					ctx.context,
@@ -1387,7 +1388,7 @@ describe('backend', () => {
 				),
 			).rejects.toHaveProperty(
 				'message',
-				`column cards.${injection} does not exist`,
+				`column ${CONTRACTS_TABLE}.${injection} does not exist`,
 			);
 
 			await expect(
@@ -1401,7 +1402,7 @@ describe('backend', () => {
 						properties: {
 							slug: {
 								type: 'string',
-								const: "Robert'; DROP TABLE cards; --",
+								const: `Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`,
 							},
 						},
 						required: ['slug'],
@@ -1420,7 +1421,7 @@ describe('backend', () => {
 						properties: {
 							name: {
 								type: 'string',
-								const: "Robert'; DROP TABLE cards; --",
+								const: `Robert'); DROP TABLE ${CONTRACTS_TABLE}; --`,
 							},
 						},
 						required: ['name'],
@@ -2139,7 +2140,7 @@ describe('backend', () => {
 		});
 
 		it('should be able to skip the results of a one-element query', async () => {
-			const card = await ctx.backend.upsertElement(ctx.context, {
+			const contract = await ctx.backend.upsertElement(ctx.context, {
 				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				links: {},
@@ -2169,7 +2170,7 @@ describe('backend', () => {
 					properties: {
 						id: {
 							type: 'string',
-							const: card.id,
+							const: contract.id,
 						},
 					},
 					required: ['id'],
@@ -2183,7 +2184,7 @@ describe('backend', () => {
 		});
 
 		it('should not skip the results of a one-element query if skip is set to zero', async () => {
-			const card = await ctx.backend.upsertElement(ctx.context, {
+			const contract = await ctx.backend.upsertElement(ctx.context, {
 				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
@@ -2214,7 +2215,7 @@ describe('backend', () => {
 					properties: {
 						id: {
 							type: 'string',
-							const: card.id,
+							const: contract.id,
 						},
 					},
 					required: ['id'],
@@ -2226,13 +2227,13 @@ describe('backend', () => {
 
 			expect(results).toEqual([
 				{
-					id: card.id,
+					id: contract.id,
 				},
 			]);
 		});
 
 		it('should be able to limit the results of a one-element query to 0', async () => {
-			const card = await ctx.backend.upsertElement(ctx.context, {
+			const contract = await ctx.backend.upsertElement(ctx.context, {
 				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
@@ -2262,7 +2263,7 @@ describe('backend', () => {
 					properties: {
 						id: {
 							type: 'string',
-							const: card.id,
+							const: contract.id,
 						},
 					},
 					required: ['id'],
@@ -2276,7 +2277,7 @@ describe('backend', () => {
 		});
 
 		it('should not omit the results of a one-element query if limit is set to one', async () => {
-			const card = await ctx.backend.upsertElement(ctx.context, {
+			const contract = await ctx.backend.upsertElement(ctx.context, {
 				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
@@ -2307,7 +2308,7 @@ describe('backend', () => {
 					properties: {
 						id: {
 							type: 'string',
-							const: card.id,
+							const: contract.id,
 						},
 					},
 					required: ['id'],
@@ -2319,7 +2320,7 @@ describe('backend', () => {
 
 			expect(results).toEqual([
 				{
-					id: card.id,
+					id: contract.id,
 				},
 			]);
 		});
@@ -2429,7 +2430,7 @@ describe('backend', () => {
 		});
 
 		it('should be able to sort the query using a key', async () => {
-			const card1 = await ctx.backend.upsertElement(ctx.context, {
+			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2447,7 +2448,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card2 = await ctx.backend.upsertElement(ctx.context, {
+			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				active: true,
@@ -2465,7 +2466,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card3 = await ctx.backend.upsertElement(ctx.context, {
+			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2483,7 +2484,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card4 = await ctx.backend.upsertElement(ctx.context, {
+			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				links: {},
@@ -2514,7 +2515,12 @@ describe('backend', () => {
 						},
 						slug: {
 							type: 'string',
-							enum: [card1.slug, card2.slug, card3.slug, card4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2524,11 +2530,11 @@ describe('backend', () => {
 				},
 			);
 
-			expect(results).toEqual([card2, card4, card3, card1]);
+			expect(results).toEqual([contract2, contract4, contract3, contract1]);
 		});
 
 		it('should be able to sort the query in descending order', async () => {
-			const card1 = await ctx.backend.upsertElement(ctx.context, {
+			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2546,7 +2552,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card2 = await ctx.backend.upsertElement(ctx.context, {
+			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2564,7 +2570,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card3 = await ctx.backend.upsertElement(ctx.context, {
+			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2582,7 +2588,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card4 = await ctx.backend.upsertElement(ctx.context, {
+			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				links: {},
@@ -2613,7 +2619,12 @@ describe('backend', () => {
 						},
 						slug: {
 							type: 'string',
-							enum: [card1.slug, card2.slug, card3.slug, card4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2624,11 +2635,11 @@ describe('backend', () => {
 				},
 			);
 
-			expect(results).toEqual([card1, card3, card4, card2]);
+			expect(results).toEqual([contract1, contract3, contract4, contract2]);
 		});
 
 		it('should be able to sort the query using an array of keys', async () => {
-			const card1 = await ctx.backend.upsertElement(ctx.context, {
+			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2647,7 +2658,7 @@ describe('backend', () => {
 				},
 			});
 
-			const card2 = await ctx.backend.upsertElement(ctx.context, {
+			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2666,7 +2677,7 @@ describe('backend', () => {
 				},
 			});
 
-			const card3 = await ctx.backend.upsertElement(ctx.context, {
+			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2685,7 +2696,7 @@ describe('backend', () => {
 				},
 			});
 
-			const card4 = await ctx.backend.upsertElement(ctx.context, {
+			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2717,7 +2728,12 @@ describe('backend', () => {
 						},
 						slug: {
 							type: 'string',
-							enum: [card1.slug, card2.slug, card3.slug, card4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2727,11 +2743,11 @@ describe('backend', () => {
 				},
 			);
 
-			expect(results).toEqual([card2, card4, card3, card1]);
+			expect(results).toEqual([contract2, contract4, contract3, contract1]);
 		});
 
 		it('should apply sort before skip', async () => {
-			const card1 = await ctx.backend.upsertElement(ctx.context, {
+			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2749,7 +2765,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card2 = await ctx.backend.upsertElement(ctx.context, {
+			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2767,7 +2783,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card3 = await ctx.backend.upsertElement(ctx.context, {
+			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2785,7 +2801,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card4 = await ctx.backend.upsertElement(ctx.context, {
+			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2816,7 +2832,12 @@ describe('backend', () => {
 						},
 						slug: {
 							type: 'string',
-							enum: [card1.slug, card2.slug, card3.slug, card4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2827,11 +2848,11 @@ describe('backend', () => {
 				},
 			);
 
-			expect(results).toEqual([card3, card1]);
+			expect(results).toEqual([contract3, contract1]);
 		});
 
 		it('should apply sort before limit', async () => {
-			const card1 = await ctx.backend.upsertElement(ctx.context, {
+			const contract1 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2849,7 +2870,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card2 = await ctx.backend.upsertElement(ctx.context, {
+			const contract2 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2867,7 +2888,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card3 = await ctx.backend.upsertElement(ctx.context, {
+			const contract3 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2885,7 +2906,7 @@ describe('backend', () => {
 				data: {},
 			});
 
-			const card4 = await ctx.backend.upsertElement(ctx.context, {
+			const contract4 = await ctx.backend.upsertElement(ctx.context, {
 				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
@@ -2916,7 +2937,12 @@ describe('backend', () => {
 						},
 						slug: {
 							type: 'string',
-							enum: [card1.slug, card2.slug, card3.slug, card4.slug],
+							enum: [
+								contract1.slug,
+								contract2.slug,
+								contract3.slug,
+								contract4.slug,
+							],
 						},
 					},
 					required: ['type', 'slug'],
@@ -2927,11 +2953,11 @@ describe('backend', () => {
 				},
 			);
 
-			expect(results).toEqual([card2, card4]);
+			expect(results).toEqual([contract2, contract4]);
 		});
 
 		it('should escape malicious sortBy statements', async () => {
-			const injection = 'created_at; DROP TABLE cards; --';
+			const injection = `created_at; DROP TABLE ${CONTRACTS_TABLE}; --`;
 			await expect(
 				ctx.backend.query(
 					ctx.context,
@@ -2953,7 +2979,7 @@ describe('backend', () => {
 				),
 			).rejects.toHaveProperty(
 				'message',
-				`column cards.${injection} does not exist`,
+				`column ${CONTRACTS_TABLE}.${injection} does not exist`,
 			);
 		});
 
@@ -3290,7 +3316,7 @@ describe('backend', () => {
 		});
 
 		it('should correctly build a JSONB object with no selected properties', async () => {
-			const card = await ctx.backend.upsertElement(ctx.context, {
+			const contract = await ctx.backend.upsertElement(ctx.context, {
 				type: 'card@1.0.0',
 				slug: ctx.generateRandomSlug(),
 				links: {},
@@ -3317,7 +3343,7 @@ describe('backend', () => {
 				{
 					properties: {
 						id: {
-							const: card.id,
+							const: contract.id,
 						},
 						data: {
 							properties: {
@@ -3332,11 +3358,11 @@ describe('backend', () => {
 
 			expect(results).toEqual([
 				{
-					id: card.id,
+					id: contract.id,
 					active: true,
 					capabilities: [],
-					created_at: card.created_at,
-					updated_at: card.updated_at,
+					created_at: contract.created_at,
+					updated_at: contract.updated_at,
 					linked_at: {},
 					markers: [],
 					name: null,
@@ -3344,8 +3370,8 @@ describe('backend', () => {
 					tags: [],
 					loop: null,
 					version: '1.0.0',
-					type: card.type,
-					slug: card.slug,
+					type: contract.type,
+					slug: contract.slug,
 					links: {},
 					data: {
 						test: {},
@@ -4114,10 +4140,10 @@ describe('backend', () => {
 			);
 
 			results[0].links['has attached element'].sort(
-				(cardA: Contract, cardB: Contract) => {
-					if (cardA.slug > cardB.slug) {
+				(contractA: Contract, contractB: Contract) => {
+					if (contractA.slug > contractB.slug) {
 						return -1;
-					} else if (cardA.slug === cardB.slug) {
+					} else if (contractA.slug === contractB.slug) {
 						return 0;
 					}
 					return 1;
@@ -4629,9 +4655,9 @@ describe('backend', () => {
 				created_at: new Date().toISOString(),
 				updated_at: null,
 				active: true,
-				name: 'card belongs to thread',
+				name: 'contract belongs to thread',
 				data: {
-					inverseName: 'thread has card',
+					inverseName: 'thread has contract',
 					from: {
 						id: message2.id,
 						type: message2.type,
@@ -4666,7 +4692,7 @@ describe('backend', () => {
 				id: thread.id,
 				linked_at: {
 					'has attached element': link.created_at,
-					'thread has card': link2.created_at,
+					'thread has contract': link2.created_at,
 				},
 				links: results[0].links,
 				markers: [],

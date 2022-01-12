@@ -2,6 +2,7 @@ import { defaultEnvironment as environment } from '@balena/jellyfish-environment
 import { v4 as uuid } from 'uuid';
 import { INDEX_TABLE, PostgresBackend } from '../../../../lib/backend/postgres';
 import { Context } from '../../../../lib/context';
+import { TABLE as CONTRACTS_TABLE } from '../../../../lib/backend/postgres/cards';
 import { version as packageVersion } from '../../../../package.json';
 import * as helpers from '../helpers';
 
@@ -208,7 +209,7 @@ describe('.createIndex()', () => {
 	});
 
 	it('should create indexes with unique flag', async () => {
-		const tableName = 'cards';
+		const tableName = CONTRACTS_TABLE;
 		const indexName = `foobar_${uuid().split('-')[0]}_idx`;
 		const predicate = 'USING btree (loop)';
 		const version = '1.0.0';

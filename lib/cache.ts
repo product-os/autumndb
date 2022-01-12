@@ -4,7 +4,7 @@ import * as Bluebird from 'bluebird';
 import * as redis from 'redis';
 import * as redismock from 'redis-mock';
 // TODO: This violates encapsulation of the backend
-import { TABLE as cardsTable } from './backend/postgres/cards';
+import { TABLE as CONTRACTS_TABLE } from './backend/postgres/cards';
 import * as errors from './errors';
 
 interface CacheOptions extends redis.ClientOpts {
@@ -19,7 +19,7 @@ export class Cache {
 	client: redis.RedisClient | null;
 
 	/**
-	 * @summary The card cache store
+	 * @summary The contract cache store
 	 * @class
 	 * @public
 	 * @param {Object} options - options
@@ -133,9 +133,9 @@ export class Cache {
 	 *
 	 * @example
 	 * const cache = new Cache()
-	 * console.log(cache.generateKey('cards', 'slug', 'xxxxxx'))
+	 * console.log(cache.generateKey('contracts', 'slug', 'xxxxxx'))
 	 *
-	 * > `database:cards:slug:xxxx`
+	 * > `database:contracts:slug:xxxx`
 	 */
 	generateKey(table: string, category: string, key: string): string {
 		return `${this.options.namespace}:${table}:${category}:${key}`;
@@ -154,7 +154,7 @@ export class Cache {
 	 *
 	 * @example
 	 * const cache = new Cache()
-	 * cache.setElementByKey('cards', 'slug', 'xxxxxx', {
+	 * cache.setElementByKey('contracts', 'slug', 'xxxxxx', {
 	 *   id: 'xxxxxx',
 	 *   slug: 'foo',
 	 *   data: 'baz'
@@ -210,7 +210,7 @@ export class Cache {
 	 *
 	 * @example
 	 * const cache = new Cache()
-	 * cache.set('cards', {
+	 * cache.set('contracts', {
 	 *   id: 'xxxxxx',
 	 *   slug: 'foo',
 	 *   data: 'baz'
@@ -239,7 +239,7 @@ export class Cache {
 	 *
 	 * @example
 	 * const cache = new Cache()
-	 * cache.setMissingSlug('cards', 'foo', '1.0.0')
+	 * cache.setMissingSlug('contracts', 'foo', '1.0.0')
 	 */
 	async setMissingSlug(table: any, slug: any, version: any) {
 		await this.setElementByKey(table, 'slug', `${slug}@${version}`, null);
@@ -255,7 +255,7 @@ export class Cache {
 	 *
 	 * @example
 	 * const cache = new Cache()
-	 * cache.setMissingId('cards', '4a962ad9-20b5-4dd8-a707-bf819593cc84')
+	 * cache.setMissingId('contracts', '4a962ad9-20b5-4dd8-a707-bf819593cc84')
 	 */
 	async setMissingId(table: any, id: any) {
 		await this.setElementByKey(table, 'id', id, null);
@@ -273,7 +273,7 @@ export class Cache {
 	 *
 	 * @example
 	 * const cache = new Cache()
-	 * const result = cache.get('cards', 'id', 'foo')
+	 * const result = cache.get('contracts', 'id', 'foo')
 	 *
 	 * if (result.hit) {
 	 *   console.log(result.data)
@@ -297,7 +297,7 @@ export class Cache {
 				hit: true,
 				element: JSON.parse(result),
 			};
-			if (table === cardsTable) {
+			if (table === CONTRACTS_TABLE) {
 				metrics.markContractReadFromCache(data.element);
 			}
 			return data;
@@ -319,7 +319,7 @@ export class Cache {
 	 *
 	 * @example
 	 * const cache = new Cache()
-	 * const result = cache.getById('cards',
+	 * const result = cache.getById('contracts',
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84')
 	 *
 	 * if (result.hit) {
@@ -342,7 +342,7 @@ export class Cache {
 	 *
 	 * @example
 	 * const cache = new Cache()
-	 * const result = cache.getBySlug('cards', 'foo', '1.0.0')
+	 * const result = cache.getBySlug('contracts', 'foo', '1.0.0')
 	 *
 	 * if (result.hit) {
 	 *   console.log(result.data)

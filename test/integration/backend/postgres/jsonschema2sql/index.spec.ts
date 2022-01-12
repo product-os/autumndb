@@ -282,7 +282,7 @@ describe('jsonSchema2sql: JsonSchema compat', () => {
 								elements: [
 									{
 										version: '1.0.0',
-										type: 'card',
+										type: 'contract',
 										data: testCase.data,
 									},
 								],
@@ -320,7 +320,7 @@ describe('jsonSchema2sql: JsonSchema compat', () => {
 							elements: [
 								{
 									version: '1.0.0',
-									type: 'card',
+									type: 'contract',
 									data: {
 										wrapper: testCase.data,
 									},
@@ -378,12 +378,12 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 					data: {
 						type: 'object',
-						required: ["Robert'); DROP TABLE cards; --"],
+						required: [`Robert'); DROP TABLE ${cards.TABLE}; --`],
 						properties: {
-							"Robert'); DROP TABLE cards; --": {
+							[`Robert'); DROP TABLE ${cards.TABLE}; --`]: {
 								type: 'object',
 								properties: {
-									"Robert'); DROP TABLE cards; --": {
+									[`Robert'); DROP TABLE ${cards.TABLE}; --`]: {
 										type: 'string',
 										const: 'foo',
 									},
@@ -397,10 +397,10 @@ describe('jsonschema2sql: Postgres specific', () => {
 			const elements = [
 				{
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					data: {
-						"Robert'); DROP TABLE cards; --": {
-							"Robert'); DROP TABLE cards; --": 'foo',
+						[`Robert'); DROP TABLE ${cards.TABLE}; --`]: {
+							[`Robert'); DROP TABLE ${cards.TABLE}; --`]: 'foo',
 						},
 					},
 				},
@@ -434,7 +434,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 						properties: {
 							foo: {
 								type: 'string',
-								const: "Robert'; DROP TABLE cards; --",
+								const: `Robert'); DROP TABLE ${cards.TABLE}; --`,
 							},
 						},
 					},
@@ -444,9 +444,9 @@ describe('jsonschema2sql: Postgres specific', () => {
 			const elements = [
 				{
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					data: {
-						foo: "Robert'; DROP TABLE cards; --",
+						foo: `Robert'); DROP TABLE ${cards.TABLE}; --`,
 					},
 				},
 			];
@@ -494,7 +494,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'beta',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						data: {
 							foo: 1,
 							timestamp: 1549016200000,
@@ -503,7 +503,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'gamma',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						data: {
 							foo: 1,
 							timestamp: 1549016300000,
@@ -512,7 +512,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'alpha',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						data: {
 							foo: 1,
 							timestamp: 1549016100000,
@@ -571,7 +571,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'beta',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					data: {
 						foo: 1,
 						timestamp: 1549016200000,
@@ -580,7 +580,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'gamma',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					data: {
 						foo: 1,
 						timestamp: 1549016300000,
@@ -589,7 +589,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'alpha',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					data: {
 						foo: 1,
 						timestamp: 1549016100000,
@@ -650,7 +650,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'beta',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						data: {
 							foo: 1,
 							timestamp: 1549016200000,
@@ -659,7 +659,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'gamma',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						data: {
 							foo: 1,
 							timestamp: 1549016300000,
@@ -668,7 +668,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'alpha',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						data: {
 							foo: 1,
 							timestamp: 1549016100000,
@@ -725,49 +725,49 @@ describe('jsonschema2sql: Postgres specific', () => {
 
 			const elements = [
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.0-beta',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.0-alpha+001',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.0-beta+001',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.1',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.1.0',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
@@ -826,49 +826,49 @@ describe('jsonschema2sql: Postgres specific', () => {
 
 			const elements = [
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.0-beta',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.0-alpha+001',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.0-beta+001',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.0.1',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
 				},
 				{
-					slug: `card-${uuid()}`,
+					slug: `contract-${uuid()}`,
 					version: '1.1.0',
-					type: 'card',
+					type: 'contract',
 					data: {
 						bar: 1,
 					},
@@ -948,7 +948,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'foo-1',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					name: 'active',
 					data: {
@@ -958,7 +958,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'foo-2',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: false,
 					name: 'inactive',
 					data: {
@@ -968,7 +968,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'foo-3',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					name: 'inactive',
 					data: {
@@ -978,7 +978,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'foo-4',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: false,
 					name: 'active',
 					data: {
@@ -988,7 +988,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'bar-1',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					name: 'active',
 					data: {
@@ -998,7 +998,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'bar-2',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: false,
 					name: 'inactive',
 					data: {
@@ -1008,7 +1008,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'bar-3',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					name: 'inactive',
 					data: {
@@ -1018,7 +1018,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'bar-4',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: false,
 					name: 'active',
 					data: {
@@ -1078,7 +1078,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'test-pattern-1',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					name: 'active',
 					data: {
@@ -1088,7 +1088,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'test-pattern-2',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					name: 'active',
 					data: {
@@ -1140,14 +1140,14 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'test-pattern-1',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					name: 'foo',
 				},
 				{
 					slug: 'test-pattern-2',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					name: 'FOO',
 				},
@@ -1187,14 +1187,14 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'test-1',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					markers: ['foobar'],
 				},
 				{
 					slug: 'test-2',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 				},
 			];
@@ -1233,14 +1233,14 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'test-1',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					markers: ['foobar'],
 				},
 				{
 					slug: 'test-2',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					markers: ['foobar', 'bazbuzz'],
 				},
@@ -1285,7 +1285,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'test-1',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					data: {
 						checked: true,
@@ -1294,7 +1294,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				{
 					slug: 'test-2',
 					version: '1.0.0',
-					type: 'card',
+					type: 'contract',
 					active: true,
 					data: {
 						checked: false,
@@ -1341,7 +1341,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'test-1',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						active: true,
 						data: {
 							checked: true,
@@ -1350,7 +1350,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'test-2',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						active: true,
 						data: {
 							checked: 'true',
@@ -1398,7 +1398,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'test-1',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						active: true,
 						data: {
 							checked: 1,
@@ -1407,7 +1407,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'test-2',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						active: true,
 						data: {
 							checked: '1',
@@ -1458,7 +1458,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'test-1',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						active: true,
 						data: {
 							collection: ['foo'],
@@ -1467,7 +1467,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'test-2',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						active: true,
 						data: {
 							collection: ['bar'],
@@ -1511,14 +1511,14 @@ describe('jsonschema2sql: Postgres specific', () => {
 					{
 						slug: 'test-1',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						active: true,
 						markers: ['foo'],
 					},
 					{
 						slug: 'test-2',
 						version: '1.0.0',
-						type: 'card',
+						type: 'contract',
 						active: true,
 						markers: ['bar'],
 					},
@@ -1571,7 +1571,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 			const elements = [
 				{
 					slug: 'test-1',
-					type: 'card',
+					type: 'contract',
 					data: {
 						array: [
 							{
@@ -1582,7 +1582,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				},
 				{
 					slug: 'test-2',
-					type: 'card',
+					type: 'contract',
 					data: {
 						array: [
 							{
@@ -1851,7 +1851,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 						const elements = [
 							{
 								slug: 'test-1',
-								type: 'card',
+								type: 'contract',
 								data: {
 									actor: actorContents,
 								},
@@ -1896,7 +1896,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 				const elements = [
 					{
 						slug: 'test-1',
-						type: 'card',
+						type: 'contract',
 						data: {
 							tags: ['test'],
 						},
