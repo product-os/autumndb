@@ -1,4 +1,19 @@
 - commits:
+    - subject: 'patch: Replace all no-breaking occurrences of card with contract'
+      hash: 8fbf43f5a8eda06874ca37ff9eb113ffdf330daa
+      body: ''
+      footer: {}
+      author: Taro Murao
+      nested: []
+    - subject: 'patch: Replace all no-breaking occurrences of card with contract'
+      hash: ed7ea8ab29d0e786124aa4d610c04f94b911b4df
+      body: ''
+      footer: {}
+      author: Taro Murao
+      nested: []
+  version: 12.1.1
+  date: 2022-01-12T10:03:59.070Z
+- commits:
     - subject: Add the PG to the exported test context
       hash: a6df7233954e2c068b151223e0b9d28bf90c93b7
       body: ''
