@@ -3,13 +3,13 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import jsone = require('json-e');
 import * as _ from 'lodash';
 import type { DatabaseBackend } from './backend/postgres/types';
-import { CARDS } from './contracts';
+import { CONTRACTS } from './contracts';
 import type { Context } from './context';
 import * as errors from './errors';
 import jsonSchema from './json-schema';
 
-const CONTRACT_CONTRACT_TYPE = `${CARDS.card.slug}@${CARDS.card.version}`;
-const VERSIONED_CONTRACTS = _.mapKeys(CARDS, (value: any, key: any) => {
+const CONTRACT_CONTRACT_TYPE = `${CONTRACTS.card.slug}@${CONTRACTS.card.version}`;
+const VERSIONED_CONTRACTS = _.mapKeys(CONTRACTS, (value: any, key: any) => {
 	return `${key}@${value.version}`;
 });
 
@@ -21,7 +21,7 @@ const applyMarkers = async (
 ): Promise<JsonSchema> => {
 	// TODO: Find a way to implement this logic without
 	// hardcoding the admin user
-	if (actor.slug === CARDS['user-admin'].slug) {
+	if (actor.slug === CONTRACTS['user-admin'].slug) {
 		return schema;
 	}
 

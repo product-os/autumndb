@@ -2,7 +2,7 @@ import type { LogContext } from '@balena/jellyfish-logger';
 import * as _ from 'lodash';
 import * as jsonpatch from 'fast-json-patch';
 import * as fastEquals from 'fast-equals';
-import { CARDS } from './contracts';
+import { CONTRACTS } from './contracts';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
@@ -152,7 +152,7 @@ const getQueryFromSchema = async (
 	// TS-TODO: Refactor this to avoid type coercion
 	let finalSchema: JsonSchema = (
 		schema instanceof Object &&
-		schema.type === `${CARDS.view.slug}@${CARDS.view.version}`
+		schema.type === `${CONTRACTS.view.slug}@${CONTRACTS.view.version}`
 			? views.getSchema(schema as ViewContract)
 			: schema
 	) as JsonSchema;
@@ -346,18 +346,18 @@ export class Kernel {
 		};
 
 		await Promise.all([
-			unsafeUpsert(CARDS.type),
-			unsafeUpsert(CARDS.session),
-			unsafeUpsert(CARDS.authentication),
-			unsafeUpsert(CARDS.user),
-			unsafeUpsert(CARDS['user-settings']),
-			unsafeUpsert(CARDS['role-user-admin']),
+			unsafeUpsert(CONTRACTS.type),
+			unsafeUpsert(CONTRACTS.session),
+			unsafeUpsert(CONTRACTS.authentication),
+			unsafeUpsert(CONTRACTS.user),
+			unsafeUpsert(CONTRACTS['user-settings']),
+			unsafeUpsert(CONTRACTS['role-user-admin']),
 		]);
 
-		const adminUser = await unsafeUpsert(CARDS['user-admin']);
+		const adminUser = await unsafeUpsert(CONTRACTS['user-admin']);
 		const adminSession = await unsafeUpsert({
 			slug: 'session-admin-kernel',
-			type: `${CARDS.session.slug}@${CARDS.session.version}`,
+			type: `${CONTRACTS.session.slug}@${CONTRACTS.session.version}`,
 			data: {
 				actor: adminUser.id,
 			},
@@ -369,23 +369,23 @@ export class Kernel {
 
 		await Promise.all(
 			[
-				CARDS.card,
-				CARDS.action,
-				CARDS['action-request'],
-				CARDS.org,
-				CARDS.error,
-				CARDS.event,
-				CARDS.view,
-				CARDS.role,
-				CARDS.link,
-				CARDS.loop,
-				CARDS['oauth-provider'],
-				CARDS['oauth-client'],
-				CARDS['scheduled-action'],
+				CONTRACTS.card,
+				CONTRACTS.action,
+				CONTRACTS['action-request'],
+				CONTRACTS.org,
+				CONTRACTS.error,
+				CONTRACTS.event,
+				CONTRACTS.view,
+				CONTRACTS.role,
+				CONTRACTS.link,
+				CONTRACTS.loop,
+				CONTRACTS['oauth-provider'],
+				CONTRACTS['oauth-client'],
+				CONTRACTS['scheduled-action'],
 			].map(async (contract) => {
 				context.debug('Upserting core contract', { slug: contract.slug });
 
-				return this.replaceCard(context, this.adminSession()!, contract);
+				return this.replaceContract(context, this.adminSession()!, contract);
 			}),
 		);
 	}
@@ -400,7 +400,7 @@ export class Kernel {
 	 * @param {String} id - contract id
 	 * @returns {(Object|Null)} contract
 	 */
-	async getCardById<T extends Contract = Contract>(
+	async getContractById<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		id: string,
@@ -432,6 +432,15 @@ export class Kernel {
 		return results[0] || null;
 	}
 
+	// Deprecated. Use getContractById instead
+	async getCardById<T extends Contract = Contract>(
+		mixedContext: MixedContext,
+		session: string,
+		id: string,
+	): Promise<T | null> {
+		return await this.getContractById(mixedContext, session, id);
+	}
+
 	/**
 	 * @summary Get a contract by its slug
 	 * @function
@@ -443,7 +452,7 @@ export class Kernel {
 	 * @param {Object} options - optional set of extra options
 	 * @returns {(Object|Null)} contract
 	 */
-	async getCardBySlug<T extends Contract = Contract>(
+	async getContractBySlug<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		slug: string,
@@ -504,6 +513,14 @@ export class Kernel {
 		return results[0] || null;
 	}
 
+	async getCardBySlug<T extends Contract = Contract>(
+		mixedContext: MixedContext,
+		session: string,
+		slug: string,
+	): Promise<T | null> {
+		return await this.getContractBySlug(mixedContext, session, slug);
+	}
+
 	/**
 	 * @summary Insert a contract to the kernel
 	 * @function
@@ -522,7 +539,7 @@ export class Kernel {
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(contract.id)
 	 */
-	async insertCard<T extends Contract = Contract>(
+	async insertConctract<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
@@ -535,6 +552,15 @@ export class Kernel {
 		await this.preUpsert(context, session, contract as Contract);
 
 		return this.backend.insertElement<T>(context, contract as Contract);
+	}
+
+	// Deprecated. Use insertContract instead.
+	async insertCard<T extends Contract = Contract>(
+		mixedContext: MixedContext,
+		session: string,
+		object: Partial<T> & Pick<T, 'type'>,
+	): Promise<T> {
+		return await this.insertConctract(mixedContext, session, object);
 	}
 
 	/**
@@ -551,11 +577,11 @@ export class Kernel {
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 *
-	 * const contract = await kernel.replaceCard(
+	 * const contract = await kernel.replaceContract(
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(contract.id)
 	 */
-	async replaceCard<T extends Contract = Contract>(
+	async replaceContract<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<Contract> &
@@ -572,6 +598,17 @@ export class Kernel {
 		return this.backend.upsertElement(context, contract as Contract);
 	}
 
+	// Deprecated. Use replaceContract instead.
+	async replaceCard<T extends Contract = Contract>(
+		mixedContext: MixedContext,
+		session: string,
+		object: Partial<Contract> &
+			Pick<Contract, 'type'> &
+			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
+	): Promise<T> {
+		return await this.replaceContract(mixedContext, session, object);
+	}
+
 	private async preUpsert(
 		context: Context,
 		session: string,
@@ -584,7 +621,7 @@ export class Kernel {
 		);
 		// Fetch necessary objects concurrently
 		const [typeContract, filter, loop] = await Promise.all([
-			this.getCardBySlug<TypeContract>(context, session, contract.type),
+			this.getContractBySlug<TypeContract>(context, session, contract.type),
 			permissionFilter.getMask(context, this.backend, session),
 			(async () => {
 				return (
@@ -661,13 +698,13 @@ export class Kernel {
 
 			await Promise.all(
 				targetContractIds.map(async (targetContractId) => {
-					const targetCard = await this.getCardById(
+					const targetContract = await this.getContractById(
 						context,
 						session,
 						targetContractId,
 					);
 
-					if (!targetCard) {
+					if (!targetContract) {
 						const newError = new errors.JellyfishNoLinkTarget(
 							`Link target does not exist: ${targetContractId}`,
 						);
@@ -695,7 +732,7 @@ export class Kernel {
 	 * @param {Object[]} patch - JSON Patch operations
 	 * @returns {Object} the patched contract
 	 */
-	async patchCardBySlug<T = Contract>(
+	async patchContractBySlug<T = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		slug: string,
@@ -733,7 +770,7 @@ export class Kernel {
 						`No such card: ${slug}`,
 					);
 
-					// TODO: Remove this log once we understand why we are having link card patch requests.
+					// TODO: Remove this log once we understand why we are having link contract patch requests.
 					if (fullContract.type === 'link@1.0.0') {
 						transactionContext.info('Received request to patch a link card', {
 							card: fullContract,
@@ -741,29 +778,30 @@ export class Kernel {
 						});
 					}
 
-					const filteredCard = await this.getCardBySlug(
+					const filteredContract = await this.getContractBySlug(
 						transactionContext,
 						session,
 						`${fullContract.slug}@${fullContract.version}`,
 					);
 
 					if (patch.length === 0) {
-						return filteredCard;
+						return filteredContract;
 					}
 
-					const typeCard = await this.getCardBySlug<TypeContract>(
+					const typeContract = await this.getContractBySlug<TypeContract>(
 						transactionContext,
 						session,
 						fullContract.type,
 					);
 
 					transactionContext.assertInternal(
-						filteredCard,
+						filteredContract,
 						errors.JellyfishNoElement,
 						`No such contract: ${slug}`,
 					);
 
-					const schema = typeCard && typeCard.data && typeCard.data.schema;
+					const schema =
+						typeContract && typeContract.data && typeContract.data.schema;
 
 					transactionContext.assertInternal(
 						schema,
@@ -772,27 +810,31 @@ export class Kernel {
 					);
 
 					/*
-					 * The idea of this algorithm is that we get the full card
-					 * as stored in the database and the card as the current actor
+					 * The idea of this algorithm is that we get the full contract
+					 * as stored in the database and the contract as the current actor
 					 * can see it. Then we apply the patch to both the full and
-					 * the filtered card, aborting if it fails on any. If it succeeds
-					 * then we upsert the full card to the database, but only
-					 * if the resulting filtered card still matches the permissions
+					 * the filtered contract, aborting if it fails on any. If it succeeds
+					 * then we upsert the full contract to the database, but only
+					 * if the resulting filtered contract still matches the permissions
 					 * filter.
 					 */
-					// TS-TODO: "filteredCard" might be null here, and we should account for this
-					const patchedFilteredCard = patchContract(filteredCard!, patch, {
-						mutate: true,
-					});
+					// TS-TODO: "filteredContract" might be null here, and we should account for this
+					const patchedFilteredContract = patchContract(
+						filteredContract!,
+						patch,
+						{
+							mutate: true,
+						},
+					);
 
-					jsonSchema.validate(filter as any, patchedFilteredCard);
+					jsonSchema.validate(filter as any, patchedFilteredContract);
 
-					const patchedFullCard = patchContract(fullContract, patch, {
+					const patchedFullContract = patchContract(fullContract, patch, {
 						mutate: false,
 					});
 
 					try {
-						jsonSchema.validate(schema as any, patchedFullCard);
+						jsonSchema.validate(schema as any, patchedFullContract);
 					} catch (error) {
 						if (error instanceof errors.JellyfishSchemaMismatch) {
 							error.expected = true;
@@ -807,37 +849,37 @@ export class Kernel {
 					}
 
 					// Don't do a pointless update
-					if (fastEquals.deepEqual(patchedFullCard, fullContract)) {
+					if (fastEquals.deepEqual(patchedFullContract, fullContract)) {
 						return fullContract;
 					}
 
-					// TODO: Remove this log once we understand why we are having link card patch requests.
+					// TODO: Remove this log once we understand why we are having link contract patch requests.
 					if (fullContract.type === 'link@1.0.0') {
-						transactionContext.info('Upserting link card after patch', {
-							card: patchedFullCard,
+						transactionContext.info('Upserting link contract after patch', {
+							card: patchedFullContract,
 							patch,
 						});
 					}
 
 					// If the loop field is changing, check that it points to an actual loop contract
 					if (
-						patchedFullCard.loop &&
-						patchedFullCard.loop !== fullContract.loop
+						patchedFullContract.loop &&
+						patchedFullContract.loop !== fullContract.loop
 					) {
-						const loopCard = await this.backend.getElementBySlug(
+						const loopContract = await this.backend.getElementBySlug(
 							transactionContext,
-							patchedFullCard.loop,
+							patchedFullContract.loop,
 						);
 						transactionContext.assertInternal(
-							loopCard && loopCard.type.split('@')[0] === 'loop',
+							loopContract && loopContract.type.split('@')[0] === 'loop',
 							errors.JellyfishNoElement,
-							`No such loop: ${patchedFullCard.loop}`,
+							`No such loop: ${patchedFullContract.loop}`,
 						);
 					}
 
 					const upsertedCard = await this.backend.upsertElement(
 						transactionContext,
-						patchedFullCard,
+						patchedFullContract,
 					);
 
 					// Otherwise a person that patches a card gets
@@ -845,7 +887,7 @@ export class Kernel {
 					// update on the root of the card
 					// This will get removed once we get rid of field-level permissions.
 					return {
-						...patchedFilteredCard,
+						...patchedFilteredContract,
 						created_at: upsertedCard.created_at,
 						updated_at: upsertedCard.updated_at,
 					};
@@ -854,6 +896,16 @@ export class Kernel {
 		});
 
 		return result;
+	}
+
+	// Deprecated. Use patchContractBySlug instead.
+	async patchCardBySlug<T = Contract>(
+		mixedContext: MixedContext,
+		session: string,
+		slug: string,
+		patch: jsonpatch.Operation[],
+	): Promise<T> {
+		return await this.patchContractBySlug(mixedContext, session, slug, patch);
 	}
 
 	/**
