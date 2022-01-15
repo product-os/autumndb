@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: e7bb4f1cf9033611911b383e9fd418bcc998a20b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 12.1.2
+  date: 2022-01-15T00:20:50.254Z
+- commits:
     - subject: 'patch: Replace all no-breaking occurrences of card with contract'
       hash: 8fbf43f5a8eda06874ca37ff9eb113ffdf330daa
       body: ''
