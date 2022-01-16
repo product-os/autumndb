@@ -1,4 +1,17 @@
 - commits:
+    - subject: Bump skhema to v6
+      hash: 6da3c0e996c3462e33a5003c54029f63f0786467
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 12.1.6
+  date: 2022-01-16T08:53:53.635Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^2.0.21'
       hash: 1f59a51b41d0215d800b73be354f08e9450ca5aa
       body: ''
