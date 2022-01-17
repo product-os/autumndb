@@ -58,7 +58,7 @@ describe('Kernel', () => {
 		});
 
 		it('should apply a single operation', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -112,7 +112,7 @@ describe('Kernel', () => {
 		});
 
 		it('should add an element to an array', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -165,7 +165,7 @@ describe('Kernel', () => {
 		});
 
 		it('should delete a property inside data', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -218,7 +218,7 @@ describe('Kernel', () => {
 		});
 
 		it('should apply more than one operation', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -281,7 +281,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not be able to delete an id', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -315,7 +315,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not be able to delete a top level property', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -350,7 +350,7 @@ describe('Kernel', () => {
 		});
 
 		it('should throw given an operation without a path', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -377,7 +377,7 @@ describe('Kernel', () => {
 		});
 
 		it('should throw if adding to non existent property', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -413,7 +413,7 @@ describe('Kernel', () => {
 		});
 
 		it('should throw given an invalid operation', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -449,7 +449,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not apply half matching patches', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -490,7 +490,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not break the type schema', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -530,7 +530,7 @@ describe('Kernel', () => {
 		});
 
 		it('should apply a no-op patch', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -565,7 +565,7 @@ describe('Kernel', () => {
 		});
 
 		it('should apply an empty set of patches', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -594,7 +594,7 @@ describe('Kernel', () => {
 		});
 
 		it('should ignore changes to read-only properties', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -642,7 +642,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -671,7 +671,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const userContract = await ctx.kernel.insertConctract(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -685,7 +685,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -735,7 +735,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -791,7 +791,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const userContract = await ctx.kernel.insertConctract(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -805,7 +805,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -857,7 +857,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -913,7 +913,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const userContract = await ctx.kernel.insertConctract(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -927,7 +927,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -982,7 +982,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1032,7 +1032,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const userContract = await ctx.kernel.insertConctract(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1046,7 +1046,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1057,7 +1057,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const randomContract = await ctx.kernel.insertConctract(
+			const randomContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1105,7 +1105,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1161,7 +1161,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const userContract = await ctx.kernel.insertConctract(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1175,7 +1175,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1226,7 +1226,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1281,7 +1281,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const userContract = await ctx.kernel.insertConctract(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1295,7 +1295,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1347,7 +1347,7 @@ describe('Kernel', () => {
 			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1359,7 +1359,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1391,7 +1391,7 @@ describe('Kernel', () => {
 			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1400,7 +1400,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1431,7 +1431,7 @@ describe('Kernel', () => {
 			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1440,7 +1440,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1453,7 +1453,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1486,7 +1486,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1526,7 +1526,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1566,7 +1566,7 @@ describe('Kernel', () => {
 			const loopSlug = testUtils.generateRandomSlug({
 				prefix: 'loop/',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1578,7 +1578,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
 			});
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1618,7 +1618,7 @@ describe('Kernel', () => {
 
 	describe('.insertContract()', () => {
 		it('should not be able to set links', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1641,7 +1641,7 @@ describe('Kernel', () => {
 		});
 
 		it('should create a user with two email addressses', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1662,7 +1662,7 @@ describe('Kernel', () => {
 
 		it('should not create a user with an empty email list', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'user@1.0.0',
 					data: {
 						email: [],
@@ -1675,7 +1675,7 @@ describe('Kernel', () => {
 
 		it('should not create a user with an invalid email', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'user@1.0.0',
 					data: {
 						email: ['foo'],
@@ -1688,7 +1688,7 @@ describe('Kernel', () => {
 
 		it('should not create a user with an invalid and a valid email', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'user@1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'foo'],
@@ -1701,7 +1701,7 @@ describe('Kernel', () => {
 
 		it('should not create a user with duplicated emails', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'user@1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'johndoe@example.com'],
@@ -1714,7 +1714,7 @@ describe('Kernel', () => {
 
 		it('should throw an error if the element does not adhere to the type', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'action@1.0.0',
 					data: {},
 				}),
@@ -1723,7 +1723,7 @@ describe('Kernel', () => {
 
 		it('should throw an error if the slug contains @latest', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					slug: 'test-1@latest',
 					type: 'card@1.0.0',
 				}),
@@ -1732,7 +1732,7 @@ describe('Kernel', () => {
 
 		it('should throw an error if the slug contains a version', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					slug: 'test-1@1.0.0',
 					type: 'card@1.0.0',
 				}),
@@ -1741,14 +1741,14 @@ describe('Kernel', () => {
 
 		it('should throw an error if the contract type does not exist', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'foobarbazqux@1.0.0',
 				}),
 			).rejects.toThrow(errors.JellyfishUnknownCardType);
 		});
 
 		it('should not throw an error if the referenced loop exists', async () => {
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1758,7 +1758,7 @@ describe('Kernel', () => {
 			);
 
 			const slug = testUtils.generateRandomSlug();
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1773,7 +1773,7 @@ describe('Kernel', () => {
 
 		it('should throw an error if the referenced loop does not exist', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'card@1.0.0',
 					loop: 'saywhat@1.0.0',
 				}),
@@ -1782,7 +1782,7 @@ describe('Kernel', () => {
 
 		it('should throw an error if the referenced loop is not a loop contract', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'card@1.0.0',
 					loop: 'user@1.0.0',
 				}),
@@ -1794,7 +1794,7 @@ describe('Kernel', () => {
 				prefix: 'hello-world',
 			});
 
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1806,7 +1806,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract2 = await ctx.kernel.insertConctract(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1844,7 +1844,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'contract',
 			});
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1864,7 +1864,7 @@ describe('Kernel', () => {
 
 		it('should insert an element with pre-release and build version data', async () => {
 			const version = '1.0.0-alpha+001';
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1886,7 +1886,7 @@ describe('Kernel', () => {
 			const version1 = '1.0.0-alpha';
 			const version2 = '1.0.0-beta';
 			const results = [
-				await ctx.kernel.insertConctract(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.adminSession()!,
 					{
@@ -1896,7 +1896,7 @@ describe('Kernel', () => {
 						data: {},
 					},
 				),
-				await ctx.kernel.insertConctract(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.adminSession()!,
 					{
@@ -1930,7 +1930,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug();
 			const version1 = '1.0.0-alpha+001';
 			const version2 = '1.0.0-alpha+002';
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1939,7 +1939,7 @@ describe('Kernel', () => {
 					version: version1,
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1968,7 +1968,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to insert a contract', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -1988,7 +1988,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to set a tag with a colon', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2009,7 +2009,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to set a tag with a space and a slash', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2030,7 +2030,7 @@ describe('Kernel', () => {
 		});
 
 		it('should use defaults if required keys are missing', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2059,7 +2059,7 @@ describe('Kernel', () => {
 		});
 
 		it('should generate a slug if one is not provided', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2079,13 +2079,13 @@ describe('Kernel', () => {
 				type: 'card@1.0.0',
 			};
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				contract,
 			);
 			await expect(
-				ctx.kernel.insertConctract(
+				ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.adminSession()!,
 					contract,
@@ -2094,7 +2094,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to create a link between two valid contracts', async () => {
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2102,7 +2102,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract2 = await ctx.kernel.insertConctract(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2110,7 +2110,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const linkContract = await ctx.kernel.insertConctract(
+			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2143,7 +2143,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to create a direction-less link between two valid contracts', async () => {
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2151,7 +2151,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract2 = await ctx.kernel.insertConctract(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2159,7 +2159,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const linkContract = await ctx.kernel.insertConctract(
+			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2191,7 +2191,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to create two different links between two valid contracts', async () => {
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2199,7 +2199,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract2 = await ctx.kernel.insertConctract(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2207,7 +2207,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const linkContract1 = await ctx.kernel.insertConctract(
+			const linkContract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2229,7 +2229,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const linkContract2 = await ctx.kernel.insertConctract(
+			const linkContract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2260,7 +2260,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not add a link if not inserting a contract with a target', async () => {
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2268,7 +2268,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2302,7 +2302,7 @@ describe('Kernel', () => {
 			const slug = testUtils.generateRandomSlug({
 				prefix: 'user-johndoe',
 			});
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2358,7 +2358,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const userContract = await ctx.kernel.insertConctract(
+			const userContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2373,7 +2373,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const targetUserContract = await ctx.kernel.insertConctract(
+			const targetUserContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2390,7 +2390,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2418,7 +2418,7 @@ describe('Kernel', () => {
 
 		it('.insertContract() should not insert a link if any of the two target contracts does not exist', async () => {
 			await expect(
-				ctx.kernel.insertConctract(ctx.logContext, ctx.kernel.adminSession()!, {
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					slug: `link-${testUtils.generateRandomSlug()}-is-attached-to-${testUtils.generateRandomSlug()}`,
 					name: 'is attached to',
 					type: 'link@1.0.0',
@@ -2441,7 +2441,7 @@ describe('Kernel', () => {
 
 	describe('.replaceContract()', () => {
 		it('should replace an element', async () => {
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2471,7 +2471,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not overwrite the "created_at" field when overriding a contract', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2493,7 +2493,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not overwrite the "linked_at" field when overriding a contract', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2517,7 +2517,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not be able to set links when overriding a contract', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2552,7 +2552,7 @@ describe('Kernel', () => {
 		});
 
 		it('.getContractBySlug() should find an active contract by its slug', async () => {
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2569,7 +2569,7 @@ describe('Kernel', () => {
 		});
 
 		it('.getContractBySlug() should not find an active contract by its slug and the wrong version', async () => {
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2597,7 +2597,7 @@ describe('Kernel', () => {
 		});
 
 		it('.getContractBySlug() should find an active contract by its slug using @latest', async () => {
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2615,7 +2615,7 @@ describe('Kernel', () => {
 		});
 
 		it('.getContractBySlug() should find the latest version of a contract', async () => {
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2626,7 +2626,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract2 = await ctx.kernel.insertConctract(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2639,7 +2639,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2663,7 +2663,7 @@ describe('Kernel', () => {
 		});
 
 		it('.getContractBySlug() should find an active contract by its slug and its type', async () => {
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2683,7 +2683,7 @@ describe('Kernel', () => {
 
 	describe('.getContractById()', () => {
 		it('should find an active contract by its id', async () => {
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2700,7 +2700,7 @@ describe('Kernel', () => {
 		});
 
 		it('should find an active contract by its id and type', async () => {
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2718,7 +2718,7 @@ describe('Kernel', () => {
 		});
 
 		it('should return an inactive contract by its id', async () => {
-			const result = await ctx.kernel.insertConctract(
+			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2798,7 +2798,7 @@ describe('Kernel', () => {
 
 		it('should be able to limit the results', async () => {
 			const ref = uuid();
-			const result1 = await ctx.kernel.insertConctract(
+			const result1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2811,7 +2811,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const result2 = await ctx.kernel.insertConctract(
+			const result2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2824,7 +2824,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2869,7 +2869,7 @@ describe('Kernel', () => {
 		it('should be able to skip the results', async () => {
 			const ref = uuid();
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2882,7 +2882,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2895,7 +2895,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const result3 = await ctx.kernel.insertConctract(
+			const result3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2940,7 +2940,7 @@ describe('Kernel', () => {
 		it('should be able to limit and skip the results', async () => {
 			const ref = uuid();
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2953,7 +2953,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const result2 = await ctx.kernel.insertConctract(
+			const result2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -2966,7 +2966,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3010,7 +3010,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to sort linked contracts', async () => {
-			const parent = await ctx.kernel.insertConctract(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3018,7 +3018,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child1 = await ctx.kernel.insertConctract(
+			const child1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3029,7 +3029,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child2 = await ctx.kernel.insertConctract(
+			const child2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3040,7 +3040,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3061,7 +3061,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3134,7 +3134,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to skip linked contracts', async () => {
-			const parent = await ctx.kernel.insertConctract(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3142,7 +3142,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child1 = await ctx.kernel.insertConctract(
+			const child1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3153,7 +3153,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child2 = await ctx.kernel.insertConctract(
+			const child2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3164,7 +3164,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3185,7 +3185,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3255,7 +3255,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to limit linked contracts', async () => {
-			const parent = await ctx.kernel.insertConctract(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3263,7 +3263,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child1 = await ctx.kernel.insertConctract(
+			const child1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3274,7 +3274,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child2 = await ctx.kernel.insertConctract(
+			const child2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3285,7 +3285,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3306,7 +3306,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3376,7 +3376,7 @@ describe('Kernel', () => {
 		});
 
 		it('should filter contracts by the options.mask schema if set', async () => {
-			const insertedContract = await ctx.kernel.insertConctract(
+			const insertedContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3437,7 +3437,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to skip and limit linked contracts', async () => {
-			const parent = await ctx.kernel.insertConctract(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3445,7 +3445,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child1 = await ctx.kernel.insertConctract(
+			const child1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3456,7 +3456,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child2 = await ctx.kernel.insertConctract(
+			const child2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3467,7 +3467,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3488,7 +3488,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3559,7 +3559,7 @@ describe('Kernel', () => {
 		});
 
 		it('should return the contracts that match a schema', async () => {
-			const result1 = await ctx.kernel.insertConctract(
+			const result1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3570,7 +3570,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3625,7 +3625,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to describe a property that starts with $', async () => {
-			const result1 = await ctx.kernel.insertConctract(
+			const result1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3672,7 +3672,7 @@ describe('Kernel', () => {
 
 		it('should take roles into account', async () => {
 			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
-			const actor = await ctx.kernel.insertConctract(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3684,7 +3684,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3695,7 +3695,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3756,7 +3756,7 @@ describe('Kernel', () => {
 
 		it('should take roles into account when querying for linked contracts', async () => {
 			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
-			const actor = await ctx.kernel.insertConctract(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3768,7 +3768,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3779,7 +3779,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3803,7 +3803,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const org = await ctx.kernel.insertConctract(
+			const org = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3812,7 +3812,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3833,7 +3833,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const attachment = await ctx.kernel.insertConctract(
+			const attachment = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3842,7 +3842,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3888,7 +3888,7 @@ describe('Kernel', () => {
 			const role = testUtils.generateRandomSlug({
 				prefix: 'foo',
 			});
-			const actor = await ctx.kernel.insertConctract(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3900,7 +3900,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3911,7 +3911,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3962,7 +3962,7 @@ describe('Kernel', () => {
 
 		it('should ignore $id properties in roles', async () => {
 			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
-			const actor = await ctx.kernel.insertConctract(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3974,7 +3974,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -3985,7 +3985,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4039,7 +4039,7 @@ describe('Kernel', () => {
 
 		it('should ignore queries to disallowed properties with additionalProperties: true', async () => {
 			const role = testUtils.generateRandomSlug({ prefix: 'foo' });
-			const actor = await ctx.kernel.insertConctract(
+			const actor = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4051,7 +4051,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4062,7 +4062,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4113,7 +4113,7 @@ describe('Kernel', () => {
 		});
 
 		it('should return inactive contracts', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4149,7 +4149,7 @@ describe('Kernel', () => {
 		});
 
 		it('should take a view contract with two filters', async () => {
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4161,7 +4161,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4234,7 +4234,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to request all contracts (with no properties) linked to a contract', async () => {
-			const parent = await ctx.kernel.insertConctract(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4246,7 +4246,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4258,7 +4258,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4345,7 +4345,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not consider inactive links', async () => {
-			const parent1 = await ctx.kernel.insertConctract(
+			const parent1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4357,7 +4357,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const parent2 = await ctx.kernel.insertConctract(
+			const parent2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4369,7 +4369,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4381,7 +4381,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4404,7 +4404,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract2 = await ctx.kernel.insertConctract(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4416,7 +4416,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4513,7 +4513,7 @@ describe('Kernel', () => {
 
 		it('should be able to query using links', async () => {
 			const ref = uuid();
-			const parent1 = await ctx.kernel.insertConctract(
+			const parent1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4525,7 +4525,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const parent2 = await ctx.kernel.insertConctract(
+			const parent2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4537,7 +4537,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4549,7 +4549,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract1 = await ctx.kernel.insertConctract(
+			const contract1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4562,7 +4562,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4584,7 +4584,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract2 = await ctx.kernel.insertConctract(
+			const contract2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4597,7 +4597,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4619,7 +4619,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract3 = await ctx.kernel.insertConctract(
+			const contract3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4632,7 +4632,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4770,7 +4770,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query using multiple link types', async () => {
-			const parent = await ctx.kernel.insertConctract(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4778,14 +4778,14 @@ describe('Kernel', () => {
 				},
 			);
 
-			const ownedContract = await ctx.kernel.insertConctract(
+			const ownedContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4807,14 +4807,14 @@ describe('Kernel', () => {
 				},
 			);
 
-			const attachedContract = await ctx.kernel.insertConctract(
+			const attachedContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4891,7 +4891,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside $$links', async () => {
-			const parent = await ctx.kernel.insertConctract(
+			const parent = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4899,7 +4899,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const child = await ctx.kernel.insertConctract(
+			const child = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4907,7 +4907,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const grandchild = await ctx.kernel.insertConctract(
+			const grandchild = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4915,7 +4915,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4937,7 +4937,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4959,7 +4959,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const santa = await ctx.kernel.insertConctract(
+			const santa = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -4968,7 +4968,7 @@ describe('Kernel', () => {
 			);
 
 			for (const eternalChild of [parent, child, grandchild]) {
-				await ctx.kernel.insertConctract(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.adminSession()!,
 					{
@@ -5065,7 +5065,7 @@ describe('Kernel', () => {
 		});
 
 		test.skip('should be able to query $$links inside an allOf', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5073,7 +5073,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5084,7 +5084,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5095,7 +5095,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertConctract(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5103,7 +5103,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5125,7 +5125,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5147,7 +5147,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5221,7 +5221,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside an anyOf', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5229,7 +5229,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5240,7 +5240,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5251,7 +5251,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5259,7 +5259,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5270,7 +5270,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5356,7 +5356,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query an optional $$links inside another optional $$links', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5364,7 +5364,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5375,7 +5375,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5386,7 +5386,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5408,7 +5408,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5430,7 +5430,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5521,7 +5521,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside a contains', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5529,7 +5529,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5540,7 +5540,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5551,7 +5551,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertConctract(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5559,7 +5559,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5581,7 +5581,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5603,7 +5603,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5678,7 +5678,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside an items', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5686,7 +5686,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5697,7 +5697,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5708,7 +5708,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertConctract(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5716,7 +5716,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5738,7 +5738,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5760,7 +5760,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5835,7 +5835,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside a not', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5843,7 +5843,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5851,7 +5851,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5859,7 +5859,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5916,7 +5916,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query $$links inside a property', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5924,7 +5924,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5935,7 +5935,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5946,7 +5946,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertConctract(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5954,7 +5954,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5976,7 +5976,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -5998,7 +5998,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6070,7 +6070,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not ignore $$links optimized out by constant folding', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6080,7 +6080,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6094,7 +6094,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6106,7 +6106,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6198,7 +6198,7 @@ describe('Kernel', () => {
 		});
 
 		test.skip('should handle the same link type in multiple $$links', async () => {
-			const office = await ctx.kernel.insertConctract(
+			const office = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6206,7 +6206,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker1 = await ctx.kernel.insertConctract(
+			const worker1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6217,7 +6217,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker2 = await ctx.kernel.insertConctract(
+			const worker2 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6228,7 +6228,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const worker3 = await ctx.kernel.insertConctract(
+			const worker3 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6239,7 +6239,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6261,7 +6261,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6356,14 +6356,14 @@ describe('Kernel', () => {
 
 		it('should filter results based on session scope', async () => {
 			// Insert contracts to query for.
-			const foo = await ctx.kernel.insertConctract(
+			const foo = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
 				},
 			);
-			const bar = await ctx.kernel.insertConctract(
+			const bar = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6378,7 +6378,7 @@ describe('Kernel', () => {
 				ctx.kernel.adminSession()!,
 			);
 			assert(adminSession !== null);
-			const scopedSession = await ctx.kernel.insertConctract(
+			const scopedSession = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6446,7 +6446,7 @@ describe('Kernel', () => {
 
 		it('should work with optional prerelease and build version data', async () => {
 			const contracts = [
-				await ctx.kernel.insertConctract(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.adminSession()!,
 					{
@@ -6457,7 +6457,7 @@ describe('Kernel', () => {
 						},
 					},
 				),
-				await ctx.kernel.insertConctract(
+				await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.kernel.adminSession()!,
 					{
@@ -6514,7 +6514,7 @@ describe('Kernel', () => {
 			assert(adminUser !== null);
 
 			// Create a new inactive session
-			const session = await ctx.kernel.insertConctract(
+			const session = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6537,7 +6537,7 @@ describe('Kernel', () => {
 
 		it('should be able to query root level string fields using full text search', async () => {
 			const name = 'lorem ipsum dolor sit amet';
-			const type = await ctx.kernel.insertConctract(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6556,7 +6556,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6564,7 +6564,7 @@ describe('Kernel', () => {
 					name,
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6600,7 +6600,7 @@ describe('Kernel', () => {
 
 		it('should be able to query root level array fields using full text search', async () => {
 			const tag = 'lorem';
-			const type = await ctx.kernel.insertConctract(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6622,7 +6622,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6630,7 +6630,7 @@ describe('Kernel', () => {
 					tags: [tag],
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6663,7 +6663,7 @@ describe('Kernel', () => {
 
 		it('should be able to query nested string fields using full text search', async () => {
 			const description = 'lorem ipsum dolor sit amet';
-			const type = await ctx.kernel.insertConctract(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6687,7 +6687,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6697,7 +6697,7 @@ describe('Kernel', () => {
 					},
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6739,7 +6739,7 @@ describe('Kernel', () => {
 
 		it('should be able to query nested array fields using full text search', async () => {
 			const label = 'lorem';
-			const type = await ctx.kernel.insertConctract(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6766,7 +6766,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6776,7 +6776,7 @@ describe('Kernel', () => {
 					},
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6819,7 +6819,7 @@ describe('Kernel', () => {
 
 		it('should be able to query deeply nested string fields using full text search', async () => {
 			const description = 'lorem ipsum dolor sit amet';
-			const type = await ctx.kernel.insertConctract(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6858,7 +6858,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6874,7 +6874,7 @@ describe('Kernel', () => {
 					},
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6936,7 +6936,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query nested array fields inside oneOf using full text search', async () => {
-			const type = await ctx.kernel.insertConctract(
+			const type = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6971,7 +6971,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -6981,7 +6981,7 @@ describe('Kernel', () => {
 					},
 				},
 			);
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -7086,7 +7086,7 @@ describe('Kernel', () => {
 						emitter.close();
 					});
 
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7156,7 +7156,7 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7169,7 +7169,7 @@ describe('Kernel', () => {
 						},
 					);
 
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7225,7 +7225,7 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7235,7 +7235,7 @@ describe('Kernel', () => {
 							},
 						},
 					);
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7305,7 +7305,7 @@ describe('Kernel', () => {
 				});
 			});
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -7396,7 +7396,7 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7415,7 +7415,7 @@ describe('Kernel', () => {
 							},
 						},
 					);
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7479,7 +7479,7 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7525,7 +7525,7 @@ describe('Kernel', () => {
 					required: ['type', 'links'],
 				})
 				.then(async (emitter: Stream) => {
-					const contract1 = await ctx.kernel.insertConctract(
+					const contract1 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7538,7 +7538,7 @@ describe('Kernel', () => {
 						},
 					);
 
-					const contract2 = await ctx.kernel.insertConctract(
+					const contract2 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7550,7 +7550,7 @@ describe('Kernel', () => {
 						},
 					);
 
-					await ctx.kernel.insertConctract(
+					await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7636,7 +7636,7 @@ describe('Kernel', () => {
 					required: ['type', 'links'],
 				})
 				.then(async (emitter: Stream) => {
-					const contract1 = await ctx.kernel.insertConctract(
+					const contract1 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7648,7 +7648,7 @@ describe('Kernel', () => {
 						},
 					);
 
-					const contract2 = await ctx.kernel.insertConctract(
+					const contract2 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7679,7 +7679,7 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertConctract(
+					ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7737,7 +7737,7 @@ describe('Kernel', () => {
 					required: ['type'],
 				})
 				.then(async (emitter: Stream) => {
-					const contract1 = await ctx.kernel.insertConctract(
+					const contract1 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7750,7 +7750,7 @@ describe('Kernel', () => {
 						},
 					);
 
-					const contract2 = await ctx.kernel.insertConctract(
+					const contract2 = await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7762,7 +7762,7 @@ describe('Kernel', () => {
 						},
 					);
 
-					await ctx.kernel.insertConctract(
+					await ctx.kernel.insertContract(
 						ctx.logContext,
 						ctx.kernel.adminSession()!,
 						{
@@ -7883,7 +7883,7 @@ describe('Kernel', () => {
 
 			const end = once(stream, 'closed');
 
-			await ctx.kernel.insertConctract(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -7900,7 +7900,7 @@ describe('Kernel', () => {
 
 		it('should send the dataset event on a query request and support the unmatch event for these contracts', async () => {
 			const slug = testUtils.generateRandomSlug();
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -7984,7 +7984,7 @@ describe('Kernel', () => {
 		});
 
 		it('issue #1128: should be able to query for two nested optional links', async () => {
-			const contract = await ctx.kernel.insertConctract(
+			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
