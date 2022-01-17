@@ -1,10 +1,10 @@
-import { CARDS, Kernel } from '../../lib';
+import { CONTRACTS, Kernel } from '../../lib';
 import * as views from '../../lib/views';
 
 describe('views', () => {
 	describe('.getSchema()', () => {
 		test('should return null if the contract is not a view', () => {
-			const schema = views.getSchema(CARDS['user-admin']);
+			const schema = views.getSchema(CONTRACTS['user-admin']);
 			expect(schema).toEqual(null);
 		});
 

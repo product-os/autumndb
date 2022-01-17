@@ -33,7 +33,7 @@ describe('permission-filter', () => {
 		});
 
 		test('should throw if the session actor is invalid', async () => {
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertConctract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -58,7 +58,7 @@ describe('permission-filter', () => {
 		});
 
 		test('should get the session user and scope given the session did not expire', async () => {
-			const result = await ctx.kernel.insertCard(
+			const result = await ctx.kernel.insertConctract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -91,7 +91,7 @@ describe('permission-filter', () => {
 				},
 			};
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertConctract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -126,7 +126,7 @@ describe('permission-filter', () => {
 		});
 
 		test('should throw if the session expired', async () => {
-			const user = await ctx.kernel.insertCard(
+			const user = await ctx.kernel.insertConctract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -146,7 +146,7 @@ describe('permission-filter', () => {
 			const date = new Date();
 			date.setDate(date.getDate() - 1);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertConctract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -172,7 +172,7 @@ describe('permission-filter', () => {
 		});
 
 		test('should throw if the session has been deleted', async () => {
-			const user = await ctx.kernel.insertCard(
+			const user = await ctx.kernel.insertConctract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
@@ -189,7 +189,7 @@ describe('permission-filter', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertCard(
+			const session = await ctx.kernel.insertConctract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{

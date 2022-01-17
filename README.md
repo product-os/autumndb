@@ -1,7 +1,7 @@
 # Jellyfish Core
 
 The Jellyfish core is a low-level internal SDK to interact with contracts in the
-database, providing functions like `.getCardById()` or `.insertCard()`. The
+database, providing functions like `.getContractById()` or `.insertContract()`. The
 core provides the foundation library for the rest of system.
 
 ## Goals
