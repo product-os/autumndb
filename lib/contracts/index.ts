@@ -52,5 +52,5 @@ export const CONTRACTS = contracts.reduce<{
 	return acc;
 }, {});
 
-// Deprecated Use CONTRACTS instead.
+/** @deprecated */
 export const CARDS = CONTRACTS;

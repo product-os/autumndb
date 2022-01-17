@@ -432,7 +432,7 @@ export class Kernel {
 		return results[0] || null;
 	}
 
-	// Deprecated. Use getContractById instead
+	/** @deprecated */
 	async getCardById<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
@@ -554,7 +554,7 @@ export class Kernel {
 		return this.backend.insertElement<T>(context, contract as Contract);
 	}
 
-	// Deprecated. Use insertContract instead.
+	/** @deprecated */
 	async insertCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
@@ -598,7 +598,7 @@ export class Kernel {
 		return this.backend.upsertElement(context, contract as Contract);
 	}
 
-	// Deprecated. Use replaceContract instead.
+	/** @deprecated */
 	async replaceCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
@@ -898,7 +898,7 @@ export class Kernel {
 		return result;
 	}
 
-	// Deprecated. Use patchContractBySlug instead.
+	/** @deprecated */
 	async patchCardBySlug<T = Contract>(
 		mixedContext: MixedContext,
 		session: string,
