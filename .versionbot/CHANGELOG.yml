@@ -1,4 +1,17 @@
 - commits:
+    - subject: >-
+        As a preparation of replacing uses of "card" with "contract", alias of
+        core library`s public interfaces were created.
+      hash: 5e877d17669cc45abc07dd110820b29bf0cb3a85
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Taro Murao
+      nested: []
+  version: 12.2.0
+  date: 2022-01-17T14:53:21.747Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 7000e25f0f43782200588200ee20b407eaef8ab4
       body: ''
