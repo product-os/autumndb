@@ -1,4 +1,15 @@
 - commits:
+    - subject: Fix typo insertConctract -> insertContract
+      hash: 5982cfb63638b48f2a00ef37022d4487510f0515
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Taro Murao
+      nested: []
+  version: 12.2.1
+  date: 2022-01-17T17:04:35.791Z
+- commits:
     - subject: >-
         As a preparation of replacing uses of "card" with "contract", alias of
         core library`s public interfaces were created.
