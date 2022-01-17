@@ -406,7 +406,7 @@ export class Kernel {
 		id: string,
 	): Promise<T | null> {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		context.debug('Fetching conctract by id', { id });
+		context.debug('Fetching contract by id', { id });
 		const schema: JsonSchema = {
 			type: 'object',
 			properties: {
@@ -539,7 +539,7 @@ export class Kernel {
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(contract.id)
 	 */
-	async insertConctract<T extends Contract = Contract>(
+	async insertContract<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
@@ -560,7 +560,7 @@ export class Kernel {
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
-		return await this.insertConctract(mixedContext, session, object);
+		return await this.insertContract(mixedContext, session, object);
 	}
 
 	/**
@@ -1112,7 +1112,7 @@ export class Kernel {
 	 * @returns {Object} contract
 	 *
 	 * @example
-	 * const conctract = Kernel.defaults({
+	 * const contract = Kernel.defaults({
 	 *   slug: 'slug',
 	 *   type: 'type'
 	 * })
