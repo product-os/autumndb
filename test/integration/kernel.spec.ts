@@ -7001,7 +7001,8 @@ describe('Kernel', () => {
 			);
 		});
 
-		it('should report back action requests', (done) => {
+		// TODO: Move this to jellyfish-queue
+		it.skip('should report back action requests', (done) => {
 			ctx.kernel
 				.stream(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'object',

@@ -200,7 +200,7 @@ describe('.createIndex()', () => {
 			`,
 			[indexName],
 		);
-		res.sql = res.sql.replaceAll(/\s+/g, ' ').trim();
+		res.sql = res.sql.replace(/\s+/g, ' ').trim();
 		expect(res).toEqual({
 			table_name: tableName,
 			sql: `CREATE INDEX IF NOT EXISTS "${indexName}" ON ${tableName} ${predicate}`,
@@ -245,7 +245,7 @@ describe('.createIndex()', () => {
 			`,
 			[indexName],
 		);
-		res.sql = res.sql.replaceAll(/\s+/g, ' ').trim();
+		res.sql = res.sql.replace(/\s+/g, ' ').trim();
 		expect(res).toEqual({
 			table_name: tableName,
 			sql: `CREATE UNIQUE INDEX IF NOT EXISTS "${indexName}" ON ${tableName} ${predicate}`,

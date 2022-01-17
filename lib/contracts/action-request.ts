@@ -24,7 +24,7 @@ export const actionRequest = {
 							type: 'string',
 							format: 'date-time',
 						},
-						context: {
+						logContext: {
 							type: 'object',
 						},
 						originator: {
@@ -55,7 +55,7 @@ export const actionRequest = {
 					required: [
 						'epoch',
 						'timestamp',
-						'context',
+						'logContext',
 						'actor',
 						'action',
 						'input',
