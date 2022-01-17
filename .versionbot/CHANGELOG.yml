@@ -1,4 +1,15 @@
 - commits:
+    - subject: Typescript provides @deprecated which is also supported by VSC
+      hash: 718a5eea94706aaf3212d4327505dc1b6071ef00
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Taro Murao
+      nested: []
+  version: 12.2.2
+  date: 2022-01-17T19:44:02.655Z
+- commits:
     - subject: Fix typo insertConctract -> insertContract
       hash: 5982cfb63638b48f2a00ef37022d4487510f0515
       body: ''
