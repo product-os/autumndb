@@ -1,4 +1,17 @@
 - commits:
+    - subject: Drop use of $ref in core contract mixins
+      hash: f48a3792d16f1d7972a95d5235542ad58e4a469d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 12.2.3
+  date: 2022-01-18T10:36:19.371Z
+- commits:
     - subject: Typescript provides @deprecated which is also supported by VSC
       hash: 718a5eea94706aaf3212d4327505dc1b6071ef00
       body: ''
