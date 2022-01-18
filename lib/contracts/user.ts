@@ -1,4 +1,4 @@
-import * as path from 'path';
+import { uiSchemaDef } from './mixins/ui-schema-defs';
 
 export const user = {
 	slug: 'user',
@@ -284,9 +284,7 @@ export const user = {
 			fields: {
 				data: {
 					hash: null,
-					email: {
-						$ref: path.join(__dirname, '/mixins/ui-schema-defs.json#/email'),
-					},
+					email: uiSchemaDef('email'),
 					status: {
 						'ui:title': null,
 						value: null,
@@ -309,12 +307,7 @@ export const user = {
 					profile: {
 						'ui:description': null,
 						viewSettings: null,
-						homeView: {
-							$ref: path.join(
-								__dirname,
-								'/mixins/ui-schema-defs.json#/idOrSlugLink',
-							),
-						},
+						homeView: uiSchemaDef('idOrSlugLink'),
 						sendCommand: {
 							'ui:widget': 'Markdown',
 							'ui:value': {
@@ -326,12 +319,7 @@ export const user = {
 						disableNotificationSound: {
 							'ui:widget': 'Checkbox',
 						},
-						starredViews: {
-							$ref: path.join(
-								__dirname,
-								'/mixins/ui-schema-defs.json#/idOrSlugList',
-							),
-						},
+						starredViews: uiSchemaDef('idOrSlugList'),
 						name: {
 							'ui:title': null,
 						},
