@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update resinci/jellyfish-test Docker tag to v1.4.20'
+      hash: ea18934ed6938aea284d771b9b12a4c3bb4063c9
+      body: |
+        Update resinci/jellyfish-test from v1.4.18 to v1.4.20
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 12.2.4
+  date: 2022-01-18T11:11:42.079Z
+- commits:
     - subject: Drop use of $ref in core contract mixins
       hash: f48a3792d16f1d7972a95d5235542ad58e4a469d
       body: ''
