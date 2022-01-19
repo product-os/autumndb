@@ -11,6 +11,7 @@ import { oauthProvider } from './oauth-provider';
 import { org } from './org';
 import { role } from './role';
 import { roleUserAdmin } from './role-user-admin';
+import { roleUserGuest } from './role-user-guest';
 import { session } from './session';
 import { type } from './type';
 import { user } from './user';
@@ -31,6 +32,7 @@ const contracts = [
 	userAdmin,
 	user,
 	roleUserAdmin,
+	roleUserGuest,
 	view,
 	oauthProvider,
 	oauthClient,
