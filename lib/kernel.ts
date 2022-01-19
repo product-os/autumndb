@@ -370,8 +370,6 @@ export class Kernel {
 		await Promise.all(
 			[
 				CONTRACTS.card,
-				CONTRACTS.action,
-				CONTRACTS['action-request'],
 				CONTRACTS.org,
 				CONTRACTS.error,
 				CONTRACTS.event,
@@ -381,7 +379,6 @@ export class Kernel {
 				CONTRACTS.loop,
 				CONTRACTS['oauth-provider'],
 				CONTRACTS['oauth-client'],
-				CONTRACTS['scheduled-action'],
 			].map(async (contract) => {
 				context.debug('Upserting core contract', { slug: contract.slug });
 

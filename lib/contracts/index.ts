@@ -1,29 +1,24 @@
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
-import { initialize } from './mixins';
-import { actionRequest } from './action-request';
-import { action } from './action';
+import { authentication } from './authentication';
 import { card } from './card';
-import { role } from './role';
-import { org } from './org';
 import { error } from './error';
 import { event } from './event';
 import { link } from './link';
 import { loop } from './loop';
+import { initialize } from './mixins';
+import { oauthClient } from './oauth-client';
+import { oauthProvider } from './oauth-provider';
+import { org } from './org';
+import { role } from './role';
+import { roleUserAdmin } from './role-user-admin';
 import { session } from './session';
 import { type } from './type';
-import { userAdmin } from './user-admin';
 import { user } from './user';
-import { roleUserAdmin } from './role-user-admin';
-import { view } from './view';
-import { oauthProvider } from './oauth-provider';
-import { oauthClient } from './oauth-client';
-import { scheduledAction } from './scheduled-action';
-import { authentication } from './authentication';
+import { userAdmin } from './user-admin';
 import { userSettings } from './user-settings';
+import { view } from './view';
 
 const contracts = [
-	actionRequest,
-	action,
 	card,
 	role,
 	org,
@@ -39,7 +34,6 @@ const contracts = [
 	view,
 	oauthProvider,
 	oauthClient,
-	scheduledAction,
 	authentication,
 	userSettings,
 ];
