@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add role-user-guest
+      hash: d40eb822451a3a64b25d0e1edd26e886b5d37592
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 13.1.0
+  date: 2022-01-19T07:22:14.984Z
+- commits:
     - subject: Remove action contracts
       hash: 92098221205075a5db44ad6a4f8ee5dfb7d992e9
       body: ''
