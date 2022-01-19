@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove action contracts
+      hash: 92098221205075a5db44ad6a4f8ee5dfb7d992e9
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 13.0.0
+  date: 2022-01-19T05:34:00.268Z
+- commits:
     - subject: 'patch: Update dependency typedoc to ^0.22.11'
       hash: b6cd39ce858eabd6f6a1fc1614acf3c22736ccd4
       body: |
