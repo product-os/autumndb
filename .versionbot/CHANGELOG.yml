@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-non-major'
+      hash: 310ad6dcb8005c474b1db89e89697a43cfc843e6
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 13.1.1
+  date: 2022-01-19T14:08:33.158Z
+- commits:
     - subject: Add role-user-guest
       hash: d40eb822451a3a64b25d0e1edd26e886b5d37592
       body: ''

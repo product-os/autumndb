@@ -1,6 +1,6 @@
 {
   "name": "@balena/jellyfish-core",
-  "version": "13.1.0",
+  "version": "13.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/product-os/jellyfish-core.git"
@@ -97,6 +97,6 @@
     "pre-commit": "npx lint-staged"
   },
   "versionist": {
-    "publishedAt": "2022-01-19T07:22:15.154Z"
+    "publishedAt": "2022-01-19T14:08:33.328Z"
   }
 }
