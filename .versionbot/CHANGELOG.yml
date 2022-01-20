@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add create user/session test utils and role test
+      hash: 60ea23c8a211950928f01e62f81e863bf4e1abc1
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 13.3.0
+  date: 2022-01-20T07:13:27.841Z
+- commits:
     - subject: Add role-user-community
       hash: eafcdd96cd036f523db8c7d181ff56a7e3f53094
       body: ''
