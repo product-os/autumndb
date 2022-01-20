@@ -9,32 +9,8 @@ let userSession: any;
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
-	const username = testUtils.generateRandomId();
-	user = await ctx.kernel.insertContract(
-		ctx.logContext,
-		ctx.kernel.adminSession()!,
-		{
-			type: 'user@1.0.0',
-			slug: `user-${username}`,
-			data: {
-				email: `${username}@example.com`,
-				hash: 'foobar',
-				roles: ['user-community'],
-			},
-		},
-	);
-
-	userSession = await ctx.kernel.insertContract(
-		ctx.logContext,
-		ctx.kernel.adminSession()!,
-		{
-			type: 'session@1.0.0',
-			slug: `session-${user.slug}-${testUtils.generateRandomId()}`,
-			data: {
-				actor: user.id,
-			},
-		},
-	);
+	user = await ctx.createUser(testUtils.generateRandomId());
+	userSession = await ctx.createSession(user);
 });
 
 afterAll(() => {
@@ -45,13 +21,11 @@ describe('role-user-community', () => {
 	it('users should be able to query views', async () => {
 		expect(user.data.roles).toEqual(['user-community']);
 
-		await ctx.kernel.insertContract<ViewContract>(
+		const view = await ctx.kernel.insertContract<ViewContract>(
 			ctx.logContext,
 			ctx.kernel.adminSession()!,
 			{
 				type: 'view@1.0.0',
-				slug: 'view-foobar',
-				name: 'foobar view',
 				data: {
 					actor: user.id,
 				},
@@ -72,6 +46,31 @@ describe('role-user-community', () => {
 				},
 			},
 		});
-		expect(_.includes(_.map(results, 'slug'), 'view-foobar')).toBe(true);
+		expect(_.includes(_.map(results, 'slug'), view.slug)).toBe(true);
+	});
+
+	it('users should not be able to view other users contracts', async () => {
+		const otherUser = await ctx.createUser(testUtils.generateRandomId());
+		expect(otherUser.data.roles).toEqual(['user-community']);
+		const otherUserSession = await ctx.createSession(otherUser);
+
+		const view = await ctx.kernel.insertContract<ViewContract>(
+			ctx.logContext,
+			ctx.kernel.adminSession()!,
+			{
+				type: 'view@1.0.0',
+				data: {
+					actor: user.id,
+				},
+				markers: [user.slug],
+			},
+		);
+
+		const results = await ctx.kernel.getContractById(
+			ctx.logContext,
+			otherUserSession.id,
+			view.id,
+		);
+		expect(results).toEqual(null);
 	});
 });

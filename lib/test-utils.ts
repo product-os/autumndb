@@ -1,5 +1,10 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import type { LogContext } from '@balena/jellyfish-logger';
+import type {
+	SessionContract,
+	UserContract,
+} from '@balena/jellyfish-types/build/core';
+import { strict as assert } from 'assert';
 import { Pool } from 'pg';
 import { v4 as uuid } from 'uuid';
 import { Cache } from './cache';
@@ -14,6 +19,12 @@ export interface TestContext {
 	cache: Cache;
 	kernel: Kernel;
 	pool: Pool;
+	createUser: (
+		username: string,
+		hash?: string,
+		roles?: string[],
+	) => Promise<UserContract>;
+	createSession: (user: UserContract) => Promise<SessionContract>;
 }
 
 /**
@@ -41,12 +52,62 @@ export const newContext = async (
 		}),
 	);
 
+	const createUser = async (
+		username: string,
+		hash = 'foobar',
+		roles = ['user-community'],
+	) => {
+		// Create the user, only if it doesn't exist yet
+		const userContract =
+			(await kernel.getContractBySlug<UserContract>(
+				logContext,
+				kernel.adminSession()!,
+				`user-${username}@latest`,
+			)) ||
+			(await kernel.insertContract<UserContract>(
+				logContext,
+				kernel.adminSession()!,
+				{
+					type: 'user@1.0.0',
+					slug: `user-${username}`,
+					data: {
+						email: `${username}@example.com`,
+						hash,
+						roles,
+					},
+				},
+			));
+		assert(userContract);
+
+		return userContract;
+	};
+
+	const createSession = async (user: UserContract) => {
+		// Force login, even if we don't know the password
+		const sessionContract = await kernel.insertContract<SessionContract>(
+			logContext,
+			kernel.adminSession()!,
+			{
+				slug: `session-${user.slug}-integration-tests-${generateRandomId()}`,
+				type: 'session@1.0.0',
+				data: {
+					actor: user.id,
+				},
+			},
+		);
+		assert(sessionContract);
+
+		return sessionContract;
+	};
+
 	return {
 		logContext,
 		session: kernel.adminSession()!,
 		cache,
 		kernel,
 		pool,
+		createUser,
+		createSession,
 	};
 };
 
