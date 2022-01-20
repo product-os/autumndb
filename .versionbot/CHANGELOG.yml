@@ -1,4 +1,37 @@
 - commits:
+    - subject: Add role-user-community
+      hash: eafcdd96cd036f523db8c7d181ff56a7e3f53094
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Add role-user-test
+      hash: a002cbf980250be45a7bc0f135ad5cbbc112633d
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Add role-user-operator
+      hash: ce1b065aab23f7d0525ac77dd30645ff7192cb61
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 13.2.0
+  date: 2022-01-20T05:20:07.895Z
+- commits:
     - subject: 'patch: Update internal-non-major'
       hash: 310ad6dcb8005c474b1db89e89697a43cfc843e6
       body: ''
