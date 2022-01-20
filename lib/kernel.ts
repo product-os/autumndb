@@ -352,6 +352,7 @@ export class Kernel {
 			unsafeUpsert(CONTRACTS.user),
 			unsafeUpsert(CONTRACTS['user-settings']),
 			unsafeUpsert(CONTRACTS['role-user-admin']),
+			unsafeUpsert(CONTRACTS['role-user-community']),
 			unsafeUpsert(CONTRACTS['role-user-guest']),
 			unsafeUpsert(CONTRACTS['role-user-operator']),
 			unsafeUpsert(CONTRACTS['role-user-test']),
