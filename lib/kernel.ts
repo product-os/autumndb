@@ -354,6 +354,7 @@ export class Kernel {
 			unsafeUpsert(CONTRACTS['role-user-admin']),
 			unsafeUpsert(CONTRACTS['role-user-guest']),
 			unsafeUpsert(CONTRACTS['role-user-operator']),
+			unsafeUpsert(CONTRACTS['role-user-test']),
 		]);
 
 		const adminUser = await unsafeUpsert(CONTRACTS['user-admin']);
