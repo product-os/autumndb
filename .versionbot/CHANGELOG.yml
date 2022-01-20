@@ -1,4 +1,22 @@
 - commits:
+    - subject: Fix `Kernel.defaults` signature
+      hash: 83cdba9f77941d7cbbd42ec73e40ea84a109e6eb
+      body: |
+        The current signature defines that the method returns a partial contract
+        while in fact it returns a full contract with only the ID undefined.
+
+        Unfortunately this is a major change as it is necessary to change the
+        generic arguments.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 14.0.0
+  date: 2022-01-20T21:22:53.588Z
+- commits:
     - subject: Add create user/session test utils and role test
       hash: 60ea23c8a211950928f01e62f81e863bf4e1abc1
       body: ''
