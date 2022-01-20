@@ -7,6 +7,7 @@ import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	Contract,
+	ContractData,
 	ContractDefinition,
 	LinkContract,
 	TypeContract,
@@ -34,7 +35,7 @@ interface KernelQueryOptions extends Partial<BackendQueryOptions> {
 // Generate a concise slug for a contract, using the `name` field
 // if its available
 export const generateSlug = (
-	contract: Partial<Contract> & Pick<Contract, 'type'>,
+	contract: Pick<Contract, 'name' | 'type'>,
 ): string => {
 	const baseType = contract.type.split('@')[0];
 
@@ -1104,54 +1105,47 @@ export class Kernel {
 	}
 
 	/**
-	 * @summary Extends a contract with default values
-	 * @function
-	 * @public
-	 *
-	 *
-	 * @param {Object} contract - contract
-	 * @returns {Object} contract
-	 *
-	 * @example
-	 * const contract = Kernel.defaults({
-	 *   slug: 'slug',
-	 *   type: 'type'
-	 * })
-	 *
-	 * console.log(contract)
+	 * Get a full contract from a partial one. Missing fields are given a
+	 * default value.
 	 */
-	static defaults<T extends Contract = Contract>(
-		contract: Partial<Contract> & Pick<T, 'type'>,
-	): ContractDefinition<T['data']> {
-		// Object.assign is used as it is significantly faster than using lodash
-		const defaultContract = Object.assign(
-			{
-				updated_at: null,
-				linked_at: {},
-				active: true,
-				version: '1.0.0',
-				tags: [],
-				markers: [],
-				loop: null,
-				links: {},
-				requires: [],
-				capabilities: [],
-				data: {},
-			},
-			contract,
-		);
+	static defaults<Data = ContractData, Links = { [key: string]: Contract[] }>(
+		contract: Partial<Contract<Data, Links>> &
+			Pick<Contract<Data, Links>, 'type'>,
+	): Omit<Contract<Data, Links>, 'id'> {
+		const extras: { created_at?: string; slug?: string } = {};
 
 		// Only create a timestamp if it's necessary
-		if (!defaultContract.created_at) {
-			defaultContract.created_at = new Date().toISOString();
+		if (!contract.created_at) {
+			extras.created_at = new Date().toISOString();
 		}
 
 		// Only create a slug if it's necessary
-		if (!defaultContract.slug) {
-			defaultContract.slug = generateSlug(defaultContract);
+		if (!contract.slug) {
+			extras.slug = generateSlug(contract);
 		}
 
-		return defaultContract as ContractDefinition<T['data']>;
+		// There are two `as` casts here:
+		//
+		// - `data`: we cannot make any assumptions as to what `Data` is nor
+		//   can construct a default value for `Data`. Thus an `as any` cast is
+		//   necessary to typecheck.
+		// - Return type: can't convince TS that `created_at` and `slug` will
+		//   always be set.
+		return {
+			updated_at: null,
+			linked_at: {},
+			active: true,
+			version: '1.0.0',
+			tags: [],
+			markers: [],
+			loop: null,
+			links: {},
+			requires: [],
+			capabilities: [],
+			data: {} as any,
+			...extras,
+			...contract,
+		} as Omit<Contract<Data, Links>, 'id'>;
 	}
 
 	/**

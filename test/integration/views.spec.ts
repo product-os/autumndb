@@ -45,7 +45,9 @@ describe('views', () => {
 
 		test('should preserve template interpolations in schema properties', () => {
 			const schema = views.getSchema(
-				Kernel.defaults({
+				// TS-TODO: using `ViewData` here does not typecheck because
+				// of the `$eval`
+				Kernel.defaults<any>({
 					type: 'view@1.0.0',
 					version: '1.0.0',
 					data: {
