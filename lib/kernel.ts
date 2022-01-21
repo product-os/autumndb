@@ -2,7 +2,12 @@ import type { LogContext } from '@balena/jellyfish-logger';
 import * as _ from 'lodash';
 import * as jsonpatch from 'fast-json-patch';
 import * as fastEquals from 'fast-equals';
-import type { Contract, ContractDefinition, LinkContract } from './contracts';
+import type {
+	Contract,
+	ContractData,
+	ContractDefinition,
+	LinkContract,
+} from './contracts';
 import * as metrics from '@balena/jellyfish-metrics';
 import { Pool } from 'pg';
 import * as stopword from 'stopword';
