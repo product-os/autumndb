@@ -1,12 +1,12 @@
 import { strict as nativeAssert } from 'assert';
 import * as Bluebird from 'bluebird';
 import * as metrics from '@balena/jellyfish-metrics';
-import type { JsonSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '../../json-schema';
 import type {
 	Contract,
 	ContractDefinition,
 	LinkContract,
-} from '@balena/jellyfish-types/build/core';
+} from '../../contracts';
 import * as _ from 'lodash';
 import { performance } from 'perf_hooks';
 import { Pool, PoolClient } from 'pg';

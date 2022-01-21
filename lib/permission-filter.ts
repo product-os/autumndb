@@ -1,12 +1,11 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
 import jsone = require('json-e');
 import * as _ from 'lodash';
 import type { DatabaseBackend } from './backend/postgres/types';
-import { CONTRACTS } from './contracts';
+import { Contract } from './contracts';
 import type { Context } from './context';
 import * as errors from './errors';
-import jsonSchema from './json-schema';
+import jsonSchema, { JsonSchema } from './json-schema';
+import { CONTRACTS } from './contracts';
 
 const CONTRACT_CONTRACT_TYPE = `${CONTRACTS.card.slug}@${CONTRACTS.card.version}`;
 const VERSIONED_CONTRACTS = _.mapKeys(CONTRACTS, (value: any, key: any) => {

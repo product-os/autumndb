@@ -1,7 +1,4 @@
-import type {
-	Contract,
-	LinkContract,
-} from '@balena/jellyfish-types/build/core';
+import type { Contract, LinkContract } from '../../contracts';
 import * as _ from 'lodash';
 import { Context } from '../../context';
 import type { PostgresBackend } from '.';

@@ -1,4 +1,4 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '../../../json-schema';
 import * as _ from 'lodash';
 import type { Context } from '../../../context';
 import type { SqlQueryOptions } from '../types';

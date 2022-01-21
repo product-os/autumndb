@@ -1,4 +1,4 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from '../../../contracts';
 import * as _ from 'lodash';
 import * as pgFormat from 'pg-format';
 import { SqlPath } from './sql-path';

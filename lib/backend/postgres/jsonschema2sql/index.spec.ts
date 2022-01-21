@@ -1,4 +1,4 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '../../../json-schema';
 import { Context } from '../../../context';
 import * as jsonschema2sql from '.';
 

@@ -23,7 +23,7 @@ import { ValueIsFilter } from './value-is-filter';
 import * as REGEXES from './regexes';
 import { InvalidSchema } from './errors';
 import * as util from './util';
-import type { JsonSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '../../../json-schema';
 import type { JSONSchema7TypeName } from 'json-schema';
 import type { SqlFilter } from './sql-filter';
 import type { SqlQueryOptions } from '../types';

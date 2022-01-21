@@ -1,12 +1,13 @@
 import { strict as assert } from 'assert';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { JsonSchema } from '../../lib/json-schema';
+import type { Contract } from '../../lib/contracts';
 import * as Bluebird from 'bluebird';
 import { once } from 'events';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
-import { CONTRACTS, errors, testUtils } from '../../lib';
+import { errors, testUtils } from '../../lib';
 import type { Stream } from '../../lib/backend/postgres/streams';
+import { CONTRACTS } from '../../lib/contracts';
 
 let ctx: testUtils.TestContext;
 

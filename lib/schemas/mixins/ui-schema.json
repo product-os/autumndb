@@ -1,0 +1,51 @@
+{
+  "data": {
+    "uiSchema": {
+      "fields": {
+        "data": {
+          "ui:title": null,
+          "ui:options": {
+            "alignSelf": "stretch"
+          },
+          "origin": null,
+          "translateDate": null,
+          "$$localSchema": null
+        },
+        "id": null,
+        "name": null,
+        "slug": null,
+        "type": null,
+        "loop": null,
+        "version": null,
+        "markers": null,
+        "tags": null,
+        "links": null,
+        "linked_at": null,
+        "created_at": null,
+        "updated_at": null,
+        "active": null,
+        "requires": null,
+        "capabilities": null
+      },
+      "edit": {
+        "ui:order": ["name", "loop", "tags", "data", "*"],
+        "loop": {
+          "ui:widget": "LoopSelect"
+        }
+      },
+      "create": {
+        "ui:order": ["name", "loop", "tags", "data", "*"],
+        "loop": {
+          "ui:widget": "LoopSelect"
+        }
+      },
+      "snippet": {
+        "ui:explicit": true,
+        "data": {
+          "ui:title": null,
+          "ui:explicit": true
+        }
+      }
+    }
+  }
+}

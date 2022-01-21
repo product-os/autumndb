@@ -2,17 +2,8 @@ import type { LogContext } from '@balena/jellyfish-logger';
 import * as _ from 'lodash';
 import * as jsonpatch from 'fast-json-patch';
 import * as fastEquals from 'fast-equals';
-import { CONTRACTS } from './contracts';
+import type { Contract, ContractDefinition, LinkContract } from './contracts';
 import * as metrics from '@balena/jellyfish-metrics';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
-	Contract,
-	ContractData,
-	ContractDefinition,
-	LinkContract,
-	TypeContract,
-	ViewContract,
-} from '@balena/jellyfish-types/build/core';
 import { Pool } from 'pg';
 import * as stopword from 'stopword';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,9 +15,11 @@ import type {
 import type { Cache } from './cache';
 import { Context, MixedContext, TransactionIsolation } from './context';
 import * as errors from './errors';
-import jsonSchema from './json-schema';
+import jsonSchema, { JsonSchema } from './json-schema';
 import * as permissionFilter from './permission-filter';
 import * as views from './views';
+import { CONTRACTS } from '.';
+import type { TypeContract, ViewContract } from './contracts';
 
 interface KernelQueryOptions extends Partial<BackendQueryOptions> {
 	mask?: JsonSchema;

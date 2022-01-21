@@ -1,0 +1,97 @@
+{
+  "slug": "type",
+  "type": "type@1.0.0",
+  "name": "Jellyfish Contract Type",
+  "data": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["type", "type@1.0.0"]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "type": "object"
+            },
+            "uiSchema": {
+              "type": "object"
+            },
+            "slices": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "indexed_fields": {
+              "description": "Fields, or groups of fields that should be indexed for improved performance",
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "$transformer": {
+            "type": "object",
+            "properties": {
+              "formulaVersion": {
+                "type": "number",
+                "$$formula": "2",
+                "readOnly": true,
+                "default": 0
+              },
+              "parentMerged": {
+                "description": "parent contract was already merged",
+                "type": "boolean",
+                "$$formula": "contract.links[\"was built from\"].length > 0 && EVERY(contract.links[\"was built from\"], \"data.$transformer.merged\") === true",
+                "readOnly": true,
+                "default": false
+              },
+              "merged": {
+                "description": "was merged as a final version",
+                "type": "boolean",
+                "$$formula": "contract.links[\"was merged as\"].length > 0",
+                "readOnly": true,
+                "default": false
+              },
+              "mergeConfirmed": {
+                "description": "all downstream contracts are merged",
+                "type": "boolean",
+                "$$formula": "(/^[^+]*-/.test(contract.version)\n\t\t\t\t\t\t\t\t\t&& EVERY(contract.links[\"was built into\"], \"data.$transformer.merged\")\n\t\t\t\t\t\t\t\t\t&& EVERY(contract.links[\"was built into\"], \"data.$transformer.mergeConfirmed\")\n\t\t\t\t\t\t\t\t) || (!/^[^+]*-/.test(contract.version)\n\t\t\t\t\t\t\t\t\t&& PROPERTY(contract.links[\"was merged from\"][0], \"data.$transformer.mergeConfirmed\") === true )",
+                "readOnly": true
+              },
+              "finalVersion": {
+                "description": "this contract is a final version and not a SemVer pre-release",
+                "type": "boolean",
+                "$$formula": "!/^[^+]*-/.test(contract.version)",
+                "readOnly": true
+              },
+              "artifactReady": {
+                "description": "artifact is created",
+                "type": ["boolean", "string"]
+              },
+              "mergeable": {
+                "description": "types are validated on insert and thus are always mergeable",
+                "type": "boolean",
+                "$$formula": "true",
+                "readOnly": true,
+                "default": false
+              }
+            }
+          },
+          "required": ["schema"]
+        }
+      },
+      "required": ["slug", "type", "data"]
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+	"slug": "error",
+		"type": "type@1.0.0",
+			"data": {
+		"schema": {
+			"type": "object",
+				"properties": {
+				"name": {
+					"type": "string"
+				},
+				"data": {
+					"type": "object",
+						"properties": {
+						"transformer": {
+							"type": "string"
+						},
+						"expectedOutputTypes": {
+							"type": "array"
+						},
+						"message": {
+							"type": "string"
+						},
+						"code": {
+							"type": "string"
+						},
+						"stdOutTail": {
+							"type": "string"
+						},
+						"stdErrTail": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		},
+		"uiSchema": {
+			"fields": {
+				"data": {
+					"stdOutTail": {
+						"ui:widget": "Txt",
+							"ui:options": {
+							"whitespace": "pre",
+								"monospace": true
+						}
+					},
+					"stdErrTail": {
+						"ui:widget": "Txt",
+							"ui:options": {
+							"whitespace": "pre",
+								"monospace": true
+						}
+					},
+					"$transformer": {
+						"ui:widget": "None"
+					}
+				}
+			}
+		}
+	}
+}

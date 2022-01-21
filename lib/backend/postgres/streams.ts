@@ -1,5 +1,5 @@
 import * as metrics from '@balena/jellyfish-metrics';
-import type { JsonSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '../../json-schema';
 import { EventEmitter } from 'events';
 import * as _ from 'lodash';
 import { Notification } from 'pg';

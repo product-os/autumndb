@@ -1,4 +1,5 @@
-import { CONTRACTS, Kernel } from '../../lib';
+import { Kernel } from '../../lib';
+import { CONTRACTS } from '../../lib/contracts';
 import * as views from '../../lib/views';
 
 describe('views', () => {

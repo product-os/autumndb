@@ -1,13 +1,10 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import type { LogContext } from '@balena/jellyfish-logger';
-import type {
-	SessionContract,
-	UserContract,
-} from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
 import { Pool } from 'pg';
 import { v4 as uuid } from 'uuid';
 import { Cache } from './cache';
+import { SessionContract, UserContract } from './contracts';
 import { Kernel } from './kernel';
 
 /**

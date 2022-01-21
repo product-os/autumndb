@@ -1,7 +1,6 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { ViewContract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
-import jsonSchema from './json-schema';
+import jsonSchema, { JsonSchema } from './json-schema';
+import { ViewContract } from './contracts';
 
 /**
  * @summary Get the schema of a view contract
@@ -25,10 +24,11 @@ export const getSchema = (
 		return null;
 	}
 
+	// FIXME: get rid of the 'as any' below
 	if (!_.isEmpty(disjunctions)) {
 		conjunctions.push({
 			anyOf: disjunctions,
-		});
+		} as any);
 	}
 
 	return jsonSchema.merge(conjunctions as any) as JsonSchema;

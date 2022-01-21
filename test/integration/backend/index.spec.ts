@@ -1,5 +1,5 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { JsonSchema } from '../../../lib/json-schema';
+import type { Contract } from '../../../lib/contracts';
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { errors } from '../../../lib';

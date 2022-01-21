@@ -1,6 +1,6 @@
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { JsonSchema } from '../../../../../lib/json-schema';
+import type { Contract } from '../../../../../lib/contracts';
 import * as _ from 'lodash';
 import jsonSchemaTestSuite = require('@json-schema-org/tests');
 import { Pool } from 'pg';
