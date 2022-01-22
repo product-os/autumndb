@@ -1,4 +1,23 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-metrics to ^2.0.26'
+      hash: a5a707c7023968315fb5dc7272b869562524f771
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: 'patch: Update external-non-major'
+      hash: 0a00877898255fa3331416e5e3ff0cf90834b2fa
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 14.0.1
+  date: 2022-01-22T00:30:02.874Z
+- commits:
     - subject: Fix `Kernel.defaults` signature
       hash: 83cdba9f77941d7cbbd42ec73e40ea84a109e6eb
       body: |
