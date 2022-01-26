@@ -23,7 +23,7 @@ const typeInterfacePrefix = `
 
 // tslint:disable: array-type
 
-export * from './contract'
+export * from './contract';
 import { ContractDefinition, Contract } from './contract';
 
 `;
