@@ -5,6 +5,7 @@ import { Contract } from './contracts';
 import type { Context } from './context';
 import jsonSchema, { JsonSchema } from './json-schema';
 import { CONTRACTS } from './contracts';
+import * as errors from './errors';
 
 const applyMarkers = async (
 	context: Context,
@@ -96,6 +97,62 @@ const applyMarkers = async (
 			},
 		},
 	]) as JsonSchema;
+};
+
+/**
+ * @summary Get the actor that corresponds to a session
+ * @function
+ * @private
+ *
+ * @param {Object} context - execution context
+ * @param {Object} backend - backend
+ * @param {String} session - session id
+ * @returns {Object} sessionActor - actor contract and session scope
+ * @returns {Object} sessionActor.actor - the actor contract
+ * @returns {Object} sessionActor.scope - the session scope
+ */
+export const getSessionActor = async (
+	context: Context,
+	backend: DatabaseBackend,
+	session: string,
+) => {
+	const sessionContract = await backend.getElementById(context, session);
+
+	context.assertUser(
+		sessionContract,
+		errors.JellyfishInvalidSession,
+		`Invalid session: ${session}`,
+	);
+
+	// Don't allow inactive sessions to be used
+	context.assertUser(
+		sessionContract.active,
+		errors.JellyfishInvalidSession,
+		`Invalid session: ${session}`,
+	);
+
+	context.assertUser(
+		!sessionContract.data.expiration ||
+			new Date() <= new Date(sessionContract.data.expiration),
+		errors.JellyfishSessionExpired,
+		`Session expired at: ${sessionContract.data.expiration}`,
+	);
+
+	const actor = await backend.getElementById(
+		context,
+		sessionContract.data.actor,
+	);
+
+	context.assertInternal(
+		actor,
+		errors.JellyfishNoElement,
+		`Invalid actor: ${sessionContract.data.actor}`,
+	);
+
+	return {
+		actor,
+		scope: sessionContract.data.scope || {},
+	};
 };
 
 /**
@@ -205,16 +262,16 @@ const getActorMask = async (
  *
  * @param {Object} context - execution context
  * @param {Object} backend - backend
- * @param {String} actorId - actor id
+ * @param {String} session - session id
  * @returns {Object} mask
  */
 export const getMask = async (
 	context: Context,
 	backend: DatabaseBackend,
-	actorId: string,
+	session: string,
 ) => {
-	const actor = await backend.getElementById(context, actorId);
-	return getActorMask(context, backend, actor);
+	const { actor, scope } = await getSessionActor(context, backend, session);
+	return getActorMask(context, backend, actor, scope);
 };
 
 // Recursively applies permission mask to $$links queries, ensuring
@@ -272,19 +329,18 @@ const mergeMaskInLinks = (schema: JsonSchema, mask: JsonSchema) => {
  *
  * @param {Object} context - execution context
  * @param {Object} backend - backend
- * @param {String} actorId - actor id
+ * @param {String} session - session id
  * @param {Object} schema - query schema
  * @returns {Promise<JsonSchema>} query
  */
 export const getQuery = async (
 	context: Context,
 	backend: DatabaseBackend,
-	actorId: string,
+	session: string,
 	schema: JsonSchema,
 ): Promise<JsonSchema> => {
-	const actor = await backend.getElementById(context, actorId);
-
-	const mask = await getActorMask(context, backend, actor);
+	const { actor, scope } = await getSessionActor(context, backend, session);
+	const mask = await getActorMask(context, backend, actor, scope);
 
 	// Apply permission mask to links, recursively
 	mergeMaskInLinks(schema, mask);

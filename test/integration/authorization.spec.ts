@@ -1,6 +1,6 @@
 import { errors, testUtils } from '../../lib';
 import { Context } from '../../lib/context';
-import * as permissionFilter from '../../lib/permission-filter';
+import * as authorization from '../../lib/authorization';
 
 // Lil hack for this test to get access to the backend without making it public
 // in the kernel
@@ -24,7 +24,7 @@ describe('permission-filter', () => {
 	describe('.getSessionActor()', () => {
 		test('should throw if the session is invalid', async () => {
 			await expect(
-				permissionFilter.getSessionActor(
+				authorization.getSessionActor(
 					new Context(ctx.logContext, ctx.backend),
 					ctx.backend,
 					'4a962ad9-20b5-4dd8-a707-bf819593cc84',
@@ -49,7 +49,7 @@ describe('permission-filter', () => {
 			);
 
 			await expect(
-				permissionFilter.getSessionActor(
+				authorization.getSessionActor(
 					new Context(ctx.logContext, ctx.backend),
 					ctx.backend,
 					session.id,
@@ -108,7 +108,7 @@ describe('permission-filter', () => {
 				},
 			);
 
-			const { actor, scope } = await permissionFilter.getSessionActor(
+			const { actor, scope } = await authorization.getSessionActor(
 				new Context(ctx.logContext, ctx.backend),
 				ctx.backend,
 				session.id,
@@ -163,7 +163,7 @@ describe('permission-filter', () => {
 			);
 
 			await expect(
-				permissionFilter.getSessionActor(
+				authorization.getSessionActor(
 					new Context(ctx.logContext, ctx.backend),
 					ctx.backend,
 					session.id,
@@ -206,7 +206,7 @@ describe('permission-filter', () => {
 			);
 
 			await expect(
-				permissionFilter.getSessionActor(
+				authorization.getSessionActor(
 					new Context(ctx.logContext, ctx.backend),
 					ctx.backend,
 					session.id,

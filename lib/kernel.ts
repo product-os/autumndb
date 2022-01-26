@@ -8,6 +8,7 @@ import type {
 	ContractDefinition,
 	LinkContract,
 } from './contracts';
+import { CONTRACTS } from './contracts';
 import * as metrics from '@balena/jellyfish-metrics';
 import { Pool } from 'pg';
 import * as stopword from 'stopword';
@@ -21,11 +22,14 @@ import type { Cache } from './cache';
 import { Context, MixedContext, TransactionIsolation } from './context';
 import * as errors from './errors';
 import jsonSchema, { JsonSchema } from './json-schema';
-import * as permissionFilter from './permission-filter';
+import * as authorization from './authorization';
 import * as views from './views';
-import { CONTRACTS } from '.';
 import type { TypeContract, ViewContract } from './contracts';
 
+const CONTRACT_CONTRACT_TYPE = `${CONTRACTS.card.slug}@${CONTRACTS.card.version}`;
+const VERSIONED_CONTRACTS = _.mapKeys(CONTRACTS, (value: any, key: any) => {
+	return `${key}@${value.version}`;
+});
 interface KernelQueryOptions extends Partial<BackendQueryOptions> {
 	mask?: JsonSchema;
 }
@@ -167,7 +171,7 @@ const getQueryFromSchema = async (
 	// also `stream()`
 	const selected = flattenSelected(getSelected(finalSchema));
 
-	const filteredQuery = await permissionFilter.getQuery(
+	const filteredQuery = await authorization.getQuery(
 		context,
 		backend,
 		session,
@@ -227,6 +231,53 @@ const patchContract = (
 			throw newError;
 		}
 	}, contract);
+};
+
+/**
+ * @summary Upsert a contract in an unsafe way (DANGEROUS)
+ * @function
+ * @public
+ *
+ * @description
+ * This bypasses the whole permission system, so use with care.
+ *
+ * This function has the added limitation that you can only insert
+ * contracts of types that are defined in the Jellyfish core.
+ *
+ * @param {Object} context - exectuion context
+ * @param {Object} backend - backend
+ * @param {Object} contract - contract
+ * @returns {Object} contract
+ *
+ * @example
+ * const contract = await unsafeUpsertContract(backend, {
+ *   type: 'foo',
+ *   links: {},
+ *   requires: [],
+ *   capabilities: [],
+ *   tags: [],
+ *   active: true,
+ *   data: {
+ *     foo: 'bar'
+ *   }
+ * })
+ *
+ * console.log(contract.id)
+ */
+export const unsafeUpsertCard = async (
+	context: Context,
+	backend: DatabaseBackend,
+	contract: Contract,
+) => {
+	jsonSchema.validate(
+		VERSIONED_CONTRACTS[CONTRACT_CONTRACT_TYPE].data.schema as any,
+		contract,
+	);
+	jsonSchema.validate(
+		VERSIONED_CONTRACTS[contract.type].data.schema as any,
+		contract,
+	);
+	return backend.upsertElement(context, contract);
 };
 
 export class Kernel {
@@ -337,11 +388,7 @@ export class Kernel {
 
 		const unsafeUpsert = (contract: ContractDefinition) => {
 			const element = Kernel.defaults(contract);
-			return permissionFilter.unsafeUpsertCard(
-				context,
-				this.backend,
-				element as Contract,
-			);
+			return unsafeUpsertCard(context, this.backend, element as Contract);
 		};
 
 		await Promise.all([
@@ -622,7 +669,7 @@ export class Kernel {
 		// Fetch necessary objects concurrently
 		const [typeContract, filter, loop] = await Promise.all([
 			this.getContractBySlug<TypeContract>(context, session, contract.type),
-			permissionFilter.getMask(context, this.backend, session),
+			authorization.getMask(context, this.backend, session),
 			(async () => {
 				return (
 					contract.loop && this.backend.getElementBySlug(context, contract.loop)
@@ -739,11 +786,7 @@ export class Kernel {
 		patch: jsonpatch.Operation[],
 	): Promise<T> {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		const filter = await permissionFilter.getMask(
-			context,
-			this.backend,
-			session,
-		);
+		const filter = await authorization.getMask(context, this.backend, session);
 
 		const result = await metrics.measureContractPatch(async () => {
 			return context.withTransaction(
