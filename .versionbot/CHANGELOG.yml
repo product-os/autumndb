@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add missing mixins
+      hash: fbe1b95ac4f01b8fdae7a5db2af29b08d2dab6d9
+      body: |
+        Bring in missing asPipelineItem() and withEvents()
+        mixin functions from plugin-base
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 14.1.0
+  date: 2022-01-26T03:36:56.321Z
+- commits:
     - subject: Export uiSchemaDef mixin function
       hash: 2489e5c1f43f4c698e6ad2e3ff486f77201ce9bd
       body: ''
