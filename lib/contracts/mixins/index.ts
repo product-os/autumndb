@@ -6,7 +6,10 @@ import deref = require('json-schema-deref-sync');
 import * as _ from 'lodash';
 import { sensibleDefaults } from './with-sensible-defaults';
 import { baseUiSchema } from './with-ui-schema';
+
+export { asPipelineItem } from './as-pipeline-item';
 export { uiSchemaDef } from './ui-schema-defs';
+export { withEvents } from './with-events';
 
 const mergeWithUniqConcatArrays = (objValue: any, srcValue: any) => {
 	if (_.isArray(objValue)) {
