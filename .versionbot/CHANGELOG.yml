@@ -1,4 +1,17 @@
 - commits:
+    - subject: Export uiSchemaDef mixin function
+      hash: 2489e5c1f43f4c698e6ad2e3ff486f77201ce9bd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 14.0.13
+  date: 2022-01-26T00:49:44.471Z
+- commits:
     - subject: 'patch: Update resinci/jellyfish-test Docker tag to v1.4.21'
       hash: bd42d5d358533551b2573b6a354b6d7b4b4e33b7
       body: |
