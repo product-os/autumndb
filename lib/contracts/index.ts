@@ -25,65 +25,6 @@ export interface AuthenticationContractDefinition
 
 export interface AuthenticationContract extends Contract<AuthenticationData> {}
 
-export interface ErrorData {
-	transformer?: string;
-	expectedOutputTypes?: unknown[];
-	message?: string;
-	code?: string;
-	stdOutTail?: string;
-	stdErrTail?: string;
-	[k: string]: unknown;
-}
-
-export interface ErrorContractDefinition
-	extends ContractDefinition<ErrorData> {}
-
-export interface ErrorContract extends Contract<ErrorData> {}
-
-export interface LoopData {
-	[k: string]: unknown;
-}
-
-export interface LoopContractDefinition extends ContractDefinition<LoopData> {}
-
-export interface LoopContract extends Contract<LoopData> {}
-
-export interface OauthProviderData {
-	authorizeUrl: string;
-	tokenUrl: string;
-	[k: string]: unknown;
-}
-
-export interface OauthProviderContractDefinition
-	extends ContractDefinition<OauthProviderData> {}
-
-export interface OauthProviderContract extends Contract<OauthProviderData> {}
-
-export interface OauthClientData {
-	clientId: string;
-	clientSecret: string;
-	scope?: string;
-	redirectUrl?: string;
-	[k: string]: unknown;
-}
-
-export interface OauthClientContractDefinition
-	extends ContractDefinition<OauthClientData> {}
-
-export interface OauthClientContract extends Contract<OauthClientData> {}
-
-export interface OrgData {
-	profile?: {
-		description?: string;
-		[k: string]: unknown;
-	};
-	[k: string]: unknown;
-}
-
-export interface OrgContractDefinition extends ContractDefinition<OrgData> {}
-
-export interface OrgContract extends Contract<OrgData> {}
-
 export interface LinkData {
 	inverseName: string;
 	from: {
@@ -104,6 +45,38 @@ export interface LinkData {
 export interface LinkContractDefinition extends ContractDefinition<LinkData> {}
 
 export interface LinkContract extends Contract<LinkData> {}
+
+export interface LoopData {
+	[k: string]: unknown;
+}
+
+export interface LoopContractDefinition extends ContractDefinition<LoopData> {}
+
+export interface LoopContract extends Contract<LoopData> {}
+
+export interface OauthClientData {
+	clientId: string;
+	clientSecret: string;
+	scope?: string;
+	redirectUrl?: string;
+	[k: string]: unknown;
+}
+
+export interface OauthClientContractDefinition
+	extends ContractDefinition<OauthClientData> {}
+
+export interface OauthClientContract extends Contract<OauthClientData> {}
+
+export interface OauthProviderData {
+	authorizeUrl: string;
+	tokenUrl: string;
+	[k: string]: unknown;
+}
+
+export interface OauthProviderContractDefinition
+	extends ContractDefinition<OauthProviderData> {}
+
+export interface OauthProviderContract extends Contract<OauthProviderData> {}
 
 export interface RoleData {
 	read: {
@@ -152,21 +125,6 @@ export interface TypeData {
 export interface TypeContractDefinition extends ContractDefinition<TypeData> {}
 
 export interface TypeContract extends Contract<TypeData> {}
-
-export interface EventData {
-	timestamp: string;
-	target: string;
-	actor: string;
-	payload?: {
-		[k: string]: unknown;
-	};
-	[k: string]: unknown;
-}
-
-export interface EventContractDefinition
-	extends ContractDefinition<EventData> {}
-
-export interface EventContract extends Contract<EventData> {}
 
 export type Email = ListOfEmailAddresses | SingleEmailAddress;
 export type ListOfEmailAddresses = string[];
@@ -285,13 +243,17 @@ export interface UserContractDefinition extends ContractDefinition<UserData> {}
 
 export interface UserContract extends Contract<UserData> {}
 
-export interface CardData {
+export interface OrgData {
+	profile?: {
+		description?: string;
+		[k: string]: unknown;
+	};
 	[k: string]: unknown;
 }
 
-export interface CardContractDefinition extends ContractDefinition<CardData> {}
+export interface OrgContractDefinition extends ContractDefinition<OrgData> {}
 
-export interface CardContract extends Contract<CardData> {}
+export interface OrgContract extends Contract<OrgData> {}
 
 export interface ViewData {
 	actor?: string;
@@ -323,3 +285,41 @@ export interface ViewData {
 export interface ViewContractDefinition extends ContractDefinition<ViewData> {}
 
 export interface ViewContract extends Contract<ViewData> {}
+
+export interface CardData {
+	[k: string]: unknown;
+}
+
+export interface CardContractDefinition extends ContractDefinition<CardData> {}
+
+export interface CardContract extends Contract<CardData> {}
+
+export interface EventData {
+	timestamp: string;
+	target: string;
+	actor: string;
+	payload?: {
+		[k: string]: unknown;
+	};
+	[k: string]: unknown;
+}
+
+export interface EventContractDefinition
+	extends ContractDefinition<EventData> {}
+
+export interface EventContract extends Contract<EventData> {}
+
+export interface ErrorData {
+	transformer?: string;
+	expectedOutputTypes?: unknown[];
+	message?: string;
+	code?: string;
+	stdOutTail?: string;
+	stdErrTail?: string;
+	[k: string]: unknown;
+}
+
+export interface ErrorContractDefinition
+	extends ContractDefinition<ErrorData> {}
+
+export interface ErrorContract extends Contract<ErrorData> {}
