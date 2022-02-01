@@ -1,4 +1,4 @@
-import type { SqlPath } from './jsonschema2sql/sql-path';
+import type { QueryOptions } from '../../';
 import type { PostgresBackend } from '.';
 
 export type DatabaseBackend = PostgresBackend;
@@ -18,54 +18,12 @@ export interface SelectObject {
 	properties?: { [key: string]: any };
 }
 
-export interface SqlQueryOptions {
-	/*
-	 an array denoting the current path in the JSON
-	 schema. Used to produce useful error messages when nesting
-	 SqlQuery instances.
-	*/
-	parentJsonPath?: string[];
-
-	/*
-	 an instance of `SqlPath` denoting the current SQL
-	 field path. This is used when creating a child SqlQuery that
-	 refers to a different table. See {@link SqlQuery#buildQueryFromCorrelatedSchema}.
-	*/
-	parentPath?: SqlPath;
+export interface BackendQueryOptions extends Omit<QueryOptions, 'mask'> {
+	limit: number;
 
 	/*
 	 a string that is used as the initial value for
 	 `this.filter`. Useful for constraints with placeholders.
 	*/
 	extraFilter?: string;
-
-	/*
-   path to field that should be used for sorting
-	*/
-	sortBy?: string | string[];
-
-	/*
-   the direction results should be sorted in
-	*/
-	sortDir?: 'asc' | 'desc';
-
-	/*
-   the number of records to skip when querying results
-	*/
-	skip?: number;
-
-	/*
-   the maximum number of records that should be returned by the query
-	*/
-	limit?: number;
-
-	// TS-TODO: strongly type this option
-	links?: any;
-}
-
-export interface BackendQueryOptions extends SqlQueryOptions {
-	limit: number;
-
-	// if true, the query parameters will be logged on every request
-	profile?: boolean;
 }

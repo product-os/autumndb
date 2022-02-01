@@ -10,11 +10,8 @@ import {
 	DatabaseNotificationHandler,
 	PreparedStatement,
 } from '../../context';
-import type {
-	BackendQueryOptions,
-	SelectObject,
-	SqlQueryOptions,
-} from './types';
+import type { QueryOptions } from '../..';
+import type { BackendQueryOptions, SelectObject } from './types';
 import * as backend from '.';
 
 interface EventPayload {
@@ -163,7 +160,7 @@ export class Streamer {
 	async attach(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: SqlQueryOptions = {},
+		options: QueryOptions = {},
 	) {
 		return new Stream(this.context, this, uuidv4(), select, schema, options);
 	}
@@ -196,7 +193,7 @@ export class Stream extends EventEmitter {
 		id: string,
 		select: SelectObject,
 		schema: JsonSchema,
-		options: SqlQueryOptions = {},
+		options: QueryOptions = {},
 	) {
 		super();
 		this.setMaxListeners(Infinity);
@@ -234,7 +231,7 @@ export class Stream extends EventEmitter {
 	async query(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: BackendQueryOptions,
+		options: Partial<BackendQueryOptions>,
 	) {
 		// Query the cards with the IDs so we can add them to
 		// `this.seenCardIds`
@@ -247,13 +244,10 @@ export class Stream extends EventEmitter {
 		const { elements } = await backend.runQuery(
 			this.context,
 			schema,
-			backend.compileSchema(
-				this.context,
-				this.streamer.table,
-				select,
-				schema,
-				options,
-			).query,
+			backend.compileSchema(this.context, this.streamer.table, select, schema, {
+				limit: backend.MAXIMUM_QUERY_LIMIT,
+				...options,
+			}).query,
 		);
 
 		for (const contract of elements) {
@@ -273,7 +267,7 @@ export class Stream extends EventEmitter {
 	setSchema(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: SqlQueryOptions = {},
+		options: QueryOptions = {},
 	) {
 		this.constCardId = _.get(schema, ['properties', 'id', 'const']);
 		this.constCardSlug = _.get(schema, ['properties', 'slug', 'const']);

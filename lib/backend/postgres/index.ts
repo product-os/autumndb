@@ -15,6 +15,7 @@ import * as skhema from 'skhema';
 import type { Cache } from './../../cache';
 import { Context, Database, Query, TransactionIsolation } from '../../context';
 import * as errors from '../../errors';
+import type { QueryOptions } from '../../kernel';
 import * as cards from './cards';
 import * as jsonschema2sql from './jsonschema2sql';
 import * as links from './links';
@@ -22,7 +23,6 @@ import type {
 	BackendQueryOptions,
 	SearchFieldDef,
 	SelectObject,
-	SqlQueryOptions,
 } from './types';
 import * as streams from './streams';
 import * as utils from './utils';
@@ -80,7 +80,7 @@ export const isIgnorableInitError = (code: string): boolean => {
 /*
  * See https://github.com/product-os/jellyfish/issues/2401
  */
-const MAXIMUM_QUERY_LIMIT = 1000;
+export const MAXIMUM_QUERY_LIMIT = 1000;
 
 // Amount of time to wait before retrying connect
 const DEFAULT_CONNECT_RETRY_DELAY = 2000;
@@ -90,7 +90,7 @@ export const compileSchema = (
 	table: string,
 	select: SelectObject,
 	schema: JsonSchema,
-	options: SqlQueryOptions,
+	options: BackendQueryOptions,
 ): { query: string; queryGenTime: number } => {
 	const queryGenStart = performance.now();
 	let query = null;
@@ -1196,7 +1196,7 @@ export class PostgresBackend implements Database {
 	async stream(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: SqlQueryOptions = {},
+		options: QueryOptions = {},
 	): Promise<streams.Stream> {
 		nativeAssert(!!this.streamClient, 'Stream client must be initialized');
 		/*
