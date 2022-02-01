@@ -28,8 +28,33 @@ import jsonSchema from './json-schema';
 import * as permissionFilter from './permission-filter';
 import * as views from './views';
 
-interface KernelQueryOptions extends Partial<BackendQueryOptions> {
+export interface QueryOptions {
+	/*
+   path to field that should be used for sorting
+	*/
+	sortBy?: string | string[];
+
+	/*
+   the direction results should be sorted in
+	*/
+	sortDir?: 'asc' | 'desc';
+
+	/*
+   the number of records to skip when querying results
+	*/
+	skip?: number;
+
+	/*
+   the maximum number of records that should be returned by the query
+	*/
+	limit?: number;
+
+	links?: { [key: string]: QueryOptions };
+
 	mask?: JsonSchema;
+
+	// if true, the query parameters will be logged on every request
+	profile?: boolean;
 }
 
 // Generate a concise slug for a contract, using the `name` field
@@ -945,7 +970,7 @@ export class Kernel {
 		mixedContext: MixedContext,
 		session: string,
 		schema: JsonSchema | ViewContract,
-		options: KernelQueryOptions = {},
+		options: QueryOptions = {},
 	): Promise<T[]> {
 		const context = Context.fromMixed(mixedContext, this.backend);
 		const { selected, filteredQuery } = await getQueryFromSchema(
@@ -956,15 +981,7 @@ export class Kernel {
 			options.mask,
 		);
 		return this.backend
-			.query(context, selected, filteredQuery, {
-				limit: options.limit,
-				skip: options.skip,
-				sortBy: options.sortBy,
-				sortDir: options.sortDir,
-				profile: options.profile,
-				links: options.links,
-				// For debugging purposes
-			})
+			.query(context, selected, filteredQuery, options)
 			.catch((error) => {
 				if (error instanceof errors.JellyfishDatabaseTimeoutError) {
 					context.warn('Query timeout', { schema });
@@ -1055,7 +1072,7 @@ export class Kernel {
 		mixedContext: MixedContext,
 		session: string,
 		schema: JsonSchema,
-		options: KernelQueryOptions = {},
+		options: QueryOptions = {},
 	) {
 		const context = Context.fromMixed(mixedContext, this.backend);
 		const { selected, filteredQuery } = await getQueryFromSchema(

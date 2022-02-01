@@ -25,8 +25,8 @@ import { InvalidSchema } from './errors';
 import * as util from './util';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { JSONSchema7TypeName } from 'json-schema';
+import type { BackendQueryOptions } from '../types';
 import type { SqlFilter } from './sql-filter';
-import type { SqlQueryOptions } from '../types';
 
 const FENCE_REWRAP = new LiteralSql(`
 	SELECT
@@ -106,6 +106,11 @@ const CARD_FIELDS = {
 		type: 'object',
 	},
 };
+
+interface ParentState {
+	jsonPath?: string[];
+	path?: SqlPath;
+}
 
 const createOrderByDefinitions = (
 	table: string,
@@ -361,18 +366,19 @@ export class SqlQuery {
 	propertiesFilter: null | ExpressionFilter;
 	format: SchemaFormat | 'date' | 'time' | null;
 	select: { [key: string]: any };
-	options: SqlQueryOptions;
+	options: BackendQueryOptions;
 	path: SqlPath;
 	types: string[];
 
 	static fromSchema(
 		context: Context,
 		parent: null | SqlQuery,
-		select: { [key: string]: any } = {},
+		select: { [key: string]: any },
 		schema: boolean | JsonSchema,
-		options: SqlQueryOptions,
+		options: BackendQueryOptions,
+		parentState: ParentState = {},
 	) {
-		const query = new SqlQuery(context, parent, select, options);
+		const query = new SqlQuery(context, parent, select, options, parentState);
 		if (schema === false) {
 			query.filter.makeUnsatisfiable();
 		} else if (schema !== true) {
@@ -408,7 +414,7 @@ export class SqlQuery {
 	 * @param {Object} options - An optional map with taking anything accepted
 	 *        by {@link SqlQuery#fromSchema}, plus the following (for internal
 	 *        use only):
-	 *        - parentJsonPath: an array denoting the current path in the JSON
+	 *        - jsonPath: an array denoting the current path in the JSON
 	 *          schema. Used to produce useful error messages when nesting
 	 *          SqlQuery instances.
 	 *        - parentPath: an instance of `SqlPath` denoting the current SQL
@@ -418,11 +424,12 @@ export class SqlQuery {
 	 *        - extraFilter: a string that is used as the initial value for
 	 *          `this.filter`. Useful for constraints with placeholders.
 	 */
-	constructor(
+	private constructor(
 		private context: Context,
 		parent: null | SqlQuery,
-		select: { [key: string]: any } = {},
-		options: SqlQueryOptions = {},
+		select: { [key: string]: any },
+		options: BackendQueryOptions,
+		private parentState: ParentState = {},
 	) {
 		// Set of properties that must exist
 		this.required = [];
@@ -449,12 +456,12 @@ export class SqlQuery {
 		this.select = select;
 		this.options = options;
 		if (!('parentJsonPath' in this.options)) {
-			this.options.parentJsonPath = [];
+			this.parentState.jsonPath = [];
 		}
 		if (parent === null) {
 			// SQL field path that is currently being processed. This may refer
 			// to columns or JSONB properties
-			this.path = new SqlPath(this.options.parentPath);
+			this.path = new SqlPath(this.parentState.path);
 		} else {
 			this.path = parent.path;
 		}
@@ -1110,7 +1117,7 @@ export class SqlQuery {
 	}
 
 	formatJsonPath(suffix: string | string[]) {
-		return _.concat(this.options.parentJsonPath, _.castArray(suffix)).join('/');
+		return _.concat(this.parentState.jsonPath, _.castArray(suffix)).join('/');
 	}
 
 	// Subschemas are just what the name implies. They have the same context as
@@ -1121,7 +1128,7 @@ export class SqlQuery {
 		suffix: string | any[],
 		select?: { [key: string]: any },
 	) {
-		this.options.parentJsonPath?.push(...suffix);
+		this.parentState.jsonPath?.push(...suffix);
 		const query = SqlQuery.fromSchema(
 			this.context,
 			this,
@@ -1131,7 +1138,7 @@ export class SqlQuery {
 		);
 		// tslint:disable-next-line: prefer-for-of
 		for (const _item of suffix) {
-			this.options.parentJsonPath?.pop();
+			this.parentState.jsonPath?.pop();
 		}
 		return query;
 	}
@@ -1144,18 +1151,25 @@ export class SqlQuery {
 		suffix: string | any[],
 	) {
 		let parentPath = null;
-		if (_.isEmpty(this.options.parentPath)) {
+		if (_.isEmpty(this.parentState.path)) {
 			parentPath = this.path;
 		} else {
 			parentPath = this.path.flattened();
 		}
-		this.options.parentJsonPath?.push(...suffix);
-		const query = SqlQuery.fromSchema(this.context, null, this.select, schema, {
-			parentJsonPath: this.options.parentJsonPath,
-			parentPath,
-		});
+		this.parentState.jsonPath?.push(...suffix);
+		const query = SqlQuery.fromSchema(
+			this.context,
+			null,
+			this.select,
+			schema,
+			this.options,
+			{
+				jsonPath: this.parentState.jsonPath,
+				path: parentPath,
+			},
+		);
 		for (const _item of suffix) {
-			this.options.parentJsonPath?.pop();
+			this.parentState.jsonPath?.pop();
 		}
 		return query;
 	}
@@ -1167,13 +1181,20 @@ export class SqlQuery {
 		schema: JsonSchema,
 		suffix: string | any[],
 	) {
-		this.options.parentJsonPath?.push(...suffix);
+		this.parentState.jsonPath?.push(...suffix);
 		const select = this.select.getLink(linkType);
-		const query = SqlQuery.fromSchema(this.context, null, select, schema, {
-			parentJsonPath: this.options.parentJsonPath,
-		});
+		const query = SqlQuery.fromSchema(
+			this.context,
+			null,
+			select,
+			schema,
+			this.options,
+			{
+				jsonPath: this.parentState.jsonPath,
+			},
+		);
 		for (const _item of suffix) {
-			this.options.parentJsonPath?.pop();
+			this.parentState.jsonPath?.pop();
 		}
 		return query;
 	}

@@ -1,7 +1,7 @@
 import type { JsonSchema } from '@balena/jellyfish-types';
 import * as _ from 'lodash';
 import type { Context } from '../../../context';
-import type { SqlQueryOptions } from '../types';
+import type { BackendQueryOptions } from '../types';
 import { SelectMap } from './select-map';
 import { SqlQuery } from './sql-query';
 
@@ -10,7 +10,7 @@ export const compile = (
 	table: string,
 	select: any,
 	schema: JsonSchema,
-	options: SqlQueryOptions = {},
+	options: BackendQueryOptions,
 ) => {
 	return SqlQuery.fromSchema(
 		context,
