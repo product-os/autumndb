@@ -1,4 +1,20 @@
 - commits:
+    - subject: Refactor `SqlQueryOptions`/`BackendQueryOptions` and export the
+        refactored `QueryOptions` type
+      hash: 59acaff98e1429a918f2cad78686732d294cae29
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 14.2.0
+  title: Refactor `SqlQueryOptions`/`BackendQueryOptions` and export the
+    refactored `QueryOptions` type
+  date: 2022-02-01T19:01:30.844Z
+- commits:
     - subject: Update resinci/jellyfish-test Docker tag to v1.4.22
       hash: 2553d08a2e6e6e4cff25b5b6d7bef5e9d82eb4f4
       body: ""
