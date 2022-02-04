@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update resinci/jellyfish-test Docker tag to v1.4.23
+      hash: 9040e71ae9a02b4f6b02e06e95eb6b4dab9e6942
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 14.2.1
+  title: "'Update resinci/jellyfish-test Docker tag to v1.4.23'"
+  date: 2022-02-04T12:03:29.064Z
+- commits:
     - subject: Refactor `SqlQueryOptions`/`BackendQueryOptions` and export the
         refactored `QueryOptions` type
       hash: 59acaff98e1429a918f2cad78686732d294cae29
