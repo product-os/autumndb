@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add and export StreamChange type
+      hash: 07b60ffed64bab940a3723fa8d0c1b073ff60a0b
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 14.3.0
+  title: "'Add and export StreamChange type'"
+  date: 2022-02-08T00:39:48.763Z
+- commits:
     - subject: Optimize postgres for tests
       hash: df2c183848b9278f609779af7f89c02fb5f0f9dc
       body: ""
