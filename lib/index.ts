@@ -1,4 +1,4 @@
-export { PostgresBackendOptions } from './backend';
+export { PostgresBackendOptions, StreamChange } from './backend';
 export { Cache } from './cache';
 export { CONTRACTS, CARDS } from './contracts';
 export * as contractMixins from './contracts/mixins';

@@ -1,5 +1,6 @@
 import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
+import type { Contract } from '@balena/jellyfish-types/build/core';
 import { EventEmitter } from 'events';
 import * as _ from 'lodash';
 import { Notification } from 'pg';
@@ -13,6 +14,13 @@ import {
 import type { QueryOptions } from '../..';
 import type { BackendQueryOptions, SelectObject } from './types';
 import * as backend from '.';
+
+export interface StreamChange {
+	id: string;
+	contractType: string;
+	type: 'update' | 'insert' | 'delete' | 'unmatch';
+	after?: Contract;
+}
 
 interface EventPayload {
 	id: any;

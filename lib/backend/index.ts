@@ -1,1 +1,5 @@
-export { PostgresBackend, PostgresBackendOptions } from './postgres';
+export {
+	PostgresBackend,
+	PostgresBackendOptions,
+	StreamChange,
+} from './postgres';

@@ -26,6 +26,7 @@ import type {
 } from './types';
 import * as streams from './streams';
 import * as utils from './utils';
+export type { StreamChange } from './streams';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
