@@ -1,4 +1,18 @@
 - commits:
+    - subject: Move unit tests into `test/unit`
+      hash: e89be343de790f0f03e0210acb36675fec58d337
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 14.3.5
+  title: "'Move unit tests into '"
+  date: 2022-02-14T11:57:51.703Z
+- commits:
     - subject: Update internal-patch
       hash: d29d2a4d70c446f594873868e014085091458786
       body: ""
