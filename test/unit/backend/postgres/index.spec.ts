@@ -1,4 +1,4 @@
-import * as backend from '.';
+import * as backend from '../../../../lib/backend/postgres';
 
 describe('backend.isIgnorableInitError()', () => {
 	it('should return true for expected codes', () => {
