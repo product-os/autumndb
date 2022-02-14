@@ -12,9 +12,9 @@ import { evaluateSchemaWithContext } from './utils';
  * @param {Object} context - execution context
  * @param {Object} backend - backend
  * @param {Object} actor - actor contract
- * @returns {Object[]} role-based authorization schemas
+ * @returns {Object} role-based authorization schema
  */
-export const resolveRoleBasedAuthorizationSchemas = async (
+export const resolveRoleBasedAuthorizationSchema = async (
 	context: Context,
 	backend: DatabaseBackend,
 	actor: Contract,

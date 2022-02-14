@@ -5,7 +5,7 @@ import type { DatabaseBackend } from '../backend/postgres/types';
 import type { Context } from '../context';
 import jsonSchema from '../json-schema';
 import { resolveMarkerBasedAuthorizationSchema } from './markers';
-import { resolveRoleBasedAuthorizationSchemas } from './roles';
+import { resolveRoleBasedAuthorizationSchema } from './roles';
 import {
 	applyAuthorizationSchemaToLinks,
 	evaluateSchemaWithContext,
@@ -28,14 +28,14 @@ export const resolveAuthorizationSchema = async (
 	actor: Contract,
 	scope: JsonSchema = {},
 ): Promise<JsonSchema> => {
-	const roleBasedAuthorizationSchemas =
-		await resolveRoleBasedAuthorizationSchemas(context, backend, actor);
+	const roleBasedAuthorizationSchema =
+		await resolveRoleBasedAuthorizationSchema(context, backend, actor);
 
 	const markerBasedAuthorizationSchema =
 		await resolveMarkerBasedAuthorizationSchema(context, backend, actor);
 
 	let authorizationSchema = jsonSchema.merge([
-		roleBasedAuthorizationSchemas as any,
+		roleBasedAuthorizationSchema as any,
 		markerBasedAuthorizationSchema as any,
 	]) as JsonSchema;
 
