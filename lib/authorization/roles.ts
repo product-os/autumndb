@@ -2,6 +2,7 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { DatabaseBackend } from '../backend/postgres/types';
 import type { Context } from '../context';
 import type { JsonSchema } from '@balena/jellyfish-types';
+import { evaluateSchemaWithContext } from './utils';
 
 /**
  * @summary Get an array containing authorization schemas for each of the actor's roles.
@@ -17,7 +18,7 @@ export const resolveRoleBasedAuthorizationSchemas = async (
 	context: Context,
 	backend: DatabaseBackend,
 	actor: Contract,
-): Promise<JsonSchema[]> => {
+): Promise<JsonSchema> => {
 	const authorizationSchemas: JsonSchema[] = [];
 
 	const actorRoleSlugs: string[] = (actor.data?.roles as string[]) || [];
@@ -43,5 +44,14 @@ export const resolveRoleBasedAuthorizationSchemas = async (
 		});
 	}
 
-	return authorizationSchemas;
+	return {
+		type: 'object',
+		// At least one permission must match
+		anyOf: authorizationSchemas.map((el) => {
+			return evaluateSchemaWithContext(el, {
+				// TODO: Update views to interpolate "actor" instead of "user"
+				user: actor,
+			});
+		}),
+	} as any;
 };

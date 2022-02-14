@@ -34,25 +34,9 @@ export const resolveAuthorizationSchema = async (
 	const markerBasedAuthorizationSchema =
 		await resolveMarkerBasedAuthorizationSchema(context, backend, actor);
 
-	// Merge the role-based authorization schemas with the marker-based authorization schema.
 	let authorizationSchema = jsonSchema.merge([
-		{
-			type: 'object',
-			// At least one permission must match
-			anyOf: roleBasedAuthorizationSchemas.map((el) => {
-				return evaluateSchemaWithContext(el, {
-					// TODO: Update views to interpolate "actor" instead of "user"
-					user: actor,
-				});
-			}),
-		} as any,
-		{
-			type: 'object',
-			required: ['markers'],
-			properties: {
-				markers: markerBasedAuthorizationSchema,
-			},
-		},
+		roleBasedAuthorizationSchemas as any,
+		markerBasedAuthorizationSchema as any,
 	]) as JsonSchema;
 
 	// Apply scope if given

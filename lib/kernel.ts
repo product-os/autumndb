@@ -190,14 +190,13 @@ const rectifySelectObject = (
 	selectObject: SelectObject,
 	authorizedSelectObject: SelectObject,
 ): SelectObject => {
-	const result = {};
+	const result = { ...selectObject };
 
-	for (const [key, value] of Object.entries(selectObject)) {
+	for (const [key, value] of Object.entries(result)) {
 		if (key in authorizedSelectObject) {
-			return {
-				...result,
-				[key]: rectifySelectObject(value, (authorizedSelectObject as any)[key]),
-			};
+			rectifySelectObject(value, (authorizedSelectObject as any)[key]);
+		} else {
+			Reflect.deleteProperty(result, key);
 		}
 	}
 
@@ -219,8 +218,8 @@ const getSelectObjectFromSchema = (
 	);
 
 	const rectifiedSelectObject = rectifySelectObject(
-		authorizedSelectedLinksAndProperties,
 		selectObject,
+		authorizedSelectedLinksAndProperties,
 	);
 
 	return rectifiedSelectObject;
@@ -706,7 +705,7 @@ export class Kernel {
 		);
 
 		// Fetch necessary objects concurrently
-		const [typeContract, permissionsMask, loop] = await Promise.all([
+		const [typeContract, authorizationSchema, loop] = await Promise.all([
 			this.getContractBySlug<TypeContract>(context, session, contract.type),
 			authorization.resolveAuthorizationSchema(
 				context,
@@ -769,7 +768,7 @@ export class Kernel {
 			throw error;
 		}
 		try {
-			jsonSchema.validate(permissionsMask as any, contract);
+			jsonSchema.validate(authorizationSchema as any, contract);
 		} catch (error) {
 			// Failing to match the filter schema is a permissions error
 			if (error instanceof errors.JellyfishSchemaMismatch) {
@@ -806,7 +805,7 @@ export class Kernel {
 			);
 		}
 
-		return permissionsMask;
+		return authorizationSchema;
 	}
 
 	/**

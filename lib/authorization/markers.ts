@@ -2,8 +2,8 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { DatabaseBackend } from '../backend/postgres/types';
 import type { Context } from '../context';
 import type { JsonSchema } from '@balena/jellyfish-types';
-import { CONTRACTS } from '../contracts';
 import _ = require('lodash');
+import { CONTRACTS } from '../contracts';
 
 export const resolveMarkerBasedAuthorizationSchema = async (
 	context: Context,
@@ -57,31 +57,37 @@ export const resolveMarkerBasedAuthorizationSchema = async (
 		}),
 	);
 
-	const markerBasedAuthorizationSchema: JsonSchema =
-		markers.length === 0
-			? // If there are no markers provided, only elements with
-			  // no markers are valid
-			  {
-					type: 'array',
-					maxItems: 0,
-			  }
-			: {
-					type: 'array',
-					items: {
-						type: 'string',
-						anyOf: [
-							{
-								enum: markers,
-							},
+	const markerBasedAuthorizationSchema: JsonSchema = {
+		type: 'object',
+		required: ['markers'],
+		properties: {
+			markers:
+				markers.length === 0
+					? // If there are no markers provided, only elements with
+					  // no markers are valid
+					  {
+							type: 'array',
+							maxItems: 0,
+					  }
+					: {
+							type: 'array',
+							items: {
+								type: 'string',
+								anyOf: [
+									{
+										enum: markers,
+									},
 
-							// Use pattern matching to allow content using compound markers
-							// (markers join with a + symbol)
-							{
-								pattern: `(^|\\+)(${markers.join('|')})($|\\+)`,
+									// Use pattern matching to allow content using compound markers
+									// (markers join with a + symbol)
+									{
+										pattern: `(^|\\+)(${markers.join('|')})($|\\+)`,
+									},
+								],
 							},
-						],
-					},
-			  };
+					  },
+		},
+	};
 
 	return markerBasedAuthorizationSchema;
 };
