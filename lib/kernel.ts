@@ -20,13 +20,18 @@ import { PostgresBackend, PostgresBackendOptions } from './backend';
 import type {
 	BackendQueryOptions,
 	DatabaseBackend,
+	SelectObject,
 } from './backend/postgres/types';
 import type { Cache } from './cache';
 import { Context, MixedContext, TransactionIsolation } from './context';
 import * as errors from './errors';
 import jsonSchema from './json-schema';
-import * as permissionFilter from './permission-filter';
-import * as views from './views';
+import * as authorization from './authorization';
+import {
+	preprocessQuerySchema,
+	resolveActorAndScopeFromSessionId,
+} from './utils';
+import { Stream } from './backend/postgres/streams';
 
 export interface QueryOptions {
 	/*
@@ -57,6 +62,26 @@ export interface QueryOptions {
 	profile?: boolean;
 }
 
+// Contracts that are inserted by default.
+const CORE_CONTRACTS = [
+	CONTRACTS.card,
+	CONTRACTS.org,
+	CONTRACTS.error,
+	CONTRACTS.event,
+	CONTRACTS.view,
+	CONTRACTS.role,
+	CONTRACTS.link,
+	CONTRACTS.loop,
+	CONTRACTS['oauth-provider'],
+	CONTRACTS['oauth-client'],
+];
+
+const CONTRACT_CONTRACT_TYPE = `${CONTRACTS['card'].slug}@${CONTRACTS['card'].version}`;
+
+const VERSIONED_CONTRACTS = _.mapKeys(CONTRACTS, (value: any, key: any) => {
+	return `${key}@${value.version}`;
+});
+
 // Generate a concise slug for a contract, using the `name` field
 // if its available
 export const generateSlug = (
@@ -79,12 +104,14 @@ export const generateSlug = (
 	}
 };
 
-const flattenSelected = (selected: any) => {
-	const flat = selected.properties;
-	if ('links' in flat && !_.isEmpty(selected.links)) {
-		flat.links = _.merge(flat.links, selected.links);
+const flattenSelectObject = (selectObject: SelectObject): SelectObject => {
+	const flat = selectObject.properties;
+
+	if ('links' in flat! && !_.isEmpty(selectObject.links)) {
+		flat.links = _.merge(flat.links, selectObject.links);
 	}
-	return flat;
+
+	return flat!;
 };
 
 const mergeSelectedMaps = (base: any, extras: any) => {
@@ -94,12 +121,13 @@ const mergeSelectedMaps = (base: any, extras: any) => {
 		} else if (!_.isEmpty(objB)) {
 			return objB;
 		}
-
 		return undefined;
 	});
 };
 
-const getSelected = (schema: JsonSchema): { links: any; properties: any } => {
+const selectObjectFromSchema = (
+	schema: JsonSchema | ViewContract,
+): SelectObject => {
 	if (_.isBoolean(schema)) {
 		return {
 			links: {},
@@ -111,7 +139,9 @@ const getSelected = (schema: JsonSchema): { links: any; properties: any } => {
 
 	if ('$$links' in schema) {
 		for (const [linkType, linked] of Object.entries(schema.$$links!)) {
-			links[linkType] = flattenSelected(getSelected(linked));
+			links[linkType] = flattenSelectObject(
+				selectObjectFromSchema(linked),
+			) as JsonSchema;
 		}
 	}
 
@@ -126,9 +156,9 @@ const getSelected = (schema: JsonSchema): { links: any; properties: any } => {
 
 	if ('properties' in schema) {
 		for (const [name, subSchema] of Object.entries(schema.properties!)) {
-			const subSelected = getSelected(subSchema);
+			const subSelected = selectObjectFromSchema(subSchema);
 			extraLinks.push(subSelected.links);
-			properties[name] = subSelected.properties;
+			properties[name] = subSelected.properties!;
 		}
 	}
 
@@ -136,7 +166,7 @@ const getSelected = (schema: JsonSchema): { links: any; properties: any } => {
 	for (const combinator of ['allOf', 'anyOf']) {
 		if (combinator in schema) {
 			for (const branch of (schema as any)[combinator]) {
-				const subSelected = getSelected(branch);
+				const subSelected = selectObjectFromSchema(branch);
 				extraLinks.push(subSelected.links);
 				extraProperties.push(subSelected.properties);
 			}
@@ -144,7 +174,7 @@ const getSelected = (schema: JsonSchema): { links: any; properties: any } => {
 	}
 
 	if ('not' in schema) {
-		const subSelected = getSelected(schema.not!);
+		const subSelected = selectObjectFromSchema(schema.not!);
 		extraLinks.push(subSelected.links);
 		extraProperties.push(subSelected.properties);
 	}
@@ -155,64 +185,45 @@ const getSelected = (schema: JsonSchema): { links: any; properties: any } => {
 	};
 };
 
-const rectifySelected = (
-	selected: any,
-	filteredSelected: { [x: string]: any },
-) => {
-	for (const [key, value] of Object.entries(selected)) {
-		if (key in filteredSelected) {
-			rectifySelected(value, filteredSelected[key]);
-		} else {
-			Reflect.deleteProperty(selected, key);
+// TODO: rename with something more descriptive.
+const rectifySelectObject = (
+	selectObject: SelectObject,
+	authorizedSelectObject: SelectObject,
+): SelectObject => {
+	const result = {};
+
+	for (const [key, value] of Object.entries(selectObject)) {
+		if (key in authorizedSelectObject) {
+			return {
+				...result,
+				[key]: rectifySelectObject(value, (authorizedSelectObject as any)[key]),
+			};
 		}
 	}
+
+	return result;
 };
 
-const getQueryFromSchema = async (
-	context: Context,
-	backend: DatabaseBackend,
-	session: string,
-	schema: JsonSchema | ViewContract,
-	mask?: JsonSchema,
-) => {
-	// TS-TODO: Refactor this to avoid type coercion
-	let finalSchema: JsonSchema = (
-		schema instanceof Object &&
-		schema.type === `${CONTRACTS.view.slug}@${CONTRACTS.view.version}`
-			? views.getSchema(schema as ViewContract)
-			: schema
-	) as JsonSchema;
+// If a field is completely blacklisted by the authorization schema, it will be
+// completely removed from `authorizedQuerySchema`. In that case we need to find
+// all selected properties again from `authorizedQuerySchema` and then rectify
+// the original `selectObject` by removing missing properties.
+const getSelectObjectFromSchema = (
+	querySchema: JsonSchema | ViewContract,
+	authorizedQuerySchema: JsonSchema,
+): SelectObject => {
+	const selectObject = flattenSelectObject(selectObjectFromSchema(querySchema));
 
-	if (mask) {
-		finalSchema = jsonSchema.merge([
-			finalSchema as any,
-			mask as any,
-		]) as JsonSchema;
-	}
-
-	// TODO: this is probably going to be given in the schema itself. See
-	// also `stream()`
-	const selected = flattenSelected(getSelected(finalSchema));
-
-	const filteredQuery = await permissionFilter.getQuery(
-		context,
-		backend,
-		session,
-		finalSchema,
+	const authorizedSelectedLinksAndProperties = flattenSelectObject(
+		selectObjectFromSchema(authorizedQuerySchema),
 	);
 
-	// If a property is completely blacklisted by the permissions, it will be
-	// completely removed from `filteredQuery`. In that case we need to find
-	// all selected properties again from `filteredQuery` and then rectify
-	// `selected` by removing missing properties
-	const filteredSelected = flattenSelected(getSelected(filteredQuery));
+	const rectifiedSelectObject = rectifySelectObject(
+		authorizedSelectedLinksAndProperties,
+		selectObject,
+	);
 
-	rectifySelected(selected, filteredSelected);
-
-	return {
-		selected,
-		filteredQuery,
-	};
+	return rectifiedSelectObject;
 };
 
 const patchContract = (
@@ -254,6 +265,62 @@ const patchContract = (
 			throw newError;
 		}
 	}, contract);
+};
+
+/**
+ * @summary Upsert a contract in an unsafe way (DANGEROUS)
+ * @function
+ * @public
+ *
+ * @description
+ * This bypasses the whole authorization system, so use with care.
+ *
+ * This function has the added limitation that you can only insert
+ * contracts of types that are defined in the Jellyfish core.
+ *
+ * @param {Object} context - exectuion context
+ * @param {Object} backend - backend
+ * @param {Object} contract - contract
+ * @returns {Object} contract
+ *
+ * @example
+ * const contract = await unsafeUpsertContract(backend, {
+ *   type: 'foo',
+ *   links: {},
+ *   requires: [],
+ *   capabilities: [],
+ *   tags: [],
+ *   active: true,
+ *   data: {
+ *     foo: 'bar'
+ *   }
+ * })
+ *
+ * console.log(contract.id)
+ */
+export const unsafeUpsertContract = async (
+	context: Context,
+	backend: DatabaseBackend,
+	contract: Contract,
+): Promise<Contract> => {
+	jsonSchema.validate(
+		VERSIONED_CONTRACTS[CONTRACT_CONTRACT_TYPE].data.schema as any,
+		contract,
+	);
+	jsonSchema.validate(
+		VERSIONED_CONTRACTS[contract.type].data.schema as any,
+		contract,
+	);
+	return backend.upsertElement(context, contract);
+};
+
+/** @deprecated */
+export const unsafeUpsertCard = async (
+	context: Context,
+	backend: DatabaseBackend,
+	card: Contract,
+): Promise<Contract> => {
+	return unsafeUpsertContract(context, backend, card);
 };
 
 export class Kernel {
@@ -364,11 +431,7 @@ export class Kernel {
 
 		const unsafeUpsert = (contract: ContractDefinition) => {
 			const element = Kernel.defaults(contract);
-			return permissionFilter.unsafeUpsertCard(
-				context,
-				this.backend,
-				element as Contract,
-			);
+			return unsafeUpsertCard(context, this.backend, element as Contract);
 		};
 
 		await Promise.all([
@@ -398,18 +461,7 @@ export class Kernel {
 		};
 
 		await Promise.all(
-			[
-				CONTRACTS.card,
-				CONTRACTS.org,
-				CONTRACTS.error,
-				CONTRACTS.event,
-				CONTRACTS.view,
-				CONTRACTS.role,
-				CONTRACTS.link,
-				CONTRACTS.loop,
-				CONTRACTS['oauth-provider'],
-				CONTRACTS['oauth-client'],
-			].map(async (contract) => {
+			CORE_CONTRACTS.map(async (contract) => {
 				context.debug('Upserting core contract', { slug: contract.slug });
 
 				return this.replaceContract(context, this.adminSession()!, contract);
@@ -646,10 +698,22 @@ export class Kernel {
 			errors.JellyfishSchemaMismatch,
 			'No type in card',
 		);
+
+		const { actor, scope } = await resolveActorAndScopeFromSessionId(
+			context,
+			this.backend,
+			session,
+		);
+
 		// Fetch necessary objects concurrently
-		const [typeContract, filter, loop] = await Promise.all([
+		const [typeContract, permissionsMask, loop] = await Promise.all([
 			this.getContractBySlug<TypeContract>(context, session, contract.type),
-			permissionFilter.getMask(context, this.backend, session),
+			authorization.resolveAuthorizationSchema(
+				context,
+				this.backend,
+				actor,
+				scope,
+			),
 			(async () => {
 				return (
 					contract.loop && this.backend.getElementBySlug(context, contract.loop)
@@ -705,7 +769,7 @@ export class Kernel {
 			throw error;
 		}
 		try {
-			jsonSchema.validate(filter as any, contract);
+			jsonSchema.validate(permissionsMask as any, contract);
 		} catch (error) {
 			// Failing to match the filter schema is a permissions error
 			if (error instanceof errors.JellyfishSchemaMismatch) {
@@ -742,7 +806,7 @@ export class Kernel {
 			);
 		}
 
-		return filter;
+		return permissionsMask;
 	}
 
 	/**
@@ -766,10 +830,18 @@ export class Kernel {
 		patch: jsonpatch.Operation[],
 	): Promise<T> {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		const filter = await permissionFilter.getMask(
+
+		const { actor, scope } = await resolveActorAndScopeFromSessionId(
 			context,
 			this.backend,
 			session,
+		);
+
+		const authorizationSchema = await authorization.resolveAuthorizationSchema(
+			context,
+			this.backend,
+			actor,
+			scope,
 		);
 
 		const result = await metrics.measureContractPatch(async () => {
@@ -854,7 +926,10 @@ export class Kernel {
 						},
 					);
 
-					jsonSchema.validate(filter as any, patchedFilteredContract);
+					jsonSchema.validate(
+						authorizationSchema as any,
+						patchedFilteredContract,
+					);
 
 					const patchedFullContract = patchContract(fullContract, patch, {
 						mutate: false,
@@ -968,23 +1043,45 @@ export class Kernel {
 	 */
 	async query<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
-		schema: JsonSchema | ViewContract,
+		sessionId: string,
+		querySchema: JsonSchema | ViewContract,
 		options: QueryOptions = {},
 	): Promise<T[]> {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		const { selected, filteredQuery } = await getQueryFromSchema(
+
+		querySchema = await preprocessQuerySchema(querySchema);
+
+		if (options.mask) {
+			querySchema = jsonSchema.merge([
+				querySchema as any,
+				options.mask as any,
+			]) as JsonSchema;
+		}
+
+		const { actor, scope } = await resolveActorAndScopeFromSessionId(
 			context,
 			this.backend,
-			session,
-			schema,
-			options.mask,
+			sessionId,
 		);
+
+		const authorizedQuerySchema = await authorization.authorizeQuery(
+			context,
+			this.backend,
+			actor,
+			scope,
+			querySchema as JsonSchema,
+		);
+
+		const selectObject = await getSelectObjectFromSchema(
+			querySchema,
+			authorizedQuerySchema,
+		);
+
 		return this.backend
-			.query(context, selected, filteredQuery, options)
+			.query(context, selectObject, authorizedQuerySchema, options)
 			.catch((error) => {
 				if (error instanceof errors.JellyfishDatabaseTimeoutError) {
-					context.warn('Query timeout', { schema });
+					context.warn('Query timeout', { querySchema });
 				}
 				throw error;
 			});
@@ -1071,52 +1168,43 @@ export class Kernel {
 	async stream(
 		mixedContext: MixedContext,
 		session: string,
-		schema: JsonSchema,
+		querySchema: JsonSchema,
 		options: QueryOptions = {},
 	) {
 		const context = Context.fromMixed(mixedContext, this.backend);
-		const { selected, filteredQuery } = await getQueryFromSchema(
+
+		const { actor, scope } = await resolveActorAndScopeFromSessionId(
 			context,
 			this.backend,
 			session,
-			schema,
-			options.mask,
+		);
+
+		querySchema = await preprocessQuerySchema(querySchema);
+
+		if (options.mask) {
+			querySchema = jsonSchema.merge([
+				querySchema as any,
+				options.mask as any,
+			]) as JsonSchema;
+		}
+
+		const authorizedQuerySchema = await authorization.authorizeQuery(
+			context,
+			this.backend,
+			actor,
+			scope,
+			querySchema,
 		);
 
 		context.debug('Opening stream');
 
-		const stream = await this.backend.stream(selected, filteredQuery, options);
+		const stream = await this.backend.stream(
+			await getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
+			authorizedQuerySchema,
+			options,
+		);
 
-		// Attach event handlers. We got to do this here and not in any lower
-		// levels because of the whole permissions handling
-		stream.on('query', async (payload) => {
-			const query = await getQueryFromSchema(
-				context,
-				this.backend,
-				session,
-				payload.schema,
-				payload.options?.mask,
-			);
-			const contracts = await stream.query(
-				query.selected,
-				query.filteredQuery,
-				payload.options,
-			);
-			stream.emit('dataset', {
-				id: payload.id,
-				cards: contracts,
-			});
-		});
-
-		stream.on('setSchema', async (newSchema) => {
-			const query = await getQueryFromSchema(
-				context,
-				this.backend,
-				session,
-				newSchema,
-			);
-			stream.setSchema(query.selected, query.filteredQuery);
-		});
+		await setupStreamEventHandlers(context, this.backend, stream, actor, scope);
 
 		return stream;
 	}
@@ -1188,3 +1276,60 @@ export class Kernel {
 		};
 	}
 }
+
+const setupStreamEventHandlers = async (
+	context: Context,
+	backend: any,
+	stream: Stream,
+	actor: Contract,
+	scope: JsonSchema,
+): Promise<void> => {
+	// Attach event handlers. We got to do this here and not in any lower
+	// levels because of the whole permissions handling
+	stream.on('query', async (payload) => {
+		let querySchema = await preprocessQuerySchema(payload.schema);
+
+		if (payload.options?.mask) {
+			querySchema = jsonSchema.merge([
+				querySchema as any,
+				payload.options?.mask as any,
+			]) as JsonSchema;
+		}
+
+		const authorizedQuerySchema = await authorization.authorizeQuery(
+			context,
+			backend,
+			actor,
+			scope,
+			payload.schema,
+		);
+
+		const contracts = await stream.query(
+			await getSelectObjectFromSchema(payload.schema, authorizedQuerySchema),
+			authorizedQuerySchema,
+			payload.options,
+		);
+
+		stream.emit('dataset', {
+			id: payload.id,
+			cards: contracts,
+		});
+	});
+
+	stream.on('setSchema', async (newSchema) => {
+		const querySchema = await preprocessQuerySchema(newSchema);
+
+		const authorizedQuerySchema = await authorization.authorizeQuery(
+			context,
+			backend,
+			actor,
+			scope,
+			querySchema,
+		);
+
+		stream.setSchema(
+			await getSelectObjectFromSchema(newSchema, authorizedQuerySchema),
+			authorizedQuerySchema,
+		);
+	});
+};
