@@ -1,4 +1,4 @@
-import { ViewContract } from '@balena/jellyfish-types/build/core';
+import type { ViewContract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import { testUtils } from '../../../lib';
 

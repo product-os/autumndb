@@ -1,9 +1,9 @@
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { v4 as uuid } from 'uuid';
 import { INDEX_TABLE, PostgresBackend } from '../../../../lib/backend/postgres';
-import { Context } from '../../../../lib/context';
 import { TABLE as CONTRACTS_TABLE } from '../../../../lib/backend/postgres/cards';
-import { version as packageVersion } from '../../../../package.json';
+import { Context } from '../../../../lib/context';
+import { version as PACKAGE_VERSION } from '../../../../package.json';
 import * as helpers from '../helpers';
 
 let ctx: helpers.BackendContext;
@@ -24,7 +24,7 @@ describe('Setup', () => {
 				`SELECT id, version, updated_at FROM jf_db_migrations WHERE id=0`,
 			);
 
-			expect(version).toEqual(packageVersion);
+			expect(version).toEqual(PACKAGE_VERSION);
 			expect(new Date(updated_at).getTime()).toBeLessThan(new Date().getTime());
 			const longestExpectedTestRun = 2 * 60 * 60 * 1000;
 			expect(new Date(updated_at).getTime()).toBeGreaterThan(

@@ -1,4 +1,7 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type {
+	TypeData,
+	TypeContractDefinition,
+} from '@balena/jellyfish-types/build/core';
 import { authentication } from './authentication';
 import { card } from './card';
 import { error } from './error';
@@ -47,9 +50,9 @@ const contracts = [
 ];
 
 export const CONTRACTS = contracts.reduce<{
-	[slug: string]: ContractDefinition;
+	[slug: string]: TypeContractDefinition;
 }>((acc, kontract) => {
-	const initializedContract = initialize(kontract as any);
+	const initializedContract = initialize<TypeData>(kontract as any);
 	acc[initializedContract.slug] = initializedContract;
 	return acc;
 }, {});

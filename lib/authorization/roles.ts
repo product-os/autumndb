@@ -1,7 +1,7 @@
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { DatabaseBackend } from '../backend/postgres/types';
 import type { Context } from '../context';
-import type { JsonSchema } from '@balena/jellyfish-types';
 import { evaluateSchemaWithContext } from './utils';
 
 /**

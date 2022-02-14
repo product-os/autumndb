@@ -1,4 +1,6 @@
-export const session = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const session: TypeContractDefinition = {
 	slug: 'session',
 	type: 'type@1.0.0',
 	name: 'Jellyfish Session',

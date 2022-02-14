@@ -11,6 +11,7 @@ import * as traverse from 'traverse';
 import { v4 as uuidv4 } from 'uuid';
 import { errors } from '../../';
 import type { Context } from '../../context';
+import { version as PACKAGE_VERSION } from '../../../package.json';
 import { SqlPath } from './jsonschema2sql/sql-path';
 import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
 import * as textSearch from './jsonschema2sql/text-search';
@@ -18,10 +19,8 @@ import type { SearchFieldDef } from './types';
 import * as utils from './utils';
 import type { PostgresBackend } from '.';
 
-// tslint:disable-next-line: no-var-requires
-const { version: coreVersion } = require('../../../package.json');
-
 const CARDS_TABLE = 'cards';
+
 const CARDS_TRIGGER_COLUMNS = [
 	'active',
 	'version_major',
@@ -39,6 +38,7 @@ const CARDS_TRIGGER_COLUMNS = [
 	'data',
 	'linked_at',
 ];
+
 const CARDS_SELECT = [
 	'id',
 	'slug',
@@ -58,6 +58,9 @@ const CARDS_SELECT = [
 	'data',
 ].join(', ');
 
+export const TABLE = CARDS_TABLE;
+export const TRIGGER_COLUMNS = CARDS_TRIGGER_COLUMNS;
+
 /**
  * Parses and normalizes slug versions. Can handle these patterns:
  *
@@ -73,7 +76,7 @@ const CARDS_SELECT = [
  * @param {String} slug - the slug including the @version part
  * @returns {*} the different parts of the versioned slug
  */
-export const parseVersionedSlug = (slug: string) => {
+export const parseVersionedSlug = (slug: string): Version => {
 	const slugVersionPattern = /^(?<base>[a-zA-Z0-9-]+)(@(?<version>.*))?$/;
 
 	const match = slugVersionPattern.exec(slug);
@@ -95,9 +98,6 @@ export const parseVersionedSlug = (slug: string) => {
 	};
 };
 
-export const TABLE = CARDS_TABLE;
-export const TRIGGER_COLUMNS = CARDS_TRIGGER_COLUMNS;
-
 export const setup = async (
 	context: Context,
 	backend: PostgresBackend,
@@ -105,7 +105,7 @@ export const setup = async (
 		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 	} = {},
-) => {
+): Promise<void> => {
 	const table = options.table || TABLE;
 	const tables = _.map(
 		await context.query(`
@@ -225,7 +225,7 @@ export const setup = async (
 					context,
 					table,
 					fullyQualifiedIndexName,
-					coreVersion,
+					PACKAGE_VERSION,
 					`USING ${secondaryIndex.indexType || 'BTREE'} (${
 						secondaryIndex.column
 					} ${secondaryIndex.options || ''})`,
@@ -245,7 +245,7 @@ export const getById = async (
 		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 	} = {},
-) => {
+): Promise<T | null> => {
 	const table = options.table || TABLE;
 	context.debug('Getting element by id', {
 		id,
@@ -274,7 +274,7 @@ export const getBySlug = async (
 		table?: string;
 		lock?: boolean;
 	} = {},
-) => {
+): Promise<T | null> => {
 	const table = options.table || TABLE;
 
 	context.debug('Getting element by slug', {
@@ -340,7 +340,7 @@ export const getManyById = async (
 		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 	} = {},
-) => {
+): Promise<T[]> => {
 	const table = options.table || TABLE;
 	context.debug('Batch get by id', {
 		count: ids.length,
@@ -553,7 +553,7 @@ export const upsert = async <T extends Contract = Contract>(
 				payload,
 			);
 		}
-	} catch (error: any) {
+	} catch (error: unknown) {
 		if (/^duplicate key value/.test(error.message)) {
 			if (/pkey/.test(error.message)) {
 				const upsertError = new errors.JellyfishElementAlreadyExists(
@@ -605,7 +605,7 @@ export const materializeLink = async (
 		// The name of the "cards" table, defaults to the TABLE constant
 		table?: string;
 	} = {},
-) => {
+): Promise<void> => {
 	const table = options.table || TABLE;
 	try {
 		await context.runQuery(
@@ -616,7 +616,7 @@ export const materializeLink = async (
 			`,
 			[card.linked_at, card.id],
 		);
-	} catch (error: any) {
+	} catch (error: unknown) {
 		if (/^duplicate key value/.test(error.message)) {
 			throw new errors.JellyfishElementAlreadyExists(
 				`There is already an element with the slug ${card.slug}`,
@@ -763,7 +763,7 @@ export const createFullTextSearchIndex = async (
 export const parseFullTextSearchFields = (
 	context: Context,
 	schema: JsonSchema,
-) => {
+): SearchFieldDef[] => {
 	const fields: SearchFieldDef[] = [];
 	const combinators = ['anyOf', 'allOf', 'oneOf'];
 	traverse(schema).forEach(function (_node) {

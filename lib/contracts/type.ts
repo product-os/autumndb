@@ -1,6 +1,7 @@
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
 import { mergeProperties } from './transformer-merge-properties';
 
-export const type = {
+export const type: TypeContractDefinition = {
 	slug: 'type',
 	type: 'type@1.0.0',
 	name: 'Jellyfish Contract Type',

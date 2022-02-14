@@ -1,4 +1,6 @@
-export const userSettings = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const userSettings: TypeContractDefinition = {
 	slug: 'user-settings',
 	type: 'type@1.0.0',
 	name: 'User Settings',

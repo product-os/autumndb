@@ -1,7 +1,7 @@
 import * as assert from '@balena/jellyfish-assert';
 import * as logger from '@balena/jellyfish-logger';
 import * as _ from 'lodash';
-import { Notification, PoolClient, QueryConfig } from 'pg';
+import type { Notification, PoolClient, QueryConfig } from 'pg';
 import * as pgFormat from 'pg-format';
 import * as uuid from 'uuid';
 import * as errors from './errors';
@@ -54,35 +54,35 @@ export class Context {
 	/**
 	 * Log a debug message.
 	 */
-	public debug(message: string, data?: object) {
+	public debug(message: string, data?: object): void {
 		LOGGER.debug(this.logContext, message, data);
 	}
 
 	/**
 	 * Log an informational message.
 	 */
-	public info(message: string, data?: object) {
+	public info(message: string, data?: object): void {
 		LOGGER.info(this.logContext, message, data);
 	}
 
 	/**
 	 * Log a warning message.
 	 */
-	public warn(message: string, data?: object) {
+	public warn(message: string, data?: object): void {
 		LOGGER.warn(this.logContext, message, data);
 	}
 
 	/**
 	 * Log an error message.
 	 */
-	public error(message: string, data?: object) {
+	public error(message: string, data?: object): void {
 		LOGGER.error(this.logContext, message, data);
 	}
 
 	/**
 	 * Log an exception.
 	 */
-	public exception(message: string, data: Error) {
+	public exception(message: string, data: Error): void {
 		LOGGER.exception(this.logContext, message, data);
 	}
 
@@ -93,7 +93,7 @@ export class Context {
 		expression: assert.AssertExpression,
 		error: assert.AssertErrorConstructor,
 		message: assert.AssertMessage,
-	) {
+	): void {
 		assert.INTERNAL(this.logContext, expression, error, message);
 	}
 
@@ -104,7 +104,7 @@ export class Context {
 		expression: assert.AssertExpression,
 		error: assert.AssertErrorConstructor,
 		message: assert.AssertMessage,
-	) {
+	): void {
 		assert.USER(this.logContext, expression, error, message);
 	}
 
@@ -315,7 +315,7 @@ export class Context {
 	/**
 	 * Run a query and ignore its results.
 	 */
-	public async runQuery(query: Query, parameters?: any[]): Promise<void> {
+	public async runQuery(query: Query, parameters?: unknown[]): Promise<void> {
 		// `pg` doesn't provide this functionality so we just use `query` here
 		await this.query(query, parameters);
 	}
@@ -323,7 +323,10 @@ export class Context {
 	/**
 	 * Run a query and return its results.
 	 */
-	public async query<T = any>(query: Query, parameters?: any[]): Promise<T[]> {
+	public async query<T = any>(
+		query: Query,
+		parameters?: unknown[],
+	): Promise<T[]> {
 		return (
 			await this.withDatabaseConnection((context: Context) => {
 				let textOrConfig: any;
@@ -344,7 +347,7 @@ export class Context {
 	 */
 	public async queryZeroOrOne<T = any>(
 		query: Query,
-		parameters?: any[],
+		parameters?: unknown[],
 	): Promise<T | null> {
 		const results = await this.query(query, parameters);
 		this.assertUser(
@@ -360,7 +363,10 @@ export class Context {
 	 * Run a query and return a single result. Throws if the query returns
 	 * either zero or more than one result.
 	 */
-	public async queryOne<T = any>(query: Query, parameters?: any[]): Promise<T> {
+	public async queryOne<T = any>(
+		query: Query,
+		parameters?: unknown[],
+	): Promise<T> {
 		const results = await this.query(query, parameters);
 		this.assertUser(
 			results.length === 1,
@@ -488,7 +494,7 @@ class PgPreparedStatement implements PreparedStatement {
 
 	public constructor(private query: string) {}
 
-	public asQueryConfig(parameters?: any[]): QueryConfig {
+	public asQueryConfig(parameters?: unknown[]): QueryConfig {
 		return {
 			name: this.name,
 			text: this.query,
@@ -514,7 +520,7 @@ export class DatabaseNotificationHandler {
 	/**
 	 * End this listener and return the connection to the pool.
 	 */
-	public async end() {
+	public async end(): Promise<void> {
 		if (!this.release) {
 			return;
 		}

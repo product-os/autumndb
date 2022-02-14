@@ -1,31 +1,29 @@
-import { SqlFilter } from './sql-filter';
+import type { SqlFragmentBuilder } from './fragment-builder';
 import { SqlSelectBuilder } from './select-builder';
-import { SqlPath } from './sql-path';
-import { SqlFragmentBuilder } from './fragment-builder';
+import { SqlFilter } from './sql-filter';
+import type { SqlPath } from './sql-path';
 
 /**
  * Filter asserting that the an array contains at least one element with which
  * another filter evaluates to true.
  */
 export class ArrayContainsFilter extends SqlFilter {
+	private path: SqlPath;
+
 	/**
 	 * Constructor.
-	 *
-	 * @param {SqlPath} path - Path to be tested.
-	 * @param {SqlFilter} filter - Filter to test elements against.
 	 */
-	constructor(public path: SqlPath, public filter: SqlFilter) {
+	public constructor(path: SqlPath, private filter: SqlFilter) {
 		super();
 
 		this.path = path.cloned();
-		this.filter = filter;
 	}
 
-	scrapLinksInto(list: any[]) {
+	public scrapLinksInto(list: any[]): void {
 		this.filter.scrapLinksInto(list);
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		const alias = 'contents';
 		const field = this.path.toSql(builder.getTable());
 		const unnest = this.path.isProcessingJsonProperty

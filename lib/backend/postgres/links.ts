@@ -4,10 +4,8 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import { Context } from '../../context';
+import { version as PACKAGE_VERSION } from '../../../package.json';
 import type { PostgresBackend } from '.';
-
-// tslint:disable-next-line: no-var-requires
-const { version: coreVersion } = require('../../../package.json');
 
 const LINK_ORIGIN_PROPERTY = '$link';
 const LINK_TABLE = 'links2';
@@ -22,7 +20,7 @@ export const setup = async (
 		// The name of the "cards" table that should be referenced
 		cards: string;
 	},
-) => {
+): Promise<void> => {
 	context.debug('Creating links table', {
 		table: LINK_TABLE,
 		databaseName,
@@ -65,7 +63,7 @@ export const setup = async (
 			context,
 			`${LINK_TABLE}`,
 			name,
-			coreVersion,
+			PACKAGE_VERSION,
 			`USING BTREE (${column})`,
 		);
 	}
@@ -119,7 +117,10 @@ const deleteLinkQuery = Context.prepareQuery(`
 	WHERE id = $1
 `);
 
-export const upsert = async (context: Context, link: LinkContract) => {
+export const upsert = async (
+	context: Context,
+	link: LinkContract,
+): Promise<void> => {
 	if (link.active) {
 		await context.runQuery(insertStringQuery, [
 			link.name,
@@ -172,7 +173,7 @@ export const parseCard = (
 	linkCard: LinkContract,
 	card: Contract,
 	joinedCard: Partial<Contract> = {},
-) => {
+): ParsedCard => {
 	const fromId = linkCard.data.from.id || linkCard.data.from;
 	const toId = linkCard.data.to.id || linkCard.data.to;
 	if (fromId === card.id) {
@@ -218,9 +219,9 @@ export const parseCard = (
  */
 export const addLink = (
 	linkCard: LinkContract,
-	card: Contract,
-	joinedCard?: Contract,
-) => {
+	card: Contract<T>,
+	joinedCard?: Contract<K>,
+): Promise<Contract<T>> => {
 	const result = parseCard(linkCard, card, joinedCard);
 	if (!result) {
 		return card;
@@ -251,7 +252,10 @@ export const addLink = (
  *
  * console.log(card.links)
  */
-export const removeLink = (linkCard: LinkContract, card: Contract) => {
+export const removeLink = (
+	linkCard: LinkContract,
+	card: Contract<T>,
+): Promise<Contract<T>> => {
 	const result = parseCard(linkCard, card);
 	if (!result || !card.links || !card.links[result.name]) {
 		return card;

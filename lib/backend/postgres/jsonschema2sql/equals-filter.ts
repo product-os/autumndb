@@ -4,27 +4,25 @@ import { ExpressionFilter } from './expression-filter';
 import type { SqlFragmentBuilder } from './fragment-builder';
 import { IsNullFilter } from './is-null-filter';
 import { SqlFilter } from './sql-filter';
-import type { SqlPath } from './sql-path';
+import type { SqlPath, ToSqlOptions } from './sql-path';
 
 /**
  * Filter asserting that the value of a field is equal to one or more possible
  * values.
  */
 export class EqualsFilter extends SqlFilter {
+	private path: SqlPath;
+
 	/**
 	 * Constructor.
-	 *
-	 * @param {SqlPath} path - Path to be tested.
-	 * @param {Array} values - Array of values to test `path` against.
 	 */
-	constructor(public path: SqlPath, public values: any[]) {
+	public constructor(path: SqlPath, private values: any[]) {
 		super();
 
 		this.path = path.cloned();
-		this.values = values;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		let canBeSqlNull = false;
 		const textValues = [];
 		const nonTextValues = [];
@@ -66,16 +64,16 @@ export class EqualsFilter extends SqlFilter {
 }
 
 class IsEqualFilter extends SqlFilter {
-	constructor(public path: SqlPath, public asText: boolean, public value: any) {
+	public constructor(
+		private path: SqlPath,
+		private asText: boolean,
+		private value: any,
+	) {
 		super();
-
-		this.path = path;
-		this.asText = asText;
-		this.value = value;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
-		const options = this.asText
+	public toSqlInto(builder: SqlFragmentBuilder): void {
+		const options: ToSqlOptions = this.asText
 			? {
 					asText: true,
 			  }
@@ -88,20 +86,16 @@ class IsEqualFilter extends SqlFilter {
 }
 
 class IsInFilter extends SqlFilter {
-	constructor(
-		public path: SqlPath,
-		public asText: boolean,
-		public values: any,
+	public constructor(
+		private path: SqlPath,
+		private asText: boolean,
+		private values: any,
 	) {
 		super();
-
-		this.path = path;
-		this.asText = asText;
-		this.values = values;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
-		const options = this.asText
+	public toSqlInto(builder: SqlFragmentBuilder): void {
+		const options: ToSqlOptions = this.asText
 			? {
 					asText: true,
 			  }

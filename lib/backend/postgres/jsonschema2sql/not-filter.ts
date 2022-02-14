@@ -5,26 +5,22 @@ import { SqlFilter } from './sql-filter';
  * Filter asserting that another filter is false.
  */
 export class NotFilter extends SqlFilter {
-	filter: SqlFilter;
-
 	/**
 	 * Constructor.
 	 *
 	 * @param {SqlFilter} filter - The filter to negate. This constructor
 	 *        assumes ownership of the filter.
 	 */
-	constructor(filter: SqlFilter) {
+	public constructor(private filter: SqlFilter) {
 		super();
-
-		this.filter = filter;
 	}
 
 	// TS-TODO: strongly type this param
-	scrapLinksInto(list: any[]) {
+	public scrapLinksInto(list: any[]): void {
 		this.filter.scrapLinksInto(list);
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		builder.push('NOT ').extendParenthisedFrom(this.filter);
 	}
 }

@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import pgFormat = require('pg-format');
+import * as pgFormat from 'pg-format';
 import type { SqlFilter } from './sql-filter';
 
 /**
@@ -7,10 +7,10 @@ import type { SqlFilter } from './sql-filter';
  * instance.
  */
 export class BuilderContext {
-	tableStack: string[];
-	linkTypeStack: Array<[string, number]>;
+	private tableStack: string[];
+	private linkTypeStack: Array<[string, number]>;
 	// TS-TODO: improve this property typing
-	links: {
+	private links: {
 		[key: string]: Array<
 			Array<{
 				nested?: { [key: string]: any };
@@ -22,16 +22,13 @@ export class BuilderContext {
 			}>
 		>;
 	};
-	linkCount: number;
-	hoistedFilters: string[];
+	private linkCount: number;
+	private hoistedFilters: string[];
 
 	/**
 	 * Constructor.
-	 *
-	 * @param {String} table - Name or alias of the table we're currently
-	 *        referencing.
 	 */
-	constructor(table: string) {
+	public constructor(table: string) {
 		this.tableStack = [table];
 		this.linkTypeStack = [];
 		this.links = {};
@@ -41,27 +38,22 @@ export class BuilderContext {
 
 	/**
 	 * Push a new table to the top of the table stack.
-	 *
-	 * @param {String} table - Name or alias of the table to be pushed and used
-	 *        as current.
 	 */
-	pushTable(table: string) {
+	public pushTable(table: string): void {
 		this.tableStack.push(table);
 	}
 
 	/**
 	 * Get the table at the top of the stack.
-	 *
-	 * @returns {String} Name or alias of the table at the top of the stack.
 	 */
-	getTable(): string {
+	public getTable(): string {
 		return this.tableStack[this.tableStack.length - 1];
 	}
 
 	/**
 	 * Pop a table from the top of the stack.
 	 */
-	popTable() {
+	public popTable(): void {
 		this.tableStack.pop();
 	}
 
@@ -76,7 +68,7 @@ export class BuilderContext {
 	 * @returns {String} Name of the cards table joined by the link that was
 	 *          just added.
 	 */
-	addLink(linkType: string, filter: SqlFilter): string {
+	public addLink(linkType: string, filter: SqlFilter): string {
 		// The link type stack is usually very shallow, so following this path
 		// from the root is not an issue
 		let currentLinks = this.links;
@@ -172,18 +164,17 @@ export class BuilderContext {
 	 *
 	 * @returns {Object} A map of all links stored in this context.
 	 */
-	getLinks() {
+	public getLinks(): Links {
 		return this.links;
 	}
 
 	/**
-	 * In some cases, filters can only appear in the `WHERE` clause and not on
-	 * any specific join condition, or we risk emitting queries with circular
-	 * dependencies.
-	 *
-	 * @returns {String} Stringified version of all hoisted filters.
+	 * In some cases, filters can only appear in the `WHERE` clause and not in
+	 * any specific join condition. Otherwise we risk emitting queries with
+	 * circular dependencies. This method returns an SQL expression for these
+	 * constraints.
 	 */
-	getHoistedFilters(): string {
+	public getHoistedFilters(): string {
 		return this.hoistedFilters.join(' AND ');
 	}
 }

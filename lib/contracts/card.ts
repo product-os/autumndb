@@ -1,4 +1,6 @@
-export const card = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const card: TypeContractDefinition = {
 	slug: 'card',
 	name: 'Jellyfish Card',
 	type: 'type@1.0.0',

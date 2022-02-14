@@ -3,17 +3,17 @@ import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import { EventEmitter } from 'events';
 import * as _ from 'lodash';
-import { Notification } from 'pg';
+import type { Notification } from 'pg';
 import * as pgFormat from 'pg-format';
 import { v4 as uuidv4 } from 'uuid';
+import type { QueryOptions } from '../..';
 import {
 	Context,
 	DatabaseNotificationHandler,
 	PreparedStatement,
 } from '../../context';
-import type { QueryOptions } from '../..';
-import type { BackendQueryOptions, SelectObject } from './types';
 import * as backend from '.';
+import type { BackendQueryOptions, SelectObject } from './types';
 
 export interface StreamChange {
 	id: string;
@@ -48,7 +48,7 @@ export const setupTrigger = async (
 	context: Context,
 	table: string,
 	columns: string[],
-) => {
+): Promise<void> => {
 	const tableIdent = pgFormat.ident(table);
 	const channel = `stream-${table}`;
 	const trigger = pgFormat.ident(`trigger-${channel}`);
@@ -109,12 +109,14 @@ export class Streamer {
 	private streams: { [id: string]: Stream } = {};
 	private notificationHandler: DatabaseNotificationHandler | null = null;
 
-	constructor(private context: Context, public table: string) {
+	public constructor(private context: Context, public table: string) {
 		this.channel = `stream-${table}`;
 		this.notificationListener = this.notificationListener.bind(this);
 	}
 
-	async notificationListener(notification: Notification) {
+	private async notificationListener(
+		notification: Notification,
+	): Promise<void> {
 		if (notification.channel !== this.channel) {
 			return;
 		}
@@ -127,7 +129,7 @@ export class Streamer {
 		);
 	}
 
-	async relisten() {
+	private async relisten(): Promise<void> {
 		this.context.error(
 			'Lost connection to the database notification stream. Reconnecting...',
 		);
@@ -140,7 +142,7 @@ export class Streamer {
 	 * @example
 	 * await streamer.init(context, await connection.connect(), columns, connectRetryDelay)
 	 */
-	async connect() {
+	public async connect(): Promise<void> {
 		await this.disconnect();
 
 		this.notificationHandler =
@@ -151,7 +153,7 @@ export class Streamer {
 			);
 	}
 
-	async disconnect() {
+	public async disconnect(): Promise<void> {
 		await this.notificationHandler?.end();
 		this.notificationHandler = null;
 
@@ -161,23 +163,23 @@ export class Streamer {
 		this.streams = {};
 	}
 
-	getAttachedStreamCount() {
+	public getAttachedStreamCount(): number {
 		return Object.keys(this.streams).length;
 	}
 
-	async attach(
+	public attach(
 		select: SelectObject,
 		schema: JsonSchema,
 		options: QueryOptions = {},
-	) {
+	): Stream {
 		return new Stream(this.context, this, uuidv4(), select, schema, options);
 	}
 
-	register(id: string, stream: Stream) {
+	public register(id: string, stream: Stream): void {
 		this.streams[id] = stream;
 	}
 
-	unregister(id: string) {
+	public unregister(id: string): void {
 		if (this.streams !== null) {
 			Reflect.deleteProperty(this.streams, id);
 		}
@@ -185,33 +187,23 @@ export class Streamer {
 }
 
 export class Stream extends EventEmitter {
-	seenCardIds: Set<unknown>;
-	streamer: Streamer;
-	id: string;
-	context: Context;
-	constCardId?: string;
-	constCardSlug?: string;
-	cardTypes: null | string[];
-	streamQuery?: PreparedStatement;
-	schema: JsonSchema = false;
+	private seenCardIds: Set<string> = new Set();
+	private constCardId?: string;
+	private constCardSlug?: string;
+	private cardTypes: null | string[] = null;
+	private streamQuery?: PreparedStatement;
+	private schema: JsonSchema = false;
 
-	constructor(
-		context: Context,
-		streamer: Streamer,
-		id: string,
+	public constructor(
+		private context: Context,
+		private streamer: Streamer,
+		private id: string,
 		select: SelectObject,
 		schema: JsonSchema,
 		options: QueryOptions = {},
 	) {
 		super();
 		this.setMaxListeners(Infinity);
-
-		this.seenCardIds = new Set();
-		this.streamer = streamer;
-		this.id = id;
-		this.context = context;
-		this.cardTypes = null;
-
 		this.setSchema(select, schema, options);
 
 		context.info('Attaching new stream', {
@@ -226,7 +218,7 @@ export class Stream extends EventEmitter {
 		// an exception will be raised and the nodeJS process will exit. To avoid
 		// this we always add an error listener that will log a warning.
 		// https://nodejs.org/api/events.html#events_error_events
-		this.on('error', (error) => {
+		this.on('error', (error: unknown) => {
 			context.error('Encountered an error in stream', {
 				id,
 				table: streamer.table,
@@ -236,11 +228,11 @@ export class Stream extends EventEmitter {
 		});
 	}
 
-	async query(
+	public async query(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: Partial<BackendQueryOptions>,
-	) {
+		options: BackendQueryOptions,
+	): Promise<Contract[]> {
 		// Query the cards with the IDs so we can add them to
 		// `this.seenCardIds`
 		const selectsId = 'id' in select;
@@ -272,11 +264,11 @@ export class Stream extends EventEmitter {
 		return elements;
 	}
 
-	setSchema(
+	public setSchema(
 		select: SelectObject,
 		schema: JsonSchema,
 		options: QueryOptions = {},
-	) {
+	): void {
 		this.constCardId = _.get(schema, ['properties', 'id', 'const']);
 		this.constCardSlug = _.get(schema, ['properties', 'slug', 'const']);
 		this.cardTypes = null;
@@ -303,7 +295,7 @@ export class Stream extends EventEmitter {
 		this.schema = schema;
 	}
 
-	async push(payload: EventPayload) {
+	public async push(payload: EventPayload): Promise<void> {
 		if (await this.tryEmitEvent(payload)) {
 			this.seenCardIds.add(payload.id);
 		} else if (this.seenCardIds.delete(payload.id)) {
@@ -316,7 +308,7 @@ export class Stream extends EventEmitter {
 		}
 	}
 
-	async tryEmitEvent(payload: EventPayload) {
+	private async tryEmitEvent(payload: EventPayload): Promise<boolean> {
 		if (this.constCardId && payload.id !== this.constCardId) {
 			return false;
 		}
@@ -365,7 +357,7 @@ export class Stream extends EventEmitter {
 		return true;
 	}
 
-	close() {
+	public close(): void {
 		this.context.info('Detaching stream', {
 			id: this.id,
 			table: this.streamer.table,

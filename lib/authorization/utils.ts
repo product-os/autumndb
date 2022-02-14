@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 export const applyAuthorizationSchemaToLinks = (
 	schema: JsonSchema,
 	authorizationSchema: JsonSchema,
-) => {
+): void => {
 	if (Array.isArray(schema)) {
 		for (const item of schema) {
 			applyAuthorizationSchemaToLinks(item, authorizationSchema);
@@ -56,27 +56,21 @@ export const applyAuthorizationSchemaToLinks = (
 export const evaluateSchemaWithContext = (
 	schema: any,
 	evaluationContext: { [key: string]: any },
-) => {
-	if (!schema) {
-		return schema;
-	}
-
-	if (schema.$eval) {
-		return jsone(schema, evaluationContext);
-	}
-
-	if (schema.$id) {
-		Reflect.deleteProperty(schema, '$id');
-	}
-
-	for (const key of Object.keys(schema)) {
-		// For performance reasons
-		// eslint-disable-next-line lodash/prefer-lodash-typecheck
-		if (typeof schema[key] !== 'object') {
-			continue;
+): JsonSchema => {
+	if (schema instanceof Object) {
+		if (schema.$eval) {
+			return jsone(schema, evaluationContext);
 		}
 
-		schema[key] = evaluateSchemaWithContext(schema[key], evaluationContext);
+		for (const key of Object.keys(schema)) {
+			// For performance reasons
+			// eslint-disable-next-line lodash/prefer-lodash-typecheck
+			if (typeof schema[key] !== 'object') {
+				continue;
+			}
+
+			schema[key] = evaluateSchemaWithContext(schema[key], evaluationContext);
+		}
 	}
 
 	return schema;

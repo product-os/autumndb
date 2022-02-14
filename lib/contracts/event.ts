@@ -1,4 +1,6 @@
-export const event = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const event: TypeContractDefinition = {
 	slug: 'event',
 	type: 'type@1.0.0',
 	name: 'Jellyfish Event',

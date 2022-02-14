@@ -17,7 +17,7 @@ export class ValueIsFilter extends SqlFilter {
 	 * @param {String} cast - An optional type that both `path` and `value`
 	 *        must be cast into before comparison.
 	 */
-	constructor(
+	public constructor(
 		public path: SqlPath,
 		public operator: string,
 		public value: any,
@@ -31,7 +31,7 @@ export class ValueIsFilter extends SqlFilter {
 		this.cast = cast;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		if (this.cast) {
 			const field = this.path.toSql(builder.getTable(), {
 				asText: true,

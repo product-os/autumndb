@@ -1,4 +1,6 @@
-export const link = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const link: TypeContractDefinition = {
 	slug: 'link',
 	type: 'type@1.0.0',
 	data: {

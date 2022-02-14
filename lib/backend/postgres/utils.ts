@@ -28,7 +28,7 @@ export const convertDatesToISOString = (row: any) => {
  * @param {String} version - the version string
  * @returns {*} the different parts of the version
  */
-export const parseVersion = (version: string) => {
+export const parseVersion = (version: string): Version => {
 	if (!version) {
 		// We treat 'my-slug@latest' and 'my-slug' identically
 		return {

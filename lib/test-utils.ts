@@ -1,11 +1,11 @@
+import { strict as assert } from 'assert';
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import type { LogContext } from '@balena/jellyfish-logger';
 import type {
 	SessionContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
-import { strict as assert } from 'assert';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import { v4 as uuid } from 'uuid';
 import { Cache } from './cache';
 import { Kernel } from './kernel';
@@ -125,7 +125,7 @@ export interface NewContextOptions {
 /**
  * Clear the test database and close all connections.
  */
-export const destroyContext = async (context: TestContext) => {
+export const destroyContext = async (context: TestContext): Promise<void> => {
 	await context.kernel.drop(context.logContext);
 	await context.kernel.disconnect(context.logContext);
 	await context.cache.disconnect();

@@ -1,4 +1,6 @@
-export const view = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const view: TypeContractDefinition = {
 	slug: 'view',
 	type: 'type@1.0.0',
 	name: 'Jellyfish view',

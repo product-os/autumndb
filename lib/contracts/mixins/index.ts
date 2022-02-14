@@ -19,10 +19,12 @@ const mergeWithUniqConcatArrays = (objValue: any, srcValue: any) => {
 	return undefined;
 };
 
-export const mixin = (...mixins: ContractDefinition[]) => {
-	return <TData = ContractData>(
-		base: ContractDefinition<TData>,
-	): ContractDefinition<TData> => {
+export const mixin = (
+	...mixins: ContractDefinition[]
+): (<TData = ContractData>(
+	base: ContractDefinition<TData>,
+) => ContractDefinition<TData>) => {
+	return (base) => {
 		return _.mergeWith({}, base, ...mixins, mergeWithUniqConcatArrays);
 	};
 };
@@ -36,7 +38,7 @@ export const initialize = <TData = ContractData>(
 	if (contract.type.split('@')[0] === 'type') {
 		snippets.push(baseUiSchema);
 	}
-	const intializedContract = (_.mergeWith as any)(
+	const intializedContract = _.mergeWith(
 		...snippets,
 		mergeWithUniqConcatArrays,
 	);
@@ -50,5 +52,5 @@ export const initialize = <TData = ContractData>(
 	return deref(intializedContract, {
 		failOnMissing: true,
 		mergeAdditionalProperties: true,
-	}) as ContractDefinition<TData>;
+	});
 };

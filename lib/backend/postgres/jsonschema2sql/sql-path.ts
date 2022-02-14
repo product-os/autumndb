@@ -2,73 +2,65 @@ import * as _ from 'lodash';
 import * as pgFormat from 'pg-format';
 import { SqlFragmentBuilder } from './fragment-builder';
 
-interface ToSqlOptions {
-	/* return the field with the proper cast into text. */
-	asText?: boolean;
-	/* apply as cast (if requested) even for columns. */
-	forceCast?: boolean;
-}
-
 /**
  * Abstraction for SQL field paths. Note that this implicitly depends on the
  * actual database layout and if that changes this may need to be updated too.
  */
 export class SqlPath {
-	path: Array<string | null>;
-	parent: Array<string | null>;
-	rootIsJson: boolean = false;
-	isProcessingJsonProperty: boolean = false;
-	isProcessingTable: boolean = false;
-	isProcessingColumn: boolean = false;
-	isProcessingSubColumn: boolean = false;
+	// These are public because having a getter causes a non-trivial drop in
+	// performance. They should be treated as read-only.
+	public isProcessingJsonProperty: boolean = false;
+	public isProcessingTable: boolean = false;
+	public isProcessingColumn: boolean = false;
+	public isProcessingSubColumn: boolean = false;
+
+	private path: string[];
+	private parent: string[];
+	private rootIsJson: boolean = false;
 
 	/**
-	 * Get the SQL expression for the`version` computed field.
-	 *
-	 * @param {String} table - The table name/alias.
-	 * @returns {String} The SQL expression for the computed field.
+	 * Get the SQL expression for the `version` computed field. If provided,
+	 * `table` is assumed to be a properly-escaped identifier.
 	 */
-	static getVersionComputedField(table?: string): string {
+	public static getVersionComputedField(table?: string): string {
 		const tablePrefix = table ? `${table}.` : '';
 		const version = `CONCAT_WS('.', ${tablePrefix}version_major, ${tablePrefix}version_minor, ${tablePrefix}version_patch)`;
 		const vWithPreRelease = `CONCAT_WS('-', ${version}, NULLIF(${tablePrefix}version_prerelease, '') )`;
 		const vWithPreReleaseAndBuildSuffix = `CONCAT_WS('+', ${vWithPreRelease}, NULLIF(${tablePrefix}version_build, '') )`;
+
 		return vWithPreReleaseAndBuildSuffix;
 	}
 
 	/**
 	 * Build an `SqlPath` from an array without having to push each element
-	 * individually. This is also faster as it avoids recomputing the
-	 * `isProcessing*` state with each new `push()`.
-	 *
-	 * @param {Array} array - The array representing the path where each item
-	 *        is an element and the first item is the table.
-	 * @returns {SqlPath} An `SqlPath` pointing to the same path as `array`.
+	 * individually. This is also faster than pushing elements one by one as it
+	 * avoids recomputing the `isProcessing*` state with each new `push()`
+	 * call.
 	 */
-	static fromArray(array: Array<string | null>): SqlPath {
+	public static fromArray(array: string[]): SqlPath {
 		const path = new SqlPath();
 		path.path = array;
 		path.recalculateIsProcessingState();
+
 		return path;
 	}
 
-	static toJsonSelector(path: Array<string | null>): string {
+	private static toJsonSelector(path: string[]): string {
 		const selector = path
 			.map((element) => {
 				return JSON.stringify(element);
 			})
 			.join(', ');
+
 		return pgFormat.literal(`{${selector}}`);
 	}
 
 	/**
-	 * Constructor.
-	 *
-	 * @param {SqlPath} parent - If this `SqlPath` denotes paths in a subquery,
-	 *        `parent` must be the `SqlPath` that points to the field that this
-	 *         subquery uses as table. Otherwise, `parent` must be `undefined`.
+	 * Constructor. If this `SqlPath` denotes paths in a subquery, `parent`
+	 * must be the `SqlPath` that points to the field that this subquery uses
+	 * as table.
 	 */
-	constructor(parent?: SqlPath) {
+	public constructor(parent?: SqlPath) {
 		this.path = [];
 		this.parent = parent ? parent.flattened().path : [];
 		this.recalculateIsProcessingState();
@@ -77,11 +69,10 @@ export class SqlPath {
 
 	/**
 	 * Extend the path by one element.
-	 *
-	 * @param {String} element - The element to pushed.
 	 */
-	push(element: string | null) {
+	public push(element: string): void {
 		this.path.push(element);
+
 		const pathDepth = this.getDepth();
 		if (pathDepth === 1) {
 			this.isProcessingTable = false;
@@ -98,44 +89,41 @@ export class SqlPath {
 	/**
 	 * Pop the last element.
 	 */
-	pop() {
+	public pop(): void {
 		this.path.pop();
 		this.recalculateIsProcessingState();
 	}
 
 	/**
 	 * Get the second to last element.
-	 *
-	 * @returns {String} The second to last element.
 	 */
-	getSecondToLast(): string | null {
+	public getSecondToLast(): string | null {
 		if (this.path.length === 0) {
 			return this.parent[this.parent.length - 2];
 		} else if (this.path.length === 1) {
 			return this.parent[this.parent.length - 1];
 		}
+
 		return this.path[this.path.length - 2];
 	}
 
 	/**
 	 * Get the last element.
-	 *
-	 * @returns {String} The last element.
 	 */
-	getLast(): string | null {
+	public getLast(): string | null {
 		if (this.path.length === 0) {
 			return this.parent[this.parent.length - 1];
 		}
+
 		return this.path[this.path.length - 1];
 	}
 
 	/**
 	 * Set the last element without resizing the underlying array.
-	 *
-	 * @param {String} element - The element to be set as last.
 	 */
-	setLast(element: string) {
+	public setLast(element: string): void {
 		this.path[this.path.length - 1] = element;
+
 		const pathDepth = this.getDepth();
 		if (pathDepth === 1) {
 			this.isProcessingJsonProperty = element === 'data';
@@ -145,13 +133,14 @@ export class SqlPath {
 		}
 	}
 
-	getDepth() {
+	private getDepth(): number {
 		const depth = this.path.length + this.parent.length;
 		const adjustment = this.path.length === 0 && this.parent.length > 0 ? 1 : 0;
+
 		return depth + adjustment;
 	}
 
-	recalculateIsProcessingState() {
+	private recalculateIsProcessingState(): void {
 		const pathDepth = this.getDepth();
 		this.isProcessingTable = pathDepth === 0;
 		this.isProcessingColumn = pathDepth === 1;
@@ -164,52 +153,48 @@ export class SqlPath {
 
 	/**
 	 * Return `this` as an array where each element is a path component.
-	 *
-	 * @returns {Array} `this` as an array.
 	 */
-	asArray() {
+	public asArray(): string[] {
 		return this.path;
 	}
 
 	/**
 	 * Return a clone of `this`.
-	 *
-	 * @returns {SqlPath} A clone of `this`.
 	 */
-	cloned() {
+	public cloned(): SqlPath {
 		const clone = _.clone(this);
 		clone.path = _.clone(this.path);
 		clone.parent = _.clone(this.parent);
+
 		return clone;
 	}
 
 	/**
 	 * Build a new `SqlPath` where `this` and `parent` are merged.
-	 *
-	 * @returns {SqlPath} The flat `SqlPath`.
 	 */
-	flattened() {
+	public flattened(): SqlPath {
 		if (this.parent.length > 0) {
 			return SqlPath.fromArray(_.concat(this.parent, this.path));
 		}
+
 		return SqlPath.fromArray(_.clone(this.path));
 	}
 
 	/**
 	 * Format this filter by pushing string fragments into `builder`.
-	 *
-	 * @param {SqlFragmentBuilder} builder - Builder for the final SQL string.
-	 * @param {ToSqlOptions} options - An optional object containing extra options.
-	 *        Accepted options are:
-	 *        - `asText`: return the field with the proper cast into text.
-	 *        - `forceCast`: apply as cast (if requested) even for columns.
 	 */
-	toSqlInto(builder: SqlFragmentBuilder, options: ToSqlOptions = {}) {
+	public toSqlInto(
+		builder: SqlFragmentBuilder,
+		options: ToSqlOptions = {},
+	): void {
 		const table = builder.getTable();
+
 		if (this.isProcessingColumn && this.getLast() === 'version') {
 			builder.push(SqlPath.getVersionComputedField(table));
+
 			return;
 		}
+
 		let operator = '#>';
 		let start = '';
 		let end = '';
@@ -237,15 +222,27 @@ export class SqlPath {
 
 	/**
 	 * Build an SQL field from `this`.
-	 *
-	 * @param {String} table - Table that `this` will refer to.
-	 * @param {ToSqlOptions} options - An optional object containing extra options.
-	 *        See {@link SqlPath#toSqlInto} for a list of accepted options.
-	 * @returns {String} The SQL field.
 	 */
-	toSql(table: string, options?: ToSqlOptions) {
+	toSql(table: string, options: ToSqlOptions = {}): string {
 		const builder = new SqlFragmentBuilder(table);
 		this.toSqlInto(builder, options);
+
 		return builder.toSql();
 	}
+}
+
+/**
+ * Options when converting an `SqlPath` into an SQL string.
+ */
+export interface ToSqlOptions {
+	/**
+	 * Cast the field to text.
+	 */
+	asText?: true;
+
+	/**
+	 * Always cast even if the `SqlPath` is pointing to a column.
+	 */
+	// TODO: doesn't sound like this makes sense
+	forceCast?: true;
 }

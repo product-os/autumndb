@@ -1,25 +1,24 @@
 import * as _ from 'lodash';
-import type { ArrayLengthFilter } from './array-length-filter';
 import { SqlFragmentBuilder } from './fragment-builder';
-import type { IsOfJsonTypesFilter } from './is-of-json-types-filter';
 import type { LiteralSql } from './literal-sql';
-import type { MultipleOfFilter } from './multiple-of-filter';
 import { NotFilter } from './not-filter';
 import { SqlFilter } from './sql-filter';
 
 // Supported logical binary operators
-const AND = 0;
-const OR = 1;
+enum LogicOperator {
+	AND,
+	OR,
+}
 
 // Rules for constant folding
 const CONSTANT_FOLD = {
-	[AND]: {
+	[LogicOperator.AND]: {
 		true: (other: any) => {
 			return other;
 		},
 		false: _.constant(false),
 	},
-	[OR]: {
+	[LogicOperator.OR]: {
 		true: _.constant(true),
 		false: (other: any) => {
 			return other;
@@ -34,33 +33,29 @@ const CONSTANT_FOLD = {
  * their arguments and are free to use/modify them as they please.
  */
 export class ExpressionFilter extends SqlFilter {
-	operator: 0 | 1;
-	expr: any[];
-	optionalLinks: any[];
+	private operator: LogicOperator = LogicOperator.AND;
+	private expr: any[];
+	private optionalLinks: any[] = [];
 
 	/**
 	 * Constructor.
-	 *
-	 * @param {any} initialValue - Initial constant value.
 	 */
-	constructor(initialValue?: string | boolean | LiteralSql | SqlFilter) {
+	public constructor(
+		initialValue: string | boolean | LiteralSql | SqlFilter = true,
+	) {
 		super();
 
-		this.operator = AND;
 		this.expr = [initialValue];
-		this.optionalLinks = [];
 	}
 
-	intoExpression() {
+	public intoExpression(): ExpressionFilter {
 		return this;
 	}
 
 	/**
 	 * Negate the whole expression.
-	 *
-	 * @returns {ExpressionFilter} `this`.
 	 */
-	negate(): ExpressionFilter {
+	public negate(): ExpressionFilter {
 		// To avoid copying and to make sure `this` references the right
 		// expression, we move our internal state into a new `ExpressionFilter`
 		// and give that to the `NotFilter` instead of `this`
@@ -69,7 +64,7 @@ export class ExpressionFilter extends SqlFilter {
 		inner.operator = this.operator;
 		inner.expr = this.expr;
 
-		this.operator = AND;
+		this.operator = LogicOperator.AND;
 		this.expr = [new NotFilter(inner)];
 
 		return this;
@@ -78,20 +73,9 @@ export class ExpressionFilter extends SqlFilter {
 	/**
 	 * Perform a logical conjunction with another filter. This method assumes
 	 * ownership of its argument.
-	 *
-	 * @param {SqlFilter} other - Filter `this` will be ANDed with.
-	 * @returns {ExpressionFilter} `this`.
 	 */
-	// TS-TODO: Duck type the filter value here
-	and(
-		other:
-			| LiteralSql
-			| ArrayLengthFilter
-			| IsOfJsonTypesFilter
-			| MultipleOfFilter
-			| SqlFilter,
-	) {
-		this.applyBinaryOperator(AND, other);
+	public and(other: SqlFilter): ExpressionFilter {
+		this.applyBinaryOperator(LogicOperator.AND, other);
 
 		return this;
 	}
@@ -99,33 +83,14 @@ export class ExpressionFilter extends SqlFilter {
 	/**
 	 * Perform a logical disjunction with another filter. This method assumes
 	 * ownership of its argument.
-	 *
-	 * @param {SqlFilter} other - Filter `this` will be ORed with.
-	 * @returns {ExpressionFilter} `this`.
 	 */
-	or(
-		other:
-			| LiteralSql
-			| ArrayLengthFilter
-			| IsOfJsonTypesFilter
-			| MultipleOfFilter
-			| SqlFilter,
-	) {
-		this.applyBinaryOperator(OR, other);
+	public or(other: SqlFilter): ExpressionFilter {
+		this.applyBinaryOperator(LogicOperator.OR, other);
 
 		return this;
 	}
 
-	applyBinaryOperator(
-		operator: 0 | 1,
-		other:
-			| LiteralSql
-			| ArrayLengthFilter
-			| IsOfJsonTypesFilter
-			| MultipleOfFilter
-			| ExpressionFilter
-			| SqlFilter,
-	) {
+	private applyBinaryOperator(operator: LogicOperator, other: SqlFilter): void {
 		const otherIsExpression = other instanceof ExpressionFilter;
 		if (this.tryConstantFolding(operator, other, otherIsExpression)) {
 			return;
@@ -159,17 +124,11 @@ export class ExpressionFilter extends SqlFilter {
 	}
 
 	// If applicable, fold constants to simplify the resulting SQL
-	tryConstantFolding(
-		operator: 0 | 1,
-		other:
-			| LiteralSql
-			| ArrayLengthFilter
-			| IsOfJsonTypesFilter
-			| MultipleOfFilter
-			| ExpressionFilter
-			| SqlFilter,
+	private tryConstantFolding(
+		operator: LogicOperator,
+		other: SqlFilter,
 		otherIsExpression: boolean,
-	) {
+	): boolean {
 		let folded = null;
 		let foldOperator = false;
 		let optionalLinks: any[] = [];
@@ -221,43 +180,18 @@ export class ExpressionFilter extends SqlFilter {
 		return true;
 	}
 
-	scrapLinksInto(list: any[]) {
-		list.push(...this.optionalLinks);
-		for (const item of this.expr) {
-			if (item instanceof SqlFilter) {
-				item.scrapLinksInto(list);
-			}
-		}
-
-		this.optionalLinks = [];
-	}
-
 	/**
 	 * Performs a material conditional: `this -> implicant`. This method
 	 * assumes ownership of its argument.
-	 *
-	 * @param {SqlFilter} implicant - The filter that `this` will imply.
-	 * @returns {ExpressionFilter} `this`.
 	 */
-	implies(
-		implicant:
-			| LiteralSql
-			| ArrayLengthFilter
-			| IsOfJsonTypesFilter
-			| MultipleOfFilter
-			| SqlFilter,
-	) {
+	public implies(implicant: SqlFilter): ExpressionFilter {
 		return this.negate().or(implicant);
 	}
 
 	/**
 	 * Make `this` always evaluate to false.
-	 *
-	 * @returns {ExpressionFilter} `this`.
 	 */
-	makeUnsatisfiable() {
-		// TS-TODO: check if this.op is used anywhere
-		(this as any).op = AND;
+	public makeUnsatisfiable(): ExpressionFilter {
 		this.expr = [false];
 
 		return this;
@@ -268,15 +202,24 @@ export class ExpressionFilter extends SqlFilter {
 	 * actually NP-complete, so this method only evaluates to true either if
 	 * `this` was constructed with an initial value of `false`, or if
 	 * `this.makeUnsatisfiable()` was called before this method.
-	 *
-	 * @returns {Boolean} Whether `this` is unsatisfiable.
 	 */
-	isUnsatisfiable(): boolean {
+	public isUnsatisfiable(): boolean {
 		return this.expr.length === 1 && this.expr[0] === false;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
-		const operator = this.operator === AND ? ' AND ' : ' OR ';
+	public scrapLinksInto(list: any[]): void {
+		list.push(...this.optionalLinks);
+		for (const item of this.expr) {
+			if (item instanceof SqlFilter) {
+				item.scrapLinksInto(list);
+			}
+		}
+
+		this.optionalLinks = [];
+	}
+
+	public toSqlInto(builder: SqlFragmentBuilder): void {
+		const operator = this.operator === LogicOperator.AND ? ' AND ' : ' OR ';
 		if (this.expr.length > 1) {
 			builder.push('(');
 		}

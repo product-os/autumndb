@@ -12,7 +12,7 @@ import { SqlPath } from './sql-path';
  * isArrayField({...}, 'data.payload.message');
  */
 export function isArrayField(
-	schema: ContractDefinition<any>,
+	schema: ContractDefinition<T>,
 	fieldPath: string,
 ): boolean {
 	const fullPath = ['data', 'schema', 'properties'].concat(
@@ -35,7 +35,7 @@ export function isArrayField(
  */
 export function generateTypeIndexPredicate(
 	fields: string[],
-	schema: ContractDefinition<any>,
+	schema: ContractDefinition<T>,
 ): string {
 	const type = `${schema.slug}@${schema.version}`;
 	const columns = [];

@@ -1,6 +1,6 @@
 import * as pgFormat from 'pg-format';
-import { SqlFragmentBuilder } from './fragment-builder';
 import { ExpressionFilter } from './expression-filter';
+import { SqlFragmentBuilder } from './fragment-builder';
 import type { SqlPath } from './sql-path';
 
 /**
@@ -11,13 +11,8 @@ export class SqlFilter {
 	/**
 	 * Format `value` as either a Postgres JSON literal, or an SQL literal
 	 * depending on whether `path` references a JSON property or not.
-	 *
-	 * @param {SqlPath} path - Choose how to to format the value based on an
-	 *        `SqlPath`
-	 * @param {any} value - The value to be formatted.
-	 * @returns {String} `value` formatted as an SQL-safe string.
 	 */
-	static maybeJsonLiteral(path: SqlPath, value: any): string {
+	public static maybeJsonLiteral(path: SqlPath, value: any): string {
 		const literal = path.isProcessingJsonProperty
 			? JSON.stringify(value)
 			: value;
@@ -27,37 +22,30 @@ export class SqlFilter {
 
 	/**
 	 * Wrap `this` into an `ExpressionFilter`.
-	 *
-	 * @returns {ExpressionFilter} `this` wrapped by an `ExpressionFilter`.
 	 */
-	intoExpression() {
+	public intoExpression(): ExpressionFilter {
 		return new ExpressionFilter(this);
 	}
 
 	/**
 	 * Fill `_list` with all links, recursively, in this filter.
-	 *
-	 * @param {Array} _list - Array to be filled with links, if any.
 	 */
-	// tslint:disable-next-line:no-empty
-	scrapLinksInto(_list: any) {}
+	// TS-TODO: find the right type for the argument
+	public scrapLinksInto(_list: any): void {
+		// Default implementation does nothing
+	}
 
 	/**
 	 * Format this filter by pushing string fragments into `_builder`.
-	 *
-	 * @param {SqlFragmentBuilder} _builder - Builder for the final SQL string.
 	 */
-	toSqlInto(_builder: any) {
+	public toSqlInto(_builder: SqlFragmentBuilder): void {
 		throw new Error();
 	}
 
 	/**
-	 * Build an SQL filter expression from `this`.
-	 *
-	 * @param {String} table - The table the result will refer to.
-	 * @returns {String} `this` as an SQL filter expression.
+	 * Build an SQL expression from `this`.
 	 */
-	toSql(table: string) {
+	public toSql(table: string): string {
 		return new SqlFragmentBuilder(table).extendFrom(this).toSql();
 	}
 }

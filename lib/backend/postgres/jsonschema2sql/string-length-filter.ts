@@ -16,7 +16,7 @@ export class StringLengthFilter extends SqlFilter {
 	 * @param {Number} value - A constant to test the string length of `path`
 	 *        against.
 	 */
-	constructor(
+	public constructor(
 		public path: SqlPath,
 		public operator: string,
 		public value: number,
@@ -28,7 +28,7 @@ export class StringLengthFilter extends SqlFilter {
 		this.value = value;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		const field = this.path.toSql(builder.getTable(), {
 			asText: true,
 		});

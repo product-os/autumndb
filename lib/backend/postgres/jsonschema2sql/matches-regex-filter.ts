@@ -8,7 +8,9 @@ import type { SqlPath } from './sql-path';
  * expression.
  */
 export class MatchesRegexFilter extends SqlFilter {
-	operator: '~*' | '~';
+	private path: SqlPath;
+	private operator: '~*' | '~';
+	private regex: string;
 
 	/**
 	 * Constructor.
@@ -19,9 +21,9 @@ export class MatchesRegexFilter extends SqlFilter {
 	 *        Accepted flags are:
 	 *        - `ignoreCase`: perform a case-insensitive regex matching.
 	 */
-	constructor(
-		public path: SqlPath,
-		public regex: string,
+	public constructor(
+		path: SqlPath,
+		regex: string,
 		flags: { ignoreCase?: boolean } = {},
 	) {
 		super();
@@ -30,7 +32,7 @@ export class MatchesRegexFilter extends SqlFilter {
 		this.regex = pgFormat.literal(regex);
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		this.path.toSqlInto(builder, {
 			asText: true,
 			forceCast: true,

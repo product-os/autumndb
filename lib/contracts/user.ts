@@ -1,6 +1,7 @@
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
 import { uiSchemaDef } from './mixins/ui-schema-defs';
 
-export const user = {
+export const user: TypeContractDefinition = {
 	slug: 'user',
 	type: 'type@1.0.0',
 	name: 'Jellyfish User',

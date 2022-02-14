@@ -1,4 +1,6 @@
-export const authentication = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const authentication: TypeContractDefinition = {
 	slug: 'authentication',
 	type: 'type@1.0.0',
 	name: 'Authentication Details',

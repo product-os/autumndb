@@ -10,15 +10,13 @@ export class LiteralSql {
 	 *
 	 * @param {String} sql - The literal SQL fragment to wrap.
 	 */
-	constructor(public sql: string) {
-		this.sql = sql;
-	}
+	public constructor(private sql: string) {}
 
-	toSql(): string {
+	public toSql(): string {
 		return this.sql;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		builder.push(this.sql);
 	}
 }

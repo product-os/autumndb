@@ -1,4 +1,6 @@
-export const role = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const role: TypeContractDefinition = {
 	slug: 'role',
 	type: 'type@1.0.0',
 	name: 'Jellyfish Role',

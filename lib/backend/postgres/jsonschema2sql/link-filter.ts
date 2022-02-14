@@ -12,18 +12,15 @@ export class LinkFilter extends SqlFilter {
 	 * @param {String} linkType - The link type.
 	 * @param {SqlFilter} filter - Filter for the link.
 	 */
-	constructor(public linkType: string, public filter: SqlFilter) {
+	public constructor(private linkType: string, private filter: SqlFilter) {
 		super();
-
-		this.linkType = linkType;
-		this.filter = filter;
 	}
 
-	scrapLinksInto(list: any) {
+	public scrapLinksInto(list: any): void {
 		list.push(this);
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		const joinAlias = builder.getContext().addLink(this.linkType, this.filter);
 		builder.push(joinAlias);
 		builder.push('.id IS NOT NULL');

@@ -1,8 +1,4 @@
 import type { LogContext } from '@balena/jellyfish-logger';
-import * as _ from 'lodash';
-import * as jsonpatch from 'fast-json-patch';
-import * as fastEquals from 'fast-equals';
-import { CONTRACTS } from './contracts';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
@@ -13,10 +9,15 @@ import type {
 	TypeContract,
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
+import * as fastEquals from 'fast-equals';
+import * as jsonpatch from 'fast-json-patch';
+import * as _ from 'lodash';
 import { Pool } from 'pg';
 import * as stopword from 'stopword';
 import { v4 as uuidv4 } from 'uuid';
+import * as authorization from './authorization';
 import { PostgresBackend, PostgresBackendOptions } from './backend';
+import type { Stream } from './backend/postgres/streams';
 import type {
 	BackendQueryOptions,
 	DatabaseBackend,
@@ -24,14 +25,13 @@ import type {
 } from './backend/postgres/types';
 import type { Cache } from './cache';
 import { Context, MixedContext, TransactionIsolation } from './context';
+import { CONTRACTS } from './contracts';
 import * as errors from './errors';
 import jsonSchema from './json-schema';
-import * as authorization from './authorization';
 import {
 	preprocessQuerySchema,
 	resolveActorAndScopeFromSessionId,
 } from './utils';
-import { Stream } from './backend/postgres/streams';
 
 export interface QueryOptions {
 	/*
@@ -65,15 +65,15 @@ export interface QueryOptions {
 // Contracts that are inserted by default.
 const CORE_CONTRACTS = [
 	CONTRACTS.card,
-	CONTRACTS.org,
 	CONTRACTS.error,
 	CONTRACTS.event,
-	CONTRACTS.view,
-	CONTRACTS.role,
 	CONTRACTS.link,
 	CONTRACTS.loop,
-	CONTRACTS['oauth-provider'],
 	CONTRACTS['oauth-client'],
+	CONTRACTS['oauth-provider'],
+	CONTRACTS.org,
+	CONTRACTS.role,
+	CONTRACTS.view,
 ];
 
 const CONTRACT_CONTRACT_TYPE = `${CONTRACTS['card'].slug}@${CONTRACTS['card'].version}`;
@@ -312,7 +312,6 @@ export const unsafeUpsertContract = async (
 };
 
 export class Kernel {
-	private backend: DatabaseBackend;
 	private sessions?: { admin: string };
 
 	/**
@@ -333,9 +332,7 @@ export class Kernel {
 	 *
 	 * const kernel = new Kernel(backend)
 	 */
-	private constructor(backend: DatabaseBackend) {
-		this.backend = backend;
-	}
+	private constructor(private backend: DatabaseBackend) {}
 
 	/**
 	 * Create a new [[`Kernel`]] object backed by a PostgreSQL database and
@@ -374,21 +371,21 @@ export class Kernel {
 	 * await kernel.initialize()
 	 * await kernel.disconnect()
 	 */
-	async disconnect(logContext: LogContext) {
+	public async disconnect(logContext: LogContext): Promise<void> {
 		await this.backend.disconnect(new Context(logContext));
 	}
 
 	/**
 	 * Truncate database tables.
 	 */
-	async reset(mixedContext: MixedContext) {
+	public async reset(mixedContext: MixedContext): Promise<void> {
 		await this.backend.reset(Context.fromMixed(mixedContext, this.backend));
 	}
 
 	/**
 	 * Drop database tables.
 	 */
-	async drop(mixedContext: MixedContext) {
+	public async drop(mixedContext: MixedContext): Promise<void> {
 		// TODO: we probably want to drop the database itself too.
 		await this.backend.drop(Context.fromMixed(mixedContext, this.backend));
 	}
@@ -408,7 +405,7 @@ export class Kernel {
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 */
-	async initialize(logContext: LogContext) {
+	private async initialize(logContext: LogContext): Promise<void> {
 		const context = new Context(logContext, this.backend);
 		await this.backend.connect(context);
 
@@ -423,16 +420,16 @@ export class Kernel {
 		};
 
 		await Promise.all([
-			unsafeUpsert(CONTRACTS.type),
-			unsafeUpsert(CONTRACTS.session),
 			unsafeUpsert(CONTRACTS.authentication),
-			unsafeUpsert(CONTRACTS.user),
-			unsafeUpsert(CONTRACTS['user-settings']),
+			unsafeUpsert(CONTRACTS.session),
 			unsafeUpsert(CONTRACTS['role-user-admin']),
 			unsafeUpsert(CONTRACTS['role-user-community']),
 			unsafeUpsert(CONTRACTS['role-user-guest']),
 			unsafeUpsert(CONTRACTS['role-user-operator']),
 			unsafeUpsert(CONTRACTS['role-user-test']),
+			unsafeUpsert(CONTRACTS['user-settings']),
+			unsafeUpsert(CONTRACTS.type),
+			unsafeUpsert(CONTRACTS.user),
 		]);
 
 		const adminUser = await unsafeUpsert(CONTRACTS['user-admin']);
@@ -442,7 +439,7 @@ export class Kernel {
 			data: {
 				actor: adminUser.id,
 			},
-		} as any as Contract);
+		});
 
 		this.sessions = {
 			admin: adminSession.id,
@@ -467,7 +464,7 @@ export class Kernel {
 	 * @param {String} id - contract id
 	 * @returns {(Object|Null)} contract
 	 */
-	async getContractById<T extends Contract = Contract>(
+	public async getContractById<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		id: string,
@@ -500,7 +497,7 @@ export class Kernel {
 	}
 
 	/** @deprecated */
-	async getCardById<T extends Contract = Contract>(
+	public async getCardById<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		id: string,
@@ -519,7 +516,7 @@ export class Kernel {
 	 * @param {Object} options - optional set of extra options
 	 * @returns {(Object|Null)} contract
 	 */
-	async getContractBySlug<T extends Contract = Contract>(
+	public async getContractBySlug<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		slug: string,
@@ -578,7 +575,7 @@ export class Kernel {
 		return results[0] || null;
 	}
 
-	async getCardBySlug<T extends Contract = Contract>(
+	public async getCardBySlug<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		slug: string,
@@ -604,7 +601,7 @@ export class Kernel {
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(contract.id)
 	 */
-	async insertContract<T extends Contract = Contract>(
+	public async insertContract<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
@@ -620,7 +617,7 @@ export class Kernel {
 	}
 
 	/** @deprecated */
-	async insertCard<T extends Contract = Contract>(
+	public async insertCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<T> & Pick<T, 'type'>,
@@ -646,7 +643,7 @@ export class Kernel {
 	 *   '4a962ad9-20b5-4dd8-a707-bf819593cc84', { ... })
 	 * console.log(contract.id)
 	 */
-	async replaceContract<T extends Contract = Contract>(
+	public async replaceContract<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<Contract> &
@@ -664,7 +661,7 @@ export class Kernel {
 	}
 
 	/** @deprecated */
-	async replaceCard<T extends Contract = Contract>(
+	public async replaceCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		object: Partial<Contract> &
@@ -678,7 +675,7 @@ export class Kernel {
 		context: Context,
 		session: string,
 		contract: Contract,
-	) {
+	): Promise<JsonSchema> {
 		context.assertInternal(
 			contract.type,
 			errors.JellyfishSchemaMismatch,
@@ -809,7 +806,7 @@ export class Kernel {
 	 * @param {Object[]} patch - JSON Patch operations
 	 * @returns {Object} the patched contract
 	 */
-	async patchContractBySlug<T = Contract>(
+	public async patchContractBySlug<T = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		slug: string,
@@ -987,7 +984,7 @@ export class Kernel {
 	}
 
 	/** @deprecated */
-	async patchCardBySlug<T = Contract>(
+	public async patchCardBySlug<T = Contract>(
 		mixedContext: MixedContext,
 		session: string,
 		slug: string,
@@ -1027,7 +1024,7 @@ export class Kernel {
 	 *   required: [ 'slug' ]
 	 * })
 	 */
-	async query<T extends Contract = Contract>(
+	public async query<T extends Contract = Contract>(
 		mixedContext: MixedContext,
 		sessionId: string,
 		querySchema: JsonSchema | ViewContract,
@@ -1057,7 +1054,7 @@ export class Kernel {
 			querySchema as JsonSchema,
 		);
 
-		const selectObject = await getSelectObjectFromSchema(
+		const selectObject = getSelectObjectFromSchema(
 			querySchema,
 			authorizedQuerySchema,
 		);
@@ -1150,12 +1147,12 @@ export class Kernel {
 	 * // At some point...
 	 * emitter.close()
 	 */
-	async stream(
+	public async stream(
 		mixedContext: MixedContext,
 		session: string,
 		querySchema: JsonSchema,
 		options: QueryOptions = {},
-	) {
+	): Promise<Stream> {
 		const context = Context.fromMixed(mixedContext, this.backend);
 
 		const { actor, scope } = await resolveActorAndScopeFromSessionId(
@@ -1183,7 +1180,7 @@ export class Kernel {
 		context.debug('Opening stream');
 
 		const stream = await this.backend.stream(
-			await getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
+			getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
 			authorizedQuerySchema,
 			options,
 		);
@@ -1197,7 +1194,10 @@ export class Kernel {
 	 * Get a full contract from a partial one. Missing fields are given a
 	 * default value.
 	 */
-	static defaults<Data = ContractData, Links = { [key: string]: Contract[] }>(
+	public static defaults<
+		Data = ContractData,
+		Links = { [key: string]: Contract[] },
+	>(
 		contract: Partial<Contract<Data, Links>> &
 			Pick<Contract<Data, Links>, 'type'>,
 	): Omit<Contract<Data, Links>, 'id'> {
@@ -1254,7 +1254,7 @@ export class Kernel {
 	 * const status = await kernel.getStatus()
 	 * console.log(status)
 	 */
-	async getStatus() {
+	public async getStatus(): Promise<Status> {
 		return {
 			backend: await this.backend.getStatus(),
 		};
@@ -1288,7 +1288,7 @@ const setupStreamEventHandlers = async (
 		);
 
 		const contracts = await stream.query(
-			await getSelectObjectFromSchema(payload.schema, authorizedQuerySchema),
+			getSelectObjectFromSchema(payload.schema, authorizedQuerySchema),
 			authorizedQuerySchema,
 			payload.options,
 		);
@@ -1311,7 +1311,7 @@ const setupStreamEventHandlers = async (
 		);
 
 		stream.setSchema(
-			await getSelectObjectFromSchema(newSchema, authorizedQuerySchema),
+			getSelectObjectFromSchema(newSchema, authorizedQuerySchema),
 			authorizedQuerySchema,
 		);
 	});

@@ -1,5 +1,4 @@
 import { strict as nativeAssert } from 'assert';
-import * as Bluebird from 'bluebird';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
@@ -7,6 +6,7 @@ import type {
 	ContractDefinition,
 	LinkContract,
 } from '@balena/jellyfish-types/build/core';
+import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { performance } from 'perf_hooks';
 import { Pool, PoolClient } from 'pg';
@@ -16,6 +16,7 @@ import type { Cache } from './../../cache';
 import { Context, Database, Query, TransactionIsolation } from '../../context';
 import * as errors from '../../errors';
 import type { QueryOptions } from '../../kernel';
+import { version as PACKAGE_VERSION } from '../../../package.json';
 import * as cards from './cards';
 import * as jsonschema2sql from './jsonschema2sql';
 import * as links from './links';
@@ -26,16 +27,14 @@ import type {
 } from './types';
 import * as streams from './streams';
 import * as utils from './utils';
-export type { StreamChange } from './streams';
-
-// tslint:disable-next-line: no-var-requires
-const { version: coreVersion } = require('../../../package.json');
 
 export const INDEX_TABLE = 'jf_indexes';
 
 // Removes version fields from database rows, as they are an
 // abstraction over the `version` field on contracts
-const removeVersionFields = (row?: any) => {
+const removeVersionFields = (
+	row?: Contract<T> & version_fields,
+): Contract<T> => {
 	if (row) {
 		Reflect.deleteProperty(row, 'version_major');
 		Reflect.deleteProperty(row, 'version_minor');
@@ -116,8 +115,8 @@ export const runQuery = async (
 	context: Context,
 	schema: JsonSchema,
 	query: Query,
-	values?: any[],
-) => {
+	values?: unknown[],
+): Promise<T> => {
 	const queryStart = performance.now();
 	const results = await context
 		.query(query, values)
@@ -152,7 +151,7 @@ export const runQuery = async (
 	};
 };
 
-const postProcessCard = (card: Contract) => {
+const postProcessCard = (card: Contract<T>): Contract<T> => {
 	if ('links' in card) {
 		const cardLinks = card.links!;
 		for (const [linkType, linked] of Object.entries(cardLinks)) {
@@ -264,7 +263,7 @@ export class PostgresBackend implements Database {
 	 * 3. Disconnect, and create a new connection to the database
 	 *    that we're actually interested in
 	 */
-	async connect(context: Context) {
+	public async connect(context: Context): Promise<void> {
 		const ourContext = new Context(context.getLogContext(), this);
 		while (true) {
 			try {
@@ -281,7 +280,7 @@ export class PostgresBackend implements Database {
 		}
 	}
 
-	private async tryConnect(context: Context) {
+	private async tryConnect(context: Context): Promise<void> {
 		/*
 		 * Drop any existing connection so we don't risk having any leaks.
 		 */
@@ -396,7 +395,7 @@ export class PostgresBackend implements Database {
 	private async executeIfDbSchemaIsOutdated(
 		context: Context,
 		migrationsCb: (context: Context) => Promise<any>,
-	) {
+	): Promise<void> {
 		const migrationsTable = 'jf_db_migrations';
 		const migrationsId = 0;
 
@@ -437,10 +436,11 @@ export class PostgresBackend implements Database {
 				// Checking for newer versions instead of just testing for inequality ensures that a restarting pod
 				// that is running an old version will not interfere with a new version being rolled out.
 				// We could do better than just checking for the version of course, but that is better left to a proper migration framework
-				const willRunMigrations = semver.compare(version, coreVersion) === -1;
+				const willRunMigrations =
+					semver.compare(version, PACKAGE_VERSION) === -1;
 				transactionContext.info('Preparing DB migrations', {
 					dbVersion: version,
-					coreVersion,
+					PACKAGE_VERSION,
 					willRunMigrations,
 				});
 				if (!willRunMigrations) {
@@ -456,14 +456,14 @@ export class PostgresBackend implements Database {
 					SET version=$1, updated_at=now()
 					WHERE id=$2
 					`,
-					[coreVersion, migrationsId],
+					[PACKAGE_VERSION, migrationsId],
 				);
 			},
 		);
 		context.info('DB migrations finished');
 	}
 
-	private async runDbMigrations(context: Context) {
+	private async runDbMigrations(context: Context): Promise<void> {
 		await this.executeIfDbSchemaIsOutdated(
 			context,
 			async (childContext: Context) => {
@@ -505,7 +505,7 @@ export class PostgresBackend implements Database {
 	 * This method takes care of gracefully disconnecting from
 	 * Postgres, and its mainly used during automated testing.
 	 */
-	async disconnect(context: Context) {
+	public async disconnect(context: Context): Promise<void> {
 		await this.streamClient?.disconnect();
 		this.streamClient = null;
 
@@ -524,7 +524,7 @@ export class PostgresBackend implements Database {
 	/*
 	 * Drop the database tables.
 	 */
-	async drop(context: Context) {
+	public async drop(context: Context): Promise<void> {
 		if (!this.pool) {
 			return;
 		}
@@ -539,7 +539,7 @@ export class PostgresBackend implements Database {
 	/*
 	 * Reset the database state.
 	 */
-	async reset(context: Context) {
+	public async reset(context: Context): Promise<void> {
 		context.debug('Resetting database', { databaseName: this.databaseName });
 
 		await context.runQuery(`TRUNCATE ${links.TABLE}, ${cards.TABLE}`);
@@ -549,10 +549,10 @@ export class PostgresBackend implements Database {
 	 * Insert a card to the database, and throw an error
 	 * if a card with the same id or slug already exists.
 	 */
-	async insertElement<T extends Contract = Contract>(
+	public async insertElement<T extends Contract = Contract>(
 		context: Context,
 		object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
-	) {
+	): Promise<T> {
 		return this.upsertObject<T>(context, object, {
 			replace: false,
 		});
@@ -787,7 +787,7 @@ export class PostgresBackend implements Database {
 	 * @example
 	 * await backend.createIndex(context, 'cards', 'example_idx', '1.0.0', 'USING btree (updated_at)');
 	 */
-	async createIndex(
+	public async createIndex(
 		context: Context,
 		tableName: string,
 		indexName: string,
@@ -795,7 +795,7 @@ export class PostgresBackend implements Database {
 		predicate: string,
 		typeSlug: string = '',
 		unique: boolean = false,
-	) {
+	): Promise<void> {
 		// "IF NOT EXISTS" is (unexpectedly) not thread safe. This is only a problem on the very first start and any "real"
 		// error will be catched by the subsequent SQL statements.
 		try {
@@ -896,7 +896,10 @@ export class PostgresBackend implements Database {
 	/*
 	 * Get a card from the database by id and table.
 	 */
-	async getElementById(context: Context, id: string) {
+	public async getElementById(
+		context: Context,
+		id: string,
+	): Promise<Contract<T> | null> {
 		/*
 		 * Lets first check the in-memory cache so we can avoid
 		 * making a full-blown query to the database.
@@ -935,14 +938,14 @@ export class PostgresBackend implements Database {
 	/*
 	 * Get a card from the database by slug and table.
 	 */
-	async getElementBySlug(
+	public async getElementBySlug(
 		context: Context,
 		slug: string,
 		options: {
 			skipCache?: boolean;
 			lock?: boolean;
 		} = {},
-	) {
+	): Promise<Contract<T> | null> {
 		const [base, version] = slug.split('@');
 		context.assertInternal(
 			version && version !== 'latest',
@@ -992,7 +995,10 @@ export class PostgresBackend implements Database {
 	/*
 	 * Get a set of cards by id from a single table in one shot.
 	 */
-	async getElementsById(context: Context, ids: string[]) {
+	public async getElementsById(
+		context: Context,
+		ids: string[],
+	): Promise<Array<Contract<T>>> {
 		/*
 		 * There is no point making a query if the set of ids
 		 * is empty.
@@ -1087,12 +1093,12 @@ export class PostgresBackend implements Database {
 	 *   they are about and construct more customised queries for
 	 *   them for performance reasons
 	 */
-	async query(
+	public async query(
 		context: Context,
 		select: SelectObject,
 		schema: JsonSchema,
 		options: Partial<BackendQueryOptions> = {},
-	) {
+	): Promise<Array<Contract<T>>> {
 		// Apply a maximum for safety reasons
 		if (typeof options.limit === 'undefined') {
 			options.limit = MAXIMUM_QUERY_LIMIT;
@@ -1194,7 +1200,7 @@ export class PostgresBackend implements Database {
 	 * In order to implement this feature, we will tap into the master
 	 * stream and resolve links and JSON Schema filtering client side.
 	 */
-	async stream(
+	public async stream(
 		select: SelectObject,
 		schema: JsonSchema,
 		options: QueryOptions = {},
@@ -1214,7 +1220,7 @@ export class PostgresBackend implements Database {
 	 * Returns a free form object with information about
 	 * this backend instance.
 	 */
-	async getStatus() {
+	public async getStatus(): Promise<BackendStatus> {
 		nativeAssert(!!this.streamClient, 'Stream client must be initialized');
 
 		return {
@@ -1227,22 +1233,22 @@ export class PostgresBackend implements Database {
 	/*
 	 * Creates a partial index on "fields" constrained by the provided "type"
 	 */
-	async createTypeIndex(
+	public async createTypeIndex(
 		context: Context,
 		fields: string[],
 		schema: ContractDefinition<any>,
-	) {
+	): Promise<void> {
 		await cards.createTypeIndex(context, this, fields, schema);
 	}
 
 	/*
 	 * Creates a partial index on fields denoted as being targets for full-text searches
 	 */
-	async createFullTextSearchIndex(
+	public async createFullTextSearchIndex(
 		context: Context,
 		type: string,
 		fields: SearchFieldDef[],
-	) {
+	): Promise<void> {
 		await cards.createFullTextSearchIndex(context, this, type, fields);
 	}
 
@@ -1256,7 +1262,7 @@ export class PostgresBackend implements Database {
 	/**
 	 * Release the given connection back to the pool.
 	 */
-	public async releaseConnection(connection: PoolClient) {
+	public async releaseConnection(connection: PoolClient): Promise<void> {
 		connection.release();
 	}
 }

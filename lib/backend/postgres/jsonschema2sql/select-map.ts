@@ -9,11 +9,11 @@ import * as util from './util';
  * Map of properties to be selected, with support for conditional selects.
  */
 export class SelectMap {
-	isLinks: boolean;
-	base: BranchMap;
-	branches: BranchMap[];
+	private isLinks: boolean;
+	private base: BranchMap;
+	private branches: BranchMap[];
 
-	static lateralAliasFor(linkType: string) {
+	private static lateralAliasFor(linkType: string): string {
 		return pgFormat.ident(`linked@/${linkType}`);
 	}
 
@@ -25,11 +25,11 @@ export class SelectMap {
 	 * @param {Object} links - Internal.
 	 * @param {SqlPath} path - Internal.
 	 */
-	constructor(
+	public constructor(
 		// TS-TODO: Strongly type these parameters
-		public map: { [key: string]: any },
-		public links: { [key: string]: any } = {},
-		public path: SqlPath = new SqlPath(),
+		private map: { [key: string]: any },
+		private links: { [key: string]: any } = {},
+		private path: SqlPath = new SqlPath(),
 	) {
 		// Save the pristine map to be used to create new `BranchMap`s
 		this.map = map;
@@ -50,7 +50,7 @@ export class SelectMap {
 	 *
 	 * @returns {BranchMap} The new branch.
 	 */
-	newBranch(): BranchMap {
+	public newBranch(): BranchMap {
 		const branch = new BranchMap(this.map, this);
 		this.branches.push(branch);
 		return branch;
@@ -61,7 +61,7 @@ export class SelectMap {
 	 *
 	 * @returns {Boolean} The unconditional `additionalProperties` setting.
 	 */
-	getAdditionalProperties(): boolean {
+	private getAdditionalProperties(): boolean {
 		return this.base.getAdditionalProperties();
 	}
 
@@ -71,7 +71,7 @@ export class SelectMap {
 	 * @param {Boolean} schema - The unconditional `additionalProperties`
 	 *        setting.
 	 */
-	setAdditionalProperties(schema: boolean) {
+	private setAdditionalProperties(schema: boolean): void {
 		this.base.setAdditionalProperties(schema);
 	}
 
@@ -81,7 +81,7 @@ export class SelectMap {
 	 *
 	 * @param {String} name - The name of the property to be marked as seen.
 	 */
-	see(name: string) {
+	private see(name: string): void {
 		this.base.see(name);
 	}
 
@@ -91,7 +91,7 @@ export class SelectMap {
 	 * @param {String} name - The name of the property.
 	 * @returns {SelectMap} The `SelectMap` corresponding for `name`.
 	 */
-	getProperty(name: string) {
+	private getProperty(name: string): SelectMap {
 		return this.base.getProperty(name);
 	}
 
@@ -102,7 +102,7 @@ export class SelectMap {
 	 * @returns {SelectMap} The `SelectMap` corresponding to the `linkType`
 	 *          link.
 	 */
-	getLink(linkType: string) {
+	public getLink(linkType: string): SelectMap {
 		if (linkType in this.links) {
 			return this.links[linkType];
 		}
@@ -117,7 +117,7 @@ export class SelectMap {
 	 * @param {String} table - The table the card is being selected from.
 	 * @returns {String} The SQL expression.
 	 */
-	toSql(table: string): string {
+	public toSql(table: string): string {
 		// The idea here is conceptually simple: the SQL expression this method
 		// returns will yield a JSONB object containing exactly the properties
 		// asked. The question is, what properties are those? There are three
@@ -291,7 +291,7 @@ export class SelectMap {
 		return build.join(' || ');
 	}
 
-	sqlBuildJsonbFor(properties: string[], table: string) {
+	private sqlBuildJsonbFor(properties: string[], table: string): string {
 		const args = [];
 		const propertiesAsLiterals = [];
 		this.path.push(null);
@@ -324,7 +324,8 @@ export class SelectMap {
 		}
 		return jsonbObject;
 	}
-	isTransitivelyConditional() {
+
+	private isTransitivelyConditional(): boolean {
 		if (this.base.isTransitivelyConditional()) {
 			return true;
 		}
@@ -341,12 +342,12 @@ export class SelectMap {
  * A single branch of a `SelectMap`.
  */
 class BranchMap {
-	additionalProperties: boolean;
-	all: { [key: string]: any };
-	filter: ExpressionFilter;
-	seen: Set<string>;
+	private additionalProperties: boolean;
+	private all: { [key: string]: any };
+	private filter: ExpressionFilter;
+	private seen: Set<string>;
 
-	constructor(map: { [key: string]: any }, public parent: SelectMap) {
+	public constructor(map: { [key: string]: any }, private parent: SelectMap) {
 		// We need this for `this.newBranch()`
 		this.parent = parent;
 		// Defaults to true as per the JSON schema spec
@@ -375,7 +376,7 @@ class BranchMap {
 	 *
 	 * @returns {BranchMap} The new branch.
 	 */
-	newBranch() {
+	private newBranch(): BranchMap {
 		return this.parent.newBranch();
 	}
 
@@ -384,8 +385,7 @@ class BranchMap {
 	 *
 	 * @returns {Boolean} This branch's `additionalProperties` setting.
 	 */
-
-	getAdditionalProperties() {
+	private getAdditionalProperties(): boolean {
 		return this.additionalProperties;
 	}
 
@@ -394,7 +394,7 @@ class BranchMap {
 	 *
 	 * @param {Boolean} schema - This branch's `additionalProperties` setting.
 	 */
-	setAdditionalProperties(schema: boolean) {
+	private setAdditionalProperties(schema: boolean): void {
 		this.additionalProperties = schema;
 	}
 
@@ -403,7 +403,7 @@ class BranchMap {
 	 *
 	 * @param {SqlFilter} filter - The filter.
 	 */
-	setFilter(filter: SqlFilter) {
+	private setFilter(filter: SqlFilter): void {
 		this.filter = _.cloneDeep(filter).intoExpression();
 	}
 
@@ -413,7 +413,7 @@ class BranchMap {
 	 *
 	 * @param {String} name - The name of the property to be marked as seen.
 	 */
-	see(name: string) {
+	private see(name: string): void {
 		this.seen.add(name);
 		const links = this.parent.links;
 		if (this.parent.isLinks) {
@@ -433,7 +433,7 @@ class BranchMap {
 	 * @param {String} name - The name of the property.
 	 * @returns {SelectMap} The `SelectMap` corresponding for `name`.
 	 */
-	getProperty(name: string) {
+	private getProperty(name: string): SelectMap {
 		this.see(name);
 		if (this.parent.isLinks) {
 			return this.parent.links[name];
@@ -448,13 +448,13 @@ class BranchMap {
 	 * @returns {SelectMap} The `SelectMap` corresponding to the `linkType`
 	 *          link.
 	 */
-	getLink(linkType: string) {
+	private getLink(linkType: string): SelectMap {
 		return this.parent.getLink(linkType);
 	}
 
 	// TODO: avoiding recursion with a cache would save some repeated
 	// calculations
-	isTransitivelyConditional() {
+	private isTransitivelyConditional(): boolean {
 		if (!this.additionalProperties) {
 			return true;
 		}
@@ -466,7 +466,10 @@ class BranchMap {
 		return false;
 	}
 
-	toConditionalJsonbFragment(table: string, wantedProperties: string[]) {
+	private toConditionalJsonbFragment(
+		table: string,
+		wantedProperties: string[],
+	): string {
 		const propertiesAsLiterals = [];
 		const args = [];
 		const path = this.parent.path;

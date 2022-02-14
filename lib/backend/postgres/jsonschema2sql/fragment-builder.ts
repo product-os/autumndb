@@ -9,63 +9,75 @@ import type { SqlPath } from './sql-path';
  * Builder for any kind of SQL fragment.
  */
 export class SqlFragmentBuilder {
-	context: BuilderContext;
-	expr: string;
+	private context: BuilderContext;
+	private expr: string = '';
 
-	constructor(tableOrContext: string | BuilderContext) {
+	/**
+	 * Constructor.
+	 */
+	public constructor(tableOrContext: string | BuilderContext) {
 		this.context =
 			tableOrContext instanceof BuilderContext
 				? tableOrContext
 				: new BuilderContext(tableOrContext);
-		this.expr = '';
 	}
 
-	getTable(): string {
+	public getTable(): string {
 		return this.context.getTable();
 	}
 
-	getContext(): BuilderContext {
+	public getContext(): BuilderContext {
 		return this.context;
 	}
 
-	push(fragment: string) {
+	public push(fragment: string): SqlFragmentBuilder {
 		this.expr += fragment;
+
 		return this;
 	}
 
-	pushParenthised(fragment: string) {
+	public pushParenthised(fragment: string): SqlFragmentBuilder {
 		this.expr += `(${fragment})`;
+
 		return this;
 	}
 
-	pushList(fragments: string[]) {
+	public pushList(fragments: string[]): SqlFragmentBuilder {
 		this.expr += fragments.join(', ');
+
 		return this;
 	}
 
-	pushParenthisedList(fragments: string[]) {
+	public pushParenthisedList(fragments: string[]): SqlFragmentBuilder {
 		this.expr += '(';
 		this.pushList(fragments);
 		this.expr += ')';
+
 		return this;
 	}
 
-	pushCasted(fragment: string, cast: string) {
+	public pushCasted(fragment: string, cast: string): SqlFragmentBuilder {
 		this.expr += `(${fragment})::${cast}`;
+
 		return this;
 	}
 
-	pushSpaced(fragment: string) {
+	public pushSpaced(fragment: string): SqlFragmentBuilder {
 		this.expr += ` ${fragment} `;
+
 		return this;
 	}
 
-	pushInvoked(functionName: string, argument: string) {
+	public pushInvoked(
+		functionName: string,
+		argument: string,
+	): SqlFragmentBuilder {
 		this.expr += `${functionName}(${argument})`;
+
 		return this;
 	}
 
-	extendFrom(
+	public extendFrom(
 		other:
 			| SqlFragmentBuilder
 			| SqlFilter
@@ -73,23 +85,27 @@ export class SqlFragmentBuilder {
 			| SqlPath
 			| SqlCteBuilder
 			| LiteralSql,
-	) {
+	): SqlFragmentBuilder {
 		other.toSqlInto(this);
+
 		return this;
 	}
 
-	extendParenthisedFrom(other: SqlSelectBuilder | SqlFilter) {
+	public extendParenthisedFrom(
+		other: SqlSelectBuilder | SqlFilter,
+	): SqlFragmentBuilder {
 		this.expr += '(';
 		other.toSqlInto(this);
 		this.expr += ')';
+
 		return this;
 	}
 
-	toSql(): string {
+	public toSql(): string {
 		return this.expr;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		builder.push(this.expr);
 	}
 }

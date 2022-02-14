@@ -7,6 +7,8 @@ import type { SqlPath } from './sql-path';
  * a constant number by an operator.
  */
 export class JsonMapPropertyCountFilter extends SqlFilter {
+	private path: SqlPath;
+
 	/**
 	 * Constructor.
 	 *
@@ -16,19 +18,17 @@ export class JsonMapPropertyCountFilter extends SqlFilter {
 	 * @param {Number} value - A constant to test the number of properties in
 	 *        `path` against.
 	 */
-	constructor(
-		public path: SqlPath,
-		public operator: string,
-		public value: number,
+	public constructor(
+		path: SqlPath,
+		private operator: string,
+		private value: number,
 	) {
 		super();
 
 		this.path = path.cloned();
-		this.operator = operator;
-		this.value = value;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		builder
 			.push('cardinality(array(SELECT jsonb_object_keys(')
 			.extendFrom(this.path)

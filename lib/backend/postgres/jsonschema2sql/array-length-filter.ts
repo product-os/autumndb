@@ -1,25 +1,21 @@
-import { SqlFragmentBuilder } from './fragment-builder';
+import type { SqlFragmentBuilder } from './fragment-builder';
 import { SqlFilter } from './sql-filter';
-import { SqlPath } from './sql-path';
+import type { SqlPath } from './sql-path';
 
 /**
  * Filter asserting that the array length of a field is related to a constant
  * number by an operator.
  */
 export class ArrayLengthFilter extends SqlFilter {
+	private path: SqlPath;
+
 	/**
 	 * Constructor.
-	 *
-	 * @param {SqlPath} path - Path to be tested.
-	 * @param {String} operator - The operator to test the array length of
-	 *        `path` against `value`.
-	 * @param {Number} value - A constant to test the array length of `path`
-	 *        against.
 	 */
-	constructor(
-		public path: SqlPath,
-		public operator: any,
-		public value: number,
+	public constructor(
+		path: SqlPath,
+		private operator: '<' | '<=' | '>' | '>=',
+		private value: number,
 	) {
 		super();
 
@@ -28,7 +24,7 @@ export class ArrayLengthFilter extends SqlFilter {
 		this.value = value;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		const field = this.path.toSql(builder.getTable());
 		const cardinality = this.path.isProcessingJsonProperty
 			? 'jsonb_array_length'

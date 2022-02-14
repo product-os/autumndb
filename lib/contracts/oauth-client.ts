@@ -1,4 +1,6 @@
-export const oauthClient = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const oauthClient: TypeContractDefinition = {
 	slug: 'oauth-client',
 	type: 'type@1.0.0',
 	name: 'Oauth Client',

@@ -14,18 +14,18 @@ const LEFT_JOIN = 1;
  * Builder for `SELECT` statements.
  */
 export class SqlSelectBuilder {
-	list: any[];
-	from: Array<
+	private list: any[];
+	private from: Array<
 		[string | SqlSelectBuilder | SqlCteBuilder, string | undefined, boolean]
 	>;
-	joins: any[];
-	filter: null | SqlFilter | LiteralSql;
-	groupBy: Array<[string, SqlPath | LiteralSql]>;
-	orderBy: Array<[string, SqlPath | LiteralSql, boolean]>;
-	offset: number;
-	limit: null | number;
+	private joins: any[];
+	private filter: null | SqlFilter | LiteralSql;
+	private groupBy: Array<[string, SqlPath | LiteralSql]>;
+	private orderBy: Array<[string, SqlPath | LiteralSql, boolean]>;
+	private offset: number;
+	private limit: null | number;
 
-	constructor() {
+	public constructor() {
 		this.list = [];
 		this.from = [];
 		this.joins = [];
@@ -35,6 +35,7 @@ export class SqlSelectBuilder {
 		this.offset = 0;
 		this.limit = null;
 	}
+
 	/**
 	 * Add a entry to the `SELECT` list.
 	 *
@@ -42,7 +43,7 @@ export class SqlSelectBuilder {
 	 * @param {String} alias - Item alias. Optional.
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	pushSelect(item: string, alias?: string) {
+	public pushSelect(item: string, alias?: string): SqlSelectBuilder {
 		if (alias) {
 			this.list.push(`${item} AS ${alias}`);
 		} else {
@@ -61,11 +62,11 @@ export class SqlSelectBuilder {
 	 *        `LATERAL`. Optional, defaults to false.
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	pushFrom(
+	public pushFrom(
 		table: string | SqlSelectBuilder | SqlCteBuilder,
 		alias?: string,
 		isLateral: boolean = false,
-	) {
+	): SqlSelectBuilder {
 		this.from.push([table, alias, isLateral]);
 		return this;
 	}
@@ -80,7 +81,11 @@ export class SqlSelectBuilder {
 	 * @param {String} alias - Table alias. Optional.
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	pushInnerJoin(table: string, filter: SqlFilter | LiteralSql, alias?: string) {
+	public pushInnerJoin(
+		table: string,
+		filter: SqlFilter | LiteralSql,
+		alias?: string,
+	): SqlSelectBuilder {
 		this.pushJoin(INNER_JOIN, table, filter, alias);
 		return this;
 	}
@@ -96,17 +101,21 @@ export class SqlSelectBuilder {
 	 * @param {String} alias - Table alias. Optional.
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	pushLeftJoin(table: string, filter: SqlFilter | LiteralSql, alias?: string) {
+	public pushLeftJoin(
+		table: string,
+		filter: SqlFilter | LiteralSql,
+		alias?: string,
+	): SqlSelectBuilder {
 		this.pushJoin(LEFT_JOIN, table, filter, alias);
 		return this;
 	}
 
-	pushJoin(
+	private pushJoin(
 		type: typeof LEFT_JOIN | typeof INNER_JOIN,
 		table: string,
 		filter: SqlFilter | LiteralSql,
 		alias?: string,
-	) {
+	): void {
 		this.joins.push(new SqlJoin(type, table, filter, alias));
 	}
 
@@ -116,7 +125,7 @@ export class SqlSelectBuilder {
 	 * @param {SqlFilter} filter - The filter.
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	setFilter(filter: SqlFilter | LiteralSql) {
+	public setFilter(filter: SqlFilter | LiteralSql): SqlSelectBuilder {
 		this.filter = filter;
 		return this;
 	}
@@ -128,7 +137,10 @@ export class SqlSelectBuilder {
 	 * @param {SqlPath} path - The path to `GROUP BY`.
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	pushGroupBy(table: string, path: SqlPath | LiteralSql) {
+	public pushGroupBy(
+		table: string,
+		path: SqlPath | LiteralSql,
+	): SqlSelectBuilder {
 		this.groupBy.push([table, path]);
 		return this;
 	}
@@ -143,7 +155,7 @@ export class SqlSelectBuilder {
 	 *        order. Optional, defaults to false (ascending).
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	pushOrderBy(
+	public pushOrderBy(
 		table: string,
 		path: SqlPath | LiteralSql,
 		isDescending: boolean = false,
@@ -157,7 +169,7 @@ export class SqlSelectBuilder {
 	 * @param {Number} offset - The value for `OFFSET`.
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	setOffset(offset: number): SqlSelectBuilder {
+	public setOffset(offset: number): SqlSelectBuilder {
 		this.offset = offset;
 		return this;
 	}
@@ -168,7 +180,7 @@ export class SqlSelectBuilder {
 	 * @param {Number} limit - The value for `LIMIT`.
 	 * @returns {SqlSelectBuilder} `this`.
 	 */
-	setLimit(limit: number): SqlSelectBuilder {
+	public setLimit(limit: number): SqlSelectBuilder {
 		this.limit = limit;
 		return this;
 	}
@@ -178,7 +190,7 @@ export class SqlSelectBuilder {
 	 *
 	 * @param {SqlFragmentBuilder} builder - Builder for the final SQL string.
 	 */
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		builder.push('SELECT ');
 		if (this.list.length > 0) {
 			builder.pushList(this.list);
@@ -241,11 +253,11 @@ export class SqlSelectBuilder {
 }
 
 class SqlJoin {
-	constructor(
-		public type: typeof LEFT_JOIN | typeof INNER_JOIN,
-		public table: string,
-		public filter: SqlFilter | LiteralSql,
-		public alias?: string,
+	public constructor(
+		private type: typeof LEFT_JOIN | typeof INNER_JOIN,
+		private table: string,
+		private filter: SqlFilter | LiteralSql,
+		private alias?: string,
 	) {
 		this.type = type;
 		this.table = table;
@@ -253,7 +265,7 @@ class SqlJoin {
 		this.alias = alias;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder) {
 		if (this.type === LEFT_JOIN) {
 			builder.push('\nLEFT JOIN ');
 		} else {

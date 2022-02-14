@@ -15,8 +15,8 @@ interface CacheOptions extends redis.ClientOpts {
 export type CacheResult = { hit: false } | { hit: true; element: any };
 
 export class Cache {
-	tables: Set<string>;
-	client: redis.RedisClient | null;
+	tables: Set<string> = new Set();
+	client: redis.RedisClient | null = null;
 
 	/**
 	 * @summary The contract cache store
@@ -29,11 +29,7 @@ export class Cache {
 	 * @example
 	 * const cache = new Cache()
 	 */
-	constructor(public options: CacheOptions) {
-		this.options = options;
-		this.tables = new Set();
-		this.client = null;
-	}
+	public constructor(private options: CacheOptions) {}
 
 	/**
 	 * @private
@@ -61,7 +57,7 @@ export class Cache {
 	 * const cache = new Cache()
 	 * await cache.connect()
 	 */
-	async connect(): Promise<void> {
+	public async connect(): Promise<void> {
 		if (this.client) {
 			return;
 		}
@@ -101,7 +97,7 @@ export class Cache {
 	 * const cache = new Cache()
 	 * await cache.disconnect()
 	 */
-	async disconnect() {
+	public async disconnect(): Promise<void> {
 		if (this.client) {
 			await new Bluebird((resolve) => {
 				if (this.client) {
@@ -137,7 +133,7 @@ export class Cache {
 	 *
 	 * > `database:contracts:slug:xxxx`
 	 */
-	generateKey(table: string, category: string, key: string): string {
+	private generateKey(table: string, category: string, key: string): string {
 		return `${this.options.namespace}:${table}:${category}:${key}`;
 	}
 
@@ -160,12 +156,12 @@ export class Cache {
 	 *   data: 'baz'
 	 * })
 	 */
-	async setElementByKey(
+	private async setElementByKey(
 		table: string,
 		category: string,
 		key: string,
 		element: Contract | null,
-	) {
+	): Promise<void> {
 		if (!key) {
 			return;
 		}
@@ -216,7 +212,7 @@ export class Cache {
 	 *   data: 'baz'
 	 * })
 	 */
-	async set(table: string, element: Contract) {
+	public async set(table: string, element: Contract): Promise<void> {
 		await Promise.all([
 			this.setElementByKey(table, 'id', element.id, element),
 			this.setElementByKey(
@@ -241,7 +237,11 @@ export class Cache {
 	 * const cache = new Cache()
 	 * cache.setMissingSlug('contracts', 'foo', '1.0.0')
 	 */
-	async setMissingSlug(table: any, slug: any, version: any) {
+	public async setMissingSlug(
+		table: string,
+		slug: string,
+		version: string,
+	): Promise<void> {
 		await this.setElementByKey(table, 'slug', `${slug}@${version}`, null);
 	}
 
@@ -257,7 +257,7 @@ export class Cache {
 	 * const cache = new Cache()
 	 * cache.setMissingId('contracts', '4a962ad9-20b5-4dd8-a707-bf819593cc84')
 	 */
-	async setMissingId(table: any, id: any) {
+	public async setMissingId(table: string, id: string): Promise<void> {
 		await this.setElementByKey(table, 'id', id, null);
 	}
 
@@ -279,7 +279,7 @@ export class Cache {
 	 *   console.log(result.data)
 	 * }
 	 */
-	async get(
+	public async get(
 		table: string,
 		category: string,
 		key: string,
@@ -326,7 +326,7 @@ export class Cache {
 	 *   console.log(result.data)
 	 * }
 	 */
-	async getById(table: string, id: string) {
+	public async getById(table: string, id: string): Promise<CacheResult> {
 		return this.get(table, 'id', id);
 	}
 
@@ -348,7 +348,11 @@ export class Cache {
 	 *   console.log(result.data)
 	 * }
 	 */
-	async getBySlug(table: any, slug: any, version: any) {
+	public async getBySlug(
+		table: string,
+		slug: string,
+		version: string,
+	): Promise<CacheResult> {
 		return this.get(table, 'slug', `${slug}@${version}`);
 	}
 
@@ -367,7 +371,7 @@ export class Cache {
 	 *   data: 'baz'
 	 * })
 	 */
-	async unset(element: Contract) {
+	public async unset(element: Contract): Promise<void> {
 		const client = this.getClient();
 
 		for (const name of this.tables) {
@@ -402,7 +406,7 @@ export class Cache {
 	 * const cache = new Cache()
 	 * cache.reset()
 	 */
-	async reset() {
+	public async reset(): Promise<void> {
 		const { client } = this;
 		if (client) {
 			await new Promise((resolve, reject) => {

@@ -1,4 +1,6 @@
-export const org = {
+import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const org: TypeContractDefinition = {
 	slug: 'org',
 	type: 'type@1.0.0',
 	name: 'Organisation',

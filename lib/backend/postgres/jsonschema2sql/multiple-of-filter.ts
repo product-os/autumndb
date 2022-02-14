@@ -6,20 +6,21 @@ import type { SqlPath } from './sql-path';
  * Filter asserting that the value of a column is or is not null.
  */
 export class MultipleOfFilter extends SqlFilter {
+	private path: SqlPath;
+
 	/**
 	 * Constructor.
 	 *
 	 * @param {SqlPath} path - Path to be tested.
 	 * @param {Number} multiple - A constant that `path` must be a multiple of.
 	 */
-	constructor(public path: SqlPath, public multiple: number) {
+	public constructor(path: SqlPath, private multiple: number) {
 		super();
 
 		this.path = path.cloned();
-		this.multiple = multiple;
 	}
 
-	toSqlInto(builder: SqlFragmentBuilder) {
+	public toSqlInto(builder: SqlFragmentBuilder): void {
 		builder
 			.pushCasted(this.path.toSql(builder.getTable()), 'numeric')
 			.push(' % ')
