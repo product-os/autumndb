@@ -1,4 +1,4 @@
-import * as utils from './utils';
+import * as utils from '../../../../lib/backend/postgres/utils';
 
 describe('utils.parseVersion', () => {
 	it('should parse valid version strings', () => {

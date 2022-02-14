@@ -1,4 +1,4 @@
-import * as textSearch from './text-search';
+import * as textSearch from '../../../../../lib/backend/postgres/jsonschema2sql/text-search';
 
 describe('textSearch', () => {
 	describe('.toTSVector()', () => {

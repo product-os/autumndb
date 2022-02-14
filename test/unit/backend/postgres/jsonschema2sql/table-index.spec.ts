@@ -1,4 +1,7 @@
-import { generateTypeIndexPredicate, isArrayField } from './table-index';
+import {
+	generateTypeIndexPredicate,
+	isArrayField,
+} from '../../../../../lib/backend/postgres/jsonschema2sql/table-index';
 
 describe('isArrayField()', () => {
 	it('should accurately parse field types from a contract type schema', () => {
