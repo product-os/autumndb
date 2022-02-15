@@ -1,4 +1,24 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 6.0.15 to 6.1.1
+      hash: 37a5d6edce1a48bdf490c72f96660e8178d6d82c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Update resinci/jellyfish-test from v1.4.25 to v1.4.26
+      hash: f578e35570f46b65fc448b8ff065d2a8dd68bca0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 14.3.6
+  title: "'Update @balena/jellyfish-environment from 6.0.15 to 6.1.1'"
+  date: 2022-02-15T01:04:01.450Z
+- commits:
     - subject: Move unit tests into `test/unit`
       hash: e89be343de790f0f03e0210acb36675fec58d337
       body: ""
