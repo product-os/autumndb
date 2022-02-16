@@ -1,8 +1,8 @@
+import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
+import * as _ from 'lodash';
 import type { DatabaseBackend } from '../backend/postgres/types';
 import type { Context } from '../context';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import _ = require('lodash');
 import { CONTRACTS } from '../contracts';
 
 export const resolveMarkerBasedAuthorizationSchema = async (
@@ -27,27 +27,22 @@ export const resolveMarkerBasedAuthorizationSchema = async (
 					type: 'object',
 					required: ['type', 'slug'],
 					properties: {
-						type: {
+						id: {
 							type: 'string',
-							const: actor.type,
+							const: actor.id,
 						},
-						slug: {
-							type: 'string',
-							const: actor.slug,
-						},
+						additionalProperties: false,
 					},
 				},
 			},
 			required: ['slug', 'type'],
 			properties: {
-				slug: {
-					type: 'string',
-				},
 				type: {
 					type: 'string',
 					const: 'org@1.0.0',
 				},
 			},
+			additionalProperties: false,
 		},
 	);
 

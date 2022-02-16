@@ -23,7 +23,7 @@ export const resolveRoleBasedAuthorizationSchema = async (
 
 	const actorRoleSlugs: string[] = (actor.data?.roles as string[]) || [];
 
-	for (const roleSlug of [actor.slug, ...actorRoleSlugs]) {
+	for (const roleSlug of [...actorRoleSlugs]) {
 		const roleContract = await backend.getElementBySlug(
 			context,
 			`role-${roleSlug}@1.0.0`,
@@ -38,10 +38,7 @@ export const resolveRoleBasedAuthorizationSchema = async (
 
 	// A default schema that will not match anything
 	if (authorizationSchemas.length === 0) {
-		authorizationSchemas.push({
-			type: 'object',
-			additionalProperties: false,
-		});
+		authorizationSchemas.push(false);
 	}
 
 	return {
