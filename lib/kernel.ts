@@ -125,9 +125,7 @@ const mergeSelectedMaps = (base: any, extras: any) => {
 	});
 };
 
-const selectObjectFromSchema = (
-	schema: JsonSchema | ViewContract,
-): SelectObject => {
+const selectObjectFromSchema = (schema: JsonSchema): SelectObject => {
 	if (_.isBoolean(schema)) {
 		return {
 			links: {},
@@ -208,7 +206,7 @@ const rectifySelectObject = (
 // all selected properties again from `authorizedQuerySchema` and then rectify
 // the original `selectObject` by removing missing properties.
 const getSelectObjectFromSchema = (
-	querySchema: JsonSchema | ViewContract,
+	querySchema: JsonSchema,
 	authorizedQuerySchema: JsonSchema,
 ): SelectObject => {
 	const selectObject = flattenSelectObject(selectObjectFromSchema(querySchema));
@@ -311,15 +309,6 @@ export const unsafeUpsertContract = async (
 		contract,
 	);
 	return backend.upsertElement(context, contract);
-};
-
-/** @deprecated */
-export const unsafeUpsertCard = async (
-	context: Context,
-	backend: DatabaseBackend,
-	card: Contract,
-): Promise<Contract> => {
-	return unsafeUpsertContract(context, backend, card);
 };
 
 export class Kernel {
@@ -430,7 +419,7 @@ export class Kernel {
 
 		const unsafeUpsert = (contract: ContractDefinition) => {
 			const element = Kernel.defaults(contract);
-			return unsafeUpsertCard(context, this.backend, element as Contract);
+			return unsafeUpsertContract(context, this.backend, element as Contract);
 		};
 
 		await Promise.all([
