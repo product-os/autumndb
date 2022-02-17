@@ -23,7 +23,7 @@ export const resolveRoleBasedAuthorizationSchema = async (
 
 	const actorRoleSlugs: string[] = (actor.data?.roles as string[]) || [];
 
-	for (const roleSlug of [...actorRoleSlugs]) {
+	for (const roleSlug of [actor.slug, ...actorRoleSlugs]) {
 		const roleContract = await backend.getElementBySlug(
 			context,
 			`role-${roleSlug}@1.0.0`,
