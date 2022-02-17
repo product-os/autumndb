@@ -4,12 +4,12 @@ import * as views from '../../lib/views';
 describe('views', () => {
 	describe('.getSchema()', () => {
 		test('should return null if the contract is not a view', () => {
-			const schema = views.getSchema(CONTRACTS['user-admin']);
+			const schema = views.getViewContractSchema(CONTRACTS['user-admin']);
 			expect(schema).toEqual(null);
 		});
 
 		test('should preserve template interpolations in user properties', () => {
-			const schema = views.getSchema(
+			const schema = views.getViewContractSchema(
 				Kernel.defaults({
 					type: 'view@1.0.0',
 					data: {
@@ -44,7 +44,7 @@ describe('views', () => {
 		});
 
 		test('should preserve template interpolations in schema properties', () => {
-			const schema = views.getSchema(
+			const schema = views.getViewContractSchema(
 				// TS-TODO: using `ViewData` here does not typecheck because
 				// of the `$eval`
 				Kernel.defaults<any>({
@@ -80,7 +80,7 @@ describe('views', () => {
 		});
 
 		test('should return a schema given a view contract with two conjunctions', () => {
-			const schema = views.getSchema(
+			const schema = views.getViewContractSchema(
 				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
@@ -132,7 +132,7 @@ describe('views', () => {
 		});
 
 		test('should return a schema given a view contract with two conjunctions and empty disjunctions', () => {
-			const schema = views.getSchema(
+			const schema = views.getViewContractSchema(
 				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
@@ -185,7 +185,7 @@ describe('views', () => {
 		});
 
 		test('should return a schema given a view contract with two disjunctions', () => {
-			const schema = views.getSchema(
+			const schema = views.getViewContractSchema(
 				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
@@ -251,7 +251,7 @@ describe('views', () => {
 		});
 
 		test('should return a schema given a view contract with two disjunctions and empty conjunctions', () => {
-			const schema = views.getSchema(
+			const schema = views.getViewContractSchema(
 				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
@@ -318,7 +318,7 @@ describe('views', () => {
 		});
 
 		test('should return a schema given a view contract with two disjunctions and two conjunctions', () => {
-			const schema = views.getSchema(
+			const schema = views.getViewContractSchema(
 				Kernel.defaults({
 					type: 'view@1.0.0',
 					version: '1.0.0',
@@ -420,7 +420,7 @@ describe('views', () => {
 		});
 
 		test('should return null given a view contract with no filters', () => {
-			const schema = views.getSchema({
+			const schema = views.getViewContractSchema({
 				type: 'view@1.0.0',
 				version: '1.0.0',
 				data: {},

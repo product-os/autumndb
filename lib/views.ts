@@ -11,7 +11,7 @@ import jsonSchema from './json-schema';
  * @param {Object} contract - view contract
  * @returns {(Object|Null)} schema
  */
-export const getSchema = (
+export const getViewContractSchema = (
 	contract: Partial<ViewContract> & Pick<ViewContract, 'data'>,
 ): JsonSchema | null => {
 	if (contract.data && contract.data.schema) {
