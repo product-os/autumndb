@@ -1,4 +1,16 @@
 - commits:
+    - subject: Refactor permission-filter
+      hash: c418604481faf6543300492834edb16b4d27a485
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: edufschmidt
+      nested: []
+  version: 14.4.0
+  title: "'Refactor permission-filter'"
+  date: 2022-02-17T18:28:33.915Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 6.1.1 to 7.0.0
       hash: 0397e4e84023aefeaa31ddce5f50dbb603ea7a4a
       body: ""
