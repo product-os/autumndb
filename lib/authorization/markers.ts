@@ -25,7 +25,6 @@ export const resolveMarkerBasedAuthorizationSchema = async (
 			$$links: {
 				'has member': {
 					type: 'object',
-					required: ['type', 'slug'],
 					properties: {
 						id: {
 							type: 'string',
@@ -35,7 +34,6 @@ export const resolveMarkerBasedAuthorizationSchema = async (
 					},
 				},
 			},
-			required: ['slug', 'type'],
 			properties: {
 				type: {
 					type: 'string',
@@ -54,7 +52,6 @@ export const resolveMarkerBasedAuthorizationSchema = async (
 
 	const markerBasedAuthorizationSchema: JsonSchema = {
 		type: 'object',
-		required: ['markers'],
 		properties: {
 			markers:
 				markers.length === 0
