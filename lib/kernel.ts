@@ -567,8 +567,6 @@ export class Kernel {
 			queryOptions.sortDir = 'desc';
 		}
 
-		schema.required = Object.keys(schema.properties!);
-
 		const results = await this.query<T>(context, session, schema, queryOptions);
 
 		context.assertInternal(
@@ -1040,10 +1038,9 @@ export class Kernel {
 		querySchema = await preprocessQuerySchema(querySchema);
 
 		if (options.mask) {
-			querySchema = jsonSchema.merge([
-				querySchema as any,
-				options.mask as any,
-			]) as JsonSchema;
+			querySchema = {
+				allOf: [querySchema, options.mask],
+			};
 		}
 
 		const { actor, scope } = await resolveActorAndScopeFromSessionId(
@@ -1170,10 +1167,9 @@ export class Kernel {
 		querySchema = await preprocessQuerySchema(querySchema);
 
 		if (options.mask) {
-			querySchema = jsonSchema.merge([
-				querySchema as any,
-				options.mask as any,
-			]) as JsonSchema;
+			querySchema = {
+				allOf: [querySchema, options.mask],
+			};
 		}
 
 		const authorizedQuerySchema = await authorization.authorizeQuery(
@@ -1278,10 +1274,9 @@ const setupStreamEventHandlers = async (
 		let querySchema = await preprocessQuerySchema(payload.schema);
 
 		if (payload.options?.mask) {
-			querySchema = jsonSchema.merge([
-				querySchema as any,
-				payload.options?.mask as any,
-			]) as JsonSchema;
+			querySchema = {
+				allOf: [querySchema, payload.options?.mask],
+			};
 		}
 
 		const authorizedQuerySchema = await authorization.authorizeQuery(
