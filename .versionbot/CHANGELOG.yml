@@ -1,4 +1,20 @@
 - commits:
+    - subject: Use `allOf` for merging schemas instead of `skhema.merge`
+      hash: 23eefb30244cc78cb1ffdc667519d2fe7166abd8
+      body: |
+        `skhema.merge` is bugged and merging provides marginal benefits at the
+        expense of additional CPU load.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 14.4.1
+  title: "'Use  for merging schemas instead of '"
+  date: 2022-02-18T19:13:32.735Z
+- commits:
     - subject: Refactor permission-filter
       hash: c418604481faf6543300492834edb16b4d27a485
       body: ""
