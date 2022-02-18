@@ -1,7 +1,6 @@
 import type { JsonSchema } from '@balena/jellyfish-types';
 import jsone = require('json-e');
 import * as _ from 'lodash';
-import jsonSchema from '../json-schema';
 
 // Recursively applies an authorization schema to $$links queries,
 // ensuring that authorization can't be escaped by using a relational query.
@@ -24,10 +23,9 @@ export const applyAuthorizationSchemaToLinks = (
 			const links = schema.$$links!;
 			for (const [linkType, linkSchema] of Object.entries(links)) {
 				applyAuthorizationSchemaToLinks(linkSchema, authorizationSchema);
-				links[linkType] = jsonSchema.merge([
-					authorizationSchema as any,
-					linkSchema as any,
-				]) as JsonSchema;
+				links[linkType] = {
+					allOf: [authorizationSchema, linkSchema],
+				};
 			}
 		}
 
