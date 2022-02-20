@@ -1,4 +1,24 @@
 - commits:
+    - subject: Update internal-patch
+      hash: 58de6b483a49ab55467c83a82a10bac2671ef2c0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Update typedoc from 0.22.11 to 0.22.12
+      hash: 1ef67195ca9c703c61ea6b7e14bd011473c5ee11
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 14.4.2
+  title: "'Update internal-patch'"
+  date: 2022-02-20T06:46:05.882Z
+- commits:
     - subject: Use `allOf` for merging schemas instead of `skhema.merge`
       hash: 23eefb30244cc78cb1ffdc667519d2fe7166abd8
       body: |
