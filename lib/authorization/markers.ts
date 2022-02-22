@@ -30,8 +30,8 @@ export const resolveMarkerBasedAuthorizationSchema = async (
 							type: 'string',
 							const: actor.id,
 						},
-						additionalProperties: false,
 					},
+					additionalProperties: false,
 				},
 			},
 			properties: {
