@@ -36,7 +36,7 @@ describe('Kernel', () => {
 		}
 	});
 
-	describe('.patchCardBySlug()', () => {
+	describe('.patchContractBySlug()', () => {
 		it('should throw an error if the element does not exist', async () => {
 			const slug = `${testUtils.generateRandomSlug({
 				prefix: 'foobarbaz',
@@ -1614,6 +1614,137 @@ describe('Kernel', () => {
 
 			expect(result).toEqual(contract);
 		});
+
+		it('should apply patch for users that satisfy markers', async () => {
+			const org = await ctx.createOrg(testUtils.generateRandomId());
+			const user = await ctx.createUser(
+				testUtils.generateRandomId(),
+				testUtils.generateRandomId(),
+			);
+			await ctx.createLink(user, org, 'is member of', 'has member');
+			const session = await ctx.createSession(user);
+
+			// org-wide markers
+			let result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					data: {
+						foo: 'bar',
+					},
+					markers: [org.slug],
+				},
+			);
+			let foo = testUtils.generateRandomId();
+			let contract = await ctx.kernel.patchContractBySlug(
+				ctx.logContext,
+				session.id,
+				`${result.slug}@${result.version}`,
+				[
+					{
+						op: 'replace',
+						path: '/data/foo',
+						value: foo,
+					},
+				],
+			);
+			expect(contract.data).toEqual({
+				foo,
+			});
+
+			// user-specific markers
+			result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					data: {
+						foo: 'bar',
+					},
+					markers: [user.slug],
+				},
+			);
+			foo = testUtils.generateRandomId();
+			contract = await ctx.kernel.patchContractBySlug(
+				ctx.logContext,
+				session.id,
+				`${result.slug}@${result.version}`,
+				[
+					{
+						op: 'replace',
+						path: '/data/foo',
+						value: foo,
+					},
+				],
+			);
+			expect(contract.data).toEqual({
+				foo,
+			});
+
+			// user+org markers
+			result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					data: {
+						foo: 'bar',
+					},
+					markers: [`${user.slug}+${org.slug}`],
+				},
+			);
+			foo = testUtils.generateRandomId();
+			contract = await ctx.kernel.patchContractBySlug(
+				ctx.logContext,
+				session.id,
+				`${result.slug}@${result.version}`,
+				[
+					{
+						op: 'replace',
+						path: '/data/foo',
+						value: foo,
+					},
+				],
+			);
+			expect(contract.data).toEqual({
+				foo,
+			});
+		});
+
+		it('should throw for users that do not satisfy markers', async () => {
+			const org = await ctx.createOrg(testUtils.generateRandomId());
+			const user = await ctx.createUser(
+				testUtils.generateRandomId(),
+				testUtils.generateRandomId(),
+			);
+			await ctx.createLink(user, org, 'is member of', 'has member');
+			const session = await ctx.createSession(user);
+
+			const result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: ['user-admin'],
+				},
+			);
+
+			await expect(
+				ctx.kernel.patchContractBySlug(
+					ctx.logContext,
+					session.id,
+					`${result.slug}@${result.version}`,
+					[
+						{
+							op: 'replace',
+							path: '/data/foo',
+							value: 'buz',
+						},
+					],
+				),
+			).rejects.toThrow(errors.JellyfishNoElement);
+		});
 	});
 
 	describe('.insertContract()', () => {
@@ -2679,6 +2810,90 @@ describe('Kernel', () => {
 
 			expect(contract).toEqual(result);
 		});
+
+		it('should return contract for users that satisfy markers', async () => {
+			const org = await ctx.createOrg(testUtils.generateRandomId());
+			const user = await ctx.createUser(
+				testUtils.generateRandomId(),
+				testUtils.generateRandomId(),
+			);
+			await ctx.createLink(user, org, 'is member of', 'has member');
+			const session = await ctx.createSession(user);
+
+			// org-wide markers
+			let result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [org.slug],
+				},
+			);
+			let contract = await ctx.kernel.getContractBySlug(
+				ctx.logContext,
+				session.id,
+				`${result.slug}@${result.version}`,
+			);
+			expect(contract).toEqual(result);
+
+			// user-specific markers
+			result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [user.slug],
+				},
+			);
+			contract = await ctx.kernel.getContractBySlug(
+				ctx.logContext,
+				session.id,
+				`${result.slug}@${result.version}`,
+			);
+			expect(contract).toEqual(result);
+
+			// user+org markers
+			result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [`${user.slug}+${org.slug}`],
+				},
+			);
+			contract = await ctx.kernel.getContractBySlug(
+				ctx.logContext,
+				session.id,
+				`${result.slug}@${result.version}`,
+			);
+			expect(contract).toEqual(result);
+		});
+
+		it('should return null for users that do not satisfy markers', async () => {
+			const org = await ctx.createOrg(testUtils.generateRandomId());
+			const user = await ctx.createUser(
+				testUtils.generateRandomId(),
+				testUtils.generateRandomId(),
+			);
+			await ctx.createLink(user, org, 'is member of', 'has member');
+			const session = await ctx.createSession(user);
+
+			const result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: ['user-admin'],
+				},
+			);
+
+			const contract = await ctx.kernel.getContractBySlug(
+				ctx.logContext,
+				session.id,
+				`${result.slug}@${result.version}`,
+			);
+			expect(contract).toEqual(null);
+		});
 	});
 
 	describe('.getContractById()', () => {
@@ -2732,6 +2947,90 @@ describe('Kernel', () => {
 				result.id,
 			);
 			expect(contract).toEqual(result);
+		});
+
+		it('should return contract for users that satisfy markers', async () => {
+			const org = await ctx.createOrg(testUtils.generateRandomId());
+			const user = await ctx.createUser(
+				testUtils.generateRandomId(),
+				testUtils.generateRandomId(),
+			);
+			await ctx.createLink(user, org, 'is member of', 'has member');
+			const session = await ctx.createSession(user);
+
+			// org-wide markers
+			let result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [org.slug],
+				},
+			);
+			let contract = await ctx.kernel.getContractById(
+				ctx.logContext,
+				session.id,
+				result.id,
+			);
+			expect(contract).toEqual(result);
+
+			// user-specific markers
+			result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [user.slug],
+				},
+			);
+			contract = await ctx.kernel.getContractById(
+				ctx.logContext,
+				session.id,
+				result.id,
+			);
+			expect(contract).toEqual(result);
+
+			// user+org markers
+			result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [`${user.slug}+${org.slug}`],
+				},
+			);
+			contract = await ctx.kernel.getContractById(
+				ctx.logContext,
+				session.id,
+				result.id,
+			);
+			expect(contract).toEqual(result);
+		});
+
+		it('should return null for users that do not satisfy markers', async () => {
+			const org = await ctx.createOrg(testUtils.generateRandomId());
+			const user = await ctx.createUser(
+				testUtils.generateRandomId(),
+				testUtils.generateRandomId(),
+			);
+			await ctx.createLink(user, org, 'is member of', 'has member');
+			const session = await ctx.createSession(user);
+
+			const result = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: ['user-admin'],
+				},
+			);
+
+			const contract = await ctx.kernel.getContractById(
+				ctx.logContext,
+				session.id,
+				result.id,
+			);
+			expect(contract).toEqual(null);
 		});
 	});
 
@@ -7023,6 +7322,110 @@ describe('Kernel', () => {
 
 			expect(results).toHaveLength(1);
 			expect(results[0].id).toBe(contract.id);
+		});
+
+		it('should return contract for users that satisfy markers', async () => {
+			const org = await ctx.createOrg(testUtils.generateRandomId());
+			const user = await ctx.createUser(
+				testUtils.generateRandomId(),
+				testUtils.generateRandomId(),
+			);
+			await ctx.createLink(user, org, 'is member of', 'has member');
+			const session = await ctx.createSession(user);
+
+			// org-wide markers
+			let contract = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [org.slug],
+				},
+			);
+			let results = await ctx.kernel.query(ctx.logContext, session.id, {
+				type: 'object',
+				properties: {
+					id: {
+						type: 'string',
+						const: contract.id,
+					},
+				},
+				required: ['id'],
+			});
+			expect(results).toEqual([contract]);
+
+			// user-specific markers
+			contract = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [user.slug],
+				},
+			);
+			results = await ctx.kernel.query(ctx.logContext, session.id, {
+				type: 'object',
+				properties: {
+					id: {
+						type: 'string',
+						const: contract.id,
+					},
+				},
+				required: ['id'],
+			});
+			expect(results).toEqual([contract]);
+
+			// user+org markers
+			contract = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: [`${user.slug}+${org.slug}`],
+				},
+			);
+			results = await ctx.kernel.query(ctx.logContext, session.id, {
+				type: 'object',
+				properties: {
+					id: {
+						type: 'string',
+						const: contract.id,
+					},
+				},
+				required: ['id'],
+			});
+			expect(results).toEqual([contract]);
+		});
+
+		it('should return null for users that do not satisfy markers', async () => {
+			const org = await ctx.createOrg(testUtils.generateRandomId());
+			const user = await ctx.createUser(
+				testUtils.generateRandomId(),
+				testUtils.generateRandomId(),
+			);
+			await ctx.createLink(user, org, 'is member of', 'has member');
+			const session = await ctx.createSession(user);
+
+			const contract = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					markers: ['user-admin'],
+				},
+			);
+
+			const results = await ctx.kernel.query(ctx.logContext, session.id, {
+				type: 'object',
+				properties: {
+					id: {
+						type: 'string',
+						const: contract.id,
+					},
+				},
+				required: ['id'],
+			});
+			expect(results).toEqual([]);
 		});
 	});
 
