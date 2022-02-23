@@ -239,7 +239,7 @@ export class Stream extends EventEmitter {
 	async query(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: Partial<BackendQueryOptions>,
+		options?: Partial<BackendQueryOptions>,
 	) {
 		// Query the cards with the IDs so we can add them to
 		// `this.seenCardIds`
