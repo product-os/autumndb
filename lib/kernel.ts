@@ -1270,34 +1270,41 @@ const setupStreamEventHandlers = async (
 ): Promise<void> => {
 	// Attach event handlers. We got to do this here and not in any lower
 	// levels because of the whole permissions handling
-	stream.on('query', async (payload) => {
-		let querySchema = await preprocessQuerySchema(payload.schema);
+	stream.on(
+		'query',
+		async (payload: {
+			id: string;
+			schema: JsonSchema | ViewContract;
+			options?: QueryOptions;
+		}) => {
+			let querySchema = await preprocessQuerySchema(payload.schema);
 
-		if (payload.options?.mask) {
-			querySchema = {
-				allOf: [querySchema, payload.options?.mask],
-			};
-		}
+			if (payload.options?.mask) {
+				querySchema = {
+					allOf: [querySchema, payload.options?.mask],
+				};
+			}
 
-		const authorizedQuerySchema = await authorization.authorizeQuery(
-			context,
-			backend,
-			actor,
-			scope,
-			payload.schema,
-		);
+			const authorizedQuerySchema = await authorization.authorizeQuery(
+				context,
+				backend,
+				actor,
+				scope,
+				querySchema,
+			);
 
-		const contracts = await stream.query(
-			await getSelectObjectFromSchema(payload.schema, authorizedQuerySchema),
-			authorizedQuerySchema,
-			payload.options,
-		);
+			const contracts = await stream.query(
+				await getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
+				authorizedQuerySchema,
+				payload.options,
+			);
 
-		stream.emit('dataset', {
-			id: payload.id,
-			cards: contracts,
-		});
-	});
+			stream.emit('dataset', {
+				id: payload.id,
+				cards: contracts,
+			});
+		},
+	);
 
 	stream.on('setSchema', async (newSchema) => {
 		const querySchema = await preprocessQuerySchema(newSchema);
