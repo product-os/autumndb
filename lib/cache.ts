@@ -1,13 +1,12 @@
 import * as metrics from '@balena/jellyfish-metrics';
 import type { Contract } from '@balena/jellyfish-types/build/core';
-import * as Bluebird from 'bluebird';
 import * as redis from 'redis';
 import * as redismock from 'redis-mock';
 // TODO: This violates encapsulation of the backend
 import { TABLE as CONTRACTS_TABLE } from './backend/postgres/cards';
 import * as errors from './errors';
 
-interface CacheOptions extends redis.ClientOpts {
+interface CacheOptions extends redis.RedisClientOptions {
 	namespace: string;
 	mock: boolean;
 }
@@ -16,7 +15,7 @@ export type CacheResult = { hit: false } | { hit: true; element: any };
 
 export class Cache {
 	tables: Set<string>;
-	client: redis.RedisClient | null;
+	client: redis.RedisClientType | null;
 
 	/**
 	 * @summary The contract cache store
@@ -39,17 +38,16 @@ export class Cache {
 	 * @private
 	 * @summary Gets the internal redis client and raises an error if it isn't set
 	 *
-	 * @return {redis.RedisClient} the redis client
+	 * @return {redis.RedisClientType} the redis client
 	 */
-	private getClient(): redis.RedisClient {
-		const { client } = this;
-		if (!client) {
+	private getClient(): redis.RedisClientType {
+		if (!this.client) {
 			throw new errors.JellyfishCacheError(
 				'Cache client is not set, did you forget to call Cache.connect()?',
 			);
 		}
 
-		return client;
+		return this.client;
 	}
 
 	/**
@@ -67,13 +65,14 @@ export class Cache {
 		}
 
 		// Attempt to recover if we lose the connection to the cache
-		this.options.retry_strategy = (options) => {
-			if (options.attempt > 100) {
+		this.options.socket = this.options.socket || {};
+		this.options.socket.reconnectStrategy = (attempts) => {
+			if (attempts > 100) {
 				return new errors.JellyfishCacheError('Cannot connect to cache');
 			}
 
 			// Reconnect after
-			return Math.min(options.attempt * 100, 3000);
+			return Math.min(attempts * 100, 3000);
 		};
 
 		if (this.options.mock) {
@@ -89,6 +88,7 @@ export class Cache {
 			this.client = redismock.createClient(this.options);
 		} else {
 			this.client = redis.createClient(this.options);
+			await this.client.connect();
 		}
 	}
 
@@ -103,20 +103,9 @@ export class Cache {
 	 */
 	async disconnect() {
 		if (this.client) {
-			await new Bluebird((resolve) => {
-				if (this.client) {
-					this.client.removeAllListeners();
-					this.client.quit(() => {
-						this.client = null;
-						resolve();
-					});
-				}
-			});
-			// This is because redis.quit() creates a thread to close the connection.
-			// We wait until all threads have been run once to ensure the connection closes.
-			await new Bluebird((resolve) => {
-				setImmediate(resolve);
-			});
+			const client = this.client;
+			this.client = null;
+			await client.quit();
 		}
 	}
 
@@ -179,23 +168,15 @@ export class Cache {
 				// Store key with one hour expiration
 				const expirationTime = 3600;
 
-				await new Promise((resolve, reject) => {
-					client.set(
-						this.generateKey(name, category, key),
-						JSON.stringify(element),
-						'EX',
-						expirationTime,
-						(err, result) => (err ? reject(err) : resolve(result)),
-					);
-				});
+				await client.set(
+					this.generateKey(name, category, key),
+					JSON.stringify(element),
+					{
+						EX: expirationTime,
+					},
+				);
 			} else if (element) {
-				await new Promise((resolve, reject) => {
-					client.set(
-						this.generateKey(name, category, key),
-						'null',
-						(err, result) => (err ? reject(err) : resolve(result)),
-					);
-				});
+				await client.set(this.generateKey(name, category, key), 'null');
 			}
 		}
 	}
@@ -286,11 +267,7 @@ export class Cache {
 	): Promise<CacheResult> {
 		const client = this.getClient();
 
-		const result = await new Promise<string | null>((resolve, reject) => {
-			client.get(this.generateKey(table, category, key), (err, reply) =>
-				err ? reject(err) : resolve(reply),
-			);
-		});
+		const result = await client.get(this.generateKey(table, category, key));
 
 		if (result) {
 			const data = {
@@ -372,23 +349,12 @@ export class Cache {
 
 		for (const name of this.tables) {
 			if (element.id) {
-				await new Promise((resolve, reject) => {
-					client.del(this.generateKey(name, 'id', element.id), (err, reply) =>
-						err ? reject(err) : resolve(reply),
-					);
-				});
+				await client.del(this.generateKey(name, 'id', element.id));
 			}
 			if (element.slug) {
-				await new Promise((resolve, reject) => {
-					client.del(
-						this.generateKey(
-							name,
-							'slug',
-							`${element.slug}@${element.version}`,
-						),
-						(err, reply) => (err ? reject(err) : resolve(reply)),
-					);
-				});
+				await client.del(
+					this.generateKey(name, 'slug', `${element.slug}@${element.version}`),
+				);
 			}
 		}
 	}
@@ -403,11 +369,8 @@ export class Cache {
 	 * cache.reset()
 	 */
 	async reset() {
-		const { client } = this;
-		if (client) {
-			await new Promise((resolve, reject) => {
-				client.flushall((err, reply) => (err ? reject(err) : resolve(reply)));
-			});
+		if (this.client) {
+			await this.client.flushAll();
 		}
 	}
 }
