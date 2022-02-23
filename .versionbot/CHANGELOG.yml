@@ -1,4 +1,18 @@
 - commits:
+    - subject: Upgrade redis to v4
+      hash: daace13eecc294eb29e90dbb6a4fe86441f8347b
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 15.0.0
+  title: "'Upgrade redis to v4'"
+  date: 2022-02-23T21:02:21.871Z
+- commits:
     - subject: Apply mask to query with view
       hash: a6dba2eed689cab6e251d21315c4f7e0348d73cd
       body: ""
