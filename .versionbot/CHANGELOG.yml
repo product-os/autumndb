@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump docker images
+      hash: 6d075210ee14a67fe5fa4bb01880a61fb6952146
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 15.0.1
+  title: "'Bump docker images'"
+  date: 2022-02-25T03:22:02.314Z
+- commits:
     - subject: Upgrade redis to v4
       hash: daace13eecc294eb29e90dbb6a4fe86441f8347b
       body: ""
