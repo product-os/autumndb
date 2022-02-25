@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 8.0.0 to 9.1.0
+      hash: cf033c51519eb65a39da51f25a17429f3bfa91f3
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 15.0.2
+  title: "'Update @balena/jellyfish-environment from 8.0.0 to 9.1.0'"
+  date: 2022-02-25T05:56:26.859Z
+- commits:
     - subject: Bump docker images
       hash: 6d075210ee14a67fe5fa4bb01880a61fb6952146
       body: ""
