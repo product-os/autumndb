@@ -1,4 +1,20 @@
 - commits:
+    - subject: Use latest version of jellyfish-logger
+      hash: 0c3ebee45e71a56fde8255cf14106b8b4a7b5b00
+      body: >
+        This major version of the logger no longer handles uncaught exceptions,
+        which would result in mangled and unreadable log messages.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 15.0.3
+  title: "'Use latest version of jellyfish-logger'"
+  date: 2022-02-25T14:48:56.655Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 8.0.0 to 9.1.0
       hash: cf033c51519eb65a39da51f25a17429f3bfa91f3
       body: ""
