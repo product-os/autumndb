@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch
+      hash: 9b055a5ac5945a25d93fbf659653fc9a5864d3d6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 15.0.4
+  title: "'Update internal-patch'"
+  date: 2022-02-26T02:05:49.171Z
+- commits:
     - subject: Use latest version of jellyfish-logger
       hash: 0c3ebee45e71a56fde8255cf14106b8b4a7b5b00
       body: >
