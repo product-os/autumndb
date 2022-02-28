@@ -1038,9 +1038,10 @@ export class Kernel {
 		querySchema = await preprocessQuerySchema(querySchema);
 
 		if (options.mask) {
-			querySchema = {
-				allOf: [querySchema, options.mask],
-			};
+			querySchema = jsonSchema.merge([
+				querySchema as any,
+				options.mask as any,
+			]) as JsonSchema;
 		}
 
 		const { actor, scope } = await resolveActorAndScopeFromSessionId(
@@ -1167,9 +1168,10 @@ export class Kernel {
 		querySchema = await preprocessQuerySchema(querySchema);
 
 		if (options.mask) {
-			querySchema = {
-				allOf: [querySchema, options.mask],
-			};
+			querySchema = jsonSchema.merge([
+				querySchema as any,
+				options.mask as any,
+			]) as JsonSchema;
 		}
 
 		const authorizedQuerySchema = await authorization.authorizeQuery(
@@ -1280,9 +1282,10 @@ const setupStreamEventHandlers = async (
 			let querySchema = await preprocessQuerySchema(payload.schema);
 
 			if (payload.options?.mask) {
-				querySchema = {
-					allOf: [querySchema, payload.options?.mask],
-				};
+				querySchema = jsonSchema.merge([
+					querySchema as any,
+					payload.options!.mask as any,
+				]) as JsonSchema;
 			}
 
 			const authorizedQuerySchema = await authorization.authorizeQuery(

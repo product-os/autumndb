@@ -3,6 +3,7 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import type { DatabaseBackend } from '../backend/postgres/types';
 import type { Context } from '../context';
+import jsonSchema from '../json-schema';
 import { resolveMarkerBasedAuthorizationSchema } from './markers';
 import { resolveRoleBasedAuthorizationSchema } from './roles';
 import {
@@ -27,17 +28,26 @@ export const resolveAuthorizationSchema = async (
 	actor: Contract,
 	scope: JsonSchema = {},
 ): Promise<JsonSchema> => {
-	const authorizationSchemaParts = await Promise.all([
-		resolveRoleBasedAuthorizationSchema(context, backend, actor),
-		resolveMarkerBasedAuthorizationSchema(context, backend, actor),
-	]);
+	const roleBasedAuthorizationSchema =
+		await resolveRoleBasedAuthorizationSchema(context, backend, actor);
+
+	const markerBasedAuthorizationSchema =
+		await resolveMarkerBasedAuthorizationSchema(context, backend, actor);
+
+	let authorizationSchema = jsonSchema.merge([
+		roleBasedAuthorizationSchema as any,
+		markerBasedAuthorizationSchema as any,
+	]) as JsonSchema;
 
 	// Apply scope if given
 	if (!_.isEmpty(scope)) {
-		authorizationSchemaParts.push(scope);
+		authorizationSchema = jsonSchema.merge([
+			authorizationSchema as any,
+			scope as any,
+		]) as JsonSchema;
 	}
 
-	return { allOf: authorizationSchemaParts };
+	return authorizationSchema;
 };
 
 /**
@@ -67,15 +77,13 @@ export const authorizeQuery = async (
 
 	applyAuthorizationSchemaToLinks(querySchema, authorizationSchema);
 
-	const authorizedQuerySchema = {
-		allOf: [
-			authorizationSchema,
-			evaluateSchemaWithContext(querySchema, {
-				// TODO: Update views to interpolate "actor" instead of "user"
-				user: actor,
-			}),
-		],
-	};
+	const authorizedQuerySchema = jsonSchema.merge([
+		authorizationSchema,
+		evaluateSchemaWithContext(querySchema, {
+			// TODO: Update views to interpolate "actor" instead of "user"
+			user: actor,
+		}),
+	]) as JsonSchema;
 
 	return authorizedQuerySchema;
 };

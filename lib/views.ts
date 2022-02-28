@@ -1,6 +1,7 @@
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { ViewContract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
+import jsonSchema from './json-schema';
 
 /**
  * @summary Get the schema of a view contract
@@ -30,5 +31,5 @@ export const getViewContractSchema = (
 		});
 	}
 
-	return { allOf: conjunctions };
+	return jsonSchema.merge(conjunctions as any) as JsonSchema;
 };
