@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add workaround for `skhema.merge` bug
+      hash: 82362bdc62a232effd1e4fd5479607aa3b294caf
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 15.0.7
+  title: "'Add workaround for  bug'"
+  date: 2022-02-28T13:29:49.661Z
+- commits:
     - subject: Revert "Use `allOf` for merging schemas instead of `skhema.merge`"
       hash: c9397b95678cffe804a3bea9d89bcd316044f7b1
       body: |
