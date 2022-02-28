@@ -654,7 +654,7 @@ describe('Kernel', () => {
 							properties: {
 								slug: {
 									type: 'string',
-									enum: ['user', 'type'],
+									const: ['user', 'type'],
 								},
 								type: {
 									type: 'string',
