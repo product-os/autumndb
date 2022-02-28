@@ -1,4 +1,19 @@
 - commits:
+    - subject: Revert "Use `allOf` for merging schemas instead of `skhema.merge`"
+      hash: c9397b95678cffe804a3bea9d89bcd316044f7b1
+      body: |
+        This reverts commit 23eefb30244cc78cb1ffdc667519d2fe7166abd8.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 15.0.6
+  title: "'Revert \"Use  for merging schemas instead of \"'"
+  date: 2022-02-28T13:18:46.073Z
+- commits:
     - subject: Update internal-patch
       hash: ff84bfa7c3fbcb53204ee4bec9726448674bfced
       body: ""
