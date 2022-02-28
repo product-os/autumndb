@@ -567,6 +567,8 @@ export class Kernel {
 			queryOptions.sortDir = 'desc';
 		}
 
+		schema.required = Object.keys(schema.properties!);
+
 		const results = await this.query<T>(context, session, schema, queryOptions);
 
 		context.assertInternal(

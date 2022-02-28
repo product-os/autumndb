@@ -31,7 +31,14 @@ describe('views', () => {
 
 			expect(schema).toEqual({
 				type: 'object',
-				properties: { foo: { type: 'string', const: { $eval: 'user.slug' } } },
+				properties: {
+					foo: {
+						type: 'string',
+						const: {
+							$eval: 'user.slug',
+						},
+					},
+				},
 				required: ['foo'],
 			});
 		});
@@ -61,7 +68,13 @@ describe('views', () => {
 
 			expect(schema).toEqual({
 				type: 'object',
-				properties: { foo: { type: { $eval: 'user.type' } } },
+				properties: {
+					foo: {
+						type: {
+							$eval: 'user.type',
+						},
+					},
+				},
 				required: ['foo'],
 			});
 		});
@@ -105,18 +118,16 @@ describe('views', () => {
 			);
 
 			expect(schema).toEqual({
-				allOf: [
-					{
-						type: 'object',
-						properties: { foo: { type: 'string', minLength: 1 } },
-						required: ['foo'],
+				type: 'object',
+				additionalProperties: true,
+				properties: {
+					foo: {
+						type: 'string',
+						minLength: 1,
+						maxLength: 5,
 					},
-					{
-						type: 'object',
-						properties: { foo: { type: 'string', maxLength: 5 } },
-						required: ['foo'],
-					},
-				],
+				},
+				required: ['foo'],
 			});
 		});
 
@@ -160,18 +171,16 @@ describe('views', () => {
 			);
 
 			expect(schema).toEqual({
-				allOf: [
-					{
-						type: 'object',
-						properties: { foo: { type: 'string', minLength: 1 } },
-						required: ['foo'],
+				type: 'object',
+				additionalProperties: true,
+				properties: {
+					foo: {
+						type: 'string',
+						minLength: 1,
+						maxLength: 5,
 					},
-					{
-						type: 'object',
-						properties: { foo: { type: 'string', maxLength: 5 } },
-						required: ['foo'],
-					},
-				],
+				},
+				required: ['foo'],
 			});
 		});
 
@@ -214,20 +223,28 @@ describe('views', () => {
 			);
 
 			expect(schema).toEqual({
-				allOf: [
+				type: 'object',
+				additionalProperties: true,
+				anyOf: [
 					{
-						anyOf: [
-							{
-								type: 'object',
-								properties: { type: { type: 'string', const: 'view' } },
-								required: ['type'],
+						type: 'object',
+						properties: {
+							type: {
+								type: 'string',
+								const: 'view',
 							},
-							{
-								type: 'object',
-								properties: { type: { type: 'string', const: 'action' } },
-								required: ['type'],
+						},
+						required: ['type'],
+					},
+					{
+						type: 'object',
+						properties: {
+							type: {
+								type: 'string',
+								const: 'action',
 							},
-						],
+						},
+						required: ['type'],
 					},
 				],
 			});
@@ -273,20 +290,28 @@ describe('views', () => {
 			);
 
 			expect(schema).toEqual({
-				allOf: [
+				type: 'object',
+				additionalProperties: true,
+				anyOf: [
 					{
-						anyOf: [
-							{
-								type: 'object',
-								properties: { type: { type: 'string', const: 'view' } },
-								required: ['type'],
+						type: 'object',
+						properties: {
+							type: {
+								type: 'string',
+								const: 'view',
 							},
-							{
-								type: 'object',
-								properties: { type: { type: 'string', const: 'action' } },
-								required: ['type'],
+						},
+						required: ['type'],
+					},
+					{
+						type: 'object',
+						properties: {
+							type: {
+								type: 'string',
+								const: 'action',
 							},
-						],
+						},
+						required: ['type'],
 					},
 				],
 			});
@@ -359,30 +384,36 @@ describe('views', () => {
 			);
 
 			expect(schema).toEqual({
-				allOf: [
+				type: 'object',
+				additionalProperties: true,
+				properties: {
+					foo: {
+						type: 'string',
+						minLength: 1,
+						maxLength: 5,
+					},
+				},
+				required: ['foo'],
+				anyOf: [
 					{
 						type: 'object',
-						properties: { foo: { type: 'string', minLength: 1 } },
-						required: ['foo'],
+						properties: {
+							type: {
+								type: 'string',
+								const: 'view@1.0.0',
+							},
+						},
+						required: ['type'],
 					},
 					{
 						type: 'object',
-						properties: { foo: { type: 'string', maxLength: 5 } },
-						required: ['foo'],
-					},
-					{
-						anyOf: [
-							{
-								type: 'object',
-								properties: { type: { type: 'string', const: 'view@1.0.0' } },
-								required: ['type'],
+						properties: {
+							type: {
+								type: 'string',
+								const: 'action',
 							},
-							{
-								type: 'object',
-								properties: { type: { type: 'string', const: 'action' } },
-								required: ['type'],
-							},
-						],
+						},
+						required: ['type'],
 					},
 				],
 			});
