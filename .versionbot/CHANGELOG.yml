@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add a functioning workaround for `skhema.merge`
+      hash: a423bb692d0455a6862617432b9dbcd9b011896a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 15.0.8
+  title: "'Add a functioning workaround for '"
+  date: 2022-02-28T17:40:45.935Z
+- commits:
     - subject: Add workaround for `skhema.merge` bug
       hash: 82362bdc62a232effd1e4fd5479607aa3b294caf
       body: ""
