@@ -38,7 +38,7 @@ export const resolveRoleBasedAuthorizationSchema = async (
 
 	// A default schema that will not match anything
 	if (authorizationSchemas.length === 0) {
-		authorizationSchemas.push({ type: 'null' });
+		authorizationSchemas.push({ properties: { id: { const: null } } });
 	}
 
 	return {
