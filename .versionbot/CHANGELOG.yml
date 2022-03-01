@@ -1,4 +1,22 @@
 - commits:
+    - subject: Restrict guest user role
+      hash: 8388f93dfa8eca0fab82015771844f77b8ab6237
+      body: |
+        This changes the guest user role so that it can only view the guest user
+        contract. This change goes hand-in-hand with updates to the worker
+        service that add special routes for login and password reset.
+        See https://github.com/product-os/jellyfish/pull/7774
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Lucian Buzzo lucian.buzzo@gmail.com
+        signed-off-by: Lucian Buzzo lucian.buzzo@gmail.com
+      author: Lucian Buzzo
+      nested: []
+  version: 16.0.0
+  title: "'Restrict guest user role'"
+  date: 2022-03-01T11:11:49.041Z
+- commits:
     - subject: Add marker tests, more test utils
       hash: 7c5e7f1629c07ccc5ec20a5f30cfc0eea91f55bd
       body: ""
