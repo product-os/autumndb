@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add marker tests, more test utils
+      hash: 7c5e7f1629c07ccc5ec20a5f30cfc0eea91f55bd
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 15.1.0
+  title: "'Add marker tests, more test utils'"
+  date: 2022-03-01T04:59:42.429Z
+- commits:
     - subject: Add a functioning workaround for `skhema.merge`
       hash: a423bb692d0455a6862617432b9dbcd9b011896a
       body: ""
