@@ -1,6 +1,9 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import type { LogContext } from '@balena/jellyfish-logger';
 import type {
+	Contract,
+	LinkContract,
+	OrgContract,
 	SessionContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
@@ -19,12 +22,19 @@ export interface TestContext {
 	cache: Cache;
 	kernel: Kernel;
 	pool: Pool;
+	createOrg: (name: string) => Promise<OrgContract>;
 	createUser: (
 		username: string,
 		hash?: string,
 		roles?: string[],
 	) => Promise<UserContract>;
 	createSession: (user: UserContract) => Promise<SessionContract>;
+	createLink: (
+		fromCard: Contract,
+		toCard: Contract,
+		verb: string,
+		inverseVerb: string,
+	) => Promise<LinkContract>;
 }
 
 /**
@@ -51,6 +61,20 @@ export const newContext = async (
 			database: dbName,
 		}),
 	);
+
+	const createOrg = async (name: string) => {
+		const orgContract = await kernel.insertContract<OrgContract>(
+			logContext,
+			kernel.adminSession()!,
+			{
+				type: 'org@1.0.0',
+				name,
+			},
+		);
+		assert(orgContract);
+
+		return orgContract;
+	};
 
 	const createUser = async (
 		username: string,
@@ -100,14 +124,50 @@ export const newContext = async (
 		return sessionContract;
 	};
 
+	const createLink = async (
+		fromCard: Contract,
+		toCard: Contract,
+		verb: string,
+		inverseVerb: string,
+	) => {
+		const linkContract = await kernel.insertContract<LinkContract>(
+			logContext,
+			kernel.adminSession()!,
+			{
+				type: 'link@1.0.0',
+				slug: `link-${fromCard.id}-${verb.replace(/\s/g, '-')}-${
+					toCard.id
+				}-${generateRandomId()}`,
+				version: '1.0.0',
+				name: verb,
+				data: {
+					inverseName: inverseVerb,
+					from: {
+						id: fromCard.id,
+						type: fromCard.type,
+					},
+					to: {
+						id: toCard.id,
+						type: toCard.type,
+					},
+				},
+			},
+		);
+		assert(linkContract);
+
+		return linkContract;
+	};
+
 	return {
 		logContext,
 		session: kernel.adminSession()!,
 		cache,
 		kernel,
 		pool,
+		createOrg,
 		createUser,
 		createSession,
+		createLink,
 	};
 };
 
