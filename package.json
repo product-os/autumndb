@@ -62,7 +62,7 @@
     "redis": "^4.0.4",
     "redis-mock": "^0.56.3",
     "semver": "^7.3.5",
-    "skhema": "^6.0.3",
+    "skhema": "6.0.4-joshbwlng-dedup-required-87d251c60204999fff8003ec64eacfe6628a8e13",
     "stopword": "^1.0.11",
     "traverse": "^0.6.6",
     "typed-error": "^3.2.1",
