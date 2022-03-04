@@ -750,17 +750,19 @@ export class Kernel {
 		}
 		try {
 			jsonSchema.validate(schema as any, contract);
-		} catch (error) {
-			if (error instanceof errors.JellyfishSchemaMismatch) {
-				error.expected = true;
+		} catch (error: any) {
+			if (error instanceof jsonSchema.SchemaMismatch) {
+				const newError = new errors.JellyfishSchemaMismatch(error.message);
+				newError.expected = true;
+				throw newError;
 			}
 			throw error;
 		}
 		try {
 			jsonSchema.validate(authorizationSchema as any, contract);
-		} catch (error) {
+		} catch (error: any) {
 			// Failing to match the filter schema is a permissions error
-			if (error instanceof errors.JellyfishSchemaMismatch) {
+			if (error instanceof jsonSchema.SchemaMismatch) {
 				const newError = new errors.JellyfishPermissionsError(error.message);
 				newError.expected = true;
 				throw newError;
@@ -914,10 +916,21 @@ export class Kernel {
 						},
 					);
 
-					jsonSchema.validate(
-						authorizationSchema as any,
-						patchedFilteredContract,
-					);
+					try {
+						jsonSchema.validate(
+							authorizationSchema as any,
+							patchedFilteredContract,
+						);
+					} catch (error: any) {
+						if (error instanceof jsonSchema.SchemaMismatch) {
+							const newError = new errors.JellyfishSchemaMismatch(
+								error.message,
+							);
+							throw newError;
+						}
+
+						throw error;
+					}
 
 					const patchedFullContract = patchContract(fullContract, patch, {
 						mutate: false,
@@ -925,14 +938,16 @@ export class Kernel {
 
 					try {
 						jsonSchema.validate(schema as any, patchedFullContract);
-					} catch (error) {
-						if (error instanceof errors.JellyfishSchemaMismatch) {
-							error.expected = true;
-
+					} catch (error: any) {
+						if (error instanceof jsonSchema.SchemaMismatch) {
 							// Because the "full" unrestricted card is being validated there is
 							// potential for an error message to leak private data. To prevent this,
 							// override the detailed error message with a generic one.
-							error.message = 'The updated card is invalid';
+							const newError = new errors.JellyfishSchemaMismatch(
+								'The updated card is invalid',
+							);
+							newError.expected = true;
+							throw newError;
 						}
 
 						throw error;
