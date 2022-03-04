@@ -1,4 +1,18 @@
 - commits:
+    - subject: Use skhema.SchemaMismatch error
+      hash: 8c4e342019b82b2cde291ba053452dc1d1708e67
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 16.0.1
+  title: "'Use skhema.SchemaMismatch error'"
+  date: 2022-03-04T06:57:23.101Z
+- commits:
     - subject: Restrict guest user role
       hash: 8388f93dfa8eca0fab82015771844f77b8ab6237
       body: |
