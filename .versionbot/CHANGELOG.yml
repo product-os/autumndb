@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update skhema from 6.0.5 to 6.0.6
+      hash: 7384982d0852a741c156cb5cc07dd7908557f10f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 16.0.2
+  title: "'Update skhema from 6.0.5 to 6.0.6'"
+  date: 2022-03-05T03:20:53.850Z
+- commits:
     - subject: Use skhema.SchemaMismatch error
       hash: 8c4e342019b82b2cde291ba053452dc1d1708e67
       body: ""
