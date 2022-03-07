@@ -1,6 +1,8 @@
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import { uiSchemaDef } from './ui-schema-defs';
 
+const eventsPartial = `FILTER(contract.links['is attached to'], function (c) { return c.type !== 'create@1.0.0' && c.type !== 'update@1.0.0' })`;
+
 // This mixin defines all common fields in cards that support
 // attached events (i.e. 'timelines')
 export function withEvents(slug: string, type: string): ContractDefinition {
@@ -15,30 +17,30 @@ export function withEvents(slug: string, type: string): ContractDefinition {
 						items: {
 							type: 'string',
 						},
-						$$formula: "AGGREGATE($events, 'tags')",
+						$$formula: `AGGREGATE(${eventsPartial}, 'tags')`,
 						fullTextSearch: true,
 					},
 					data: {
 						properties: {
 							participants: {
 								type: 'array',
-								$$formula: "AGGREGATE($events, 'data.actor')",
+								$$formula: `AGGREGATE(${eventsPartial}, 'participants')`,
 							},
 							mentionsUser: {
 								type: 'array',
-								$$formula: "AGGREGATE($events, 'data.payload.mentionsUser')",
+								$$formula: `AGGREGATE(${eventsPartial}, 'data.payload.mentionsUser')`,
 							},
 							alertsUser: {
 								type: 'array',
-								$$formula: "AGGREGATE($events, 'data.payload.alertsUser')",
+								$$formula: `AGGREGATE(${eventsPartial}, 'data.payload.alertsUser')`,
 							},
 							mentionsGroup: {
 								type: 'array',
-								$$formula: "AGGREGATE($events, 'data.payload.mentionsGroup')",
+								$$formula: `AGGREGATE(${eventsPartial}, 'data.payload.mentionsGroup')`,
 							},
 							alertsGroup: {
 								type: 'array',
-								$$formula: "AGGREGATE($events, 'data.payload.alertsGroup')",
+								$$formula: `AGGREGATE(${eventsPartial}, 'data.payload.alertsGroup')`,
 							},
 						},
 					},
