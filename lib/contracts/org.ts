@@ -6,13 +6,6 @@ export const org = {
 		schema: {
 			type: 'object',
 			properties: {
-				tags: {
-					type: 'array',
-					items: {
-						type: 'string',
-					},
-					$$formula: "AGGREGATE($events, 'tags')",
-				},
 				markers: {
 					type: 'array',
 					items: {
