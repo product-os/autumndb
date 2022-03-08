@@ -1,4 +1,36 @@
 - commits:
+    - subject: "Org: Don't aggregate tags for orgs"
+      hash: adf28a130e8292d31269ff7bc63b6060efd6e782
+      body: |
+        This aggregation is here by mistake AFAICT
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: "Mixins: Stop using `$events` in formulas"
+      hash: db945585f61d200674f7aa4bc601a656102ab5c3
+      body: >
+        `$events` is a shorthand for getting whisper and message contracts from
+
+        a timeline, and will be deprecated in future versions of Jellyscript.
+
+        The current implementation of `$events` uses a standalone AST parsing algorithm which
+
+        needs to be removed.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 16.0.8
+  title: "'Mixins: Stop using  in formulas'"
+  date: 2022-03-08T11:42:33.989Z
+- commits:
     - subject: Update internal-patch
       hash: 6a60f8ee0d662cd1fa9cae03d901712c249d54f3
       body: ""
