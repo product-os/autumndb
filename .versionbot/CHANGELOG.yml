@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 5.1.51 to 5.2.1
+      hash: 3178964e95309b930477127ee3836d977fc4557a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 16.0.11
+  title: "'Update @balena/jellyfish-jellyscript from 5.1.51 to 5.2.1'"
+  date: 2022-03-09T13:52:39.263Z
+- commits:
     - subject: "mixins: Add unit test for .withEvents()"
       hash: a30e09e3a502d37251e9f146baa326ce00212f6c
       body: |
