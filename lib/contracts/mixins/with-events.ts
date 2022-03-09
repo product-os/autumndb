@@ -1,7 +1,7 @@
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import { uiSchemaDef } from './ui-schema-defs';
 
-const eventsPartial = `FILTER(contract.links['is attached to'], function (c) { return c.type !== 'create@1.0.0' && c.type !== 'update@1.0.0' })`;
+const eventsPartial = `FILTER(contract.links['is attached to'], function (c) { return c && c.type && c.type !== 'create@1.0.0' && c.type !== 'update@1.0.0' })`;
 
 // This mixin defines all common fields in cards that support
 // attached events (i.e. 'timelines')
