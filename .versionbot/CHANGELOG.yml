@@ -1,4 +1,18 @@
 - commits:
+    - subject: Fix mixin events partial function
+      hash: 2612206d68a09875af8be4adca73a88d5f22329a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 16.0.9
+  title: "'Fix mixin events partial function'"
+  date: 2022-03-09T07:00:14.420Z
+- commits:
     - subject: "Org: Don't aggregate tags for orgs"
       hash: adf28a130e8292d31269ff7bc63b6060efd6e782
       body: |
