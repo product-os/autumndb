@@ -1,4 +1,35 @@
 - commits:
+    - subject: "mixins: Add unit test for .withEvents()"
+      hash: a30e09e3a502d37251e9f146baa326ce00212f6c
+      body: |
+        This change adds a simple unit test to sanity check the formula used for
+        aggregating values in the `withEvents()` mixin. This change highlights
+        that the core should probably not be providing mixins, especialy with
+        functionality that it doesn't provide or handle directly ($$formula
+        fields). In the future we should consider hoisting mixins into the
+        worker module to improve feature seperation and make the system less
+        brittle.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Fix incorrect link verb for traversing event contracts
+      hash: 6485b17b08668e26d8ade2bbccca8b0b1b1d8ba7
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 16.0.10
+  title: "'mixins: Add unit test for .withEvents()'"
+  date: 2022-03-09T10:55:57.635Z
+- commits:
     - subject: Fix mixin events partial function
       hash: 2612206d68a09875af8be4adca73a88d5f22329a
       body: ""
