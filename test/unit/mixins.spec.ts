@@ -11,6 +11,7 @@ describe('cardMixins', () => {
 				name: 'sample contract',
 				type: 'test-type',
 				slug: 'test-sample',
+				tags: ['foo'],
 				links: {
 					'has attached element': [
 						{
@@ -31,7 +32,7 @@ describe('cardMixins', () => {
 			};
 			const result = evaluateObject(schema, sample);
 
-			expect(result.tags).toEqual(['test-tag']);
+			expect(result.tags).toEqual(['foo', 'test-tag']);
 		});
 	});
 });
