@@ -17,7 +17,7 @@ export function withEvents(slug: string, type: string): ContractDefinition {
 						items: {
 							type: 'string',
 						},
-						$$formula: `AGGREGATE(${eventsPartial}, 'tags')`,
+						$$formula: `AGGREGATE(${eventsPartial}, 'tags', input)`,
 						fullTextSearch: true,
 					},
 					data: {
