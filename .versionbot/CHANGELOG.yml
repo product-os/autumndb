@@ -1,4 +1,24 @@
 - commits:
+    - subject: "mixins: use initial value when aggregating tags"
+      hash: 63545856b2dab2c15df0220dcc04cb35c7bd884d
+      body: >
+        This change ensures that the initial value for tags is kept when
+        aggregating tags.
+
+        Previously, if a tag was added directly, it would be overriden by the
+
+        AGGREGATE.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 16.0.12
+  title: "'mixins: use initial value when aggregating tags'"
+  date: 2022-03-11T10:59:48.071Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 5.1.51 to 5.2.1
       hash: 3178964e95309b930477127ee3836d977fc4557a
       body: ""
