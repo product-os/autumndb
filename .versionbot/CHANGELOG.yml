@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update to major version 6 of Jellyscript
+      hash: 64677214f1f0600981e3c511c962afd5a68a16a1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 16.0.13
+  title: "'Update to major version 6 of Jellyscript'"
+  date: 2022-03-14T14:11:32.840Z
+- commits:
     - subject: "mixins: use initial value when aggregating tags"
       hash: 63545856b2dab2c15df0220dcc04cb35c7bd884d
       body: >
