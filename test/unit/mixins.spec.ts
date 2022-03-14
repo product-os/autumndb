@@ -1,6 +1,6 @@
 import { cardMixins } from '../../lib';
 import type { JsonSchema } from '@balena/jellyfish-types';
-import { evaluateObject } from '@balena/jellyfish-jellyscript';
+import { Jellyscript } from '@balena/jellyfish-jellyscript';
 
 describe('cardMixins', () => {
 	describe('.withEvents()', () => {
@@ -30,7 +30,7 @@ describe('cardMixins', () => {
 					],
 				},
 			};
-			const result = evaluateObject(schema, sample);
+			const result = new Jellyscript().evaluateObject(schema, sample);
 
 			expect(result.tags).toEqual(['foo', 'test-tag']);
 		});
