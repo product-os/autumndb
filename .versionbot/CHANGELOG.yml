@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 6.0.0 to 7.0.0
+      hash: 0408cf40deba681b9c33d2ec2a1e786cd0b332e2
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 17.0.3
+  title: "'Update @balena/jellyfish-jellyscript from 6.0.0 to 7.0.0'"
+  date: 2022-03-15T18:26:54.330Z
+- commits:
     - subject: Log query errors
       hash: 957e6b4039e6969ae84e03194b80e211255856f0
       body: ""
