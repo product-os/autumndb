@@ -333,7 +333,12 @@ export class Context {
 					textOrConfig = query;
 				}
 
-				return context.connection!.query<T>(textOrConfig, parameters);
+				try {
+					return context.connection!.query<T>(textOrConfig, parameters);
+				} catch (err: unknown) {
+					context.error('Postgres error', { err, query, parameters });
+					throw err;
+				}
 			})
 		).rows;
 	}
