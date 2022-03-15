@@ -1,4 +1,18 @@
 - commits:
+    - subject: Log query errors
+      hash: 957e6b4039e6969ae84e03194b80e211255856f0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 17.0.2
+  title: "'Log query errors'"
+  date: 2022-03-15T17:26:42.681Z
+- commits:
     - subject: Add query example to README
       hash: 372e6247618c6b7985c9699cbc84dbb3d2dcae59
       body: ""
