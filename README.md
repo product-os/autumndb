@@ -1,21 +1,90 @@
-# Jellyfish Core
+<div align="center">
+  <img width="400" height="auto" src="https://raw.githubusercontent.com/product-os/autumndb/master/autumnDB.png">
+  <br>
+  <br>
 
-The Jellyfish core is a low-level internal SDK to interact with contracts in the
-database, providing functions like `.getContractById()` or `.insertContract()`. The
-core provides the foundation library for the rest of system.
+[![npm version](https://badge.fury.io/js/autumndb.svg)](https://badge.fury.io/js/autumndb)
 
-## Goals
+  <p>
+    A JSON schema based graph database, based on Postgres.
+  </p>
+  <br>
+  <br>
+</div>
 
-- The core aims to expose a small and simple interface
-- The core aims to **not** expose any details about the underlying database
-  implementations
-- The core aims for correctness and speed
-- The core aims to be the only module in the system that directly interacts
-  with the database
+## Installation
+
+Install by running:
+
+```sh
+npm install --save autumndb
+```
+
+## Usage
+
+AutumnDB relies on Postgres v12+ and Redis v5+. The easiest way to get run these services is to use Docker via `docker-compose up`.
+
+```js
+import * as autumndb from "autumndb";
+
+const start = async () => {
+	// Create a unique logging context for the startup process
+	const logContext = {
+		id: `AUTUMN_DB_CONTEXT`,
+	};
+
+	// Instantiate the redis cache and connect to it
+	const cache = new autumndb.Cache({
+		mock: false,
+		namespace: 'autumndb',
+		url: 'redis://redis:6379',
+		socket: {
+			host: 'redis',
+			port: 6379,
+			tls: false
+		},
+	});
+	await cache.connect();
+
+	// Setup the kernel
+	const { kernel } = await autumndb.Kernel.withPostgres(
+		logContext,
+		cache,
+		backendOptions
+		{
+			host: 'localhost';
+		}
+	);
+
+	// Create a new user
+	const userCard = await kernel.replaceCard(
+		logContext,
+		kernel.adminSession(),
+		{
+			slug: 'user-test',
+			type: 'user@1.0.0',
+			name: 'Test User',
+			data: {
+				email: 'test@example.com',
+				hash: 'PASSWORDLESS',
+				roles: ['user-community'],
+			},
+		},
+	);
+};
+
+start();
+```
+
+## Documentation
+
+[![Publish Documentation](https://github.com/product-os/autumndb/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/product-os/autumndb/actions/workflows/publish-docs.yml)
+
+Visit the website for complete documentation: https://product-os.github.io/autumndb
 
 ## Features
 
-The Jellyfish core provides the following features
+AutumnDB provides the following features
 
 ### The contract data model
 
@@ -36,7 +105,7 @@ of. Contract type definitions are indicated by having a `type` of `type`, e.g.
 These "type" contracts contain model definitions in the form of a JSON schema. The
 slug of a type contract is the value used in the type property of instances of the
 type.
-As an example, you can look at the [type contract for a "message"](https://github.com/product-os/jellyfish-plugin-default/blob/master/lib/contracts/contrib/message.json). You can see that under the `data` key, there is a `schema` value that defines the shape of a contract of type "message".
+As an example, you can look at the [type contract for a "user"](https://github.com/product-os/autumndb/blob/master/lib/contracts/user.ts). You can see that under the `data` key, there is a `schema` value that defines the shape of a contract of type "message".
 We follow the JSON schema spec, so if the schema allows, additional fields can
 be added to a contract that are not defined in the type schema.
 
@@ -140,20 +209,6 @@ Contracts can be linked together by creating a contract of type "link" that refe
 
 Requests for individual contracts by id or slug are cached, reducing DB load and
 improving query speed.
-This library contains email integration functionality for use in Jellyfish.
-
-## Usage
-
-Below is an example how to use this library:
-
-```js
-import { MemoryCache, create } from '@balena/jellyfish-core';
-
-const cache = new core.MemoryCache(environment.redis);
-const jellyfish = await create(context, cache, {
-	backend: environment.database.options,
-});
-```
 
 # Testing
 
@@ -166,12 +221,14 @@ $ npm run test:compose
 ```
 
 You can also run tests locally against Postgres and Redis instances running in `docker-compose`:
+
 ```
 $ npm run compose
 $ REDIS_HOST=localhost POSTGRES_HOST=localhost npx jest test/integration/permission-filter.spec.ts
 ```
 
 You can also access these Postgres and Redis instances:
+
 ```
 $ PGPASSWORD=docker psql -hlocalhost -Udocker
 $ redis-cli -h localhost
