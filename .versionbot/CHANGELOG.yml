@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add query example to README
+      hash: 372e6247618c6b7985c9699cbc84dbb3d2dcae59
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Lucian Buzzo
+      nested: []
+  version: 17.0.1
+  title: "'Add query example to README'"
+  date: 2022-03-15T13:19:46.646Z
+- commits:
     - subject: Rename project to AutumnDB
       hash: 67ca9e1c172b8e16359657c6ab6ab7eba1ca4b06
       body: >
