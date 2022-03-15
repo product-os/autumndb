@@ -1,4 +1,20 @@
 - commits:
+    - subject: Rename project to AutumnDB
+      hash: 67ca9e1c172b8e16359657c6ab6ab7eba1ca4b06
+      body: >
+        Renaming the project helps define it as a standalone product, with a
+        clear interface and purpose.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 17.0.0
+  title: "'Rename project to AutumnDB'"
+  date: 2022-03-15T10:44:14.059Z
+- commits:
     - subject: Update to major version 6 of Jellyscript
       hash: 64677214f1f0600981e3c511c962afd5a68a16a1
       body: ""
