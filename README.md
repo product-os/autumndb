@@ -6,7 +6,7 @@
 [![npm version](https://badge.fury.io/js/autumndb.svg)](https://badge.fury.io/js/autumndb)
 
   <p>
-    A JSON schema based graph database, based on Postgres.
+    JSON schema + Postgres.
   </p>
   <br>
   <br>
@@ -69,6 +69,21 @@ const start = async () => {
 				hash: 'PASSWORDLESS',
 				roles: ['user-community'],
 			},
+		},
+	);
+
+	// Query for users using JSON Schema
+	const results = await kernel.query(
+		logContext,
+		kernel.adminSession(),
+		{
+			type: 'object',
+			properties: {
+				type: {
+					type: 'string',
+					const: 'user@1.0.0'
+				}
+			}
 		},
 	);
 };
