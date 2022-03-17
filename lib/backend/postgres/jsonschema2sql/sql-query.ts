@@ -184,20 +184,15 @@ const pushLinkedJoins = (
 			SELECT id
 			FROM strings
 			WHERE string = ${linked.linkName}
-		)
-	`);
-	innerSelect.pushLeftJoin('links2', linksFilter, linked.linksAlias);
-	const joinFilter = new LiteralSql(`(
-		${linked.linksAlias}.name = (
-			SELECT id
-			FROM strings
-			WHERE string = ${linked.linkName}
 		) AND
 		${linked.linksAlias}.toId = ${linked.joinAlias}.id
-	) AND (
-		${linked.sqlFilter}
-	)`);
-	innerSelect.pushLeftJoin(cardsTable, joinFilter, linked.joinAlias);
+	`);
+	innerSelect.pushLeftJoin(
+		cardsTable,
+		new LiteralSql(linked.sqlFilter),
+		linked.joinAlias,
+	);
+	innerSelect.pushLeftJoin('links2', linksFilter, linked.linksAlias);
 };
 
 const pushLinkedLateral = (
