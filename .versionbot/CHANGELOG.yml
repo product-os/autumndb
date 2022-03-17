@@ -1,4 +1,18 @@
 - commits:
+    - subject: Fix support-thread participants formula
+      hash: b99fb1fca6d2672de0574e2e67ab7692c68c8c51
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 17.0.6
+  title: "'Fix support-thread participants formula'"
+  date: 2022-03-17T07:54:10.759Z
+- commits:
     - subject: Update internal-patch
       hash: 9a465131aa2955245c6252a19d72fb956b4be554
       body: ""
