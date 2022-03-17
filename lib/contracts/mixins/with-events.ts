@@ -24,7 +24,7 @@ export function withEvents(slug: string, type: string): ContractDefinition {
 						properties: {
 							participants: {
 								type: 'array',
-								$$formula: `AGGREGATE(${eventsPartial}, 'participants')`,
+								$$formula: `AGGREGATE(${eventsPartial}, 'data.actor')`,
 							},
 							mentionsUser: {
 								type: 'array',
