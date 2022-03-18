@@ -1,4 +1,19 @@
 - commits:
+    - subject: Drop out-of-scope mixins
+      hash: e7e92e4e0a01bdbc3fd6ac3fc1d6805ef63163e2
+      body: |
+        Moving these to jellyfish-worker
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.0.0
+  title: "'Drop out-of-scope mixins'"
+  date: 2022-03-18T04:10:46.248Z
+- commits:
     - subject: Drop cardMixins export
       hash: f2afa4032de2f4004d34e3b1f4bfd178fa03fa04
       body: |
