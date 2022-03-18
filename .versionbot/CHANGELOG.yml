@@ -1,4 +1,19 @@
 - commits:
+    - subject: Drop cardMixins export
+      hash: f2afa4032de2f4004d34e3b1f4bfd178fa03fa04
+      body: |
+        Dropping this alias in favor of contractMixins
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.0.0
+  title: "'Drop cardMixins export'"
+  date: 2022-03-18T00:49:43.336Z
+- commits:
     - subject: Fix support-thread participants formula
       hash: b99fb1fca6d2672de0574e2e67ab7692c68c8c51
       body: ""
