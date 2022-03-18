@@ -7,24 +7,14 @@ import * as _ from 'lodash';
 import { sensibleDefaults } from './with-sensible-defaults';
 import { baseUiSchema } from './with-ui-schema';
 
-export { asPipelineItem } from './as-pipeline-item';
 export { uiSchemaDef } from './ui-schema-defs';
-export { withEvents } from './with-events';
 
-const mergeWithUniqConcatArrays = (objValue: any, srcValue: any) => {
+export const mergeWithUniqConcatArrays = (objValue: any, srcValue: any) => {
 	if (_.isArray(objValue)) {
 		return _.uniq(objValue.concat(srcValue));
 	}
 
 	return undefined;
-};
-
-export const mixin = (...mixins: ContractDefinition[]) => {
-	return <TData = ContractData>(
-		base: ContractDefinition<TData>,
-	): ContractDefinition<TData> => {
-		return _.mergeWith({}, base, ...mixins, mergeWithUniqConcatArrays);
-	};
 };
 
 export const initialize = <TData = ContractData>(
