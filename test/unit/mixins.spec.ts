@@ -1,11 +1,11 @@
-import { cardMixins } from '../../lib';
-import type { JsonSchema } from '@balena/jellyfish-types';
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import { contractMixins } from '../../lib';
 
-describe('cardMixins', () => {
+describe('contractMixins', () => {
 	describe('.withEvents()', () => {
 		it('should create a valid formula', () => {
-			const typeContract = cardMixins.withEvents('test-type', 'type');
+			const typeContract = contractMixins.withEvents('test-type', 'type');
 			const schema: JsonSchema = typeContract.data.schema as any;
 			const sample: any = {
 				name: 'sample contract',
