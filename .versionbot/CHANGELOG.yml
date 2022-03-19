@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update external-non-major
+      hash: a8bfef453c5a936864ac7fe35dc753df0edd5142
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.0.1
+  title: "'Update external-non-major'"
+  date: 2022-03-19T04:19:05.361Z
+- commits:
     - subject: Drop out-of-scope mixins
       hash: e7e92e4e0a01bdbc3fd6ac3fc1d6805ef63163e2
       body: |
