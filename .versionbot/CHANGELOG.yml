@@ -1,4 +1,19 @@
 - commits:
+    - subject: Recycle DB connections after 7500 uses by default
+      hash: 1550619f2645ab89fceaab357566ee717360a998
+      body: |
+        Tentative fix for a memory leak in the database.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 19.1.0
+  title: "'Recycle DB connections after 7500 uses by default'"
+  date: 2022-03-22T17:14:52.023Z
+- commits:
     - subject: Update internal-patch
       hash: 9035f8f3a2c22691ed7c2d8f2dc3634a811eb2a7
       body: ""
