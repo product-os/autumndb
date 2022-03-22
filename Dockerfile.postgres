@@ -1,0 +1,24 @@
+FROM balena/open-balena-db:v5.1.0
+
+# Install pre-requisites for building zombodb
+RUN apt update \
+	&& apt install -y bison flex zlib1g zlib1g-dev pkg-config make libssl-dev libreadline-dev \
+		git curl libclang-dev postgresql-server-dev-13 && rm -rf /var/lib/apt/lists/*
+
+# Give postgres user temporary ownership of select directories
+RUN chown postgres:postgres /usr/share/postgresql/13/extension /usr/lib/postgresql/13/lib
+
+# Install rust and cargo-pgx
+USER postgres
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+ENV PATH $PATH:/var/lib/postgresql/.cargo/bin
+RUN cargo install cargo-pgx --version 0.3.3
+RUN cargo pgx init --pg13=`which pg_config`
+
+# Build and install zombodb
+RUN cd /var/lib/postgresql && git clone https://github.com/zombodb/zombodb.git \
+	&& cd zombodb && git checkout v3000.0.10 && cargo pgx install --release
+
+# Restore postgres directory ownership
+USER root
+RUN chown root:root /usr/share/postgresql/13/extension /usr/lib/postgresql/13/lib

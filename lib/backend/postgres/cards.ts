@@ -117,20 +117,24 @@ export const setup = async (
 	);
 	if (!tables.includes(table)) {
 		await context.runQuery(`
+			-- Install zombodb extension
+			CREATE EXTENSION IF NOT EXISTS zombodb;
+
+			-- Create table
 			CREATE TABLE IF NOT EXISTS ${table} (
 				id UUID PRIMARY KEY NOT NULL,
 				slug VARCHAR (255) NOT NULL,
-				type TEXT NOT NULL,
+				type zdb.fulltext NOT NULL,
 				active BOOLEAN NOT NULL,
 				version_major INTEGER NOT NULL DEFAULT 1,
 				version_minor INTEGER NOT NULL DEFAULT 0,
 				version_patch INTEGER NOT NULL DEFAULT 0,
-				version_prerelease TEXT NOT NULL DEFAULT '',
-				version_build TEXT NOT NULL DEFAULT '',
-				name TEXT,
-				loop TEXT,
-				tags TEXT[] NOT NULL,
-				markers TEXT[] NOT NULL,
+				version_prerelease zdb.fulltext NOT NULL DEFAULT '',
+				version_build zdb.fulltext NOT NULL DEFAULT '',
+				name zdb.fulltext,
+				loop zdb.fulltext,
+				tags zdb.fulltext[] NOT NULL,
+				markers zdb.fulltext[] NOT NULL,
 				links JSONB NOT NULL,
 				requires JSONB[] NOT NULL,
 				capabilities JSONB[] NOT NULL,
@@ -176,6 +180,11 @@ export const setup = async (
 			CREATE OR REPLACE FUNCTION immutable_array_to_string(arr text[], sep text) RETURNS text AS $$
 				SELECT array_to_string(arr, sep);
 			$$ LANGUAGE SQL IMMUTABLE;
+
+			-- Create zombodb index on name column
+			-- Can also only index specific columns: https://github.com/zombodb/zombodb/blob/master/CREATE-INDEX.md#indexing-specific-columns
+			CREATE INDEX idx_z_cards ON cards
+				USING zombodb ((cards.*)) WITH (url='http://elasticsearch:9200/');
 		`);
 	}
 

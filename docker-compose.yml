@@ -2,7 +2,9 @@ version: '2.1'
 
 services:
   postgres:
-    image: balena/open-balena-db:v5.1.0
+    build:
+      context: .
+      dockerfile: ./Dockerfile.postgres
     restart: always
     networks:
       - internal
@@ -22,6 +24,15 @@ services:
       - internal
     ports:
       - '6379:6379'
+  elasticsearch:
+    image: elasticsearch:7.17.1
+    restart: always
+    environment:
+      - discovery.type=single-node
+    networks:
+      - internal
+    ports:
+      - '9200:9200'
 
 networks:
   internal: {}
