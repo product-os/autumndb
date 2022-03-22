@@ -194,6 +194,7 @@ export interface PostgresBackendOptions {
 	connectionTimeoutMillis?: number; // this is also used for waiting for a connection from the pool
 	keepAlive?: boolean;
 	max?: number; // pool size
+	maxUses?: number;
 }
 
 const defaultPgOptions: Partial<PostgresBackendOptions> = {
@@ -203,7 +204,7 @@ const defaultPgOptions: Partial<PostgresBackendOptions> = {
 	connectionTimeoutMillis: 30 * 1000,
 	keepAlive: true,
 	max: 10, // same as default https://github.com/brianc/node-postgres/blob/master/packages/pg-pool/index.js#L84
-	// maxUses: 5000,
+	maxUses: 7500,
 };
 
 /*
