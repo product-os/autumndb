@@ -1,4 +1,19 @@
 - commits:
+    - subject: Increase the default number of uses before recycling a DB connection
+      hash: 0cdd8beed57ea4e2b9bc44a7a9274856c21b204b
+      body: |
+        From 7500 to 30000.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 19.1.2
+  title: "'Increase the default number of uses before recycling a DB connection'"
+  date: 2022-03-23T17:13:57.820Z
+- commits:
     - subject: Update balena/open-balena-db from v5.0.3 to v5.1.0
       hash: ad6e1a1bc0620b31b440c167903ad80be9def3de
       body: ""
