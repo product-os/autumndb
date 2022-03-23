@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update balena/open-balena-db from v5.0.3 to v5.1.0
+      hash: ad6e1a1bc0620b31b440c167903ad80be9def3de
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.1.1
+  title: "'Update balena/open-balena-db from v5.0.3 to v5.1.0'"
+  date: 2022-03-22T17:53:58.715Z
+- commits:
     - subject: Recycle DB connections after 7500 uses by default
       hash: 1550619f2645ab89fceaab357566ee717360a998
       body: |
