@@ -204,7 +204,7 @@ const defaultPgOptions: Partial<PostgresBackendOptions> = {
 	connectionTimeoutMillis: 30 * 1000,
 	keepAlive: true,
 	max: 10, // same as default https://github.com/brianc/node-postgres/blob/master/packages/pg-pool/index.js#L84
-	maxUses: 100000,
+	maxUses: 200000,
 };
 
 /*
