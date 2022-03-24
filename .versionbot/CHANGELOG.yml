@@ -1,4 +1,18 @@
 - commits:
+    - subject: Last increase of `maxUses`
+      hash: 5abf31a60a69be0d6d77b83143e7988066fcfbd3
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 19.1.4
+  title: "'Last increase of '"
+  date: 2022-03-24T18:59:53.850Z
+- commits:
     - subject: Increase the number of max uses for a DB connection even further
       hash: b67712057193c1dd859c031a17ecf11b3a74b609
       body: ""
