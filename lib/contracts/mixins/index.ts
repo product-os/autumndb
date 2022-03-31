@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { sensibleDefaults } from './with-sensible-defaults';
 import { baseUiSchema } from './with-ui-schema';
 
+export { asTimeZone } from './as-time-zone';
 export { uiSchemaDef } from './ui-schema-defs';
 
 export const mergeWithUniqConcatArrays = (objValue: any, srcValue: any) => {

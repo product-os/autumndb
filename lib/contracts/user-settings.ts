@@ -1,3 +1,5 @@
+import { asTimeZone, uiSchemaDef } from './mixins';
+
 export const userSettings = {
 	slug: 'user-settings',
 	type: 'type@1.0.0',
@@ -78,6 +80,71 @@ export const userSettings = {
 												},
 											},
 										},
+									},
+								},
+							},
+						},
+						timeZone: {
+							description: 'Work time-zone preferences',
+							type: 'object',
+							required: ['default'],
+							properties: {
+								default: asTimeZone(),
+								overrides: {
+									description: 'List of date-based time-zone overrides',
+									type: 'array',
+									items: {
+										type: 'object',
+										required: ['start', 'end', 'timeZone'],
+										properties: {
+											start: {
+												type: 'string',
+												format: 'date',
+											},
+											end: {
+												type: 'string',
+												format: 'date',
+											},
+											timeZone: asTimeZone(),
+										},
+									},
+								},
+							},
+						},
+						shareBirthday: {
+							description: 'Option to share birthday with team',
+							title:
+								'May we share you birthday (day and month only) with the balena team?',
+							type: 'boolean',
+							default: false,
+						},
+						leavePayoutThreshold: {
+							description:
+								'Pay out leave above this number (min 40, max 80 days)',
+							title: 'Leave payout threshold',
+							type: 'number',
+							minimum: 40,
+							maximum: 80,
+							default: 40,
+						},
+						supportShiftLength: {
+							description: 'Ideal support shift length (in hours)',
+							type: 'number',
+						},
+						workingHours: {
+							description: 'Preferred working hours in your local time',
+							title: 'Preferred working hours',
+							type: 'array',
+							items: {
+								type: 'object',
+								required: ['start', 'end', 'level'],
+								properties: {
+									start: uiSchemaDef('time'),
+									end: uiSchemaDef('time'),
+									level: {
+										type: 'number',
+										minimum: 0,
+										maximum: 3,
 									},
 								},
 							},
