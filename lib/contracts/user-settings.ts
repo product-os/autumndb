@@ -12,7 +12,12 @@ export const userSettings = {
 				},
 				data: {
 					type: 'object',
+					required: ['actorId'],
 					properties: {
+						actorId: {
+							type: 'string',
+							format: 'uuid',
+						},
 						type: {
 							type: 'string',
 						},

@@ -1,5 +1,6 @@
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
-import { authentication } from './authentication';
+import { authenticationOauth } from './authentication-oauth';
+import { authenticationPassword } from './authentication-password';
 import { card } from './card';
 import { error } from './error';
 import { event } from './event';
@@ -23,27 +24,28 @@ import { userSettings } from './user-settings';
 import { view } from './view';
 
 const contracts = [
+	authenticationOauth,
+	authenticationPassword,
 	card,
-	role,
-	org,
-	event,
 	error,
+	event,
 	link,
 	loop,
-	session,
-	type,
-	userAdmin,
-	user,
+	oauthClient,
+	oauthProvider,
+	org,
+	role,
 	roleUserAdmin,
 	roleUserCommunity,
 	roleUserGuest,
 	roleUserOperator,
 	roleUserTest,
-	view,
-	oauthProvider,
-	oauthClient,
-	authentication,
+	session,
+	type,
+	user,
+	userAdmin,
 	userSettings,
+	view,
 ];
 
 export const CONTRACTS = contracts.reduce<{
