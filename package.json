@@ -48,8 +48,8 @@
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.23",
     "@balena/jellyfish-environment": "^9.1.9",
-    "@balena/jellyfish-logger": "^5.0.15",
-    "@balena/jellyfish-metrics": "^2.0.56",
+    "@balena/jellyfish-logger": "^5.0.16",
+    "@balena/jellyfish-metrics": "^2.0.59",
     "bluebird": "^3.7.2",
     "fast-equals": "^3.0.0",
     "fast-json-patch": "^3.1.1",
