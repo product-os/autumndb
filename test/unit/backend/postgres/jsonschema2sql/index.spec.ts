@@ -42,4 +42,25 @@ describe('jsonschema2sql', () => {
 			expect(sql.includes('to_tsquery')).toBe(true);
 		});
 	});
+
+	describe.only('.toExpression()', () => {
+		it('should return a valid SQL expression', () => {
+			const table = 'cards';
+			const value = 'foo';
+			const context = new Context({
+				id: 'jsonschema2sql-test',
+			});
+			const sql = jsonschema2sql.toExpression(context, table, {
+				type: 'object',
+				additionalProperties: true,
+				required: ['type'],
+				properties: {
+					type: {
+						const: value,
+					},
+				},
+			} as any);
+			expect(sql).toBe(`${table}.type = '${value}'`);
+		});
+	});
 });

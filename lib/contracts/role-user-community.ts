@@ -104,12 +104,12 @@ export const roleUserCommunity: RoleContractDefinition = {
 				{
 					type: 'object',
 					additionalProperties: true,
-					required: ['slug', 'type', 'data'],
+					required: ['id', 'type', 'data'],
 					properties: {
-						slug: {
+						id: {
 							type: 'string',
 							const: {
-								$eval: 'user.slug',
+								$eval: 'user.id',
 							},
 						},
 						type: {

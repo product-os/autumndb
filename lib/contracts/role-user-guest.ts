@@ -8,13 +8,13 @@ export const roleUserGuest: RoleContractDefinition = {
 	data: {
 		read: {
 			type: 'object',
-			required: ['slug', 'type'],
+			required: ['id', 'type'],
 			additionalProperties: true,
 			properties: {
-				slug: {
+				id: {
 					type: 'string',
 					const: {
-						$eval: 'user.slug',
+						$eval: 'user.id',
 					},
 				},
 				type: {

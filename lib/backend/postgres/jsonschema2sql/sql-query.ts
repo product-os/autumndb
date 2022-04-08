@@ -1199,7 +1199,7 @@ export class SqlQuery {
 		return query;
 	}
 
-	toSqlSelect(table: string) {
+	toInnerSQLSelect(table: string) {
 		// Set common stuff for our `SELECT`
 		const select = new SqlSelectBuilder().pushFrom(table);
 		this.fillOrderBy(table, select);
@@ -1291,6 +1291,19 @@ export class SqlQuery {
 				select.pushFrom(lateral, alias, true);
 			}
 		}
+
+		return select;
+	}
+
+	toSqlExpression(table: string) {
+		const select = this.toInnerSQLSelect(table);
+		return select.filter?.hasOwnProperty('sql')
+			? (select.filter as LiteralSql).sql
+			: null;
+	}
+
+	toSqlSelect(table: string) {
+		const select = this.toInnerSQLSelect(table);
 		return new SqlFragmentBuilder(table).extendFrom(select).toSql();
 	}
 

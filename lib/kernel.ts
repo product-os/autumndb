@@ -428,12 +428,13 @@ export class Kernel {
 			unsafeUpsert(CONTRACTS.authentication),
 			unsafeUpsert(CONTRACTS.user),
 			unsafeUpsert(CONTRACTS['user-settings']),
-			unsafeUpsert(CONTRACTS['role-user-admin']),
-			unsafeUpsert(CONTRACTS['role-user-community']),
-			unsafeUpsert(CONTRACTS['role-user-guest']),
-			unsafeUpsert(CONTRACTS['role-user-operator']),
-			unsafeUpsert(CONTRACTS['role-user-test']),
 		]);
+
+		await unsafeUpsert(CONTRACTS['role-user-admin']);
+		await unsafeUpsert(CONTRACTS['role-user-community']);
+		await unsafeUpsert(CONTRACTS['role-user-guest']);
+		await unsafeUpsert(CONTRACTS['role-user-operator']);
+		await unsafeUpsert(CONTRACTS['role-user-test']);
 
 		const adminUser = await unsafeUpsert(CONTRACTS['user-admin']);
 		const adminSession = await unsafeUpsert({
@@ -1080,6 +1081,7 @@ export class Kernel {
 			authorizedQuerySchema,
 		);
 
+		(context as any).actor = actor;
 		return this.backend
 			.query(context, selectObject, authorizedQuerySchema, options)
 			.catch((error) => {

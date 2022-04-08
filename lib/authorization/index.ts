@@ -27,9 +27,11 @@ export const resolveAuthorizationSchema = async (
 	backend: DatabaseBackend,
 	actor: Contract,
 	scope: JsonSchema = {},
+	markersOnly?: boolean,
 ): Promise<JsonSchema> => {
-	const roleBasedAuthorizationSchema =
-		await resolveRoleBasedAuthorizationSchema(context, backend, actor);
+	const roleBasedAuthorizationSchema = markersOnly
+		? {}
+		: await resolveRoleBasedAuthorizationSchema(context, backend, actor);
 
 	const markerBasedAuthorizationSchema =
 		await resolveMarkerBasedAuthorizationSchema(context, backend, actor);
@@ -73,6 +75,7 @@ export const authorizeQuery = async (
 		backend,
 		actor,
 		scope,
+		true,
 	);
 
 	applyAuthorizationSchemaToLinks(querySchema, authorizationSchema);

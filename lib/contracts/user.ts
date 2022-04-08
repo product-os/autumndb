@@ -118,6 +118,7 @@ export const user = {
 									const: 'user-admin',
 								},
 							},
+							minLength: 1,
 						},
 						oauth: {
 							description: 'Linked accounts',

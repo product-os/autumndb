@@ -29,7 +29,18 @@ export class EqualsFilter extends SqlFilter {
 		const textValues = [];
 		const nonTextValues = [];
 		for (const value of this.values) {
-			if (value === null && !this.path.isProcessingJsonProperty) {
+			// If the schema is using $eval, compare the value to a PG setting
+			// This allows interpolation of expressions at runtime
+			if (value?.$eval) {
+				if (value.$eval === 'user.id') {
+					const contextValue = `current_setting('context.user.id')`;
+					nonTextValues.push(
+						this.path.isProcessingJsonProperty
+							? `to_jsonb(${contextValue})`
+							: `${contextValue}::uuid`,
+					);
+				}
+			} else if (value === null && !this.path.isProcessingJsonProperty) {
 				canBeSqlNull = true;
 			} else if (_.isString(value)) {
 				textValues.push(pgFormat.literal(value));

@@ -20,3 +20,14 @@ export const compile = (
 		_.cloneDeep(options),
 	).toSqlSelect(table);
 };
+
+export const toExpression = (
+	context: Context,
+	table: string,
+	schema: JsonSchema,
+) => {
+	const q = SqlQuery.fromSchema(context, null, new SelectMap({}), schema, {
+		limit: 1,
+	});
+	return q.toSqlExpression(table);
+};

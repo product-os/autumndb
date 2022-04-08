@@ -11,6 +11,7 @@ import * as traverse from 'traverse';
 import { v4 as uuidv4 } from 'uuid';
 import { errors } from '../../';
 import type { Context } from '../../context';
+import * as jsonSchema2Sql from './jsonschema2sql';
 import { SqlPath } from './jsonschema2sql/sql-path';
 import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
 import * as textSearch from './jsonschema2sql/text-search';
@@ -151,6 +152,9 @@ export const setup = async (
 			ALTER COLUMN data SET STORAGE EXTERNAL,
 			ALTER COLUMN links SET STORAGE EXTERNAL,
 			ALTER COLUMN linked_at SET STORAGE EXTERNAL;
+
+			-- Set row level security allowing us to implement permissions at the PG level
+			ALTER table cards enable row level security;
 
 			-- Recursive function to merge JSONB objects. This function assumes
 			-- both objects are just views into the same underlying object
@@ -833,4 +837,45 @@ export const fromTypePath = (from: string[]): string[] => {
 	});
 	path.push(target!);
 	return path;
+};
+
+export const createRole = async (
+	context: Context,
+	slug: string,
+	schema: JsonSchema,
+) => {
+	// Generate SQL expression
+	const expression = jsonSchema2Sql.toExpression(context, TABLE, schema);
+	const roleName = `${slug.replace(/-/g, '_')}_read_role`;
+	// Check if role already exists
+	await context.query(`
+		do
+		$$
+		begin
+		if not exists (select * from pg_catalog.pg_roles where rolname = '${roleName}') then 
+			create role ${roleName};
+			GRANT SELECT, UPDATE ON ${TABLE} TO ${roleName};
+		end if;
+		end
+		$$
+		;
+	`);
+	await context.query(`
+			GRANT SELECT, UPDATE ON ${TABLE} TO ${roleName};
+	`);
+	// Check if RLS exists
+	const policyName = `${roleName}_policy`;
+	const rows = await context.query(`
+		select * from pg_catalog.pg_policies where tablename = '${TABLE}' AND policyname = '${policyName}';
+	`);
+	// IF RLS doesn't exist or expression is different, set RLS
+	if (rows.length === 0) {
+		await context.query(`
+			create policy ${policyName} on ${TABLE} FOR SELECT to ${roleName} using (${expression});
+		`);
+	} else if (rows[0].qual !== expression) {
+		await context.query(`
+			alter policy ${policyName} on ${TABLE} to ${roleName} using (${expression});
+		`);
+	}
 };

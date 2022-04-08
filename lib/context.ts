@@ -325,7 +325,7 @@ export class Context {
 	 */
 	public async query<T = any>(query: Query, parameters?: any[]): Promise<T[]> {
 		return (
-			await this.withDatabaseConnection((context: Context) => {
+			await this.withDatabaseConnection(async (context: Context) => {
 				let textOrConfig: any;
 				if (query instanceof PgPreparedStatement) {
 					textOrConfig = query.asQueryConfig(parameters);
@@ -334,7 +334,30 @@ export class Context {
 				}
 
 				try {
-					return context.connection!.query<T>(textOrConfig, parameters);
+					const result = await context.withTransaction(
+						this.transactionData
+							? this.transactionData.isolation
+							: TransactionIsolation.Atomic,
+						async (ctx) => {
+							if ((context as any).actor) {
+								const actor = (context as any).actor;
+								if (actor.slug === 'user-admin') {
+									await ctx.connection!.query(`SET ROLE NONE`);
+								} else {
+									const role = actor.data.roles[0] || actor.slug;
+									// Set the actor id value for the current transaction
+									await ctx.connection!.query(
+										`select set_config('context.user.id', '${actor.id}', true);`,
+									);
+									await ctx.connection!.query(
+										`SET ROLE role_${role.replace(/-/g, '_')}_read_role;`,
+									);
+								}
+							}
+							return ctx.connection!.query<T>(textOrConfig, parameters);
+						},
+					);
+					return result;
 				} catch (err: unknown) {
 					context.error('Postgres error', { err, query, parameters });
 					throw err;

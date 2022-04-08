@@ -534,6 +534,7 @@ export class PostgresBackend implements Database {
 			databaseName: this.databaseName,
 		});
 
+		await context.query('SET ROLE NONE;');
 		await context.query(`DROP TABLE ${cards.TABLE}, ${links.TABLE} CASCADE`);
 	}
 
@@ -768,6 +769,12 @@ export class PostgresBackend implements Database {
 					options,
 				),
 			]);
+		}
+
+		if (baseType === 'role') {
+			const readSchema = insertedObject.data.read as JsonSchema;
+			const slug = insertedObject.slug;
+			await cards.createRole(context, slug, readSchema);
 		}
 		return insertedObject;
 	}
