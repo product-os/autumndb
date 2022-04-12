@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typedoc from 0.22.14 to 0.22.15
+      hash: e1a0002aad511587c4ecf7eea77bcde1d5cccbc7
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.1.17
+  title: "'Update typedoc from 0.22.14 to 0.22.15'"
+  date: 2022-04-11T14:45:07.996Z
+- commits:
     - subject: Update resinci/jellyfish-test from v3.0.5 to v3.0.6
       hash: e582383805ca96aedbfd6656f51da0f0cbec0cd3
       body: ""
