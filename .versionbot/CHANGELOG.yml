@@ -1,4 +1,24 @@
 - commits:
+    - subject: 🔄 Synced file(s) with product-os/jellyfish-config
+      hash: dc33dc2916beedf078ceadeaaa0ed8854d388921
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+    - subject: Update resinci/jellyfish-test from v3.0.6 to v3.0.7
+      hash: 167d8d32ad9b3c8547212bfd198214f448f6e0a0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.1.20
+  title: "'🔄 Synced file(s) with product-os/jellyfish-config'"
+  date: 2022-04-15T03:42:45.621Z
+- commits:
     - subject: Update internal-patch
       hash: 4f62f3fdea05c0714eb23d9e56734ddcbc3d3a86
       body: ""
