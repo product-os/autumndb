@@ -47,9 +47,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.26",
-    "@balena/jellyfish-environment": "^10.0.1",
+    "@balena/jellyfish-environment": "^10.0.2",
     "@balena/jellyfish-logger": "^5.0.24",
-    "@balena/jellyfish-metrics": "^2.0.68",
+    "@balena/jellyfish-metrics": "^2.0.69",
     "bluebird": "^3.7.2",
     "fast-equals": "^3.0.1",
     "fast-json-patch": "^3.1.1",
