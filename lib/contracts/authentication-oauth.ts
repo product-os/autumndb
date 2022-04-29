@@ -1,21 +1,22 @@
-export const authentication = {
-	slug: 'authentication',
+export const authenticationOauth = {
+	slug: 'authentication-oauth',
 	type: 'type@1.0.0',
-	name: 'Authentication Details',
+	name: 'OAuth Authentication Details',
 	data: {
 		schema: {
 			type: 'object',
 			properties: {
 				slug: {
 					type: 'string',
-					pattern: '^authentication-[a-z0-9-]+$',
+					pattern: '^authentication-oauth-[a-z0-9-]+$',
 				},
 				data: {
 					type: 'object',
+					required: ['actorId', 'oauth'],
 					properties: {
-						hash: {
+						actorId: {
 							type: 'string',
-							minLength: 1,
+							format: 'uuid',
 						},
 						oauth: {
 							description: 'Linked accounts',

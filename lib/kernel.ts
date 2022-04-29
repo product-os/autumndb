@@ -425,7 +425,8 @@ export class Kernel {
 		await Promise.all([
 			unsafeUpsert(CONTRACTS.type),
 			unsafeUpsert(CONTRACTS.session),
-			unsafeUpsert(CONTRACTS.authentication),
+			unsafeUpsert(CONTRACTS['authentication-oauth']),
+			unsafeUpsert(CONTRACTS['authentication-password']),
 			unsafeUpsert(CONTRACTS.user),
 			unsafeUpsert(CONTRACTS['user-settings']),
 			unsafeUpsert(CONTRACTS['role-user-admin']),
