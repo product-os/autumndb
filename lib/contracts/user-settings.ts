@@ -86,28 +86,36 @@ export const userSettings = {
 							},
 						},
 						timeZone: {
-							description: 'Work time-zone preferences',
+							description: 'Work time zone preferences',
 							type: 'object',
 							required: ['default'],
 							properties: {
-								default: asTimeZone(),
+								default: {
+									title: 'Default time zone',
+									...asTimeZone(),
+								},
 								overrides: {
 									title: 'Time zone overrides',
-									description: 'List of date-based time-zone overrides',
+									description: 'List of date-based time zone overrides',
 									type: 'array',
 									items: {
 										type: 'object',
 										required: ['start', 'end', 'timeZone'],
 										properties: {
 											start: {
+												title: 'Start date',
 												type: 'string',
 												format: 'date',
 											},
 											end: {
+												title: 'End date',
 												type: 'string',
 												format: 'date',
 											},
-											timeZone: asTimeZone(),
+											timeZone: {
+												title: 'Time zone',
+												...asTimeZone(),
+											},
 										},
 									},
 								},
@@ -141,11 +149,18 @@ export const userSettings = {
 								type: 'object',
 								required: ['start', 'end', 'level'],
 								properties: {
-									start: uiSchemaDef('time'),
-									end: uiSchemaDef('time'),
+									from: {
+										title: 'From',
+										...uiSchemaDef('time'),
+									},
+									to: {
+										title: 'To',
+										...uiSchemaDef('time'),
+									},
 									level: {
 										type: 'number',
 										title: 'Level',
+										description: 'Higher numbers for more preferred hours',
 										default: 0,
 										enum: [0, 1, 2, 3],
 									},
