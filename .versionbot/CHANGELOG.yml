@@ -1,4 +1,19 @@
 - commits:
+    - subject: Split the `authentication` contract into two
+      hash: fd889de7462417e836a20635123bf55c103e5a75
+      body: |
+        Two new types: `authentication-password` and `authentication-oauth`.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 19.1.30
+  title: "'Split the  contract into two'"
+  date: 2022-04-29T05:07:08.190Z
+- commits:
     - subject: Update typescript from 4.6.3 to 4.6.4
       hash: 78c88ccfc04e719ce2b1f3424480eb6e99387e0a
       body: ""
