@@ -25,6 +25,7 @@ export const userSettings = {
 						},
 						activeLoop: {
 							// TODO: Add pattern regex once it is finalized
+							title: 'Active loop',
 							description: 'The loop that the user is currently working on',
 							type: ['string', 'null'],
 						},
@@ -91,6 +92,7 @@ export const userSettings = {
 							properties: {
 								default: asTimeZone(),
 								overrides: {
+									title: 'Time zone overrides',
 									description: 'List of date-based time-zone overrides',
 									type: 'array',
 									items: {
@@ -143,8 +145,9 @@ export const userSettings = {
 									end: uiSchemaDef('time'),
 									level: {
 										type: 'number',
-										minimum: 0,
-										maximum: 3,
+										title: 'Level',
+										default: 0,
+										enum: [0, 1, 2, 3],
 									},
 								},
 							},
