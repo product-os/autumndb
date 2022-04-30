@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch
+      hash: 626d59eb268c9c7082da9a49bc3312f75fc25c37
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.1.31
+  title: "'Update internal-patch'"
+  date: 2022-04-30T03:21:02.783Z
+- commits:
     - subject: Split the `authentication` contract into two
       hash: fd889de7462417e836a20635123bf55c103e5a75
       body: |
