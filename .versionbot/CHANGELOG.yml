@@ -1,4 +1,21 @@
 - commits:
+    - subject: Caret redis dependency
+      hash: a481ae4db97918f6db0aac67c23f4edebad5069a
+      body: |
+        redis 4.1.0 brings in breaking types,
+        will remove caret after dealing with
+        these breakages and upgrading to 4.1.0
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.1.35
+  title: "'Caret redis dependency'"
+  date: 2022-05-03T00:59:19.762Z
+- commits:
     - subject: Update internal-patch
       hash: a10be759847b395d150305562aa588a2500b3417
       body: ""
