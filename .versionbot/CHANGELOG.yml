@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update resinci/jellyfish-test from v3.0.8 to v3.0.9
+      hash: 025416ab635b7956fb8d84b887b8cd12288d4b4b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.1.36
+  title: "'Update resinci/jellyfish-test from v3.0.8 to v3.0.9'"
+  date: 2022-05-03T01:16:26.404Z
+- commits:
     - subject: Caret redis dependency
       hash: a481ae4db97918f6db0aac67c23f4edebad5069a
       body: |
