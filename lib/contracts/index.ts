@@ -7,8 +7,6 @@ import { event } from './event';
 import { link } from './link';
 import { loop } from './loop';
 import { initialize } from './mixins';
-import { oauthClient } from './oauth-client';
-import { oauthProvider } from './oauth-provider';
 import { org } from './org';
 import { relationship } from './relationship';
 import { relationshipOauthProviderHasAttachedOauthClient } from './relationship-oauth-provider-has-attached-oauth-client';
@@ -34,8 +32,6 @@ const contracts = [
 	event,
 	link,
 	loop,
-	oauthClient,
-	oauthProvider,
 	org,
 	relationship,
 	relationshipOauthProviderHasAttachedOauthClient,
