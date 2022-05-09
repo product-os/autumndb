@@ -1,4 +1,19 @@
 - commits:
+    - subject: Fix the new `authentication-*` contracts being inserted as the old
+        `authentication` type
+      hash: d4b687189ce5d3b966d082268d1a7d4b0769dc88
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 19.1.41
+  title: "'Fix the new  contracts being inserted as the old  type'"
+  date: 2022-05-09T19:06:37.876Z
+- commits:
     - subject: Update jest dependencies
       hash: 58182c2d9fd072f526311d79ba7edc3e235860be
       body: ""
