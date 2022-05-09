@@ -735,7 +735,7 @@ export class PostgresBackend implements Database {
 					{
 						slug: 'authentication-password-' + userContract.slug,
 						version: userContract.version,
-						type: 'authentication@1.0.0',
+						type: 'authentication-password@1.0.0',
 						active: userContract.active,
 						created_at: userContract.created_at,
 						markers: userContract.markers,
@@ -767,7 +767,7 @@ export class PostgresBackend implements Database {
 							},
 							to: {
 								id: authenticationContract.id,
-								type: 'authentication@1.0.0',
+								type: 'authentication-password@1.0.0',
 							},
 							inverseName: 'authenticates',
 						},
@@ -784,7 +784,7 @@ export class PostgresBackend implements Database {
 					{
 						slug: 'authentication-oauth-' + userContract.slug,
 						version: userContract.version,
-						type: 'authentication@1.0.0',
+						type: 'authentication-oauth@1.0.0',
 						active: userContract.active,
 						created_at: userContract.created_at,
 						markers: userContract.markers,
@@ -816,7 +816,7 @@ export class PostgresBackend implements Database {
 							},
 							to: {
 								id: authenticationContract.id,
-								type: 'authentication@1.0.0',
+								type: 'authentication-oauth@1.0.0',
 							},
 							inverseName: 'authenticates',
 						},
