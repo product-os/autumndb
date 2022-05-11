@@ -69,6 +69,7 @@ const CORE_CONTRACTS = [
 	CONTRACTS.error,
 	CONTRACTS.event,
 	CONTRACTS.view,
+	CONTRACTS.relationship,
 	CONTRACTS.role,
 	CONTRACTS.link,
 	CONTRACTS.loop,

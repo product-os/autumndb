@@ -5,3 +5,4 @@ export * as contractMixins from './contracts/mixins';
 export * as errors from './errors';
 export { Kernel, QueryOptions } from './kernel';
 export * as testUtils from './test-utils';
+export * from './types';

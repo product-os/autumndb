@@ -52,7 +52,7 @@ export const newContext = async (
 	);
 	await cache.connect();
 
-	const logContext = { id: `CORE-TEST-${uuid()}` };
+	const logContext: LogContext = { id: `CORE-TEST-${uuid()}` };
 
 	const { kernel, pool } = await Kernel.withPostgres(
 		logContext,
