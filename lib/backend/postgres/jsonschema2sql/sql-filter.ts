@@ -1,6 +1,6 @@
 import * as pgFormat from 'pg-format';
-import { SqlFragmentBuilder } from './fragment-builder';
 import { ExpressionFilter } from './expression-filter';
+import { SqlFragmentBuilder } from './fragment-builder';
 import type { SqlPath } from './sql-path';
 
 /**

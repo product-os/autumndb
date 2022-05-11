@@ -1,9 +1,15 @@
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type { JSONSchema7TypeName } from 'json-schema';
 import * as _ from 'lodash';
 import type { Context } from '../../../context';
+import type { BackendQueryOptions } from '../types';
 import { ArrayContainsFilter } from './array-contains-filter';
 import { ArrayLengthFilter } from './array-length-filter';
+import { SqlCteBuilder } from './cte-builder';
 import { EqualsFilter } from './equals-filter';
+import { InvalidSchema } from './errors';
 import { ExpressionFilter } from './expression-filter';
+import { SqlFragmentBuilder } from './fragment-builder';
 import { FullTextSearchFilter } from './full-text-search-filter';
 import { IsNullFilter } from './is-null-filter';
 import { IsOfJsonTypesFilter } from './is-of-json-types-filter';
@@ -13,20 +19,14 @@ import { LiteralSql } from './literal-sql';
 import { MatchesRegexFilter } from './matches-regex-filter';
 import { MultipleOfFilter } from './multiple-of-filter';
 import { NotFilter } from './not-filter';
-import { SelectMap } from './select-map';
-import { SqlCteBuilder } from './cte-builder';
-import { SqlFragmentBuilder } from './fragment-builder';
-import { SqlPath } from './sql-path';
-import { SqlSelectBuilder } from './select-builder';
-import { StringLengthFilter } from './string-length-filter';
-import { ValueIsFilter } from './value-is-filter';
 import * as REGEXES from './regexes';
-import { InvalidSchema } from './errors';
-import * as util from './util';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { JSONSchema7TypeName } from 'json-schema';
-import type { BackendQueryOptions } from '../types';
+import { SqlSelectBuilder } from './select-builder';
+import { SelectMap } from './select-map';
 import type { SqlFilter } from './sql-filter';
+import { SqlPath } from './sql-path';
+import { StringLengthFilter } from './string-length-filter';
+import * as util from './util';
+import { ValueIsFilter } from './value-is-filter';
 
 const FENCE_REWRAP = new LiteralSql(`
 	SELECT

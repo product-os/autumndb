@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import * as pgFormat from 'pg-format';
 import * as traverse from 'traverse';
 import { v4 as uuidv4 } from 'uuid';
+import type { PostgresBackend } from '.';
 import { errors } from '../../';
 import type { Context } from '../../context';
 import { SqlPath } from './jsonschema2sql/sql-path';
@@ -16,7 +17,6 @@ import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
 import * as textSearch from './jsonschema2sql/text-search';
 import type { SearchFieldDef } from './types';
 import * as utils from './utils';
-import type { PostgresBackend } from '.';
 
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');

@@ -1,8 +1,4 @@
 import type { LogContext } from '@balena/jellyfish-logger';
-import * as _ from 'lodash';
-import * as jsonpatch from 'fast-json-patch';
-import * as fastEquals from 'fast-equals';
-import { CONTRACTS } from './contracts';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
@@ -13,10 +9,15 @@ import type {
 	TypeContract,
 	ViewContract,
 } from '@balena/jellyfish-types/build/core';
+import * as fastEquals from 'fast-equals';
+import * as jsonpatch from 'fast-json-patch';
+import * as _ from 'lodash';
 import { Pool } from 'pg';
 import * as stopword from 'stopword';
 import { v4 as uuidv4 } from 'uuid';
+import * as authorization from './authorization';
 import { PostgresBackend, PostgresBackendOptions } from './backend';
+import { Stream, StreamChange } from './backend/postgres/streams';
 import type {
 	BackendQueryOptions,
 	DatabaseBackend,
@@ -24,15 +25,14 @@ import type {
 } from './backend/postgres/types';
 import type { Cache } from './cache';
 import { Context, MixedContext, TransactionIsolation } from './context';
+import { CONTRACTS } from './contracts';
 import * as errors from './errors';
 import jsonSchema from './json-schema';
-import * as authorization from './authorization';
+import type { RelationshipContract } from './types';
 import {
 	preprocessQuerySchema,
 	resolveActorAndScopeFromSessionId,
 } from './utils';
-import { Stream, StreamChange } from './backend/postgres/streams';
-import type { RelationshipContract } from './types';
 
 export interface QueryOptions {
 	/*

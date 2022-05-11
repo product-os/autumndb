@@ -6,14 +6,14 @@ import * as _ from 'lodash';
 import { Notification } from 'pg';
 import * as pgFormat from 'pg-format';
 import { v4 as uuidv4 } from 'uuid';
+import * as backend from '.';
+import type { QueryOptions } from '../..';
 import {
 	Context,
 	DatabaseNotificationHandler,
 	PreparedStatement,
 } from '../../context';
-import type { QueryOptions } from '../..';
 import type { BackendQueryOptions, SelectObject } from './types';
-import * as backend from '.';
 
 export interface StreamChange {
 	id: string;

@@ -1,6 +1,6 @@
-import { strict as assert } from 'assert';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
+import { strict as assert } from 'assert';
 import * as Bluebird from 'bluebird';
 import { once } from 'events';
 import * as _ from 'lodash';

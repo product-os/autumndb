@@ -1,7 +1,7 @@
-import { SqlFilter } from './sql-filter';
-import { SqlSelectBuilder } from './select-builder';
-import { SqlPath } from './sql-path';
 import { SqlFragmentBuilder } from './fragment-builder';
+import { SqlSelectBuilder } from './select-builder';
+import { SqlFilter } from './sql-filter';
+import { SqlPath } from './sql-path';
 
 /**
  * Filter asserting that the an array contains at least one element with which
