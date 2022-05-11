@@ -1,5 +1,3 @@
-import { strict as nativeAssert } from 'assert';
-import * as Bluebird from 'bluebird';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
@@ -8,24 +6,26 @@ import type {
 	LinkContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
+import { strict as nativeAssert } from 'assert';
+import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { performance } from 'perf_hooks';
 import { Pool, PoolClient } from 'pg';
 import * as semver from 'semver';
 import * as skhema from 'skhema';
-import type { Cache } from './../../cache';
+import type { Cache } from '../../cache';
 import { Context, Database, Query, TransactionIsolation } from '../../context';
 import * as errors from '../../errors';
 import type { QueryOptions } from '../../kernel';
 import * as cards from './cards';
 import * as jsonschema2sql from './jsonschema2sql';
 import * as links from './links';
+import * as streams from './streams';
 import type {
 	BackendQueryOptions,
 	SearchFieldDef,
 	SelectObject,
 } from './types';
-import * as streams from './streams';
 import * as utils from './utils';
 export type { StreamChange } from './streams';
 
