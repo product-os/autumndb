@@ -1,4 +1,18 @@
 - commits:
+    - subject: Alphabetize imports
+      hash: 2c32c6e70fdab574f4510abd72c4ef2b16a14eb6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.3.1
+  title: "'Alphabetize imports'"
+  date: 2022-05-11T05:11:42.808Z
+- commits:
     - subject: Add core relationships and kernel cache
       hash: 011fb046d0abbd33ba8d2a9c24f933976ab607b7
       body: ""
