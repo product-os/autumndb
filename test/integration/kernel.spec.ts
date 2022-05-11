@@ -5,7 +5,7 @@ import * as Bluebird from 'bluebird';
 import { once } from 'events';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
-import { CONTRACTS, errors, testUtils } from '../../lib';
+import { CONTRACTS, errors, RelationshipContract, testUtils } from '../../lib';
 import type { Stream } from '../../lib/backend/postgres/streams';
 
 let ctx: testUtils.TestContext;
@@ -8339,6 +8339,169 @@ describe('Kernel', () => {
 			);
 
 			expect(results).toEqual([contract]);
+		});
+	});
+
+	describe('relationships', () => {
+		test('instance should have list of known relationships', async () => {
+			expect(ctx.kernel.relationships.length).toBeGreaterThan(0);
+		});
+
+		test('instance should be updated on new relationships', async () => {
+			const relationship = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.session,
+				{
+					name: testUtils.generateRandomId(),
+					type: 'relationship@1.0.0',
+					slug: testUtils.generateRandomSlug({
+						prefix: 'relationship',
+					}),
+					data: {
+						inverseName: testUtils.generateRandomId(),
+						title: testUtils.generateRandomId(),
+						inverseTitle: testUtils.generateRandomId(),
+						from: {
+							type: 'org@1.0.0',
+						},
+						to: {
+							type: 'card@1.0.0',
+						},
+					},
+				},
+			);
+			assert(relationship);
+
+			// Wait for the stream to update the kernel
+			await ctx.retry(
+				() => {
+					return ctx.kernel.relationships.find((r) => r.id === relationship.id);
+				},
+				(contract: RelationshipContract) => {
+					return contract !== undefined;
+				},
+			);
+		});
+
+		test('instance should be updated on soft-deleted relationship', async () => {
+			const relationship = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.session,
+				{
+					name: testUtils.generateRandomId(),
+					type: 'relationship@1.0.0',
+					slug: testUtils.generateRandomSlug({
+						prefix: 'relationship',
+					}),
+					data: {
+						inverseName: testUtils.generateRandomId(),
+						title: testUtils.generateRandomId(),
+						inverseTitle: testUtils.generateRandomId(),
+						from: {
+							type: 'org@1.0.0',
+						},
+						to: {
+							type: 'card@1.0.0',
+						},
+					},
+				},
+			);
+			assert(relationship);
+
+			// Wait for the stream to update the kernel
+			await ctx.retry(
+				() => {
+					return ctx.kernel.relationships.find((r) => r.id === relationship.id);
+				},
+				(contract: RelationshipContract) => {
+					return contract !== undefined;
+				},
+			);
+
+			// Soft-delete the relationship
+			await ctx.kernel.patchContractBySlug(
+				ctx.logContext,
+				ctx.session,
+				`${relationship.slug}@${relationship.version}`,
+				[
+					{
+						op: 'replace',
+						path: '/active',
+						value: false,
+					},
+				],
+			);
+
+			// Wait for the stream to update the kernel
+			await ctx.retry(
+				() => {
+					return ctx.kernel.relationships.find((r) => r.id === relationship.id);
+				},
+				(contract: RelationshipContract) => {
+					return contract === undefined;
+				},
+			);
+		});
+
+		test('instance should be updated on updated relationship', async () => {
+			const relationship = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.session,
+				{
+					name: testUtils.generateRandomId(),
+					type: 'relationship@1.0.0',
+					slug: testUtils.generateRandomSlug({
+						prefix: 'relationship',
+					}),
+					data: {
+						inverseName: testUtils.generateRandomId(),
+						title: testUtils.generateRandomId(),
+						inverseTitle: testUtils.generateRandomId(),
+						from: {
+							type: 'org@1.0.0',
+						},
+						to: {
+							type: 'card@1.0.0',
+						},
+						foo: 'bar',
+					},
+				},
+			);
+			assert(relationship);
+
+			// Wait for the stream to update the kernel
+			await ctx.retry(
+				() => {
+					return ctx.kernel.relationships.find((r) => r.id === relationship.id);
+				},
+				(contract: RelationshipContract) => {
+					return contract !== undefined;
+				},
+			);
+
+			// Update relationship data
+			await ctx.kernel.patchContractBySlug(
+				ctx.logContext,
+				ctx.session,
+				`${relationship.slug}@${relationship.version}`,
+				[
+					{
+						op: 'replace',
+						path: '/data/foo',
+						value: 'buz',
+					},
+				],
+			);
+
+			// Wait for the stream to update the kernel
+			await ctx.retry(
+				() => {
+					return ctx.kernel.relationships.find((r) => r.id === relationship.id);
+				},
+				(contract: RelationshipContract) => {
+					return contract !== undefined && contract.data?.foo === 'buz';
+				},
+			);
 		});
 	});
 });

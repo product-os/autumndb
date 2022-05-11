@@ -11,6 +11,8 @@ import { oauthClient } from './oauth-client';
 import { oauthProvider } from './oauth-provider';
 import { org } from './org';
 import { relationship } from './relationship';
+import { relationshipOauthProviderHasAttachedOauthClient } from './relationship-oauth-provider-has-attached-oauth-client';
+import { relationshipOrgHasMemberUser } from './relationship-org-has-member-user';
 import { role } from './role';
 import { roleUserAdmin } from './role-user-admin';
 import { roleUserCommunity } from './role-user-community';
@@ -36,6 +38,8 @@ const contracts = [
 	oauthProvider,
 	org,
 	relationship,
+	relationshipOauthProviderHasAttachedOauthClient,
+	relationshipOrgHasMemberUser,
 	role,
 	roleUserAdmin,
 	roleUserCommunity,

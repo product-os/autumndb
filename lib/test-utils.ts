@@ -35,6 +35,12 @@ export interface TestContext {
 		verb: string,
 		inverseVerb: string,
 	) => Promise<LinkContract>;
+	retry: (
+		fn: any,
+		checkResult: any,
+		times?: number,
+		delay?: number,
+	) => Promise<any>;
 }
 
 /**
@@ -158,6 +164,25 @@ export const newContext = async (
 		return linkContract;
 	};
 
+	const retry = async (
+		fn: any,
+		checkResult: any,
+		times = 10,
+		delay = 500,
+	): Promise<any> => {
+		const result = await fn();
+		if (!checkResult(result)) {
+			if (times > 0) {
+				await new Promise((resolve) => {
+					setTimeout(resolve, delay);
+				});
+				return retry(fn, checkResult, times - 1);
+			}
+			throw new Error('Ran out of retry attempts');
+		}
+		return result;
+	};
+
 	return {
 		logContext,
 		session: kernel.adminSession()!,
@@ -168,6 +193,7 @@ export const newContext = async (
 		createUser,
 		createSession,
 		createLink,
+		retry,
 	};
 };
 
