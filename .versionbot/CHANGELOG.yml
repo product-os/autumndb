@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add relationship type contract
+      hash: 3cce0b25f63b388f651940c516c41f13f233ef67
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.2.0
+  title: "'Add relationship type contract'"
+  date: 2022-05-11T01:07:59.404Z
+- commits:
     - subject: Fix the new `authentication-*` contracts being inserted as the old
         `authentication` type
       hash: d4b687189ce5d3b966d082268d1a7d4b0769dc88
