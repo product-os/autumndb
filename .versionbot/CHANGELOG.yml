@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add core relationships and kernel cache
+      hash: 011fb046d0abbd33ba8d2a9c24f933976ab607b7
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.3.0
+  title: "'Add core relationships and kernel cache'"
+  date: 2022-05-11T03:20:51.247Z
+- commits:
     - subject: Add relationship type contract
       hash: 3cce0b25f63b388f651940c516c41f13f233ef67
       body: ""
