@@ -31,7 +31,8 @@ import {
 	preprocessQuerySchema,
 	resolveActorAndScopeFromSessionId,
 } from './utils';
-import { Stream } from './backend/postgres/streams';
+import { Stream, StreamChange } from './backend/postgres/streams';
+import type { RelationshipContract } from './types';
 
 export interface QueryOptions {
 	/*
@@ -82,6 +83,19 @@ const CONTRACT_CONTRACT_TYPE = `${CONTRACTS['card'].slug}@${CONTRACTS['card'].ve
 const VERSIONED_CONTRACTS = _.mapKeys(CONTRACTS, (value: any, key: any) => {
 	return `${key}@${value.version}`;
 });
+
+const SCHEMA_RELATIONSHIPS: JsonSchema = {
+	type: 'object',
+	required: ['active', 'type'],
+	properties: {
+		active: {
+			const: true,
+		},
+		type: {
+			const: 'relationship@1.0.0',
+		},
+	},
+};
 
 // Generate a concise slug for a contract, using the `name` field
 // if its available
@@ -315,6 +329,8 @@ export const unsafeUpsertContract = async (
 export class Kernel {
 	private backend: DatabaseBackend;
 	private sessions?: { admin: string };
+	relationshipsStream?: Stream;
+	relationships: RelationshipContract[];
 
 	/**
 	 * @summary The Jellyfish Kernel
@@ -336,6 +352,7 @@ export class Kernel {
 	 */
 	private constructor(backend: DatabaseBackend) {
 		this.backend = backend;
+		this.relationships = [];
 	}
 
 	/**
@@ -435,6 +452,10 @@ export class Kernel {
 			unsafeUpsert(CONTRACTS['role-user-guest']),
 			unsafeUpsert(CONTRACTS['role-user-operator']),
 			unsafeUpsert(CONTRACTS['role-user-test']),
+			unsafeUpsert(
+				CONTRACTS['relationship-oauth-provider-has-attached-oauth-client'],
+			),
+			unsafeUpsert(CONTRACTS['relationship-org-has-member-user']),
 		]);
 
 		const adminUser = await unsafeUpsert(CONTRACTS['user-admin']);
@@ -457,6 +478,133 @@ export class Kernel {
 				return this.replaceContract(context, this.adminSession()!, contract);
 			}),
 		);
+
+		await this.setUpRelationshipsStream(context);
+
+		const loadedRelationships = await this.query<RelationshipContract>(
+			context,
+			this.adminSession()!,
+			SCHEMA_RELATIONSHIPS,
+		);
+
+		context.debug('Loading relationships', {
+			relationships: loadedRelationships.length,
+		});
+		this.setRelationships(context, loadedRelationships);
+	}
+
+	/**
+	 * Set up relationships cache.
+	 * Relationship contracts are streamed from the DB, so this has the most up to date version of them.
+	 *
+	 * @param context - execution context
+	 */
+	private async setUpRelationshipsStream(context: Context) {
+		this.relationshipsStream = await this.stream(
+			context,
+			this.adminSession()!,
+			SCHEMA_RELATIONSHIPS,
+		);
+
+		this.relationshipsStream.on('data', (change: StreamChange) => {
+			context.debug('relationshipsStream data event', change);
+			const contract = change.after;
+			const relationshipContract = contract as RelationshipContract;
+			if (
+				change.type === 'update' ||
+				change.type === 'insert' ||
+				change.type === 'unmatch'
+			) {
+				// If `after` is null, the contract is no longer available: most likely it has
+				// been soft-deleted, having its `active` state set to false
+				if (!contract) {
+					this.removeRelationship(context, change.id);
+				} else {
+					this.upsertRelationship(context, relationshipContract);
+				}
+			} else if (change.type === 'delete') {
+				this.removeRelationship(context, change.id);
+			}
+		});
+	}
+
+	/**
+	 * @summary Remove a single registered relationship
+	 * @function
+	 * @public
+	 *
+	 * @param context - execution context
+	 * @param id - relationship contract id
+	 *
+	 */
+	private removeRelationship(context: Context, id: string) {
+		context.debug('Removing relationship', {
+			id,
+		});
+
+		this.relationships = _.reject(this.relationships, {
+			id,
+		});
+	}
+
+	/**
+	 * @summary Upsert a single registered relationship
+	 * @function
+	 * @public
+	 *
+	 * @param context - execution context
+	 * @param contract - relationship contract
+	 *
+	 */
+	private upsertRelationship(context: Context, contract: RelationshipContract) {
+		context.debug('Upserting relationship', {
+			slug: contract.slug,
+		});
+
+		// Find the index of an existing relationship with the same id
+		const existingRelationshipIndex = _.findIndex(this.relationships, {
+			id: contract.id,
+		});
+
+		if (existingRelationshipIndex === -1) {
+			// If an existing relationship is not found, add the relationship
+			this.relationships.push(contract);
+		} else {
+			// If an existing relationship is found, replace it
+			this.relationships.splice(existingRelationshipIndex, 1, contract);
+		}
+	}
+
+	/**
+	 * @summary Set all registered relationships
+	 * @function
+	 * @public
+	 *
+	 * @param context - execution context
+	 * @param relationshipContracts - relationship contracts
+	 *
+	 */
+	private setRelationships(
+		context: Context,
+		relationshipContracts: RelationshipContract[],
+	) {
+		context.debug('Setting relationships', {
+			count: relationshipContracts.length,
+		});
+
+		this.relationships = relationshipContracts;
+	}
+
+	/**
+	 * @summary Get all registered relationships
+	 * @function
+	 * @public
+	 *
+	 * @returns relationship contracts
+	 *
+	 */
+	getRelationships() {
+		return this.relationships;
 	}
 
 	/**
@@ -464,7 +612,7 @@ export class Kernel {
 	 * @function
 	 * @public
 	 *
-	 * @param {MixedContext} context - execution context
+	 * @param {MixedContext} mixedContext - execution context
 	 * @param {String} session - session id
 	 * @param {String} id - contract id
 	 * @returns {(Object|Null)} contract

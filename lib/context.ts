@@ -6,7 +6,7 @@ import * as pgFormat from 'pg-format';
 import * as uuid from 'uuid';
 import * as errors from './errors';
 
-const LOGGER = logger.getLogger('jellyfish-core');
+const LOGGER = logger.getLogger('autumndb');
 
 /**
  * Context object encapsulating the current execution context.
