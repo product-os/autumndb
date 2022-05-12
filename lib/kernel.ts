@@ -74,8 +74,6 @@ const CORE_CONTRACTS = [
 	CONTRACTS.role,
 	CONTRACTS.link,
 	CONTRACTS.loop,
-	CONTRACTS['oauth-provider'],
-	CONTRACTS['oauth-client'],
 ];
 
 const CONTRACT_CONTRACT_TYPE = `${CONTRACTS['card'].slug}@${CONTRACTS['card'].version}`;
