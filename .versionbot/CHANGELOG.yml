@@ -1,4 +1,20 @@
 - commits:
+    - subject: Remove oauth type contracts
+      hash: e2a1e500dddb2434dba50f203e98f24b8369ff83
+      body: >
+        1. Move oauth provider type contract to jellyfish-plugin-jellyfish, it's
+        used by hydra;
+
+        2. Move oauth client type contract to worker. Worker uses it during sync to request data;
+      footer:
+        Change-type: major
+        change-type: major
+      author: karaxuna
+      nested: []
+  version: 20.0.0
+  title: "'Remove oauth type contracts'"
+  date: 2022-05-12T10:58:54.989Z
+- commits:
     - subject: Alphabetize imports
       hash: 2c32c6e70fdab574f4510abd72c4ef2b16a14eb6
       body: ""
