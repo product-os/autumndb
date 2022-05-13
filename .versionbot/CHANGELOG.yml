@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 11.0.3 to 12.0.0
+      hash: 76777ce23da14b95705c6b77c262962ef4717474
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 20.0.1
+  title: "'Update @balena/jellyfish-environment from 11.0.3 to 12.0.0'"
+  date: 2022-05-12T14:44:07.334Z
+- commits:
     - subject: Remove oauth type contracts
       hash: e2a1e500dddb2434dba50f203e98f24b8369ff83
       body: >
