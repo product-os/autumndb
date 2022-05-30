@@ -218,12 +218,40 @@ Measurable are gathered and observed using prometheus/grafana.
 
 ### Data relationships
 
-Contracts can be linked together by creating a contract of type "link" that references both contracts and describes their relationship. Relationships can be traversed when querying data using the `$$links` syntax.
+Contracts can be linked together by creating a contract of type `link` that references both contracts and describes their relationship. Relationships can be traversed when querying data using the `$$links` syntax.
+
+`Link` contracts are described by a [`relationship` contract](./lib/contracts/relationship.ts). Relationship contracts relate two contracts which are specified using the `from.type` and `to.type` properties, and describe two directions, from `from` to `to` using the `name` property, and from `to` to `from` using the `inverseName` property.
+
+Example:
+
+```ts
+{
+  slug: `relationship-message-is-attached-to-issue`,
+  type: 'relationship@1.0.0',
+  name: 'is attached to',
+  data: {
+  	inverseName: 'has attached element',
+  	title: 'Message',
+  	inverseTitle: 'Issue',
+  	from: {
+  		type: 'message',
+  	},
+  	to: {
+  		type: 'issue',
+  	},
+  },
+},
+```
+
+Note that `from.type` and `to.type` can refer to contracts by their slug ( `card` ) or if you want a more specific relationship they can refer to the versioned slug ( `card@1.0.0` ).
+
+Relationships are bidirectional, `name` goes from `from` to `to` ( _{message} is attached to {issue}_ ), and `inverseName` goes from `to` to `from` ( _{issue} has attached element {message}_ ). Note that both directions have the same precedence; they're named `name` and `inverseName` for historical reasons but could've also been named `left` and `right`. Relationships contracts also have a `title` and `inverseTitle` property that can be used to describe the role of the `from` and `to` contracts.
+
+All links ( contracts of type `link` ) created must be defined by a `relationship` contract or the link creation will be rejected with a `JellyfishUnknownRelationship` error. Client modules, for example `jellyfish-worker` create a set of "bootstrap" relationships on initialization.
 
 ### Caching
 
-Requests for individual contracts by id or slug are cached, reducing DB load and
-improving query speed.
+Requests for individual contracts by id or slug are cached, reducing DB load and improving query speed.
 
 # Testing
 

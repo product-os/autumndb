@@ -42,3 +42,4 @@ export class JellyfishSchemaMismatch extends BaseTypedError {}
 export class JellyfishSessionExpired extends BaseTypedError {}
 export class JellyfishTransactionError extends BaseTypedError {}
 export class JellyfishUnknownCardType extends BaseTypedError {}
+export class JellyfishUnknownRelationship extends BaseTypedError {}

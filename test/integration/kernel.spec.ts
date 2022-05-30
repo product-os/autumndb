@@ -12,6 +12,7 @@ let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
+	await createRelationships();
 });
 
 afterAll(async () => {
@@ -2222,211 +2223,6 @@ describe('Kernel', () => {
 					contract,
 				),
 			).rejects.toThrow(errors.JellyfishElementAlreadyExists);
-		});
-
-		it('should be able to create a link between two valid contracts', async () => {
-			const contract1 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'card@1.0.0',
-				},
-			);
-
-			const contract2 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'card@1.0.0',
-				},
-			);
-
-			const linkContract = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
-					type: 'link@1.0.0',
-					name: 'is attached to',
-					data: {
-						inverseName: 'has attached element',
-						from: {
-							id: contract1.id,
-							type: contract1.type,
-						},
-						to: {
-							id: contract2.id,
-							type: contract2.type,
-						},
-					},
-				},
-			);
-
-			const element = await ctx.kernel.getContractById(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				linkContract.id,
-			);
-
-			assert(element !== null);
-
-			expect(element.data.from).not.toBe(element.data.to);
-		});
-
-		it('should be able to create a direction-less link between two valid contracts', async () => {
-			const contract1 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'card@1.0.0',
-				},
-			);
-
-			const contract2 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'card@1.0.0',
-				},
-			);
-
-			const linkContract = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `link-${contract1.slug}-is-linked-to-${contract2.slug}`,
-					type: 'link@1.0.0',
-					name: 'is linked to',
-					data: {
-						inverseName: 'is linked to',
-						from: {
-							id: contract1.id,
-							type: contract1.type,
-						},
-						to: {
-							id: contract2.id,
-							type: contract2.type,
-						},
-					},
-				},
-			);
-
-			const element = await ctx.kernel.getContractById(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				linkContract.id,
-			);
-			assert(element !== null);
-			expect(element.data.from).not.toBe(element.data.to);
-			expect(element.name).toBe(element.data.inverseName);
-		});
-
-		it('should be able to create two different links between two valid contracts', async () => {
-			const contract1 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'card@1.0.0',
-				},
-			);
-
-			const contract2 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'card@1.0.0',
-				},
-			);
-
-			const linkContract1 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `link-${contract1.slug}-is-linked-to-${contract2.slug}`,
-					type: 'link@1.0.0',
-					version: '1.0.0',
-					name: 'is linked to',
-					data: {
-						inverseName: 'has been linked to',
-						from: {
-							id: contract1.id,
-							type: contract1.type,
-						},
-						to: {
-							id: contract2.id,
-							type: contract2.type,
-						},
-					},
-				},
-			);
-
-			const linkContract2 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
-					type: 'link@1.0.0',
-					version: '1.0.0',
-					name: 'is attached to',
-					data: {
-						inverseName: 'has attached element',
-						from: {
-							id: contract1.id,
-							type: contract1.type,
-						},
-						to: {
-							id: contract2.id,
-							type: contract2.type,
-						},
-					},
-				},
-			);
-
-			expect((linkContract1 as any).data.from.id).toBe(
-				(linkContract2 as any).data.from.id,
-			);
-			expect((linkContract1 as any).data.to.id).toBe(
-				(linkContract2 as any).data.to.id,
-			);
-		});
-
-		it('should not add a link if not inserting a contract with a target', async () => {
-			const contract1 = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'card@1.0.0',
-				},
-			);
-
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'card@1.0.0',
-					data: {
-						foo: contract1.id,
-					},
-				},
-			);
-
-			const results = await ctx.kernel.query(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'object',
-					required: ['type'],
-					additionalProperties: true,
-					properties: {
-						type: {
-							type: 'string',
-							const: 'link',
-						},
-					},
-				},
-			);
-
-			expect(results).toEqual([]);
 		});
 
 		it('.insertContract() read access on a property should not allow to write other properties', async () => {
@@ -5223,7 +5019,7 @@ describe('Kernel', () => {
 					version: '1.0.0',
 					name: 'is child of',
 					data: {
-						inverseName: 'owns',
+						inverseName: 'has child',
 						from: {
 							id: child.id,
 							type: child.type,
@@ -5245,7 +5041,7 @@ describe('Kernel', () => {
 					version: '1.0.0',
 					name: 'is child of',
 					data: {
-						inverseName: 'owns',
+						inverseName: 'has child',
 						from: {
 							id: grandchild.id,
 							type: grandchild.type,
@@ -8505,3 +8301,134 @@ describe('Kernel', () => {
 		});
 	});
 });
+
+// Create the relationships which are not already part of the kernel
+async function createRelationships() {
+	const relSpecs: any[] = [
+		{
+			fromVersionedType: 'user',
+			toVersionedType: 'org',
+			name: 'is member of',
+			inverseName: 'has member',
+			title: 'User',
+			inverseTitle: 'Organization',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'org',
+			name: 'is part of',
+			inverseName: 'has member',
+			title: 'Card',
+			inverseTitle: 'Organization',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'is attached to',
+			inverseName: 'has attached element',
+			title: 'Attachment',
+			inverseTitle: 'Attachment',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'is linked to',
+			inverseName: 'has link',
+			title: 'Link',
+			inverseTitle: 'Link',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'is child of',
+			inverseName: 'has child', // It is defined like this in tests above
+			title: 'Card',
+			inverseTitle: 'Card',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'is appended to',
+			inverseName: 'has appended element',
+			title: 'Card',
+			inverseTitle: 'Card',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'is owned by',
+			inverseName: 'owns',
+			title: 'Card',
+			inverseTitle: 'Owner',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'works at',
+			inverseName: 'has worker',
+			title: 'Worker',
+			inverseTitle: 'Workplace',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'believes in',
+			inverseName: 'is believed by',
+			title: 'Believer',
+			inverseTitle: 'Deity',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'reports to',
+			inverseName: 'receives reports from',
+			title: 'Reporter',
+			inverseTitle: 'Manager',
+		},
+	];
+
+	const relContracts = relSpecs.map((spec) => {
+		const fromType = spec.fromVersionedType.split('@')[0];
+		const toType = spec.toVersionedType.split('@')[0];
+		const dashedName = _.kebabCase(spec.name);
+		return {
+			slug: `relationship-${fromType}-${dashedName}-${toType}`,
+			type: 'relationship@1.0.0',
+			name: spec.name,
+			data: {
+				inverseName: spec.inverseName,
+				title: spec.title,
+				inverseTitle: spec.inverseTitle,
+				from: {
+					type: spec.fromVersionedType,
+				},
+				to: {
+					type: spec.toVersionedType,
+				},
+			},
+		};
+	});
+
+	const inKernelRelationshipsCount = ctx.kernel.getRelationships().length;
+
+	const createdContracts = await Promise.all(
+		relContracts.map((rc) =>
+			ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, rc),
+		),
+	);
+
+	createdContracts.forEach((cc) => assert(cc !== null));
+
+	// wait until all relationships are loaded into the kernel
+	await ctx.retry(
+		() => {
+			return ctx.kernel.getRelationships();
+		},
+		(relationships: RelationshipContract[]) => {
+			return (
+				relationships.length >=
+				createdContracts.length + inKernelRelationshipsCount
+			);
+		},
+	);
+}
