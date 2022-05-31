@@ -944,6 +944,47 @@ export class Kernel {
 			);
 		}
 
+		// If inserting a link, validate that there's a relationship for it
+		const contractType = contract.type.split('@')[0];
+		if (contractType === 'link') {
+			context.debug('Fetching candidate relationships for link', {
+				slug: contract.slug,
+			});
+			const linkContract: LinkContract = contract as LinkContract;
+			const unversionedFromType = linkContract.data.from.type.split('@')[0];
+			const unversionedToType = linkContract.data.to.type.split('@')[0];
+
+			const results = this.getRelationships().filter(
+				(rel) =>
+					// forward relationship
+					(linkContract.name === rel.name &&
+						linkContract.data.inverseName === rel.data.inverseName &&
+						[linkContract.data.from.type, unversionedFromType, '*'].includes(
+							rel.data.from.type,
+						) &&
+						[linkContract.data.to.type, unversionedToType, '*'].includes(
+							rel.data.to.type,
+						)) ||
+					// inverse relationship
+					(linkContract.data.inverseName === rel.name &&
+						linkContract.name === rel.data.inverseName &&
+						[linkContract.data.from.type, unversionedFromType, '*'].includes(
+							rel.data.to.type,
+						) &&
+						[linkContract.data.to.type, unversionedToType, '*'].includes(
+							rel.data.from.type,
+						)),
+			);
+
+			if (results.length === 0) {
+				const errorMessage = `Relationship not found ${linkContract.data.from.type} ${linkContract.name} (inverse ${linkContract.data.inverseName}) ${linkContract.data.to.type} for contract ${contract.slug}`;
+				context.error(errorMessage);
+				const newError = new errors.JellyfishUnknownRelationship(errorMessage);
+				newError.expected = true;
+				throw newError;
+			}
+		}
+
 		return authorizationSchema;
 	}
 
