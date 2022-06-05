@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update external packages
+      hash: 664655b3b03fb4cc5c0cbc7d353731df5ce1c7b3
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.6
+  title: "'Update external packages'"
+  date: 2022-06-05T08:23:55.657Z
+- commits:
     - subject: Update lint-staged from 12.4.2 to 13.0.0
       hash: eed17b01db20a21a4ca74e02e1442e26449c9295
       body: ""
