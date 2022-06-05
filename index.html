@@ -44,7 +44,7 @@
 a &quot;contract&quot;. Contracts are an implementation of the <a href="https://github.com/balena-io/balena/pull/1002">contracts data model</a>.</p>
 <p>Every contract has a <code>type</code> field that specifies type that the contract is an instance
 of. Contract type definitions are indicated by having a <code>type</code> of <code>type</code>, e.g.</p>
-<pre><code class="language-json"><span class="hl-0">{</span><br/><span class="hl-0">    </span><span class="hl-9">&quot;slug&quot;</span><span class="hl-0">: </span><span class="hl-4">&quot;message&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-9">&quot;type&quot;</span><span class="hl-0">: </span><span class="hl-4">&quot;type&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-10">...</span><br/><span class="hl-0">}</span>
+<pre><code><span class="hl-0">{</span><br/><span class="hl-0">    </span><span class="hl-4">&quot;slug&quot;</span><span class="hl-0">: </span><span class="hl-4">&quot;message&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-4">&quot;type&quot;</span><span class="hl-0">: </span><span class="hl-4">&quot;type&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    ...</span><br/><span class="hl-0">}</span>
 </code></pre>
 <p>These &quot;type&quot; contracts contain model definitions in the form of a JSON schema. The
 slug of a type contract is the value used in the type property of instances of the
@@ -96,7 +96,7 @@ This behaviour is based on the <a href="https://ajv.js.org/#filtering-data">AJV 
 Markers allow individual contracts to be restricted to one or more users. A marker
 is a string that corresponds to either a user or organisation slug and they
 appear as an array at the top level of a contract under the key <code>markers</code>.</p>
-<pre><code class="language-json"><span class="hl-0">{</span><br/><span class="hl-0">    </span><span class="hl-10">...</span><br/><span class="hl-0">    </span><span class="hl-9">&quot;markers&quot;</span><span class="hl-0">: [ </span><span class="hl-4">&quot;user-lucianbuzzo&quot;</span><span class="hl-0">, </span><span class="hl-4">&quot;org-balena&quot;</span><span class="hl-0"> ]</span><br/><span class="hl-0">    </span><span class="hl-10">...</span><br/><span class="hl-0">}</span>
+<pre><code class="language-json"><span class="hl-0">{</span><br/><span class="hl-0">    </span><span class="hl-9">...</span><br/><span class="hl-0">    </span><span class="hl-10">&quot;markers&quot;</span><span class="hl-0">: [ </span><span class="hl-4">&quot;user-lucianbuzzo&quot;</span><span class="hl-0">, </span><span class="hl-4">&quot;org-balena&quot;</span><span class="hl-0"> ]</span><br/><span class="hl-0">    </span><span class="hl-9">...</span><br/><span class="hl-0">}</span>
 </code></pre>
 <p>To view a contract, a user must have access to all the markers on that contract. A user
 has access to their marker (which is the slug of their user contract) and the
