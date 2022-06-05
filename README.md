@@ -109,7 +109,7 @@ a "contract". Contracts are an implementation of the [contracts data model](http
 Every contract has a `type` field that specifies type that the contract is an instance
 of. Contract type definitions are indicated by having a `type` of `type`, e.g.
 
-```json
+```
 {
 	"slug": "message",
 	"type": "type",
