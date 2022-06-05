@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update @types/jest from 28.1.0 to 28.1.1
+      hash: 84c2f40910fccb3acacf2eb32d77dcfdbe82a960
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.7
+  title: "'Update @types/jest from 28.1.0 to 28.1.1'"
+  date: 2022-06-05T08:51:30.376Z
+- commits:
     - subject: Update external packages
       hash: 664655b3b03fb4cc5c0cbc7d353731df5ce1c7b3
       body: ""
