@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update code block in readme
+      hash: 9c16d5119e8365d3fbe7c7b477d836fa80db985a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.4
+  title: "'Update code block in readme'"
+  date: 2022-06-05T02:24:06.286Z
+- commits:
     - subject: Temporarily disable relationship error throw
       hash: 361f26f6b2c03674bb6f0f5c10b0a2e47cb85ab7
       body: ""
