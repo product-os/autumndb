@@ -1,4 +1,29 @@
 - commits:
+    - subject: Set sane statement and query timeouts for postgres
+      hash: bb15a890fcf9cb48a8f1ea9c04ae0a3dec2d517a
+      body: |
+        Previously, the statement and query timeouts were not set and just ran
+        on the default of 0, which is no timeout. This changes it to 30s.
+        See https://node-postgres.com/api/client
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Update resinci/jellyfish-test from v3.0.13 to v3.0.14
+      hash: 6bf53863a186793a7847ab06314e0375401eaca2
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 20.1.8
+  title: "'Set sane statement and query timeouts for postgres'"
+  date: 2022-06-09T09:21:56.583Z
+- commits:
     - subject: Update @types/jest from 28.1.0 to 28.1.1
       hash: 84c2f40910fccb3acacf2eb32d77dcfdbe82a960
       body: ""
