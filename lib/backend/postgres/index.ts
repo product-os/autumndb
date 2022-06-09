@@ -199,8 +199,8 @@ export interface PostgresBackendOptions {
 }
 
 const defaultPgOptions: Partial<PostgresBackendOptions> = {
-	// statement_timeout: undefined,
-	// query_timeout: undefined,
+	statement_timeout: 30 * 1000,
+	query_timeout: 30 * 1000,
 	idleTimeoutMillis: 60 * 1000,
 	connectionTimeoutMillis: 30 * 1000,
 	keepAlive: true,
