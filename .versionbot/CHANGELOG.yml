@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump external packages
+      hash: fd06e3dde8491d266c437640265ed8ba5736aecd
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.9
+  title: "'Bump external packages'"
+  date: 2022-06-09T23:00:48.485Z
+- commits:
     - subject: Set sane statement and query timeouts for postgres
       hash: bb15a890fcf9cb48a8f1ea9c04ae0a3dec2d517a
       body: |
