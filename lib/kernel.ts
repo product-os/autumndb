@@ -29,10 +29,12 @@ import type {
 	TypeContract,
 	ViewContract,
 } from './types';
-import {
-	preprocessQuerySchema,
-	resolveActorAndScopeFromSessionId,
-} from './utils';
+import { preprocessQuerySchema } from './utils';
+
+export interface AutumnDBSession {
+	scope?: JsonSchema;
+	actor: Contract;
+}
 
 export interface QueryOptions {
 	/*
@@ -326,7 +328,7 @@ export const unsafeUpsertContract = async (
 
 export class Kernel {
 	private backend: DatabaseBackend;
-	private sessions?: { admin: string };
+	private sessions?: { admin: AutumnDBSession };
 	relationshipsStream?: Stream;
 	relationships: RelationshipContract[];
 
@@ -374,7 +376,7 @@ export class Kernel {
 	 * Get the admin session token. Returns null if this `Kernel` is not
 	 * connected.
 	 */
-	public adminSession(): string | null {
+	public adminSession(): AutumnDBSession | null {
 		return this.sessions?.admin || null;
 	}
 
@@ -467,7 +469,7 @@ export class Kernel {
 		]);
 
 		const adminUser = await unsafeUpsert(CONTRACTS['user-admin']);
-		const adminSession = await unsafeUpsert({
+		await unsafeUpsert({
 			slug: 'session-admin-kernel',
 			type: `${CONTRACTS.session.slug}@${CONTRACTS.session.version}`,
 			data: {
@@ -476,7 +478,9 @@ export class Kernel {
 		} as any as Contract);
 
 		this.sessions = {
-			admin: adminSession.id,
+			admin: {
+				actor: adminUser,
+			},
 		};
 
 		await Promise.all(
@@ -621,13 +625,13 @@ export class Kernel {
 	 * @public
 	 *
 	 * @param {MixedContext} mixedContext - execution context
-	 * @param {String} session - session id
+	 * @param {AutumnDBSession} session - session
 	 * @param {String} id - contract id
 	 * @returns {(Object|Null)} contract
 	 */
 	async getContractById<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		id: string,
 	): Promise<T | null> {
 		const context = Context.fromMixed(mixedContext, this.backend);
@@ -660,7 +664,7 @@ export class Kernel {
 	/** @deprecated */
 	async getCardById<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		id: string,
 	): Promise<T | null> {
 		return await this.getContractById(mixedContext, session, id);
@@ -679,7 +683,7 @@ export class Kernel {
 	 */
 	async getContractBySlug<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		slug: string,
 	): Promise<T | null> {
 		const context = Context.fromMixed(mixedContext, this.backend);
@@ -740,7 +744,7 @@ export class Kernel {
 
 	async getCardBySlug<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		slug: string,
 	): Promise<T | null> {
 		return await this.getContractBySlug(mixedContext, session, slug);
@@ -766,7 +770,7 @@ export class Kernel {
 	 */
 	async insertContract<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
 		const context = Context.fromMixed(mixedContext, this.backend);
@@ -782,7 +786,7 @@ export class Kernel {
 	/** @deprecated */
 	async insertCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		object: Partial<T> & Pick<T, 'type'>,
 	): Promise<T> {
 		return await this.insertContract(mixedContext, session, object);
@@ -808,7 +812,7 @@ export class Kernel {
 	 */
 	async replaceContract<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		object: Partial<Contract> &
 			Pick<Contract, 'type'> &
 			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
@@ -826,7 +830,7 @@ export class Kernel {
 	/** @deprecated */
 	async replaceCard<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		object: Partial<Contract> &
 			Pick<Contract, 'type'> &
 			(Pick<Contract, 'slug'> | Pick<Contract, 'id'>),
@@ -836,7 +840,7 @@ export class Kernel {
 
 	private async preUpsert(
 		context: Context,
-		session: string,
+		session: AutumnDBSession,
 		contract: Contract,
 	) {
 		context.assertInternal(
@@ -845,11 +849,7 @@ export class Kernel {
 			'No type in card',
 		);
 
-		const { actor, scope } = await resolveActorAndScopeFromSessionId(
-			context,
-			this.backend,
-			session,
-		);
+		const { actor, scope } = session;
 
 		// Fetch necessary objects concurrently
 		const [typeContract, authorizationSchema, loop] = await Promise.all([
@@ -1007,24 +1007,20 @@ export class Kernel {
 	 * See https://tools.ietf.org/html/rfc6902
 	 *
 	 * @param {MixedContext} context - execution context
-	 * @param {String} session - session id
+	 * @param {AutumnDBSession} session - session id
 	 * @param {String} slug - contract slug
 	 * @param {Object[]} patch - JSON Patch operations
 	 * @returns {Object} the patched contract
 	 */
 	async patchContractBySlug<T = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		slug: string,
 		patch: jsonpatch.Operation[],
 	): Promise<T> {
 		const context = Context.fromMixed(mixedContext, this.backend);
 
-		const { actor, scope } = await resolveActorAndScopeFromSessionId(
-			context,
-			this.backend,
-			session,
-		);
+		const { actor, scope } = session;
 
 		const authorizationSchema = await authorization.resolveAuthorizationSchema(
 			context,
@@ -1205,7 +1201,7 @@ export class Kernel {
 	/** @deprecated */
 	async patchCardBySlug<T = Contract>(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		slug: string,
 		patch: jsonpatch.Operation[],
 	): Promise<T> {
@@ -1218,7 +1214,7 @@ export class Kernel {
 	 * @public
 	 *
 	 * @param {MixedContext} context - execution context
-	 * @param {String} session - session id
+	 * @param {AutumnDBSession} session - session
 	 * @param {Object} schema - JSON Schema
 	 * @param {Object} [options] - options
 	 * @param {Number} [options.limit] - query limit
@@ -1245,7 +1241,7 @@ export class Kernel {
 	 */
 	async query<T extends Contract = Contract>(
 		mixedContext: MixedContext,
-		sessionId: string,
+		session: AutumnDBSession,
 		querySchema: JsonSchema | ViewContract,
 		options: QueryOptions = {},
 	): Promise<T[]> {
@@ -1260,11 +1256,7 @@ export class Kernel {
 			]) as JsonSchema;
 		}
 
-		const { actor, scope } = await resolveActorAndScopeFromSessionId(
-			context,
-			this.backend,
-			sessionId,
-		);
+		const { actor, scope } = session;
 
 		const authorizedQuerySchema = await authorization.authorizeQuery(
 			context,
@@ -1330,7 +1322,7 @@ export class Kernel {
 	 * - setSchema: set the stream's schema. The payload is the new schema
 	 *
 	 * @param {MixedContext} context - execution context
-	 * @param {String} session - session id
+	 * @param {AutumnDBSession} session - session
 	 * @param {Object} schema - JSON Schema
 	 * @param {Object} options - options object
 	 * @returns {EventEmitter} emitter
@@ -1339,7 +1331,7 @@ export class Kernel {
 	 * const kernel = new Kernel(backend, { ... })
 	 * await kernel.initialize()
 	 *
-	 * const emitter = await kernel.stream('4a962ad9-20b5-4dd8-a707-bf819593cc84', {
+	 * const emitter = await kernel.stream(session, {
 	 *   type: 'object',
 	 *   properties: {
 	 *     type: {
@@ -1369,17 +1361,13 @@ export class Kernel {
 	 */
 	async stream(
 		mixedContext: MixedContext,
-		session: string,
+		session: AutumnDBSession,
 		querySchema: JsonSchema,
 		options: QueryOptions = {},
 	) {
 		const context = Context.fromMixed(mixedContext, this.backend);
 
-		const { actor, scope } = await resolveActorAndScopeFromSessionId(
-			context,
-			this.backend,
-			session,
-		);
+		const { actor, scope } = session;
 
 		querySchema = await preprocessQuerySchema(querySchema);
 
@@ -1406,7 +1394,13 @@ export class Kernel {
 			options,
 		);
 
-		await setupStreamEventHandlers(context, this.backend, stream, actor, scope);
+		await setupStreamEventHandlers(
+			context,
+			this.backend,
+			stream,
+			actor,
+			scope || {},
+		);
 
 		return stream;
 	}
