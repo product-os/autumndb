@@ -283,14 +283,22 @@ export class Stream extends EventEmitter {
 		if (schema instanceof Object) {
 			if (_.has(schema, ['properties', 'type', 'const'])) {
 				this.cardTypes = [(schema.properties!.type as any).const.split('@')[0]];
-			}
-			if (_.has(schema, ['properties', 'type', 'enum'])) {
+			} else if (_.has(schema, ['properties', 'type', 'enum'])) {
 				const deversionedTypes = (schema.properties!.type as any).enum.map(
 					(typeName: string) => {
 						return typeName.split('@')[0];
 					},
 				);
 				this.cardTypes = deversionedTypes;
+			} else if (_.has(schema, ['properties', 'type', 'anyOf'])) {
+				const deversionedTypes = (schema.properties!.type as any).anyOf.map(
+					(subSchema: JsonSchema) => {
+						return typeof subSchema === 'boolean'
+							? null
+							: (subSchema?.const as string).split('@')[0];
+					},
+				);
+				this.cardTypes = _.compact(deversionedTypes);
 			}
 		}
 		this.streamQuery = Context.prepareQuery(
