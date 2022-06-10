@@ -1,4 +1,19 @@
 - commits:
+    - subject: "Streams: Add checking for contract type in `anyOf` expression"
+      hash: d3153368452afa1c74885ee48f51fe055d1fd7a8
+      body: |
+        This allows more stream results to be quickly rejected
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 20.1.10
+  title: "'Streams: Add checking for contract type in  expression'"
+  date: 2022-06-10T10:59:46.068Z
+- commits:
     - subject: Bump external packages
       hash: fd06e3dde8491d266c437640265ed8ba5736aecd
       body: ""
