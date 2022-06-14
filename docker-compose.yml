@@ -2,8 +2,11 @@ version: '2.1'
 
 services:
   postgres:
-    image: balena/open-balena-db:v5.1.0
+    image: postgres:14
     restart: always
+    environment:
+      POSTGRES_PASSWORD: docker
+      POSTGRES_USER: docker
     networks:
       - internal
     ports:
