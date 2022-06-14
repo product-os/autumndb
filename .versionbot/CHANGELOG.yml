@@ -1,4 +1,18 @@
 - commits:
+    - subject: Use official Postgres 14 image
+      hash: 07aabe5b4be31f73b5582f528b8aaab6545dc424
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.11
+  title: "'Use official Postgres 14 image'"
+  date: 2022-06-14T04:37:47.574Z
+- commits:
     - subject: "Streams: Add checking for contract type in `anyOf` expression"
       hash: d3153368452afa1c74885ee48f51fe055d1fd7a8
       body: |
