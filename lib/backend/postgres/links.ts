@@ -228,7 +228,9 @@ export const addLink = (
 	if (!card.linked_at) {
 		card.linked_at = {};
 	}
-	card.linked_at[result.name] = result.created_at;
+	if (!card.linked_at[result.name]) {
+		card.linked_at[result.name] = result.created_at;
+	}
 	return card;
 };
 /**

@@ -524,6 +524,82 @@ describe('Kernel', () => {
 			);
 			assert(linkContract !== null);
 		});
+
+		it('should not update timestamp for existing linked_at verbs', async () => {
+			// Create contracts and initial link
+			const [foo, bar, buz] = await Promise.all([
+				insertCardContract(),
+				insertCardContract(),
+				insertCardContract(),
+				upsertRelationshipCardIsAttachedTo(),
+			]);
+			assert(foo && bar && buz);
+			await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					slug: `link-${foo.slug}-is-attached-to-${bar.slug}`,
+					type: 'link@1.0.0',
+					name: 'is attached to',
+					data: {
+						inverseName: 'has attached element',
+						from: {
+							id: foo.id,
+							type: foo.type,
+						},
+						to: {
+							id: bar.id,
+							type: bar.type,
+						},
+					},
+				},
+			);
+
+			// Assert that expected verbs are added to linked_at
+			const foo2 = await ctx.kernel.getContractById(
+				ctx.logContext,
+				ctx.session,
+				foo.id,
+			);
+			const bar2 = await ctx.kernel.getContractById(
+				ctx.logContext,
+				ctx.session,
+				bar.id,
+			);
+			assert(foo2 && foo2.linked_at!['is attached to']);
+			assert(bar2 && bar2.linked_at!['has attached element']);
+
+			// Create a new link with the same verb
+			await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					slug: `link-${foo.slug}-is-attached-to-${buz.slug}`,
+					type: 'link@1.0.0',
+					name: 'is attached to',
+					data: {
+						inverseName: 'has attached element',
+						from: {
+							id: foo.id,
+							type: foo.type,
+						},
+						to: {
+							id: buz.id,
+							type: buz.type,
+						},
+					},
+				},
+			);
+
+			// Assert the linked_at timestamp hasn't been updated for existing verb
+			const foo3 = await ctx.kernel.getContractById(
+				ctx.logContext,
+				ctx.session,
+				foo.id,
+			);
+			assert(foo3 && foo3.linked_at!['is attached to']);
+			expect(foo3.linked_at).toEqual(foo2.linked_at);
+		});
 	});
 });
 
