@@ -8,6 +8,7 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import { strict as nativeAssert } from 'assert';
 import * as Bluebird from 'bluebird';
+import * as fastEquals from 'fast-equals';
 import * as _ from 'lodash';
 import { performance } from 'perf_hooks';
 import { Pool, PoolClient } from 'pg';
@@ -623,6 +624,7 @@ export class PostgresBackend implements Database {
 						return;
 					}
 
+					const linkedAt = _.clone(linkCards[0].linked_at);
 					const updatedCard = insertedObject.active
 						? links.addLink(
 								insertedObject as any as LinkContract,
@@ -634,8 +636,10 @@ export class PostgresBackend implements Database {
 								linkCards[0],
 						  );
 
-					await cards.materializeLink(context, updatedCard);
-					await this.cache?.unset(updatedCard);
+					if (!fastEquals.deepEqual(linkedAt, updatedCard.linked_at)) {
+						await cards.materializeLink(context, updatedCard);
+						await this.cache?.unset(updatedCard);
+					}
 				},
 			);
 		}
