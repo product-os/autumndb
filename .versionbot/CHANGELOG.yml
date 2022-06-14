@@ -1,4 +1,22 @@
 - commits:
+    - subject: "Links: Stop updating linked_at timestamps"
+      hash: 07a932b1af6b51930a58f07fb9156f035da6d06e
+      body: |
+        The linked_at timestamps are not being used, so stop updating
+        them every time a contract is linked using a verb in which
+        it was linked with previously. Every update causes a lock
+        and unnecessary database load.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.12
+  title: "'Links: Stop updating linked_at timestamps'"
+  date: 2022-06-14T06:17:23.467Z
+- commits:
     - subject: Use official Postgres 14 image
       hash: 07aabe5b4be31f73b5582f528b8aaab6545dc424
       body: ""
