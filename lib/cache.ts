@@ -15,7 +15,7 @@ export type CacheResult = { hit: false } | { hit: true; element: any };
 
 export class Cache {
 	tables: Set<string>;
-	client: redis.RedisClientType | null;
+	client: redis.RedisClientType<any, any, any> | null;
 
 	/**
 	 * @summary The contract cache store
@@ -40,7 +40,7 @@ export class Cache {
 	 *
 	 * @return {redis.RedisClientType} the redis client
 	 */
-	private getClient(): redis.RedisClientType {
+	private getClient(): redis.RedisClientType<any, any, any> {
 		if (!this.client) {
 			throw new errors.JellyfishCacheError(
 				'Cache client is not set, did you forget to call Cache.connect()?',
@@ -88,7 +88,9 @@ export class Cache {
 			this.client = redismock.createClient(this.options);
 		} else {
 			this.client = redis.createClient(this.options);
-			await this.client.connect();
+			if (this.client) {
+				await this.client.connect();
+			}
 		}
 	}
 
