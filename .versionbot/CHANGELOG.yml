@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update external packages
+      hash: c502cc83ec5458216d32c59dd338adf14fea4d6a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.13
+  title: "'Update external packages'"
+  date: 2022-06-17T04:20:30.609Z
+- commits:
     - subject: "Links: Stop updating linked_at timestamps"
       hash: 07a932b1af6b51930a58f07fb9156f035da6d06e
       body: |
