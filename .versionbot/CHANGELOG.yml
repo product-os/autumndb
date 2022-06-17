@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update redis from 4.0.6 to 4.1.0
+      hash: 552d0f8f01180f269981c87464e71547467d259e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.14
+  title: "'Update redis from 4.0.6 to 4.1.0'"
+  date: 2022-06-17T06:09:03.576Z
+- commits:
     - subject: Update external packages
       hash: c502cc83ec5458216d32c59dd338adf14fea4d6a
       body: ""
