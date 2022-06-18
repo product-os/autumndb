@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typescript from 4.7.3 to 4.7.4
+      hash: fa84155a238a5c918e3d8f5c024d6a4ea8d34575
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 20.1.16
+  title: "'Update typescript from 4.7.3 to 4.7.4'"
+  date: 2022-06-17T18:43:53.565Z
+- commits:
     - subject: Update dependencies (external major bumps)
       hash: d2c689895c84309686b71641f3bca3277c78127d
       body: ""
