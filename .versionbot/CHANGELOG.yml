@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump dependencies
+      hash: 48b928c91239ed641e8187d183f3cf1f1fd89d7d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.17
+  title: "'Bump dependencies'"
+  date: 2022-06-19T03:46:35.360Z
+- commits:
     - subject: Update typescript from 4.7.3 to 4.7.4
       hash: fa84155a238a5c918e3d8f5c024d6a4ea8d34575
       body: ""
