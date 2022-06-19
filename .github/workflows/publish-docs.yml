@@ -1,9 +1,6 @@
 # This workflow will install the dependencies and then build and deploy the
 # TypeScript documentation website to the docs branch.
 
-# This file is auto-synced from product-os/jellyfish-config/sync/.github/workflows/publish-docs.yml
-# and should only be edited there!
-
 name: Publish Documentation
 
 on:
@@ -21,7 +18,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '16'
 
       - name: Install NPM dependencies
         run: npm i
