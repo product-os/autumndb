@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM resinci/jellyfish-test:v4.0.1
+FROM node:16
 
 WORKDIR /usr/src/jellyfish
 
@@ -9,4 +9,4 @@ RUN npm install
 
 COPY . ./
 
-CMD /bin/bash -c "task test"
+CMD /bin/bash -c "npm run test:integration"
