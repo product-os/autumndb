@@ -733,7 +733,7 @@ export class PostgresBackend implements Database {
 				options,
 			);
 
-			if (userContract.data.hash && userContract.data.hash !== 'PASSWORDLESS') {
+			if (userContract.data.hash && userContract.data.hash.charAt(0) === '$') {
 				const authenticationContract = await this.upsertObject(
 					context,
 					{
