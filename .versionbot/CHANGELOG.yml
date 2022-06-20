@@ -1,4 +1,18 @@
 - commits:
+    - subject: "CI: Use standard node image"
+      hash: 5e85bb2012a027db46127b21675d3b72503175f8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.20
+  title: "'CI: Use standard node image'"
+  date: 2022-06-20T01:32:59.195Z
+- commits:
     - subject: Bump internal deps
       hash: 21552672830e2b43fadfc92b35dca39b1e05e72f
       body: ""
