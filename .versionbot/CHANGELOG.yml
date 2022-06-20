@@ -1,4 +1,25 @@
 - commits:
+    - subject: Do not create `authentication-password` contracts for users that don't
+        have what looks like a valid hash
+      hash: 1695504f5f6154f1def8a8b066da6df1a12f1295
+      body: |
+        Setting the hash to an invalid hash disables login indirectly. This is
+        usually done by setting the hash to the constant `PASSWORDLESS` but the
+        same effect can be achieved with other strings. Some tests and a few
+        contracts on live do this so we need to check if the hash at least looks
+        valid.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 20.1.21
+  title: "'Do not create  contracts for users that don't have what looks like a
+    valid hash'"
+  date: 2022-06-20T17:03:32.958Z
+- commits:
     - subject: "CI: Use standard node image"
       hash: 5e85bb2012a027db46127b21675d3b72503175f8
       body: ""
