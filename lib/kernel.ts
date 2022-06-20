@@ -978,15 +978,10 @@ export class Kernel {
 
 			if (results.length === 0) {
 				const errorMessage = `Relationship not found ${linkContract.data.from.type} ${linkContract.name} (inverse ${linkContract.data.inverseName}) ${linkContract.data.to.type} for contract ${contract.slug}`;
-				context.warn(errorMessage);
-
-				// TODO: Re-enable error throw after missing relationships added to system
-				/*
 				context.error(errorMessage);
 				const newError = new errors.JellyfishUnknownRelationship(errorMessage);
 				newError.expected = true;
 				throw newError;
-				*/
 			}
 		}
 
