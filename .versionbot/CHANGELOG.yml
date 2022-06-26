@@ -1,4 +1,24 @@
 - commits:
+    - subject: Update dependencies (external v0 minor bumps)
+      hash: 89983dcb8c6902a951c2566b8d2812f2d6c4691e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+    - subject: Update typedoc from 0.22.17 to 0.22.18
+      hash: aaaac74fb1eb257f202a8f12159fc8a53f3d85ba
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 20.1.22
+  title: "'Update dependencies (external v0 minor bumps)'"
+  date: 2022-06-26T23:21:43.585Z
+- commits:
     - subject: Do not create `authentication-password` contracts for users that don't
         have what looks like a valid hash
       hash: 1695504f5f6154f1def8a8b066da6df1a12f1295
