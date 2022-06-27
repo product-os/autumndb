@@ -1,4 +1,18 @@
 - commits:
+    - subject: Enable relationship validation
+      hash: d96c814db049e533e1949f68e1eb37bfe47783bd
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.23
+  title: "'Enable relationship validation'"
+  date: 2022-06-27T00:07:38.608Z
+- commits:
     - subject: Update dependencies (external v0 minor bumps)
       hash: 89983dcb8c6902a951c2566b8d2812f2d6c4691e
       body: ""
