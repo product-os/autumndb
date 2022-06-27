@@ -1,4 +1,16 @@
 - commits:
+    - subject: "Update: update internal-patch (internal patch bumps)"
+      hash: c7a6d559189db3949c7e4ebd0fc76358011b6083
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 20.1.24
+  title: "'Update: update internal-patch (internal patch bumps)'"
+  date: 2022-06-27T12:03:15.623Z
+- commits:
     - subject: Enable relationship validation
       hash: d96c814db049e533e1949f68e1eb37bfe47783bd
       body: ""
