@@ -11,6 +11,8 @@ import { org } from './org';
 import { relationship } from './relationship';
 import { relationshipOauthProviderHasAttachedOauthClient } from './relationship-oauth-provider-has-attached-oauth-client';
 import { relationshipOrgHasMemberUser } from './relationship-org-has-member-user';
+import { relationshipUserIsAuthenticatedWithAuthenticationOauth } from './relationship-user-is-authenticated-with-authentication-oauth';
+import { relationshipUserIsAuthenticatedWithAuthenticationPassword } from './relationship-user-is-authenticated-with-authentication-password';
 import { role } from './role';
 import { roleUserAdmin } from './role-user-admin';
 import { roleUserCommunity } from './role-user-community';
@@ -36,6 +38,8 @@ const contracts = [
 	relationship,
 	relationshipOauthProviderHasAttachedOauthClient,
 	relationshipOrgHasMemberUser,
+	relationshipUserIsAuthenticatedWithAuthenticationOauth,
+	relationshipUserIsAuthenticatedWithAuthenticationPassword,
 	role,
 	roleUserAdmin,
 	roleUserCommunity,

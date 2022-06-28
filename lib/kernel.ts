@@ -454,6 +454,16 @@ export class Kernel {
 				CONTRACTS['relationship-oauth-provider-has-attached-oauth-client'],
 			),
 			unsafeUpsert(CONTRACTS['relationship-org-has-member-user']),
+			unsafeUpsert(
+				CONTRACTS[
+					'relationship-user-is-authenticated-with-authentication-oauth'
+				],
+			),
+			unsafeUpsert(
+				CONTRACTS[
+					'relationship-user-is-authenticated-with-authentication-password'
+				],
+			),
 		]);
 
 		const adminUser = await unsafeUpsert(CONTRACTS['user-admin']);
