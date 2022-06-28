@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add relationship contracts for authentication contracts
+      hash: 2f329c5896cbc986b541977ae3a4690578fab238
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 20.2.0
+  title: "'Add relationship contracts for authentication contracts'"
+  date: 2022-06-28T20:35:44.688Z
+- commits:
     - subject: "Update: update dependencies (internal patch bumps)"
       hash: 061026a984ced412f3c72050857b2393ffc7a2a9
       body: ""
