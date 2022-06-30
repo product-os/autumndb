@@ -1,4 +1,4 @@
-import type { RoleContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { RoleContractDefinition } from '../types';
 
 export const roleUserCommunity: RoleContractDefinition = {
 	slug: 'role-user-community',

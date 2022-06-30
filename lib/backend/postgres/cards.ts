@@ -1,9 +1,4 @@
 import * as metrics from '@balena/jellyfish-metrics';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
-	Contract,
-	ContractDefinition,
-} from '@balena/jellyfish-types/build/core';
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import * as pgFormat from 'pg-format';
@@ -12,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { PostgresBackend } from '.';
 import { errors } from '../../';
 import type { Context } from '../../context';
+import type { Contract, ContractDefinition, JsonSchema } from '../../types';
 import { SqlPath } from './jsonschema2sql/sql-path';
 import { generateTypeIndexPredicate } from './jsonschema2sql/table-index';
 import * as textSearch from './jsonschema2sql/text-search';

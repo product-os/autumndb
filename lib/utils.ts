@@ -1,9 +1,8 @@
-import { JsonSchema } from '@balena/jellyfish-types';
-import { Contract, ViewContract } from '@balena/jellyfish-types/build/core';
 import type { DatabaseBackend } from './backend/postgres/types';
 import type { Context } from './context';
 import { CONTRACTS } from './contracts';
 import * as errors from './errors';
+import type { Contract, JsonSchema, ViewContract } from './types';
 import { getViewContractSchema } from './views';
 
 /**

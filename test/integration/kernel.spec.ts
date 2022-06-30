@@ -1,11 +1,10 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
 import * as Bluebird from 'bluebird';
 import { once } from 'events';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { CONTRACTS, errors, RelationshipContract, testUtils } from '../../lib';
+import type { Contract, JsonSchema } from '../../lib/types';
 import type { Stream } from '../../lib/backend/postgres/streams';
 
 let ctx: testUtils.TestContext;

@@ -1,7 +1,6 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { ViewContract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import jsonSchema from './json-schema';
+import type { JsonSchema, ViewContract } from './types';
 
 /**
  * @summary Get the schema of a view contract
@@ -18,8 +17,14 @@ export const getViewContractSchema = (
 		return contract.data.schema;
 	}
 
-	const conjunctions = _.map(_.get(contract, ['data', 'allOf']), 'schema');
-	const disjunctions = _.map(_.get(contract, ['data', 'anyOf']), 'schema');
+	const conjunctions: JsonSchema[] = _.map(
+		_.get(contract, ['data', 'allOf']),
+		'schema',
+	);
+	const disjunctions: JsonSchema[] = _.map(
+		_.get(contract, ['data', 'anyOf']),
+		'schema',
+	);
 
 	if (_.isEmpty(conjunctions) && _.isEmpty(disjunctions)) {
 		return null;

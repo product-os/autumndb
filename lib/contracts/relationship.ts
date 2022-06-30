@@ -1,4 +1,4 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from '../types';
 
 const typeRegExp = '^\\*|([a-z0-9-]+(@\\d+\\.\\d+\\.\\d+)?)$';
 

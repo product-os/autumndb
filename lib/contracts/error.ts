@@ -1,4 +1,4 @@
-import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { TypeContractDefinition } from '../types';
 
 const logWidget = {
 	'ui:widget': 'Txt',

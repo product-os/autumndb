@@ -8,22 +8,23 @@
 
 import type { Contract, ContractDefinition } from '../';
 
-export interface RelationshipData {
+export interface LinkData {
 	inverseName: string;
-	title: string;
-	inverseTitle: string;
 	from: {
+		id: string;
 		type: string;
+		slug?: string;
 		[k: string]: unknown;
 	};
 	to: {
+		id: string;
 		type: string;
+		slug?: string;
 		[k: string]: unknown;
 	};
 	[k: string]: unknown;
 }
 
-export interface RelationshipContractDefinition
-	extends ContractDefinition<RelationshipData> {}
+export interface LinkContractDefinition extends ContractDefinition<LinkData> {}
 
-export interface RelationshipContract extends Contract<RelationshipData> {}
+export interface LinkContract extends Contract<LinkData> {}

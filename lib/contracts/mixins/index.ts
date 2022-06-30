@@ -1,13 +1,12 @@
-import type {
-	ContractData,
-	ContractDefinition,
-} from '@balena/jellyfish-types/build/core';
-import deref = require('json-schema-deref-sync');
 import * as _ from 'lodash';
+import type { ContractData, ContractDefinition } from '../../types';
 import { sensibleDefaults } from './with-sensible-defaults';
 import { baseUiSchema } from './with-ui-schema';
 
 export { uiSchemaDef } from './ui-schema-defs';
+
+// tslint:disable-next-line: no-var-requires
+const deref = require('json-schema-deref-sync');
 
 export const mergeWithUniqConcatArrays = (objValue: any, srcValue: any) => {
 	if (_.isArray(objValue)) {

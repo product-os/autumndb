@@ -1,6 +1,4 @@
 import * as metrics from '@balena/jellyfish-metrics';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
 import { EventEmitter } from 'events';
 import * as _ from 'lodash';
 import { Notification } from 'pg';
@@ -8,6 +6,7 @@ import * as pgFormat from 'pg-format';
 import { v4 as uuidv4 } from 'uuid';
 import * as backend from '.';
 import type { QueryOptions } from '../..';
+import type { Contract, JsonSchema } from '../../types';
 import {
 	Context,
 	DatabaseNotificationHandler,

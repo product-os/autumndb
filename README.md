@@ -253,6 +253,18 @@ All links ( contracts of type `link` ) created must be defined by a `relationshi
 
 Requests for individual contracts by id or slug are cached, reducing DB load and improving query speed.
 
+### Contract interface generation
+
+TypeScript interfaces derived from contract definitions can be generated using the CLI:
+```
+npx autumndb generate-contract-interfaces
+```
+
+For more information:
+```
+npx autumndb --help
+```
+
 # Testing
 
 Unit tests can be easily run with the command `npm test`.

@@ -1,10 +1,10 @@
 import * as metrics from '@balena/jellyfish-metrics';
-import type { Contract } from '@balena/jellyfish-types/build/core';
 import * as redis from 'redis';
 import * as redismock from 'redis-mock';
 // TODO: This violates encapsulation of the backend
 import { TABLE as CONTRACTS_TABLE } from './backend/postgres/cards';
 import * as errors from './errors';
+import type { Contract } from './types';
 
 interface CacheOptions extends redis.RedisClientOptions {
 	namespace: string;

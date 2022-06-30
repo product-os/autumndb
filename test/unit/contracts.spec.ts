@@ -1,7 +1,7 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import * as skhema from 'skhema';
 import { CONTRACTS } from '../../lib/contracts';
+import type { ContractDefinition } from '../../lib/types';
 
 const addCreatedField = (contract: ContractDefinition) => {
 	return Object.assign(

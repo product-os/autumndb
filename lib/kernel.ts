@@ -1,14 +1,5 @@
 import type { LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
-	Contract,
-	ContractData,
-	ContractDefinition,
-	LinkContract,
-	TypeContract,
-	ViewContract,
-} from '@balena/jellyfish-types/build/core';
 import * as fastEquals from 'fast-equals';
 import * as jsonpatch from 'fast-json-patch';
 import * as _ from 'lodash';
@@ -28,7 +19,16 @@ import { Context, MixedContext, TransactionIsolation } from './context';
 import { CONTRACTS } from './contracts';
 import * as errors from './errors';
 import jsonSchema from './json-schema';
-import type { RelationshipContract } from './types';
+import type {
+	Contract,
+	ContractData,
+	ContractDefinition,
+	JsonSchema,
+	LinkContract,
+	RelationshipContract,
+	TypeContract,
+	ViewContract,
+} from './types';
 import {
 	preprocessQuerySchema,
 	resolveActorAndScopeFromSessionId,
