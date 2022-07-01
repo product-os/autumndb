@@ -11,42 +11,26 @@ export const roleUserOperator: RoleContractDefinition = {
 			anyOf: [
 				{
 					type: 'object',
-					additionalProperties: true,
 					required: ['slug'],
 					properties: {
 						slug: {
-							type: 'string',
-							enum: ['first-time-login', 'action-create-user'],
+							enum: ['action-create-user', 'first-time-login'],
 						},
 					},
 				},
 				{
-					type: 'object',
 					description:
-						"User can see other user's roles (except for user-admin and user-guest)",
-					additionalProperties: true,
-					required: ['data', 'type', 'slug'],
+						'User can see other users (except for user-admin and user-guest)',
+					type: 'object',
+					required: ['type', 'slug'],
 					properties: {
 						slug: {
-							type: 'string',
 							not: {
 								enum: ['user-admin', 'user-guest'],
 							},
 						},
 						type: {
-							type: 'string',
 							const: 'user@1.0.0',
-						},
-						data: {
-							type: 'object',
-							properties: {
-								roles: {
-									type: 'array',
-									items: {
-										type: 'string',
-									},
-								},
-							},
 						},
 					},
 				},

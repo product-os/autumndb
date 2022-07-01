@@ -1617,10 +1617,7 @@ describe('Kernel', () => {
 
 		it('should apply patch for users that satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
-				testUtils.generateRandomId(),
-				testUtils.generateRandomId(),
-			);
+			const user = await ctx.createUser(testUtils.generateRandomId());
 			await ctx.createLink(user, org, 'is member of', 'has member');
 			const session = await ctx.createSession(user);
 

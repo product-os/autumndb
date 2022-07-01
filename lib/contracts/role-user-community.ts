@@ -11,183 +11,66 @@ export const roleUserCommunity: RoleContractDefinition = {
 			required: ['active'],
 			properties: {
 				active: {
-					type: 'boolean',
 					const: true,
 				},
 			},
-			anyOf: [
-				{
-					type: 'object',
-					additionalProperties: true,
-					required: ['slug', 'type'],
-					properties: {
-						slug: {
-							type: 'string',
-							not: {
-								enum: ['action-create-user'],
-							},
-						},
-						type: {
-							type: 'string',
-							not: {
+			not: {
+				anyOf: [
+					{
+						required: ['slug'],
+						properties: {
+							slug: {
 								enum: [
-									'action-request@1.0.0',
-									'create@1.0.0',
-									'event@1.0.0',
-									'external-event@1.0.0',
-									'role@1.0.0',
-									'session@1.0.0',
-									'type@1.0.0',
-									'user@1.0.0',
-									'view@1.0.0',
-									'password-reset@1.0.0',
-									'first-time-login@1.0.0',
-								],
-							},
-						},
-					},
-				},
-				{
-					type: 'object',
-					required: ['slug', 'type'],
-					additionalProperties: true,
-					properties: {
-						slug: {
-							not: {
-								enum: [
+									'action-create-user',
 									'action',
 									'event',
 									'external-event',
-									'role',
 									'first-time-login',
+									'role',
 									'triggered-action',
+									'view-active-triggered-actions',
+									'view-active',
+									'view-non-executed-action-requests',
 								],
 							},
 						},
-						type: {
-							type: 'string',
-							const: 'type@1.0.0',
-						},
 					},
-				},
-				{
-					type: 'object',
-					description:
-						'User can view their own execute, session, web-push-subscription and view cards',
-					additionalProperties: true,
-					required: ['data', 'type'],
-					properties: {
-						type: {
-							type: 'string',
-							enum: [
-								'view@1.0.0',
-								'session@1.0.0',
-								'web-push-subscription@1.0.0',
-								'execute@1.0.0',
-							],
-						},
-						data: {
-							type: 'object',
-							required: ['actor'],
-							additionalProperties: true,
-							properties: {
-								actor: {
-									type: 'string',
-									const: {
-										$eval: 'user.id',
-									},
-								},
+					{
+						required: ['type'],
+						properties: {
+							type: {
+								enum: [
+									'action-request@1.0.0',
+									'event@1.0.0',
+									'external-event@1.0.0',
+									'first-time-login@1.0.0',
+									'password-reset@1.0.0',
+									'role@1.0.0',
+								],
 							},
 						},
 					},
-				},
-				{
-					type: 'object',
-					additionalProperties: true,
-					required: ['slug', 'type', 'data'],
-					properties: {
-						slug: {
-							type: 'string',
-							const: {
-								$eval: 'user.slug',
+					{
+						description:
+							'User can view their own execute, session, web-push-subscription and view cards',
+						required: ['type', 'data'],
+						properties: {
+							type: {
+								enum: [
+									'execute@1.0.0',
+									'session@1.0.0',
+									'view@1.0.0',
+									'web-push-subscription@1.0.0',
+								],
 							},
-						},
-						type: {
-							type: 'string',
-							const: 'user@1.0.0',
-						},
-						data: {
-							type: 'object',
-							additionalProperties: false,
-							properties: {
-								status: {
+							data: {
+								not: {
 									type: 'object',
-									additionalProperties: true,
-								},
-								email: {
-									type: ['string', 'array'],
-								},
-								hash: {
-									type: 'string',
-								},
-								avatar: {
-									type: ['string', 'null'],
-								},
-								oauth: {
-									type: 'object',
-									additionalProperties: true,
-								},
-								profile: {
-									type: 'object',
-									additionalProperties: true,
-								},
-							},
-						},
-					},
-				},
-				{
-					properties: {
-						type: {
-							enum: [
-								'authentication-oauth@1.0.0',
-								'authentication-password@1.0.0',
-								'user-settings@1.0.0',
-							],
-						},
-						data: {
-							type: 'object',
-							required: ['actorId'],
-							properties: {
-								actorId: {
-									const: {
-										$eval: 'user.id',
-									},
-								},
-							},
-						},
-					},
-				},
-				{
-					type: 'object',
-					description: "User can view create cards that don't create users",
-					additionalProperties: true,
-					required: ['data', 'type'],
-					properties: {
-						type: {
-							type: 'string',
-							const: 'create@1.0.0',
-						},
-						data: {
-							type: 'object',
-							additionalProperties: true,
-							properties: {
-								payload: {
-									type: 'object',
+									required: ['actor'],
 									properties: {
-										type: {
-											type: 'string',
-											not: {
-												enum: ['user@1.0.0', 'user'],
+										actor: {
+											const: {
+												$eval: 'user.id',
 											},
 										},
 									},
@@ -195,96 +78,123 @@ export const roleUserCommunity: RoleContractDefinition = {
 							},
 						},
 					},
-				},
-				{
-					type: 'object',
-					additionalProperties: true,
-					required: ['slug', 'type', 'data'],
-					properties: {
-						type: {
-							type: 'string',
-							const: 'view@1.0.0',
-						},
-						slug: {
-							type: 'string',
-							not: {
-								enum: [
-									'view-active',
-									'view-active-triggered-actions',
-									'view-non-executed-action-requests',
-								],
-							},
-						},
-						data: {
-							type: 'object',
-							additionalProperties: true,
-						},
-					},
-				},
-				{
-					type: 'object',
-					additionalProperties: true,
-					required: ['id', 'type', 'data', 'slug'],
-					properties: {
-						id: {
-							type: 'string',
-						},
-						slug: {
-							type: 'string',
-							not: {
-								enum: ['user-admin', 'user-guest'],
-							},
-						},
-						type: {
-							type: 'string',
-							const: 'user@1.0.0',
-						},
-						data: {
-							type: 'object',
-							additionalProperties: false,
-							properties: {
-								status: {
-									type: 'object',
-									additionalProperties: true,
+					{
+						required: ['slug', 'type', 'data'],
+						properties: {
+							slug: {
+								const: {
+									$eval: 'user.slug',
 								},
-								email: {
-									type: ['string', 'array'],
-								},
-								profile: {
+							},
+							type: {
+								const: 'user@1.0.0',
+							},
+							data: {
+								not: {
 									type: 'object',
 									additionalProperties: false,
 									properties: {
-										name: {
-											type: 'object',
-										},
-										about: {
-											type: 'object',
-										},
-										birthday: {
-											type: 'string',
-										},
-										startDate: {
-											type: 'string',
-										},
-										country: {
-											type: 'string',
-										},
-										city: {
-											type: 'string',
-										},
-										timezone: {
-											type: 'string',
-										},
+										avatar: true,
+										email: true,
+										hash: true,
+										oauth: true,
+										profile: true,
+										status: true,
 									},
-								},
-								avatar: {
-									type: ['string', 'null'],
 								},
 							},
 						},
 					},
-				},
-			],
+					{
+						required: ['type', 'data'],
+						properties: {
+							type: {
+								enum: [
+									'authentication-oauth@1.0.0',
+									'authentication-password@1.0.0',
+									'user-settings@1.0.0',
+								],
+							},
+							data: {
+								not: {
+									type: 'object',
+									required: ['actorId'],
+									properties: {
+										actorId: {
+											const: {
+												$eval: 'user.id',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						description: "User can view create cards that don't create users",
+						required: ['type', 'data'],
+						properties: {
+							type: {
+								const: 'create@1.0.0',
+							},
+							data: {
+								not: {
+									type: 'object',
+									properties: {
+										payload: {
+											type: 'object',
+											properties: {
+												type: {
+													not: {
+														enum: ['user@1.0.0', 'user'],
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						required: ['slug', 'type', 'data'],
+						properties: {
+							slug: {
+								not: {
+									enum: ['user-admin', 'user-guest'],
+								},
+							},
+							type: {
+								const: 'user@1.0.0',
+							},
+							data: {
+								not: {
+									type: 'object',
+									additionalProperties: false,
+									properties: {
+										avatar: true,
+										email: true,
+										profile: {
+											type: 'object',
+											additionalProperties: false,
+											properties: {
+												name: true,
+												about: true,
+												birthday: true,
+												startDate: true,
+												country: true,
+												city: true,
+												timezone: true,
+											},
+										},
+										status: true,
+									},
+								},
+							},
+						},
+					},
+				],
+			},
 		},
 	},
 };

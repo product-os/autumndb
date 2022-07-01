@@ -6,8 +6,6 @@ export const roleUserTest: RoleContractDefinition = {
 	type: 'role@1.0.0',
 	markers: [],
 	data: {
-		read: {
-			type: 'object',
-		},
+		read: {},
 	},
 };
