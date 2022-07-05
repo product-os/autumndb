@@ -1,5 +1,5 @@
 {
-  "extends": "@balena/lint/tsconfig.json",
+  "extends": "./node_modules/@balena/lint/tsconfig.json",
   "compilerOptions": {
     "target": "es2020",
     "noImplicitAny": true,

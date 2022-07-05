@@ -1,4 +1,4 @@
-import type { TypeContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { TypeContractDefinition } from '../types';
 
 export const loop: TypeContractDefinition = {
 	slug: 'loop',

@@ -1,7 +1,7 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
 import type { JSONSchema7TypeName } from 'json-schema';
 import * as _ from 'lodash';
 import type { Context } from '../../../context';
+import type { JsonSchema } from '../../../types';
 import type { BackendQueryOptions } from '../types';
 import { ArrayContainsFilter } from './array-contains-filter';
 import { ArrayLengthFilter } from './array-length-filter';

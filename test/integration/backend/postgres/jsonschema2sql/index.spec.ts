@@ -1,6 +1,5 @@
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+
 import * as _ from 'lodash';
 import jsonSchemaTestSuite = require('@json-schema-org/tests');
 import { Pool } from 'pg';
@@ -11,6 +10,7 @@ import * as jsonschema2sql from '../../../../../lib/backend/postgres/jsonschema2
 import * as links from '../../../../../lib/backend/postgres/links';
 import type { DatabaseBackend } from '../../../../../lib/backend/postgres/types';
 import { Context } from '../../../../../lib/context';
+import type { Contract, JsonSchema } from '../../../../../lib/types';
 import regexpTestSuite from './regexp';
 import formatMaxMinTestSuite from './format-max-min';
 

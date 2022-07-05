@@ -11,6 +11,7 @@
   "description": "A JSON schema based graph database, based on Postgres",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "bin": "build/cli/index.js",
   "files": [
     "build/"
   ],
@@ -20,7 +21,7 @@
   "scripts": {
     "clean": "rimraf build",
     "build": "npm run clean && tsc -p tsconfig.build.json",
-    "lint": "balena-lint lib test && deplint",
+    "lint": "npm run types && balena-lint lib test && deplint",
     "lint:fix": "balena-lint --fix lib test",
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest test/unit",
@@ -28,7 +29,8 @@
     "test:compose": "docker build -t balena/jellyfish-sut:latest . && docker-compose -f docker-compose.test.yml -f docker-compose.yml up --exit-code-from=sut",
     "doc": "typedoc lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
-    "compose": "docker-compose up"
+    "compose": "docker-compose up",
+    "types": "npm run build && ts-node lib/cli/index.ts generate-contract-interfaces && balena-lint --fix lib/types/contracts"
   },
   "deplint": {
     "files": [
@@ -51,11 +53,13 @@
     "@balena/jellyfish-logger": "^5.1.7",
     "@balena/jellyfish-metrics": "^2.0.92",
     "bluebird": "^3.7.2",
+    "commander": "^9.3.0",
     "fast-equals": "^4.0.1",
     "fast-json-patch": "^3.1.1",
     "json-e": "^4.4.3",
     "json-schema": "^0.4.0",
     "json-schema-deref-sync": "^0.14.0",
+    "json-schema-to-typescript": "^11.0.0",
     "lodash": "^4.17.21",
     "pg": "^8.7.3",
     "pg-format": "^1.0.4",
@@ -71,7 +75,6 @@
   },
   "devDependencies": {
     "@balena/jellyfish-jellyscript": "^7.0.17",
-    "@balena/jellyfish-types": "^2.0.5",
     "@balena/lint": "^6.2.0",
     "@json-schema-org/tests": "^1.0.0",
     "@types/bluebird": "^3.5.36",
@@ -89,6 +92,7 @@
     "lint-staged": "^13.0.2",
     "simple-git-hooks": "^2.8.0",
     "ts-jest": "^28.0.5",
+    "ts-node": "^10.8.1",
     "typedoc": "^0.23.5",
     "typescript": "^4.7.4"
   },

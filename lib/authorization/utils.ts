@@ -1,7 +1,7 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
 import jsone = require('json-e');
 import * as _ from 'lodash';
 import jsonSchema from '../json-schema';
+import type { JsonSchema } from '../types';
 
 // Recursively applies an authorization schema to $$links queries,
 // ensuring that authorization can't be escaped by using a relational query.

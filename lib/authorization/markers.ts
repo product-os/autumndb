@@ -1,9 +1,8 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import type { DatabaseBackend } from '../backend/postgres/types';
 import type { Context } from '../context';
 import { CONTRACTS } from '../contracts';
+import type { Contract, JsonSchema } from '../types';
 
 export const resolveMarkerBasedAuthorizationSchema = async (
 	context: Context,

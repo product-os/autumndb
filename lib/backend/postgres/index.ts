@@ -1,11 +1,4 @@
 import * as metrics from '@balena/jellyfish-metrics';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
-	Contract,
-	ContractDefinition,
-	LinkContract,
-	UserContract,
-} from '@balena/jellyfish-types/build/core';
 import { strict as nativeAssert } from 'assert';
 import * as Bluebird from 'bluebird';
 import * as fastEquals from 'fast-equals';
@@ -18,6 +11,13 @@ import type { Cache } from '../../cache';
 import { Context, Database, Query, TransactionIsolation } from '../../context';
 import * as errors from '../../errors';
 import type { QueryOptions } from '../../kernel';
+import type {
+	Contract,
+	ContractDefinition,
+	JsonSchema,
+	LinkContract,
+	UserContract,
+} from '../../types';
 import * as cards from './cards';
 import * as jsonschema2sql from './jsonschema2sql';
 import * as links from './links';

@@ -1,4 +1,3 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
 import { authenticationOauth } from './authentication-oauth';
 import { authenticationPassword } from './authentication-password';
 import { card } from './card';
@@ -21,12 +20,13 @@ import { roleUserOperator } from './role-user-operator';
 import { roleUserTest } from './role-user-test';
 import { session } from './session';
 import { type } from './type';
+import type { ContractDefinition } from '../types';
 import { user } from './user';
 import { userAdmin } from './user-admin';
 import { userSettings } from './user-settings';
 import { view } from './view';
 
-const contracts = [
+export const contracts = [
 	authenticationOauth,
 	authenticationPassword,
 	card,

@@ -1,11 +1,10 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import type { DatabaseBackend } from '../backend/postgres/types';
 import type { Context } from '../context';
 import jsonSchema from '../json-schema';
 import { resolveMarkerBasedAuthorizationSchema } from './markers';
 import { resolveRoleBasedAuthorizationSchema } from './roles';
+import type { Contract, JsonSchema } from '../types';
 import {
 	applyAuthorizationSchemaToLinks,
 	evaluateSchemaWithContext,

@@ -1,11 +1,10 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { errors } from '../../../lib';
 import type { Stream } from '../../../lib/backend/postgres/streams';
 import * as helpers from './helpers';
 import { TABLE as CONTRACTS_TABLE } from '../../../lib/backend/postgres/cards';
+import type { Contract, JsonSchema } from '../../../lib/types';
 
 let ctx: helpers.BackendContext;
 

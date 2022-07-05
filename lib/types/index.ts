@@ -1,1 +1,3 @@
-export * from './contracts/relationship';
+export * from './contracts';
+export * from './contract';
+export * from './json-schema';

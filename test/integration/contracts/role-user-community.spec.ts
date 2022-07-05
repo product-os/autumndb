@@ -1,6 +1,6 @@
-import { ViewContract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
 import { testUtils } from '../../../lib';
+import type { ViewContract } from '../../../lib/types';
 
 let ctx: testUtils.TestContext;
 let user: any;

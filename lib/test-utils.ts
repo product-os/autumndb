@@ -1,17 +1,17 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import type { LogContext } from '@balena/jellyfish-logger';
+import { strict as assert } from 'assert';
+import { Pool } from 'pg';
+import { v4 as uuid } from 'uuid';
+import { Cache } from './cache';
+import { Kernel } from './kernel';
 import type {
 	Contract,
 	LinkContract,
 	OrgContract,
 	SessionContract,
 	UserContract,
-} from '@balena/jellyfish-types/build/core';
-import { strict as assert } from 'assert';
-import { Pool } from 'pg';
-import { v4 as uuid } from 'uuid';
-import { Cache } from './cache';
-import { Kernel } from './kernel';
+} from './types';
 
 /**
  * Context that can be used in tests against the core.
