@@ -1,4 +1,30 @@
 - commits:
+    - subject: Add contract interface generator script
+      hash: 9fff5d143b5d99ca540d98a57e3843108c3f6c1a
+      body: |
+        Add CLI interface for generating TypeScript interfaces
+        from JSON schema provided by contract definitions.
+        Also drop jellyfish-types and add new contracts export
+        to match other repos.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Update typedoc from 0.23.4 to 0.23.5
+      hash: 64eeaedd84c3d6e8ad935ec94c75b948582c7761
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 20.3.0
+  title: "'Add contract interface generator script'"
+  date: 2022-07-05T06:29:29.843Z
+- commits:
     - subject: Update typedoc from 0.23.3 to 0.23.4
       hash: 9ab4487d20e04e4c24cbf7ddab1d05e05657f2df
       body: ""
