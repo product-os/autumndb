@@ -1,4 +1,18 @@
 - commits:
+    - subject: Export contract data interface
+      hash: 7e2235a5b860c7f6a3a41a805b4029dcb537c723
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.3.2
+  title: "'Export contract data interface'"
+  date: 2022-07-06T03:41:41.704Z
+- commits:
     - subject: Use redis stock instead of balena/redis.
       hash: 234af033e072ff7ae76c73b71dc6dcad3eaae238
       body: >
