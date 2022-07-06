@@ -1,4 +1,23 @@
 - commits:
+    - subject: Use redis stock instead of balena/redis.
+      hash: 234af033e072ff7ae76c73b71dc6dcad3eaae238
+      body: >
+        This allows the docker-compose config to pull whichever arch-specific
+        image variation needs, like arm64 for a Mac with an M1
+
+
+        The config on docker-compose is based on what https://github.com/product-os/balena-redis uses
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+        signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+      author: Ramiro González Maciel
+      nested: []
+  version: 20.3.1
+  title: "'Use redis stock instead of balena/redis.'"
+  date: 2022-07-06T01:13:03.105Z
+- commits:
     - subject: Add contract interface generator script
       hash: 9fff5d143b5d99ca540d98a57e3843108c3f6c1a
       body: |
