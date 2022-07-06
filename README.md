@@ -163,7 +163,7 @@ Markers allow individual contracts to be restricted to one or more users. A mark
 is a string that corresponds to either a user or organisation slug and they
 appear as an array at the top level of a contract under the key `markers`.
 
-```json
+```
 {
 	...
 	"markers": [ "user-lucianbuzzo", "org-balena" ]
