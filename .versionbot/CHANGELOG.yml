@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update code block in readme
+      hash: 5732bac335bc288103960ba3a9f4b8a6bc4550fb
+      body: |
+        The code block is invalid JSON so removing json notation.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.3.3
+  title: "'Update code block in readme'"
+  date: 2022-07-06T04:21:15.730Z
+- commits:
     - subject: Export contract data interface
       hash: 7e2235a5b860c7f6a3a41a805b4029dcb537c723
       body: ""
