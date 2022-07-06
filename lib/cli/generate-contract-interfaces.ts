@@ -149,7 +149,7 @@ export interface ${contractName}Contract
 				// Add contract export to index file
 				await fs.promises.appendFile(
 					indexFile,
-					`export type { ${contractName}Contract, ${contractName}ContractDefinition } from './${contract.slug}';\n`,
+					`export type { ${contractName}Contract, ${contractName}ContractDefinition, ${contractName}Data } from './${contract.slug}';\n`,
 				);
 				return true;
 			}),

@@ -41,6 +41,10 @@
     ]
   },
   "lint-staged": {
+    "lib/contracts/*.ts": [
+      "npm run types",
+      "git add lib/types/contracts/*"
+    ],
     "*.{ts,tsx}": [
       "balena-lint --fix"
     ]

@@ -7,27 +7,43 @@
 export type {
 	AuthenticationOauthContract,
 	AuthenticationOauthContractDefinition,
+	AuthenticationOauthData,
 } from './authentication-oauth';
 export type {
 	AuthenticationPasswordContract,
 	AuthenticationPasswordContractDefinition,
+	AuthenticationPasswordData,
 } from './authentication-password';
-export type { CardContract, CardContractDefinition } from './card';
-export type { ErrorContract, ErrorContractDefinition } from './error';
-export type { EventContract, EventContractDefinition } from './event';
-export type { LinkContract, LinkContractDefinition } from './link';
-export type { LoopContract, LoopContractDefinition } from './loop';
-export type { OrgContract, OrgContractDefinition } from './org';
+export type { CardContract, CardContractDefinition, CardData } from './card';
+export type {
+	EventContract,
+	EventContractDefinition,
+	EventData,
+} from './event';
+export type {
+	ErrorContract,
+	ErrorContractDefinition,
+	ErrorData,
+} from './error';
+export type { LinkContract, LinkContractDefinition, LinkData } from './link';
+export type { LoopContract, LoopContractDefinition, LoopData } from './loop';
+export type { OrgContract, OrgContractDefinition, OrgData } from './org';
 export type {
 	RelationshipContract,
 	RelationshipContractDefinition,
+	RelationshipData,
 } from './relationship';
-export type { RoleContract, RoleContractDefinition } from './role';
-export type { SessionContract, SessionContractDefinition } from './session';
-export type { TypeContract, TypeContractDefinition } from './type';
-export type { UserContract, UserContractDefinition } from './user';
+export type { RoleContract, RoleContractDefinition, RoleData } from './role';
+export type {
+	SessionContract,
+	SessionContractDefinition,
+	SessionData,
+} from './session';
+export type { TypeContract, TypeContractDefinition, TypeData } from './type';
+export type { UserContract, UserContractDefinition, UserData } from './user';
 export type {
 	UserSettingsContract,
 	UserSettingsContractDefinition,
+	UserSettingsData,
 } from './user-settings';
-export type { ViewContract, ViewContractDefinition } from './view';
+export type { ViewContract, ViewContractDefinition, ViewData } from './view';
