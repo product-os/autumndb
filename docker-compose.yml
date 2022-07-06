@@ -18,8 +18,8 @@ services:
       retries: 5
     command: ['postgres', '-c', 'fsync=off', '-c', 'synchronous_commit=off', '-c', 'full_page_writes=off']
   redis:
-    image: balena/balena-redis:v0.0.4
-    command: [sh, -c, "redis-server /usr/local/etc/redis/redis.conf --save ''"]
+    image: redis:6
+    command: [sh, -c, "redis-server --save ''"]
     restart: always
     networks:
       - internal
