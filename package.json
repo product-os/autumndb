@@ -78,7 +78,6 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/jellyfish-jellyscript": "^7.0.17",
     "@balena/lint": "^6.2.0",
     "@json-schema-org/tests": "^1.0.0",
     "@types/bluebird": "^3.5.36",
