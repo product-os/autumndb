@@ -1,4 +1,18 @@
 - commits:
+    - subject: Drop jellyfish-jellyscripts dep
+      hash: 0e00c5507b89ab9e6a4763715e60c393dc15a41f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.3.4
+  title: "'Drop jellyfish-jellyscripts dep'"
+  date: 2022-07-07T04:01:33.395Z
+- commits:
     - subject: Update code block in readme
       hash: 5732bac335bc288103960ba3a9f4b8a6bc4550fb
       body: |
