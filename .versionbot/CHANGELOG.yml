@@ -1,4 +1,244 @@
 - commits:
+    - subject: Refactor role permission schemas
+      hash: 29e5647f2d44bb5e9f71286fa1d988a427f006de
+      body: >
+        - Remove redundant `additionalProperties: true` entries.
+
+        - Remove constraints that duplicate the contract type definition with no
+          functional reason. These constraints may not only add useless
+          constraints to the underlying database query but also make permissions
+          more brittle as minor changes to the underlying type definition may
+          invalidate permission constraints that are too specific.
+        - When denying access to specific slugs do it regardless of type. It is
+          technically possible to have multiple contracts with the same slug and
+          different types but the latter is not important. This also helps
+          future-proofing permissions.
+        - While `role-user-guest`, `role-user-operator`, and `role-user-test`
+          have a deny-by-default policy, `role-user-community` has a
+          allow-by-default policy. It achieves this by having a denylist in
+          disjunction with the allowlist:
+
+        ```
+
+        d || a0 || a1 || ...
+
+        ```
+
+
+        where `d` is the denylist and `a*` is an entry from the allowlist. While
+
+        this arrangement works, it allows for a particularly nasty way to shoot
+
+        our own foot: the denylist must cover each and every entry in the
+
+        allowlist or otherwise non-covered entries are nullified. For example,
+
+        if we want to restrict access to `session` contracts:
+
+
+        ```js
+
+        {
+          properties: {
+            type: { const: 'session@1.0.0' },
+            data: {
+              properties: {
+                actor: { const: { $eval: 'user.id' } }
+              }
+            }
+          }
+        }
+
+        ```
+
+
+        In a deny-by-default scenario this is sufficient to apply the
+
+        restrictions we want. In a allow-by-default scenario with the denylist
+
+        in disjunction with the allowlist we are additionary required to add all
+
+        `session` contracts to the denylist:
+
+
+        ```js
+
+        {
+          properties: {
+            type: {
+              not: { const: 'session@1.0.0' }
+            }
+          }
+        }
+
+        ```
+
+
+        The footgun is a failure to maintain the denylist and allowlist in sync
+
+        will silently allow full access to everything the denylist doesn't
+
+        cover, regardless of what the allowlist contains. And so, security holes
+
+        are easy to create by minor mistakes. To fix this both lists are now
+
+        combined with a conjunction:
+
+
+        ```
+
+        d && (a0 || a1 || ...)
+
+        ```
+
+
+        That is, access will be granted only when **both** the denylist and
+
+        allowlist checks pass. This change has two effects:
+
+          - The denylist now only contains the things that are completely
+            inaccessible with no exceptions, considerably simplifying `d`.
+          - Each allowlist entry is now completely self-contained. Adding or
+            removing allowlist entries require no changes to the denylist.
+
+        To make this approach works we must change how we write allowlist
+
+        entries slightly so they work in a allow-by-default world. To illustrate
+
+        the problem assume the following two entries:
+
+
+        ```js
+
+        anyOf: [
+          {
+            properties: {
+              type: { const: 'session@1.0.0' },
+              data: {
+                properties: {
+                  actor: { const: { $eval: 'user.id' } }
+                }
+              }
+            }
+          },
+          {
+            properties: {
+              type: { const: 'execute@1.0.0' },
+              data: {
+                properties: {
+                  actor: { const: { $eval: 'user.id' } }
+                }
+              }
+            }
+          }
+        ]
+
+        ```
+
+
+        Since we're now using conjunction this `anyOf` must evaluate to `true`
+
+        on every contract that is not of type `session` or `execute`, which is
+
+        clearly impossible. To allow for that to happen we have to slightly
+
+        change how entries are expressed. For that we now use another boolean
+
+        operator: material implication `p -> t`, where `p` is the precondition
+
+        and `t` is the test. Material implication does the following operation:
+
+        if `p` then `t` else `true`. For the above allowlist:
+
+
+        ```
+
+        ((type == 'session@1.0.0') -> (data.actor == user.id)) &&  # If contract is of type `session` then it must be owned by the current user
+
+        ((type == 'execute@1.0.0') -> (data.actor == user.id))     # If contract is of type `execute` then it must be owned by the current user
+
+        ```
+
+
+        Unfortunately we can't express `p -> t` directly with JSON Schema and
+
+        have to use the equivalent expression `!p || t` instead. Simplifying the
+
+        full expression with the denylist we get:
+
+
+        ```
+
+        !(!d || (p0 && !t0) || (p1 && !t1) || ...)
+
+        ```
+
+
+        In JSON Schema it looks something like this:
+
+
+        ```js
+
+        not: {
+          anyOf: [
+            {
+              properties: {
+                slug: { const: 'user-admin' }
+              }
+            },
+            {
+              properties: {
+                type: { const: 'session@1.0.0' },
+                data: {
+                  properties: {
+                    actor: { not: { const: { $eval: 'user.id' } } }
+                  }
+                }
+              }
+            },
+            {
+              properties: {
+                type: { const: 'execute@1.0.0' },
+                data: {
+                  properties: {
+                    actor: { not: { const: { $eval: 'user.id' } } }
+                  }
+                }
+              }
+            }
+          ]
+        }
+
+        ```
+
+
+        Notice:
+
+          - Toplevel `not`.
+          - The denylist (first entry inside the `anyOf`) doesn't have a `not`.
+            If the denylist matches the toplevel `not` will invert the result
+            and return `false`.
+          - In the allowlist the precondition is unaffected (type check) but the
+            test is negated (ID check).
+
+        In practical terms, this change turns the allowlist into a
+
+        self-contained filterlist, which is a better fit for an
+
+        allow-by-default-world. This also slightly reduces the amount of checks
+
+        run by the database.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 20.3.7
+  title: "'Refactor role permission schemas'"
+  date: 2022-07-11T18:57:23.362Z
+- commits:
     - subject: Update typedoc from 0.23.6 to 0.23.7
       hash: 9bd6fe2483d042dde7617a2fe3dcf6b38d7a9f77
       body: ""
