@@ -3,7 +3,13 @@ import * as Bluebird from 'bluebird';
 import { once } from 'events';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
-import { CONTRACTS, errors, RelationshipContract, testUtils } from '../../lib';
+import {
+	AutumnDBSession,
+	CONTRACTS,
+	errors,
+	RelationshipContract,
+	testUtils,
+} from '../../lib';
 import type { Contract, JsonSchema } from '../../lib/types';
 import type { Stream } from '../../lib/backend/postgres/streams';
 
@@ -685,21 +691,10 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: userContract.id,
-					},
-				},
-			);
-
 			expect(
 				await ctx.kernel.getContractBySlug(
 					ctx.logContext,
-					session.id,
+					{ actor: userContract },
 					`${userContract.slug}@${userContract.version}`,
 				),
 			).toBeFalsy();
@@ -707,7 +702,7 @@ describe('Kernel', () => {
 			await expect(
 				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
-					session.id,
+					{ actor: userContract },
 					`${userContract.slug}@${userContract.version}`,
 					[
 						{
@@ -805,20 +800,9 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: userContract.id,
-					},
-				},
-			);
-
 			const filteredUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor: userContract },
 				`${userContract.slug}@${userContract.version}`,
 			);
 
@@ -829,7 +813,7 @@ describe('Kernel', () => {
 			await expect(
 				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
-					session.id,
+					{ actor: userContract },
 					`${userContract.slug}@${userContract.version}`,
 					[
 						{
@@ -927,20 +911,9 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: userContract.id,
-					},
-				},
-			);
-
 			const filteredUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor: userContract },
 				`${userContract.slug}@${userContract.version}`,
 			);
 
@@ -950,7 +923,7 @@ describe('Kernel', () => {
 
 			const patched = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor: userContract },
 				`${userContract.slug}@${userContract.version}`,
 				[
 					{
@@ -1046,17 +1019,6 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: userContract.id,
-					},
-				},
-			);
-
 			const randomContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
@@ -1071,7 +1033,7 @@ describe('Kernel', () => {
 
 			const filteredContract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor: userContract },
 				`${randomContract.slug}@${randomContract.version}`,
 			);
 
@@ -1080,7 +1042,7 @@ describe('Kernel', () => {
 			await expect(
 				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
-					session.id,
+					{ actor: userContract },
 					`${randomContract.slug}@${randomContract.version}`,
 					[
 						{
@@ -1175,20 +1137,9 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: userContract.id,
-					},
-				},
-			);
-
 			const filteredUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor: userContract },
 				`${userContract.slug}@${userContract.version}`,
 			);
 
@@ -1199,7 +1150,7 @@ describe('Kernel', () => {
 			await expect(
 				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
-					session.id,
+					{ actor: userContract },
 					`${userContract.slug}@${userContract.version}`,
 					[
 						{
@@ -1295,20 +1246,9 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: userContract.id,
-					},
-				},
-			);
-
 			const filteredUser = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor: userContract },
 				`${userContract.slug}@${userContract.version}`,
 			);
 
@@ -1319,7 +1259,7 @@ describe('Kernel', () => {
 			await expect(
 				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
-					session.id,
+					{ actor: userContract },
 					`${userContract.slug}@${userContract.version}`,
 					[
 						{
@@ -1617,12 +1557,11 @@ describe('Kernel', () => {
 
 		it('should apply patch for users that satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
+			const actor = await ctx.createUser(
 				testUtils.generateRandomId(),
 				testUtils.generateRandomId(),
 			);
-			await ctx.createLink(user, org, 'is member of', 'has member');
-			const session = await ctx.createSession(user);
+			await ctx.createLink(actor, org, 'is member of', 'has member');
 
 			// org-wide markers
 			let result = await ctx.kernel.insertContract(
@@ -1639,7 +1578,7 @@ describe('Kernel', () => {
 			let foo = testUtils.generateRandomId();
 			let contract = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				`${result.slug}@${result.version}`,
 				[
 					{
@@ -1662,13 +1601,13 @@ describe('Kernel', () => {
 					data: {
 						foo: 'bar',
 					},
-					markers: [user.slug],
+					markers: [actor.slug],
 				},
 			);
 			foo = testUtils.generateRandomId();
 			contract = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				`${result.slug}@${result.version}`,
 				[
 					{
@@ -1691,13 +1630,13 @@ describe('Kernel', () => {
 					data: {
 						foo: 'bar',
 					},
-					markers: [`${user.slug}+${org.slug}`],
+					markers: [`${actor.slug}+${org.slug}`],
 				},
 			);
 			foo = testUtils.generateRandomId();
 			contract = await ctx.kernel.patchContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				`${result.slug}@${result.version}`,
 				[
 					{
@@ -1714,12 +1653,11 @@ describe('Kernel', () => {
 
 		it('should throw for users that do not satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
+			const actor = await ctx.createUser(
 				testUtils.generateRandomId(),
 				testUtils.generateRandomId(),
 			);
-			await ctx.createLink(user, org, 'is member of', 'has member');
-			const session = await ctx.createSession(user);
+			await ctx.createLink(actor, org, 'is member of', 'has member');
 
 			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
@@ -1733,7 +1671,7 @@ describe('Kernel', () => {
 			await expect(
 				ctx.kernel.patchContractBySlug(
 					ctx.logContext,
-					session.id,
+					{ actor },
 					`${result.slug}@${result.version}`,
 					[
 						{
@@ -2316,29 +2254,22 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: userContract.id,
-					},
-				},
-			);
-
 			await expect(
-				ctx.kernel.replaceContract(ctx.logContext, session.id, {
-					id: targetUserContract.id,
-					slug: targetUserContract.slug,
-					type: 'user@1.0.0',
-					version: '1.0.0',
-					data: {
-						email: 'pwned@example.com',
-						hash: 'PASSWORDLESS',
-						roles: [],
+				ctx.kernel.replaceContract(
+					ctx.logContext,
+					{ actor: userContract },
+					{
+						id: targetUserContract.id,
+						slug: targetUserContract.slug,
+						type: 'user@1.0.0',
+						version: '1.0.0',
+						data: {
+							email: 'pwned@example.com',
+							hash: 'PASSWORDLESS',
+							roles: [],
+						},
 					},
-				}),
+				),
 			).rejects.toThrow(errors.JellyfishPermissionsError);
 		});
 
@@ -2608,12 +2539,11 @@ describe('Kernel', () => {
 
 		it('should return contract for users that satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
+			const actor = await ctx.createUser(
 				testUtils.generateRandomId(),
 				testUtils.generateRandomId(),
 			);
-			await ctx.createLink(user, org, 'is member of', 'has member');
-			const session = await ctx.createSession(user);
+			await ctx.createLink(actor, org, 'is member of', 'has member');
 
 			// org-wide markers
 			let result = await ctx.kernel.insertContract(
@@ -2626,7 +2556,7 @@ describe('Kernel', () => {
 			);
 			let contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				`${result.slug}@${result.version}`,
 			);
 			expect(contract).toEqual(result);
@@ -2637,12 +2567,12 @@ describe('Kernel', () => {
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
-					markers: [user.slug],
+					markers: [actor.slug],
 				},
 			);
 			contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				`${result.slug}@${result.version}`,
 			);
 			expect(contract).toEqual(result);
@@ -2653,12 +2583,12 @@ describe('Kernel', () => {
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
-					markers: [`${user.slug}+${org.slug}`],
+					markers: [`${actor.slug}+${org.slug}`],
 				},
 			);
 			contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				`${result.slug}@${result.version}`,
 			);
 			expect(contract).toEqual(result);
@@ -2666,12 +2596,11 @@ describe('Kernel', () => {
 
 		it('should return null for users that do not satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
+			const actor = await ctx.createUser(
 				testUtils.generateRandomId(),
 				testUtils.generateRandomId(),
 			);
-			await ctx.createLink(user, org, 'is member of', 'has member');
-			const session = await ctx.createSession(user);
+			await ctx.createLink(actor, org, 'is member of', 'has member');
 
 			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
@@ -2684,7 +2613,7 @@ describe('Kernel', () => {
 
 			const contract = await ctx.kernel.getContractBySlug(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				`${result.slug}@${result.version}`,
 			);
 			expect(contract).toEqual(null);
@@ -2746,12 +2675,11 @@ describe('Kernel', () => {
 
 		it('should return contract for users that satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
+			const actor = await ctx.createUser(
 				testUtils.generateRandomId(),
 				testUtils.generateRandomId(),
 			);
-			await ctx.createLink(user, org, 'is member of', 'has member');
-			const session = await ctx.createSession(user);
+			await ctx.createLink(actor, org, 'is member of', 'has member');
 
 			// org-wide markers
 			let result = await ctx.kernel.insertContract(
@@ -2764,7 +2692,7 @@ describe('Kernel', () => {
 			);
 			let contract = await ctx.kernel.getContractById(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				result.id,
 			);
 			expect(contract).toEqual(result);
@@ -2775,12 +2703,12 @@ describe('Kernel', () => {
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
-					markers: [user.slug],
+					markers: [actor.slug],
 				},
 			);
 			contract = await ctx.kernel.getContractById(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				result.id,
 			);
 			expect(contract).toEqual(result);
@@ -2791,12 +2719,12 @@ describe('Kernel', () => {
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
-					markers: [`${user.slug}+${org.slug}`],
+					markers: [`${actor.slug}+${org.slug}`],
 				},
 			);
 			contract = await ctx.kernel.getContractById(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				result.id,
 			);
 			expect(contract).toEqual(result);
@@ -2804,12 +2732,11 @@ describe('Kernel', () => {
 
 		it('should return null for users that do not satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
+			const actor = await ctx.createUser(
 				testUtils.generateRandomId(),
 				testUtils.generateRandomId(),
 			);
-			await ctx.createLink(user, org, 'is member of', 'has member');
-			const session = await ctx.createSession(user);
+			await ctx.createLink(actor, org, 'is member of', 'has member');
 
 			const result = await ctx.kernel.insertContract(
 				ctx.logContext,
@@ -2822,7 +2749,7 @@ describe('Kernel', () => {
 
 			const contract = await ctx.kernel.getContractById(
 				ctx.logContext,
-				session.id,
+				{ actor },
 				result.id,
 			);
 			expect(contract).toEqual(null);
@@ -3778,17 +3705,6 @@ describe('Kernel', () => {
 				},
 			);
 
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: actor.id,
-					},
-				},
-			);
-
 			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
@@ -3821,26 +3737,30 @@ describe('Kernel', () => {
 				},
 			);
 
-			let results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				required: ['type', 'slug', 'active', 'data'],
-				additionalProperties: false,
-				properties: {
-					type: {
-						type: 'string',
-					},
-					slug: {
-						type: 'string',
-						pattern: '^user',
-					},
-					active: {
-						type: 'boolean',
-					},
-					data: {
-						type: 'object',
+			let results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					required: ['type', 'slug', 'active', 'data'],
+					additionalProperties: false,
+					properties: {
+						type: {
+							type: 'string',
+						},
+						slug: {
+							type: 'string',
+							pattern: '^user',
+						},
+						active: {
+							type: 'boolean',
+						},
+						data: {
+							type: 'object',
+						},
 					},
 				},
-			});
+			);
 			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
@@ -3858,17 +3778,6 @@ describe('Kernel', () => {
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
-					},
-				},
-			);
-
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: actor.id,
 					},
 				},
 			);
@@ -3957,23 +3866,27 @@ describe('Kernel', () => {
 				},
 			);
 
-			const results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				$$links: {
-					'is attached to': {
-						type: 'object',
+			const results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					$$links: {
+						'is attached to': {
+							type: 'object',
+						},
+						'is part of': {
+							type: 'object',
+						},
 					},
-					'is part of': {
-						type: 'object',
+					properties: {
+						id: {
+							type: 'string',
+							const: actor.id,
+						},
 					},
 				},
-				properties: {
-					id: {
-						type: 'string',
-						const: actor.id,
-					},
-				},
-			});
+			);
 
 			expect(results).toEqual([]);
 		});
@@ -3990,17 +3903,6 @@ describe('Kernel', () => {
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
-					},
-				},
-			);
-
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: actor.id,
 					},
 				},
 			);
@@ -4029,21 +3931,25 @@ describe('Kernel', () => {
 				},
 			);
 
-			let results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				properties: {
-					id: {
-						type: 'string',
-					},
-					type: {
-						type: 'string',
-					},
-					slug: {
-						type: 'string',
-						pattern: '^user',
+			let results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					properties: {
+						id: {
+							type: 'string',
+						},
+						type: {
+							type: 'string',
+						},
+						slug: {
+							type: 'string',
+							pattern: '^user',
+						},
 					},
 				},
-			});
+			);
 			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
@@ -4064,17 +3970,6 @@ describe('Kernel', () => {
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
-					},
-				},
-			);
-
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: actor.id,
 					},
 				},
 			);
@@ -4105,22 +4000,26 @@ describe('Kernel', () => {
 				},
 			);
 
-			let results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				additionalProperties: true,
-				properties: {
-					id: {
-						type: 'string',
-					},
-					type: {
-						type: 'string',
-					},
-					slug: {
-						type: 'string',
-						pattern: '^user',
+			let results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					additionalProperties: true,
+					properties: {
+						id: {
+							type: 'string',
+						},
+						type: {
+							type: 'string',
+						},
+						slug: {
+							type: 'string',
+							pattern: '^user',
+						},
 					},
 				},
-			});
+			);
 			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
@@ -4141,17 +4040,6 @@ describe('Kernel', () => {
 					data: {
 						email: 'johndoe@example.io',
 						roles: [role],
-					},
-				},
-			);
-
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: actor.id,
 					},
 				},
 			);
@@ -4180,22 +4068,26 @@ describe('Kernel', () => {
 				},
 			);
 
-			let results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				additionalProperties: true,
-				properties: {
-					id: {
-						type: 'string',
-					},
-					type: {
-						type: 'string',
-					},
-					slug: {
-						type: 'string',
-						pattern: '^user',
+			let results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					additionalProperties: true,
+					properties: {
+						id: {
+							type: 'string',
+						},
+						type: {
+							type: 'string',
+						},
+						slug: {
+							type: 'string',
+							pattern: '^user',
+						},
 					},
 				},
-			});
+			);
 			results = results.filter((x) => x.slug !== 'user-settings');
 
 			expect(results).toEqual([
@@ -6466,31 +6358,20 @@ describe('Kernel', () => {
 			);
 
 			// Create scoped session for admin user.
-			const adminSession = await ctx.kernel.getContractById(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				ctx.kernel.adminSession()!,
-			);
+			const adminSession = ctx.kernel.adminSession()!;
 			assert(adminSession !== null);
-			const scopedSession = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'session@1.0.0',
-					data: {
-						actor: adminSession.data.actor,
-						scope: {
-							type: 'object',
-							properties: {
-								slug: {
-									type: 'string',
-									const: foo.slug,
-								},
-							},
+			const scopedSession: AutumnDBSession = {
+				...adminSession,
+				scope: {
+					type: 'object',
+					properties: {
+						slug: {
+							type: 'string',
+							const: foo.slug,
 						},
 					},
 				},
-			);
+			};
 
 			// Query with both scoped and non-scoped sessions.
 			const query: JsonSchema = {
@@ -6512,7 +6393,7 @@ describe('Kernel', () => {
 			);
 			const scopedResults = await ctx.kernel.query(
 				ctx.logContext,
-				scopedSession.id,
+				scopedSession,
 				query,
 			);
 
@@ -6596,37 +6477,6 @@ describe('Kernel', () => {
 					version: contracts[1].version,
 				},
 			]);
-		});
-
-		it('should throw if the session is not active', async () => {
-			const adminUser = await ctx.kernel.getContractBySlug(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				'user-admin@1.0.0',
-			);
-
-			assert(adminUser !== null);
-
-			// Create a new inactive session
-			const session = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					active: false,
-					type: 'session@1.0.0',
-					data: {
-						actor: adminUser.id,
-					},
-				},
-			);
-
-			expect(
-				ctx.kernel.getContractBySlug(
-					ctx.logContext,
-					session.id,
-					'user-admin@1.0.0',
-				),
-			).rejects.toThrow();
 		});
 
 		it('should be able to query root level string fields using full text search', async () => {
@@ -7121,12 +6971,11 @@ describe('Kernel', () => {
 
 		it('should return contract for users that satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
+			const actor = await ctx.createUser(
 				testUtils.generateRandomId(),
 				testUtils.generateRandomId(),
 			);
-			await ctx.createLink(user, org, 'is member of', 'has member');
-			const session = await ctx.createSession(user);
+			await ctx.createLink(actor, org, 'is member of', 'has member');
 
 			// org-wide markers
 			let contract = await ctx.kernel.insertContract(
@@ -7137,16 +6986,20 @@ describe('Kernel', () => {
 					markers: [org.slug],
 				},
 			);
-			let results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				properties: {
-					id: {
-						type: 'string',
-						const: contract.id,
+			let results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					properties: {
+						id: {
+							type: 'string',
+							const: contract.id,
+						},
 					},
+					required: ['id'],
 				},
-				required: ['id'],
-			});
+			);
 			expect(results).toEqual([contract]);
 
 			// user-specific markers
@@ -7155,19 +7008,23 @@ describe('Kernel', () => {
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
-					markers: [user.slug],
+					markers: [actor.slug],
 				},
 			);
-			results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				properties: {
-					id: {
-						type: 'string',
-						const: contract.id,
+			results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					properties: {
+						id: {
+							type: 'string',
+							const: contract.id,
+						},
 					},
+					required: ['id'],
 				},
-				required: ['id'],
-			});
+			);
 			expect(results).toEqual([contract]);
 
 			// user+org markers
@@ -7176,30 +7033,33 @@ describe('Kernel', () => {
 				ctx.kernel.adminSession()!,
 				{
 					type: 'card@1.0.0',
-					markers: [`${user.slug}+${org.slug}`],
+					markers: [`${actor.slug}+${org.slug}`],
 				},
 			);
-			results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				properties: {
-					id: {
-						type: 'string',
-						const: contract.id,
+			results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					properties: {
+						id: {
+							type: 'string',
+							const: contract.id,
+						},
 					},
+					required: ['id'],
 				},
-				required: ['id'],
-			});
+			);
 			expect(results).toEqual([contract]);
 		});
 
 		it('should return null for users that do not satisfy markers', async () => {
 			const org = await ctx.createOrg(testUtils.generateRandomId());
-			const user = await ctx.createUser(
+			const actor = await ctx.createUser(
 				testUtils.generateRandomId(),
 				testUtils.generateRandomId(),
 			);
-			await ctx.createLink(user, org, 'is member of', 'has member');
-			const session = await ctx.createSession(user);
+			await ctx.createLink(actor, org, 'is member of', 'has member');
 
 			const contract = await ctx.kernel.insertContract(
 				ctx.logContext,
@@ -7210,16 +7070,20 @@ describe('Kernel', () => {
 				},
 			);
 
-			const results = await ctx.kernel.query(ctx.logContext, session.id, {
-				type: 'object',
-				properties: {
-					id: {
-						type: 'string',
-						const: contract.id,
+			const results = await ctx.kernel.query(
+				ctx.logContext,
+				{ actor },
+				{
+					type: 'object',
+					properties: {
+						id: {
+							type: 'string',
+							const: contract.id,
+						},
 					},
+					required: ['id'],
 				},
-				required: ['id'],
-			});
+			);
 			expect(results).toEqual([]);
 		});
 	});

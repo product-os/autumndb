@@ -4,7 +4,7 @@ import { strict as assert } from 'assert';
 import { Pool } from 'pg';
 import { v4 as uuid } from 'uuid';
 import { Cache } from './cache';
-import { Kernel } from './kernel';
+import { AutumnDBSession, Kernel } from './kernel';
 import type {
 	Contract,
 	LinkContract,
@@ -18,7 +18,7 @@ import type {
  */
 export interface TestContext {
 	logContext: LogContext;
-	session: string;
+	session: AutumnDBSession;
 	cache: Cache;
 	kernel: Kernel;
 	pool: Pool;
