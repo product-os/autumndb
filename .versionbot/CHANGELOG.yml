@@ -1,4 +1,24 @@
 - commits:
+    - subject: Remove session contract indirection when finding identity of actor
+      hash: 2e38485c75725c0037e2d2efb5bad14a27c77fe7
+      body: |
+        With this change, autumndb sessions are now expected to be objects
+        containing the actor and an optional scope directly instead of a string
+        referring to the session contract. Validating session contracts
+        should now be handled by the implementing app layer.
+        This means that autumndb is only dealing with identity, instead of
+        partially handling auth.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 21.0.0
+  title: "'Remove session contract indirection when finding identity of actor'"
+  date: 2022-07-18T16:44:14.217Z
+- commits:
     - subject: Update typedoc from 0.23.7 to 0.23.8
       hash: 8dea6c1c3ccfa1cfb821692d0759e722823da9c2
       body: ""
