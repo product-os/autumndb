@@ -7244,6 +7244,96 @@ describe('Kernel', () => {
 				});
 		});
 
+		it('should filter contracts by the options.mask schema if set', async () => {
+			const scope = uuid();
+			const schema: JsonSchema = {
+				required: ['data'],
+				properties: {
+					data: {
+						required: ['scope'],
+						properties: {
+							scope: {
+								const: scope,
+							},
+						},
+					},
+				},
+			};
+
+			const contract1 = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					data: {
+						scope,
+						status: 'open',
+						order: 0,
+					},
+				},
+			);
+
+			const contract2 = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					data: {
+						scope,
+						status: 'closed',
+						order: 1,
+					},
+				},
+			);
+
+			const stream = await ctx.kernel.stream(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				schema,
+			);
+
+			const queryWithoutMaskId = uuid();
+			const queryWithMaskId = uuid();
+
+			stream.on('dataset', async (payload) => {
+				if (payload.id === queryWithoutMaskId) {
+					expect(payload.cards).toEqual([contract1, contract2]);
+
+					const mask: JsonSchema = {
+						type: 'object',
+						properties: {
+							data: {
+								properties: {
+									status: {
+										const: 'open',
+									},
+								},
+							},
+						},
+					};
+
+					stream.emit('query', {
+						id: queryWithMaskId,
+						schema,
+						options: {
+							mask,
+						},
+					});
+				} else if (payload.id === queryWithMaskId) {
+					expect(payload.cards).toEqual([contract1]);
+					stream.close();
+				}
+			});
+
+			stream.emit('query', {
+				id: queryWithoutMaskId,
+				schema,
+				options: { sortBy: ['data', 'order'] },
+			});
+
+			await once(stream, 'closed');
+		});
+
 		it('should report back elements of a certain type', (done) => {
 			const slug = testUtils.generateRandomSlug();
 
