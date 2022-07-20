@@ -1,4 +1,18 @@
 - commits:
+    - subject: Upgrade `redis` and `"@types/node`
+      hash: fb21c7f3968718d6295552e1a2e06457075a321a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 21.1.1
+  title: "'Upgrade  and '"
+  date: 2022-07-20T19:47:27.330Z
+- commits:
     - subject: Add test for options.mask when querying dataset
       hash: 6fb11d020b05d3b94910b9796807e23fe26ea180
       body: ""
