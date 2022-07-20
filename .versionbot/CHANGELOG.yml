@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add test for options.mask when querying dataset
+      hash: 6fb11d020b05d3b94910b9796807e23fe26ea180
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: karaxuna
+      nested: []
+  version: 21.1.0
+  title: "'Add test for options.mask when querying dataset'"
+  date: 2022-07-20T19:23:33.038Z
+- commits:
     - subject: Remove session contract indirection when finding identity of actor
       hash: 2e38485c75725c0037e2d2efb5bad14a27c77fe7
       body: |
