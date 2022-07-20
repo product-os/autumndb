@@ -7268,6 +7268,7 @@ describe('Kernel', () => {
 					data: {
 						scope,
 						status: 'open',
+						order: 0,
 					},
 				},
 			);
@@ -7280,6 +7281,7 @@ describe('Kernel', () => {
 					data: {
 						scope,
 						status: 'closed',
+						order: 1,
 					},
 				},
 			);
@@ -7326,6 +7328,7 @@ describe('Kernel', () => {
 			stream.emit('query', {
 				id: queryWithoutMaskId,
 				schema,
+				options: { sortBy: ['data', 'order'] },
 			});
 
 			await once(stream, 'closed');
