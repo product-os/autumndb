@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update dependencies (external major bumps)
+      hash: 79f768b437d0b2506e9ebc34ee7b2c5f0eb1d76d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 21.1.3
+  title: "'Update dependencies (external major bumps)'"
+  date: 2022-07-21T14:07:52.412Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 12.2.0 to 12.3.0
       hash: 7cb390b0cdb49cfb7b5d5f6f95ef9711143f467a
       body: ""
