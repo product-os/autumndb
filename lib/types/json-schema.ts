@@ -66,11 +66,11 @@ export type JsonSchema =
 			additionalProperties?: JsonSchema;
 			// These are not supported currently
 			/*patternProperties?: {
-		[key: string]: JsonSchema;
-	};*/
+				[key: string]: JsonSchema;
+			};*/
 			/*dependencies?: {
-		[key: string]: JSONSchema | string[];
-	};*/
+				[key: string]: JSONSchema | string[];
+			};*/
 			// propertyNames?: JsonSchema;
 
 			/**
@@ -106,8 +106,8 @@ export type JsonSchema =
 			 */
 			// This is not supported currently
 			/*definitions?: {
-		[key: string]: JsonSchema;
-	};*/
+				[key: string]: JsonSchema;
+			};*/
 
 			/**
 			 * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-10
