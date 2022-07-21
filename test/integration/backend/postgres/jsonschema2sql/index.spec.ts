@@ -23,56 +23,71 @@ let ctx: {
 };
 
 /*
- * The list of JSON Schema suites we support. This
- * list represents the JSON Schema keywords that are
- * safe to use in queries.
- *
- * See https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/master/tests
- * for more details.
+ * List of JSON Schema keywords we support
  */
-const SUPPORTED_SUITES = [
-	// additionalItems
-	// additionalProperties
+const SUPPORTED_KEYWORDS = [
+	'additionalProperties',
 	'allOf',
 	'anyOf',
-	'boolean_schema',
 	'const',
 	'contains',
-	// default
-	// definitions
-	// dependencies
+	'description',
 	'enum',
+	'examples',
 	'exclusiveMaximum',
 	'exclusiveMinimum',
+	'format',
 	'items',
+	'maximum',
 	'maxItems',
 	'maxLength',
 	'maxProperties',
-	'maximum',
+	'minimum',
 	'minItems',
 	'minLength',
 	'minProperties',
-	'minimum',
 	'multipleOf',
 	'not',
-	// oneOf
-	'bignum',
-	// ecmascript-regex
-	'format',
-	'zeroTerminatedFloats',
+	'oneOf',
 	'pattern',
-	// patternProperties
-	// properties
-	// propertyNames
-	// ref
-	// refRemote
+	'properties',
 	'required',
+	'title',
 	'type',
-	// uniqueItems
-
-	'regexp',
-	'formatMaximum|formatMinimum',
 ];
+
+/*
+ * List of values for the `format` keyword we support
+ */
+const SUPPORTED_FORMATS = [
+	'date-time',
+	'email',
+	'hostname',
+	'ipv4',
+	'ipv6',
+	'json-pointer',
+	'uri-reference',
+	'uri-template',
+	'uri',
+	'uuid',
+
+	// The format we accept for these is different from the standard
+	// 'date',
+	// 'time',
+];
+
+/*
+ * List of specific test cases to skip.
+ */
+const UNSUPPORTED_TEST_CASES: { [key: string]: [string] } = {
+	// We'd have to parse and fixup regexes in the compiler to pass these
+	'ECMA 262 \\w matches ascii letters only': [
+		'latin-1 e-acute does not match (unlike e.g. Python)',
+	],
+	'ECMA 262 \\w matches everything but ascii letters': [
+		'latin-1 e-acute matches (unlike e.g. Python)',
+	],
+};
 
 interface RunnerOptions {
 	context: Context;
@@ -132,7 +147,7 @@ const runner = async ({
 	}
 
 	/*
-	 * 3. Query the elements back using our translator.
+	 * 3. Build the query using our translator.
 	 */
 	const query = jsonschema2sql.compile(context, table, {}, schema, {
 		limit: 1000,
@@ -147,6 +162,44 @@ const runner = async ({
 	return results.map((wrapper: { payload: any }) => {
 		return wrapper.payload;
 	});
+};
+
+const isSupportedSchema = (schema: object | boolean): boolean => {
+	if (typeof schema === 'boolean') {
+		return true;
+	}
+
+	for (const [key, value] of Object.entries(schema)) {
+		if (!SUPPORTED_KEYWORDS.includes(key)) {
+			return false;
+		}
+
+		if (
+			key !== 'const' &&
+			typeof value === 'object' &&
+			!isSupportedSchema(value)
+		) {
+			return false;
+		}
+
+		if (key === 'format' && !SUPPORTED_FORMATS.includes(value)) {
+			return false;
+		}
+
+		if (key === 'additionalProperties' && typeof value === 'object') {
+			return false;
+		}
+
+		if (['allOf', 'anyOf', 'oneOf'].includes(key)) {
+			for (const branch of value) {
+				if (!isSupportedSchema(branch)) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
 };
 
 beforeAll(async () => {
@@ -199,9 +252,9 @@ beforeAll(async () => {
 });
 
 /*
- * Load the standard set of draft6 tests
+ * Load the standard set of draft7 tests
  */
-const testSuites = jsonSchemaTestSuite.draft6();
+const testSuites = jsonSchemaTestSuite.draft7();
 
 /*
  * Add a test suite for the non-standard key word "regexp" that is used by the
@@ -217,7 +270,7 @@ testSuites.push(regexpTestSuite as any);
  */
 testSuites.push(formatMaxMinTestSuite as any);
 
-describe('jsonSchema2sql: JsonSchema compat', () => {
+describe('jsonschema2sql: JSON Schema compatibility', () => {
 	/*
 	 * The JSON Schema tests are divided in suites, where
 	 * each of them corresponds to a JSON Schema keyword.
@@ -230,6 +283,12 @@ describe('jsonSchema2sql: JsonSchema compat', () => {
 			 * that may or may not match the object.
 			 */
 			for (const scenario of suite.schemas) {
+				/*
+				 * Skip the scenario if the schema contains keywords or values
+				 * that are not currently supported.
+				 */
+				const scenarioIsSupported = isSupportedSchema(scenario.schema);
+
 				/*
 				 * Each test case in an scenario contains a boolean
 				 * flag to determine whether it should match or
@@ -264,8 +323,11 @@ describe('jsonSchema2sql: JsonSchema compat', () => {
 					 * first place, but this is a nice way to measure how far
 					 * we are from supporting the whole set of tests.
 					 */
+					const testCaseIsSupported = !UNSUPPORTED_TEST_CASES[
+						scenario.description
+					]?.includes(testCase.description);
 					const autotestFn =
-						SUPPORTED_SUITES.includes(suite.name) && IS_POSTGRES
+						testCaseIsSupported && scenarioIsSupported && IS_POSTGRES
 							? test
 							: test.skip;
 
