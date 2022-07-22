@@ -23,21 +23,8 @@ program
 		'Path to output directory',
 		'lib/types/contracts',
 	)
-	.action((options) => {
-		generateContractInterfaces(options.input, options.output).then(
-			(results) => {
-				const succeeded = _.filter(results, _.identity);
-				console.log(
-					`Generated ${succeeded.length} contract interfaces (${
-						results.length - succeeded.length
-					} failed)`,
-				);
-
-				if (results.length - succeeded.length > 0) {
-					process.exit(1);
-				}
-			},
-		);
+	.action(async (options) => {
+		await generateContractInterfaces(options.input, options.output);
 	});
 
 program.parse();
