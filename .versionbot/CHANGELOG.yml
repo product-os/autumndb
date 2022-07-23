@@ -1,4 +1,20 @@
 - commits:
+    - subject: Alphabetize interface generation output
+      hash: ca8eae9b381250f3a678e4f0dc410dfe16cf2c22
+      body: |
+        Ensure that compiled TypeScript interface definitions are output
+        in alphabetized order.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 21.1.4
+  title: "'Alphabetize interface generation output'"
+  date: 2022-07-22T09:26:18.789Z
+- commits:
     - subject: Update dependencies (external major bumps)
       hash: 79f768b437d0b2506e9ebc34ee7b2c5f0eb1d76d
       body: ""
