@@ -16,15 +16,15 @@ export type {
 } from './authentication-password';
 export type { CardContract, CardContractDefinition, CardData } from './card';
 export type {
-	EventContract,
-	EventContractDefinition,
-	EventData,
-} from './event';
-export type {
 	ErrorContract,
 	ErrorContractDefinition,
 	ErrorData,
 } from './error';
+export type {
+	EventContract,
+	EventContractDefinition,
+	EventData,
+} from './event';
 export type { LinkContract, LinkContractDefinition, LinkData } from './link';
 export type { LoopContract, LoopContractDefinition, LoopData } from './loop';
 export type { OrgContract, OrgContractDefinition, OrgData } from './org';

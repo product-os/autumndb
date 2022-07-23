@@ -40,7 +40,7 @@ const requireFromString = (code: string, filename: string = '') => {
 export async function generateContractInterfaces(
 	input: string,
 	output: string,
-): Promise<boolean[]> {
+): Promise<void> {
 	console.log('Generating TS interface from JSON schema...');
 
 	// Prepare banner comment for generated files
@@ -93,67 +93,49 @@ import type { Contract, ContractDefinition } from '${
 	const indexFile = path.resolve(outputDir, 'index.ts');
 	await fs.promises.appendFile(indexFile, bannerComment);
 
-	// Transform JSON schema to interfaces and output to files
-	const results = await Promise.all(
-		sortBy(contracts, 'slug')
-			.filter((contract) => {
-				return contract.type.split('@')[0] === 'type';
-			})
-			.map(async (contract) => {
-				const schema = get(
-					contract,
-					['data', 'schema', 'properties', 'data'],
-					{},
-				);
-				schema.title = `${contract.slug}-data`;
+	// Compile and output type contract interface definitions
+	const typeContracts = sortBy(contracts, 'slug').filter((contract) => {
+		return contract.type.split('@')[0] === 'type';
+	});
+	for (const contract of typeContracts) {
+		const schema = get(contract, ['data', 'schema', 'properties', 'data'], {});
+		schema.title = `${contract.slug}-data`;
 
-				let compiled = '';
-				try {
-					compiled = await compile(schema, contract.slug, {
-						ignoreMinAndMaxItems: true,
-						style: {
-							bracketSpacing: true,
-							printWidth: 120,
-							semi: true,
-							singleQuote: true,
-							tabWidth: 2,
-							trailingComma: 'all',
-							useTabs: true,
-						},
-						bannerComment: '',
-					});
-				} catch (error) {
-					console.log(`✗ ${contract.slug}: ${error}`);
-					return false;
-				}
-				console.log(`✓ ${contract.slug}`);
+		let compiled = await compile(schema, contract.slug, {
+			ignoreMinAndMaxItems: true,
+			style: {
+				bracketSpacing: true,
+				printWidth: 120,
+				semi: true,
+				singleQuote: true,
+				tabWidth: 2,
+				trailingComma: 'all',
+				useTabs: true,
+			},
+			bannerComment: '',
+		});
+		const contractName = compiled.match(/interface ([a-zA-Z]+)Data/)![1];
 
-				const contractName = compiled.match(/interface ([a-zA-Z]+)Data/)![1];
-
-				// Add definitions for the contract and contract definition
-				compiled += `
+		// Add definitions for the contract and contract definition
+		compiled += `
 export interface ${contractName}ContractDefinition
-	extends ContractDefinition<${contractName}Data> {}
+extends ContractDefinition<${contractName}Data> {}
 
 export interface ${contractName}Contract
-	extends Contract<${contractName}Data> {}
+extends Contract<${contractName}Data> {}
 
 `;
-				// Output to contract definition file
-				const contractFile = path.resolve(outputDir, `${contract.slug}.ts`);
-				await fs.promises.writeFile(
-					contractFile,
-					bannerComment + baseContractImports + compiled,
-				);
+		// Output to contract definition file
+		const contractFile = path.resolve(outputDir, `${contract.slug}.ts`);
+		await fs.promises.writeFile(
+			contractFile,
+			bannerComment + baseContractImports + compiled,
+		);
 
-				// Add contract export to index file
-				await fs.promises.appendFile(
-					indexFile,
-					`export type { ${contractName}Contract, ${contractName}ContractDefinition, ${contractName}Data } from './${contract.slug}';\n`,
-				);
-				return true;
-			}),
-	);
-
-	return results;
+		// Add contract export to index file
+		await fs.promises.appendFile(
+			indexFile,
+			`export type { ${contractName}Contract, ${contractName}ContractDefinition, ${contractName}Data } from './${contract.slug}';\n`,
+		);
+	}
 }
