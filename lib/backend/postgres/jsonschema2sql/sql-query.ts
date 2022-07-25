@@ -11,6 +11,7 @@ import { InvalidSchema } from './errors';
 import { ExpressionFilter } from './expression-filter';
 import { SqlFragmentBuilder } from './fragment-builder';
 import { FullTextSearchFilter } from './full-text-search-filter';
+import { IfThenElseFilter } from './if-then-else-filter';
 import { IsNullFilter } from './is-null-filter';
 import { IsOfJsonTypesFilter } from './is-of-json-types-filter';
 import { JsonMapPropertyCountFilter } from './json-map-property-count-filter';
@@ -360,7 +361,7 @@ type SchemaFormat = keyof typeof REGEXES.format;
  * SqlQuery#toSqlSelect} to generate an SQL query for the parsed JSON schema.
  */
 export class SqlQuery {
-	filter: any;
+	filter: ExpressionFilter;
 	required: string[];
 	filterImpliesExists: boolean;
 	propertiesFilter: null | ExpressionFilter;
@@ -395,6 +396,17 @@ export class SqlQuery {
 			}
 			if ('format' in schema) {
 				query.setFormat(schema.format as any);
+			}
+			if ('if' in schema) {
+				let thenSchema: JsonSchema = true;
+				if ('then' in schema) {
+					thenSchema = schema.then!;
+				}
+				let elseSchema: JsonSchema = true;
+				if ('else' in schema) {
+					elseSchema = schema.else!;
+				}
+				query.addIfThenElse(schema.if!, thenSchema, elseSchema);
 			}
 			for (const [key, value] of Object.entries(schema)) {
 				query.visit(key, value);
@@ -558,6 +570,21 @@ export class SqlQuery {
 		const filter = new MatchesRegexFilter(this.path, regex);
 		this.filter.and(this.ifTypeThen('string', filter));
 	}
+
+	addIfThenElse(
+		ifSchema: JsonSchema,
+		thenSchema: JsonSchema,
+		elseSchema: JsonSchema,
+	) {
+		this.filter.and(
+			new IfThenElseFilter(
+				this.buildQueryFromSubSchema(ifSchema, 'if').filter,
+				this.buildQueryFromSubSchema(thenSchema, 'then').filter,
+				this.buildQueryFromSubSchema(elseSchema, 'else').filter,
+			),
+		);
+	}
+
 	finalize() {
 		const noPropertiesFilter = this.propertiesFilter === null;
 		if (this.required.length === 0 && noPropertiesFilter) {
@@ -585,9 +612,12 @@ export class SqlQuery {
 		const skippedKeywords = [
 			'additionalProperties',
 			'description',
+			'else',
 			'examples',
 			'format',
+			'if',
 			'required',
+			'then',
 			'title',
 			'type',
 		];
@@ -600,7 +630,7 @@ export class SqlQuery {
 			return `invalid key: ${this.formatJsonPath(key)}`;
 		});
 
-		this[visitor](value);
+		(this[visitor] as any)(value);
 	}
 
 	$$linksVisitor(linkMap: { [s: string]: JsonSchema }) {
