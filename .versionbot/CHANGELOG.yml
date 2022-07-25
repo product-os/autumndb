@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add support for JSON Schema's `if`/`then`/`else` keywords
+      hash: 8b867c476af9d2560e2acb8e0ddd14d9ec1d1bc4
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 21.2.0
+  title: "'Add support for JSON Schema's if/then/else keywords'"
+  date: 2022-07-25T16:03:53.442Z
+- commits:
     - subject: Update typedoc from 0.23.8 to 0.23.9
       hash: 5d2103f8b40c225f7929982588d97de50ea59bbd
       body: ""
