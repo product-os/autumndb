@@ -10,12 +10,12 @@ export const mergeProperties = {
 		default: 0,
 	},
 
-	// this.links."was built from".merged
+	// this.links."was transformed from".merged
 	parentMerged: {
 		description: 'parent contract was already merged',
 		type: 'boolean',
 		$$formula:
-			'contract.links["was built from"].length > 0 && EVERY(contract.links["was built from"], "data.$transformer.merged") === true',
+			'contract.links["was transformed from"].length > 0 && EVERY(contract.links["was transformed from"], "data.$transformer.merged") === true',
 		readOnly: true,
 		default: false,
 	},
@@ -42,14 +42,14 @@ export const mergeProperties = {
 		else if isFinalVersion
 			this.links.was merged from.mergeConfirmed
 		else
-			this.links.was built into.all(c => c.merged && c.mergeConfirmed)
+			this.links.was transformed to.all(c => c.merged && c.mergeConfirmed)
 	*/
 	mergeConfirmed: {
 		description: 'all downstream contracts are merged',
 		type: 'boolean',
 		$$formula: `(${isDraftVersion}
-									&& EVERY(contract.links["was built into"], "data.$transformer.merged")
-									&& EVERY(contract.links["was built into"], "data.$transformer.mergeConfirmed")
+									&& EVERY(contract.links["was transformed to"], "data.$transformer.merged")
+									&& EVERY(contract.links["was transformed to"], "data.$transformer.mergeConfirmed")
 								) || (${isFinalVersion}
 									&& PROPERTY(contract.links["was merged from"][0], "data.$transformer.mergeConfirmed") === true )`,
 		readOnly: true,
