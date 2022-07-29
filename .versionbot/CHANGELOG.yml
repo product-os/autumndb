@@ -1,4 +1,20 @@
 - commits:
+    - subject: Rename `was built into` relationship to `was transformed to`.
+      hash: 94a96c2db80a44117a19e66e3d16457359bb7b80
+      body: |
+        This is part of the effort to align the terminologies with
+        transformers.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+  version: 21.2.1
+  title: "'Rename  relationship to .'"
+  date: 2022-07-28T15:16:25.713Z
+- commits:
     - subject: Add support for JSON Schema's `if`/`then`/`else` keywords
       hash: 8b867c476af9d2560e2acb8e0ddd14d9ec1d1bc4
       body: ""
