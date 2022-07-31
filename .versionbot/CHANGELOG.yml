@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update jest monorepo
+      hash: ebeb1ef868d660d0cf073d3da781783d69861e4c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 21.3.9
+  title: "'Update jest monorepo'"
+  date: 2022-07-31T20:49:13.520Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.106 to 2.0.107
       hash: dfae1e9fbc10696d5fd2388104f391e6c5245249
       body: ""
