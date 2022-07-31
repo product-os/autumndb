@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update dependencies to 7
+      hash: 7b5dab506e42865b35edc763e9032f285eb36c86
+      body: |
+        Update redis to 7
+
+        Update redis from 6 to 7
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: renovate[bot]
+      nested: []
+  version: 21.3.0
+  title: "'Update dependencies to 7'"
+  date: 2022-07-31T01:04:28.271Z
+- commits:
     - subject: Rename `was built into` relationship to `was transformed to`.
       hash: 94a96c2db80a44117a19e66e3d16457359bb7b80
       body: |
