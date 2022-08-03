@@ -1,3 +1,4 @@
+/* tslint:disable no-floating-promises */
 import { strict as assert } from 'assert';
 import * as Bluebird from 'bluebird';
 import { once } from 'events';
@@ -7670,7 +7671,7 @@ describe('Kernel', () => {
 				});
 		});
 
-		it('should be able to resolve links when a new link is added', (done) => {
+		it.only('should be able to resolve links when a new link is added', (done) => {
 			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
@@ -7765,6 +7766,136 @@ describe('Kernel', () => {
 						},
 					);
 				});
+		});
+
+		it.only('should be able to resolve links when subsequent links of the same verb are added', async () => {
+			const slug = testUtils.generateRandomSlug();
+
+			// Create the base contract, and two additional contracts to link to
+			const contract1 = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					slug,
+					type: 'card@1.0.0',
+					data: {
+						test: 1,
+					},
+				},
+			);
+
+			const contract2 = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					data: {
+						test: 2,
+					},
+				},
+			);
+
+			const contract3 = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'card@1.0.0',
+					data: {
+						test: 3,
+					},
+				},
+			);
+
+			// Create the first link between contract 1 and contract 2
+			await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
+					type: 'link@1.0.0',
+					name: 'is attached to',
+					data: {
+						inverseName: 'has attached element',
+						from: {
+							id: contract1.id,
+							type: contract1.type,
+						},
+						to: {
+							id: contract2.id,
+							type: contract2.type,
+						},
+					},
+				},
+			);
+
+			const emitter = await ctx.kernel.stream(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					$$links: {
+						'is attached to': {
+							type: 'object',
+							additionalProperties: false,
+							properties: {
+								slug: {
+									type: 'string',
+								},
+							},
+						},
+					},
+					type: 'object',
+					additionalProperties: false,
+					properties: {
+						slug: {
+							type: 'string',
+							const: slug,
+						},
+						type: {
+							type: 'string',
+							const: 'card@1.0.0',
+						},
+					},
+					required: ['type', 'links'],
+				},
+			);
+
+			const result = await new Promise(async (resolve, reject) => {
+				emitter.on('data', (change) => {
+					resolve(change.after);
+				});
+
+				emitter.on('error', reject);
+
+				// Insert a second link between contract 1 and contract 3 - this should trigger a stream update
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+					type: 'link@1.0.0',
+					name: 'is attached to',
+					data: {
+						inverseName: 'has attached element',
+						from: {
+							id: contract1.id,
+							type: contract1.type,
+						},
+						to: {
+							id: contract3.id,
+							type: contract3.type,
+						},
+					},
+				});
+			});
+
+			expect(result).toEqual({
+				type: 'card@1.0.0',
+				slug,
+				links: {
+					'is attached to': [
+						{
+							slug: contract3.slug,
+						},
+					],
+				},
+			});
+			emitter.close();
 		});
 
 		// TODO: Get this working, but in a performant way.
