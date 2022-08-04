@@ -65,6 +65,12 @@ export interface QueryOptions {
 	profile?: boolean;
 }
 
+export interface StreamOptions {
+	links?: { [key: string]: StreamOptions };
+
+	mask?: JsonSchema;
+}
+
 // Contracts that are inserted by default.
 const CORE_CONTRACTS = [
 	CONTRACTS.card,
@@ -1389,7 +1395,7 @@ export class Kernel {
 		context.debug('Opening stream');
 
 		const stream = await this.backend.stream(
-			await getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
+			getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
 			authorizedQuerySchema,
 			options,
 		);
@@ -1507,7 +1513,7 @@ const setupStreamEventHandlers = async (
 			);
 
 			const contracts = await stream.query(
-				await getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
+				getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
 				authorizedQuerySchema,
 				payload.options,
 			);
@@ -1531,7 +1537,7 @@ const setupStreamEventHandlers = async (
 		);
 
 		stream.setSchema(
-			await getSelectObjectFromSchema(newSchema, authorizedQuerySchema),
+			getSelectObjectFromSchema(newSchema, authorizedQuerySchema),
 			authorizedQuerySchema,
 		);
 	});

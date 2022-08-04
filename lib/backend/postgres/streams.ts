@@ -5,13 +5,13 @@ import { Notification } from 'pg';
 import * as pgFormat from 'pg-format';
 import { v4 as uuidv4 } from 'uuid';
 import * as backend from '.';
-import type { QueryOptions } from '../..';
 import type { Contract, JsonSchema } from '../../types';
 import {
 	Context,
 	DatabaseNotificationHandler,
 	PreparedStatement,
 } from '../../context';
+import type { StreamOptions } from '../../kernel';
 import type { BackendQueryOptions, SelectObject } from './types';
 
 export interface StreamChange {
@@ -167,7 +167,7 @@ export class Streamer {
 	async attach(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: QueryOptions = {},
+		options: StreamOptions = {},
 	) {
 		return new Stream(this.context, this, uuidv4(), select, schema, options);
 	}
@@ -200,7 +200,7 @@ export class Stream extends EventEmitter {
 		id: string,
 		select: SelectObject,
 		schema: JsonSchema,
-		options: QueryOptions = {},
+		options: StreamOptions = {},
 	) {
 		super();
 		this.setMaxListeners(Infinity);
@@ -273,7 +273,7 @@ export class Stream extends EventEmitter {
 	setSchema(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: QueryOptions = {},
+		options: StreamOptions = {},
 	) {
 		this.constCardId = _.get(schema, ['properties', 'id', 'const']);
 		this.constCardSlug = _.get(schema, ['properties', 'slug', 'const']);
@@ -301,9 +301,9 @@ export class Stream extends EventEmitter {
 		}
 		this.streamQuery = Context.prepareQuery(
 			backend.compileSchema(this.context, this.streamer.table, select, schema, {
+				...options,
 				limit: 1,
 				extraFilter: `${this.streamer.table}.id = $1`,
-				...options,
 			}).query,
 		);
 		this.schema = schema;
