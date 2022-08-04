@@ -1,4 +1,18 @@
 - commits:
+    - subject: Stream options are now of a new, more restricted type `StreamOptions`
+      hash: 31ddccc9393535eeecd77f8e8a7ca8846841e932
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 22.0.0
+  title: "'Stream options are now of a new, more restricted type '"
+  date: 2022-08-04T18:04:06.305Z
+- commits:
     - subject: Don't log entire stream schema on error
       hash: d208cf183f8583edd710a2071c6b274c055bf1e3
       body: >
