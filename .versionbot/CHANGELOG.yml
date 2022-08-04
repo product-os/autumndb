@@ -1,4 +1,19 @@
 - commits:
+    - subject: Don't log entire stream schema on error
+      hash: d208cf183f8583edd710a2071c6b274c055bf1e3
+      body: >
+        This reduces verbosity of stream errors, making them easier to work with.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 21.3.15
+  title: "'Don't log entire stream schema on error'"
+  date: 2022-08-04T09:47:15.267Z
+- commits:
     - subject: Update typedoc from 0.23.9 to 0.23.10
       hash: a828106839a8afcd18189a75972530b6bc35609c
       body: ""
