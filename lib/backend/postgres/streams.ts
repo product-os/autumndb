@@ -230,7 +230,6 @@ export class Stream extends EventEmitter {
 				id,
 				table: streamer.table,
 				message: error.message,
-				schema,
 			});
 		});
 	}
