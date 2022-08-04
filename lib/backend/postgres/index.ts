@@ -10,7 +10,7 @@ import * as skhema from 'skhema';
 import type { Cache } from '../../cache';
 import { Context, Database, Query, TransactionIsolation } from '../../context';
 import * as errors from '../../errors';
-import type { QueryOptions } from '../../kernel';
+import type { StreamOptions } from '../../kernel';
 import type {
 	Contract,
 	ContractDefinition,
@@ -1260,7 +1260,7 @@ export class PostgresBackend implements Database {
 	async stream(
 		select: SelectObject,
 		schema: JsonSchema,
-		options: QueryOptions = {},
+		options: StreamOptions = {},
 	): Promise<streams.Stream> {
 		nativeAssert(!!this.streamClient, 'Stream client must be initialized');
 		/*
