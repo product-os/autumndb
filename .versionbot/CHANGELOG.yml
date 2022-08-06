@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update json-schema-to-typescript from 11.0.0 to 11.0.1
+      hash: 00d20eb5a4f0576b24c2c77a9274a312986c28f8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.0.1
+  title: "'Update json-schema-to-typescript from 11.0.0 to 11.0.1'"
+  date: 2022-08-06T00:15:07.560Z
+- commits:
     - subject: Stream options are now of a new, more restricted type `StreamOptions`
       hash: 31ddccc9393535eeecd77f8e8a7ca8846841e932
       body: ""
