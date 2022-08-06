@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update commander from 9.3.0 to 9.4.0
+      hash: 3970cc4b1c8522f98f171b3867c4e5654a6784f9
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.0.4
+  title: "'Update commander from 9.3.0 to 9.4.0'"
+  date: 2022-08-06T03:33:26.859Z
+- commits:
     - subject: Update ts-jest from 28.0.5 to 28.0.7
       hash: 8b3a7c634c0614d030ad4582e0d7e26ca86d0d7f
       body: ""
