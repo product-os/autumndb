@@ -63,7 +63,7 @@
     "json-e": "^4.4.3",
     "json-schema": "^0.4.0",
     "json-schema-deref-sync": "^0.14.0",
-    "json-schema-to-typescript": "^11.0.0",
+    "json-schema-to-typescript": "^11.0.1",
     "lodash": "^4.17.21",
     "pg": "^8.7.3",
     "pg-format": "^1.0.4",
