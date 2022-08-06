@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update json-schema-to-typescript from 11.0.1 to 11.0.2
+      hash: 0a718f26e65aac2ef86860aaa7b0009e51d8f135
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.0.6
+  title: "'Update json-schema-to-typescript from 11.0.1 to 11.0.2'"
+  date: 2022-08-06T11:47:19.693Z
+- commits:
     - subject: Update ts-node from 10.8.1 to 10.9.1
       hash: 2ed47f730df3c39696ac6d416a9e618df033308b
       body: ""
