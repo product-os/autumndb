@@ -1,4 +1,18 @@
 - commits:
+    - subject: Index commonly queried fields on relationships
+      hash: 88d8021c7658586f4903ab2207a0b2fd99aac184
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 22.1.0
+  title: "'Index commonly queried fields on relationships'"
+  date: 2022-08-10T13:14:39.849Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.115 to 2.0.116
       hash: 6127c6180bd33b1073aff283677d771e420cb9a8
       body: ""
