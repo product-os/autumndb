@@ -59,6 +59,11 @@ export const relationship: ContractDefinition = {
 				},
 			},
 		},
-		indexed_fields: [['data.from.type', 'data.to.type'], ['slug']],
+		indexed_fields: [
+			['data.from.type', 'data.to.type'],
+			['slug'],
+			['name', 'data.from.type', 'data.to.type'],
+			['data.inverseName', 'data.from.type', 'data.to.type'],
+		],
 	},
 };
