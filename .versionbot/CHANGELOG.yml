@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/semver from 7.3.10 to 7.3.12
+      hash: 7427d6930be272509b0d09d74559912adfbdff29
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.1.1
+  title: "'Update @types/semver from 7.3.10 to 7.3.12'"
+  date: 2022-08-13T00:07:49.693Z
+- commits:
     - subject: Index commonly queried fields on relationships
       hash: 88d8021c7658586f4903ab2207a0b2fd99aac184
       body: ""
