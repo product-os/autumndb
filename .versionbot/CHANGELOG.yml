@@ -1,4 +1,37 @@
 - commits:
+    - subject: Support link updates in streams
+      hash: 7aa3a8fc5d36516a33b3ba9f7356623fcbe508dd
+      body: |
+        The stream trigger will now return link metadata, allowing updates on
+        links to be returned by a stream in a performance way.
+        The heuristics for detecting if a link insert is relevant to the current
+        streamed schema has been borrowed from the trigger handling logic in
+        jellyfish-worker, and ideally should be unified - likely in a helper
+        function here in AutumnDB.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Fix bug where stream updates don't occur for new links
+      hash: 96f9925dbdc265ed40de646aaa221d29614a12aa
+      body: |
+        This PR fixes a bug where you won't get a stream update when for
+        multiple links with the same verb. The first link *will* trigger an
+        update, but any after that do not.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 22.1.9
+  title: "'Fix bug where stream updates don't occur for new links'"
+  date: 2022-08-15T12:57:34.969Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.119 to 2.0.120
       hash: d60b93d4444b44c78a04c7f5ee283cd8468c9e11
       body: ""
