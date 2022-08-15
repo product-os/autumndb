@@ -7671,7 +7671,7 @@ describe('Kernel', () => {
 				});
 		});
 
-		it.only('should be able to resolve links when a new link is added', (done) => {
+		it('should be able to resolve links when a new link is added', (done) => {
 			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
@@ -7768,7 +7768,7 @@ describe('Kernel', () => {
 				});
 		});
 
-		it.only('should be able to resolve links when subsequent links of the same verb are added', async () => {
+		it('should be able to resolve links when subsequent links of the same verb are added', async () => {
 			const slug = testUtils.generateRandomSlug();
 
 			// Create the base contract, and two additional contracts to link to
@@ -7889,6 +7889,9 @@ describe('Kernel', () => {
 				slug,
 				links: {
 					'is attached to': [
+						{
+							slug: contract2.slug,
+						},
 						{
 							slug: contract3.slug,
 						},

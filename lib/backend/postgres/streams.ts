@@ -4,8 +4,9 @@ import * as _ from 'lodash';
 import { Notification } from 'pg';
 import * as pgFormat from 'pg-format';
 import { v4 as uuidv4 } from 'uuid';
+import { setTimeout as delay } from 'timers/promises';
 import * as backend from '.';
-import type { Contract, JsonSchema } from '../../types';
+import type { Contract, JsonSchema, LinkContract } from '../../types';
 import {
 	Context,
 	DatabaseNotificationHandler,
@@ -22,10 +23,16 @@ export interface StreamChange {
 }
 
 interface EventPayload {
-	id: any;
-	slug: any;
-	cardType?: any;
-	type?: any;
+	id: string;
+	slug: string;
+	cardType: string;
+	type?: 'insert' | 'update' | 'delete';
+	linkData: {
+		name: LinkContract['name'];
+		inverseName: LinkContract['data']['inverseName'];
+		from: LinkContract['data']['from'];
+		to: LinkContract['data']['to'];
+	};
 }
 
 const INSERT_EVENT = 'insert';
@@ -83,7 +90,13 @@ export const setupTrigger = async (
 					'cardType', type,
 					'slug', slug,
 					'type', changeType,
-					'table', TG_TABLE_NAME
+					'table', TG_TABLE_NAME,
+					'linkData', (CASE WHEN (type  = 'link@1.0.0') THEN json_build_object(
+							'name', NEW.name,
+							'inverseName', NEW.data->'inverseName',
+							'from', NEW.data->'from',
+							'to', NEW.data->'to'
+						) ELSE NULL END)
 				)::text
 			);
 
@@ -193,6 +206,7 @@ export class Stream extends EventEmitter {
 	cardTypes: null | string[];
 	streamQuery?: PreparedStatement;
 	schema: JsonSchema = false;
+	traversesLinks: boolean = false;
 
 	constructor(
 		context: Context,
@@ -307,6 +321,8 @@ export class Stream extends EventEmitter {
 			}).query,
 		);
 		this.schema = schema;
+		this.traversesLinks =
+			typeof schema !== 'boolean' && schema.hasOwnProperty('$$links');
 	}
 
 	async push(payload: EventPayload) {
@@ -322,18 +338,94 @@ export class Stream extends EventEmitter {
 		}
 	}
 
+	// TODO: Unify this with the trigger matching logic in jellyfish-worker
+	// see: https://github.com/product-os/jellyfish-worker/blob/master/lib/triggers.ts#L43
 	async tryEmitEvent(payload: EventPayload) {
-		if (this.constCardId && payload.id !== this.constCardId) {
-			return false;
-		}
-		if (this.constCardSlug && payload.slug !== this.constCardSlug) {
-			return false;
-		}
-		if (
-			this.cardTypes &&
-			!this.cardTypes.includes(payload.cardType.split('@')[0])
-		) {
-			return false;
+		let searchId = payload.id;
+		if (payload.linkData && this.traversesLinks) {
+			/*
+			 * This is the tricky part, where we augment the trigger
+			 * schema with the right contract id. The challenge is that
+			 * we need to consider link contracts, and use the id from
+			 * the right direction of the link depending on the
+			 * link name in the trigger schema.
+			 */
+			const schema = this.schema;
+			if (typeof schema === 'boolean') {
+				return false;
+			}
+			if (schema.$$links) {
+				const verb = Object.keys(schema.$$links)[0];
+
+				// If the link being inserted joins different types together
+				// than what is defined in the filter schema, we can use
+				// this as a heuristic to validate the trigger
+
+				// Get a list of types the filter link expansion queries against
+				const linkToTypeKeySchema = (schema.$$links[verb] as any)?.properties
+					?.type;
+				let linkToTypes: null | string[] = null;
+				if (linkToTypeKeySchema?.const) {
+					linkToTypes = [linkToTypeKeySchema.const];
+				} else if (linkToTypeKeySchema?.enum) {
+					linkToTypes = linkToTypeKeySchema.enum;
+				}
+
+				// Get a list of types the filter queries against
+				const linkFromTypeKeySchema = schema.properties?.type as any;
+				let linkFromTypes: null | string[] = null;
+				if (linkFromTypeKeySchema?.const) {
+					linkFromTypes = [linkFromTypeKeySchema.const];
+				} else if (linkFromTypeKeySchema?.enum) {
+					linkFromTypes = linkFromTypeKeySchema.enum;
+				}
+
+				// Check if the link contract references the same types as the filter
+				// The type testing heuristic needs to run the other way around if the verb
+				// in the filter is the inverse name
+				if (verb === payload.linkData.name) {
+					if (
+						(linkFromTypes &&
+							!linkFromTypes.includes(payload.linkData.from.type)) ||
+						(linkToTypes && !linkToTypes.includes(payload.linkData.to.type))
+					) {
+						return false;
+					}
+
+					searchId = payload.linkData.from.id;
+				} else if (verb === payload.linkData.inverseName) {
+					if (
+						(linkToTypes &&
+							!linkToTypes.includes(payload.linkData.from.type)) ||
+						(linkFromTypes && !linkFromTypes.includes(payload.linkData.to.type))
+					) {
+						return false;
+					}
+
+					searchId = payload.linkData.to.id;
+
+					// Abort if the link doesn't match.
+				} else {
+					return false;
+				}
+				// If this is an update from a link, we need to allow a small grace period
+				// to allow the link tables to be updated before querying, otherwise the
+				// linked data will not appear in the result
+				await delay(10);
+			}
+		} else {
+			if (this.constCardId && payload.id !== this.constCardId) {
+				return false;
+			}
+			if (this.constCardSlug && payload.slug !== this.constCardSlug) {
+				return false;
+			}
+			if (
+				this.cardTypes &&
+				!this.cardTypes.includes(payload.cardType.split('@')[0])
+			) {
+				return false;
+			}
 		}
 		if (payload.type === DELETE_EVENT) {
 			this.seenCardIds.delete(payload.id);
@@ -348,7 +440,7 @@ export class Stream extends EventEmitter {
 		try {
 			const result = (
 				await backend.runQuery(this.context, this.schema, this.streamQuery!, [
-					payload.id,
+					searchId,
 				])
 			).elements;
 			if (result.length === 1) {
