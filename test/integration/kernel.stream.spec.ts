@@ -699,7 +699,7 @@ describe('Kernel', () => {
 				});
 		});
 
-		it.skip('should be able to resolve links when subsequent links of the same verb are added', async () => {
+		it('should be able to resolve links when subsequent links of the same verb are added', async () => {
 			const slug = testUtils.generateRandomSlug();
 
 			// Create the base contract, and two additional contracts to link to
@@ -851,8 +851,7 @@ describe('Kernel', () => {
 			emitter.close();
 		});
 
-		// TODO: Get this working, but in a performant way.
-		test.skip('should be able to resolve links on an update to the linked contract', (done) => {
+		test('should be able to resolve links on an update to the linked contract', (done) => {
 			const slug = testUtils.generateRandomSlug();
 
 			ctx.kernel
@@ -862,12 +861,7 @@ describe('Kernel', () => {
 							type: 'object',
 							additionalProperties: false,
 							properties: {
-								slug: {
-									type: 'string',
-								},
-								data: {
-									type: 'object',
-								},
+								slug: true,
 							},
 						},
 					},
@@ -875,15 +869,13 @@ describe('Kernel', () => {
 					additionalProperties: false,
 					properties: {
 						slug: {
-							type: 'string',
 							const: slug,
 						},
 						type: {
-							type: 'string',
 							const: 'card@1.0.0',
 						},
+						links: true,
 					},
-					required: ['type'],
 				})
 				.then(async (emitter: Stream) => {
 					const contract1 = await ctx.kernel.insertContract(
@@ -934,8 +926,8 @@ describe('Kernel', () => {
 
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
-							type: 'card@1.0.0',
 							slug,
+							type: 'card@1.0.0',
 							links: {
 								'is attached to': [
 									{
@@ -1174,7 +1166,7 @@ describe('Kernel', () => {
 			expect(results).toEqual([contract]);
 		});
 
-		it.skip('should respond to an unmatch update to the linked contract', async () => {
+		it('should respond to an unmatch update to the linked contract', async () => {
 			const slug = testUtils.generateRandomSlug();
 
 			const contract1 = await ctx.kernel.insertContract(
