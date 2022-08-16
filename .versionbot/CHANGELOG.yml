@@ -1,4 +1,30 @@
 - commits:
+    - subject: Add skipped test cases for stream functionality we need to implement
+      hash: 944cf9c40f17d11afcfc8bdc2aa73530d50cc37e
+      body: |
+        This change also refactors stream tests into a seperate spec file for
+        ease-of-use.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Add test for stream updates for new links of the same verb
+      hash: 462d931cdac4e0c71e06727bd274fba59319fa7e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 22.1.9
+  title: "'Add failing stream tests'"
+  date: 2022-08-16T11:00:53.676Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.119 to 2.0.120
       hash: d60b93d4444b44c78a04c7f5ee283cd8468c9e11
       body: ""
