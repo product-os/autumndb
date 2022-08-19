@@ -5,7 +5,7 @@ import { Notification } from 'pg';
 import * as pgFormat from 'pg-format';
 import { v4 as uuidv4 } from 'uuid';
 import * as backend from '.';
-import type { Contract, JsonSchema } from '../../types';
+import type { Contract, JsonSchema, LinkContract } from '../../types';
 import {
 	Context,
 	DatabaseNotificationHandler,
@@ -22,10 +22,16 @@ export interface StreamChange {
 }
 
 interface EventPayload {
-	id: any;
-	slug: any;
-	cardType?: any;
-	type?: any;
+	id: string;
+	slug: string;
+	cardType: string;
+	type: 'update' | 'insert' | 'delete';
+	linkData: null | {
+		name: LinkContract['name'];
+		inverseName: LinkContract['data']['inverseName'];
+		from: LinkContract['data']['from'];
+		to: LinkContract['data']['to'];
+	};
 }
 
 const INSERT_EVENT = 'insert';
@@ -58,6 +64,7 @@ export const setupTrigger = async (
 			slug TEXT;
 			type TEXT;
 			changeType TEXT;
+			linkData JSON;
 		BEGIN
 			IF (TG_OP = 'INSERT') THEN
 				id := NEW.id;
@@ -76,6 +83,24 @@ export const setupTrigger = async (
 				changeType := '${DELETE_EVENT}';
 			END IF;
 
+			IF (type  = 'link@1.0.0') THEN
+				IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
+					linkData := json_build_object(
+						'name', NEW.name,
+						'inverseName', NEW.data->'inverseName',
+						'from', NEW.data->'from',
+						'to', NEW.data->'to'
+					);
+				ELSE
+					linkData := json_build_object(
+						'name', OLD.name,
+						'inverseName', OLD.data->'inverseName',
+						'from', OLD.data->'from',
+						'to', OLD.data->'to'
+					);
+				END IF;
+			END IF;
+
 			PERFORM pg_notify(
 				TG_ARGV[0],
 				json_build_object(
@@ -83,7 +108,8 @@ export const setupTrigger = async (
 					'cardType', type,
 					'slug', slug,
 					'type', changeType,
-					'table', TG_TABLE_NAME
+					'table', TG_TABLE_NAME,
+					'linkData', linkData
 				)::text
 			);
 
@@ -184,32 +210,26 @@ export class Streamer {
 }
 
 export class Stream extends EventEmitter {
-	seenCardIds: Set<unknown>;
-	streamer: Streamer;
-	id: string;
-	context: Context;
-	constCardId?: string;
-	constCardSlug?: string;
-	cardTypes: null | string[];
-	streamQuery?: PreparedStatement;
-	schema: JsonSchema = false;
+	// This is a map from contract IDs to a set of root contract IDs that link
+	// to it, directly or not. Root contracts reference themselves
+	private seenContractIds: { [key: string]: Set<string> } = {};
 
-	constructor(
-		context: Context,
-		streamer: Streamer,
-		id: string,
+	private constCardId?: string;
+	private constCardSlug?: string;
+	private cardTypes: null | string[] = null;
+	private streamQuery?: PreparedStatement;
+	private schema: JsonSchema = false;
+
+	public constructor(
+		private context: Context,
+		private streamer: Streamer,
+		private id: string,
 		select: SelectObject,
 		schema: JsonSchema,
 		options: StreamOptions = {},
 	) {
 		super();
 		this.setMaxListeners(Infinity);
-
-		this.seenCardIds = new Set();
-		this.streamer = streamer;
-		this.id = id;
-		this.context = context;
-		this.cardTypes = null;
 
 		this.setSchema(select, schema, options);
 
@@ -234,13 +254,13 @@ export class Stream extends EventEmitter {
 		});
 	}
 
-	async query(
+	public async query(
 		select: SelectObject,
 		schema: JsonSchema,
 		options?: Partial<BackendQueryOptions>,
 	) {
 		// Query the cards with the IDs so we can add them to
-		// `this.seenCardIds`
+		// `this.seenContractIds`
 		const selectsId = 'id' in select;
 
 		if (!selectsId) {
@@ -257,7 +277,7 @@ export class Stream extends EventEmitter {
 		);
 
 		for (const contract of elements) {
-			this.seenCardIds.add(contract.id);
+			this.seeContractTree(contract);
 		}
 
 		// Remove the ID if that wasn't requested in the first place
@@ -270,7 +290,7 @@ export class Stream extends EventEmitter {
 		return elements;
 	}
 
-	setSchema(
+	public setSchema(
 		select: SelectObject,
 		schema: JsonSchema,
 		options: StreamOptions = {},
@@ -302,27 +322,119 @@ export class Stream extends EventEmitter {
 		this.streamQuery = Context.prepareQuery(
 			backend.compileSchema(this.context, this.streamer.table, select, schema, {
 				...options,
-				limit: 1,
-				extraFilter: `${this.streamer.table}.id = $1`,
+				limit: backend.MAXIMUM_QUERY_LIMIT,
+				extraFilter: `${this.streamer.table}.id IN $1`,
 			}).query,
 		);
 		this.schema = schema;
 	}
 
-	async push(payload: EventPayload) {
-		if (await this.tryEmitEvent(payload)) {
-			this.seenCardIds.add(payload.id);
-		} else if (this.seenCardIds.delete(payload.id)) {
-			this.emit('data', {
-				id: payload.id,
-				contractType: payload.cardType,
-				type: UNMATCH_EVENT,
-				after: null,
-			});
+	public async push(payload: EventPayload) {
+		if (payload.cardType === 'link@1.0.0') {
+			// Adding or removing links do not cause any changes to the linked
+			// contracts, so we have to look at link contracts to handle those
+			// cases
+			// TODO: note that we don't hadle the case where a link contract is
+			// modified to point at different contracts. This shouldn't happen
+			// anyway so it shouldn't be a problem
+			const rootIds: Set<string> = new Set();
+			const fromRootSet = this.seenContractIds[payload.linkData!.from.id];
+			if (fromRootSet) {
+				for (const id of fromRootSet) {
+					rootIds.add(id);
+				}
+			}
+			const toRootSet = this.seenContractIds[payload.linkData!.to.id];
+			if (toRootSet) {
+				for (const id of toRootSet) {
+					rootIds.add(id);
+				}
+			}
+			await this.contractsUpdated(rootIds);
+
+			// TODO: since we're doing an early return here we miss the case
+			// where a contract is linked to another link contract. There is no
+			// reason for this to happen atm so it's a sensible simplification
+			return;
+		}
+
+		const rootIds = this.seenContractIds[payload.id];
+		if (rootIds) {
+			// We've already seen this contract so no need to heuristically
+			// filter it
+
+			if (payload.type === DELETE_EVENT && rootIds.has(payload.id)) {
+				// A root contract was deleted. Emit a delete event for it
+				this.unseeContractId(payload.id);
+				this.emit('data', {
+					id: payload.id,
+					contractType: payload.cardType,
+					type: DELETE_EVENT,
+					after: null,
+				});
+			} else {
+				// Root contracts were updated. We will emit an update event
+				// or an unmatch event
+				await this.contractsUpdated(rootIds);
+			}
+		} else if (payload.type !== DELETE_EVENT) {
+			// We haven't seen this contract yet. And if it's deleted we don't
+			// care regardless
+			await this.filterContractUpdated(payload);
 		}
 	}
 
-	async tryEmitEvent(payload: EventPayload) {
+	private async filterContractUpdated(payload: EventPayload) {
+		if (this.constCardId && payload.id !== this.constCardId) {
+			return;
+		}
+		if (this.constCardSlug && payload.slug !== this.constCardSlug) {
+			return;
+		}
+		if (
+			this.cardTypes &&
+			!this.cardTypes.includes(payload.cardType.split('@')[0])
+		) {
+			return;
+		}
+
+		await this.contractsUpdated(new Set([payload.id]));
+	}
+
+	private async contractsUpdated(rootIds: Set<string>) {
+		try {
+			const contracts = (await backend.runQuery(this.context, this.schema, this.streamQuery!, [rootIds])).elements;
+
+			for (const contract of contracts) {
+				rootIds.delete(contract.id);
+				this.seeContractTree(contract);
+				this.emit('data', {
+					id: contract.id,
+					contractType: contract.cardType,
+					type: UPDATE_EVENT,
+					after: contract,
+				});
+			}
+
+			for (const contractId of rootIds) {
+				this.unseeContractId(contractId);
+				this.emit('data', {
+					id: contractId,
+					contractType: contract.cardType,
+					type: UNMATCH_EVENT,
+					after: null,
+				});
+			}
+		} catch (error: unknown) {
+			metrics.markStreamError(
+				this.context.getLogContext(),
+				this.streamer.table,
+			);
+			this.emit('error', error);
+		}
+	}
+
+	private async tryEmitEvent(payload: EventPayload) {
 		if (this.constCardId && payload.id !== this.constCardId) {
 			return false;
 		}
@@ -336,7 +448,7 @@ export class Stream extends EventEmitter {
 			return false;
 		}
 		if (payload.type === DELETE_EVENT) {
-			this.seenCardIds.delete(payload.id);
+			this.seenContractIds.delete(payload.id);
 			this.emit('data', {
 				id: payload.id,
 				contractType: payload.cardType,
@@ -371,7 +483,48 @@ export class Stream extends EventEmitter {
 		return true;
 	}
 
-	close() {
+	private seeContractTree(contract: Contract, rootId: string = contract.id) {
+		if (contract.id in this.seenContractIds) {
+			this.seenContractIds[contract.id].add(rootId);
+		} else {
+			this.seenContractIds[contract.id] = new Set([rootId]);
+		}
+
+		if ('links' in contract) {
+			for (const linkTypeLinked of Object.values(contract.links!)) {
+				for (const linked of linkTypeLinked) {
+					this.seeContractTree(linked, rootId);
+				}
+			}
+		}
+	}
+
+	private unseeContractId(contractId: string) {
+		const contractRootSet = this.seenContractIds[contractId];
+		if (!contractRootSet) {
+			// ID never seen, nothing to do
+			return;
+		}
+
+		if (contractRootSet.has(contractId)) {
+			// `contractId` is the ID of a root contract so remove it from
+			// everyone's root set (including its own). Note that we can't
+			// blindly delete `contractId`'s root set because it may also
+			// appear as a linked contract
+			for (const [seenContractId, seenRootSet] of Object.entries(this.seenContractIds)) {
+				seenRootSet.delete(contractId);
+				if (seenRootSet.size === 0) {
+					Reflect.deleteProperty(this.seenContractIds, seenContractId);
+				}
+			}
+		} else {
+			// `contractId` is not the ID of a root contract so we can just
+			// remove its root set
+			Reflect.deleteProperty(this.seenContractIds, contractId);
+		}
+	}
+
+	public close() {
 		this.context.info('Detaching stream', {
 			id: this.id,
 			table: this.streamer.table,
