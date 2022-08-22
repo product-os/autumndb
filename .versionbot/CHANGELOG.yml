@@ -1,4 +1,18 @@
 - commits:
+    - subject: Prevent users from viewing other's authentication-password contracts
+      hash: 9db2814bceafd6fb0857845f6540c969be604bb1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 22.1.27
+  title: "'Prevent users from viewing other's authentication-password contracts'"
+  date: 2022-08-22T11:02:32.013Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.130 to 2.0.131
       hash: 0063c8c5d94b7f1bb67b0066144ca51bb7ce6f5e
       body: ""
