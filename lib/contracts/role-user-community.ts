@@ -32,6 +32,8 @@ export const roleUserCommunity: RoleContractDefinition = {
 							not: {
 								enum: [
 									'action-request@1.0.0',
+									'authentication-oauth@1.0.0',
+									'authentication-password@1.0.0',
 									'create@1.0.0',
 									'event@1.0.0',
 									'external-event@1.0.0',
@@ -42,6 +44,7 @@ export const roleUserCommunity: RoleContractDefinition = {
 									'view@1.0.0',
 									'password-reset@1.0.0',
 									'first-time-login@1.0.0',
+									'user-settings@1.0.0',
 								],
 							},
 						},
