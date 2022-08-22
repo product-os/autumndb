@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-metrics from 2.0.130 to 2.0.131
+      hash: 0063c8c5d94b7f1bb67b0066144ca51bb7ce6f5e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.1.26
+  title: "'Update @balena/jellyfish-metrics from 2.0.130 to 2.0.131'"
+  date: 2022-08-21T23:44:34.674Z
+- commits:
     - subject: Update ts-jest from 28.0.7 to 28.0.8
       hash: 84f8cb733b06457d4b7703a6bba2232fe108dd8f
       body: ""
