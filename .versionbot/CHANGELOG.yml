@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add migrations table docs
+      hash: a1ff3abcea331f0e11eff279f44e72b2e992ffc3
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.1.28
+  title: "'Add migrations table docs'"
+  date: 2022-08-23T05:32:01.770Z
+- commits:
     - subject: Prevent users from viewing other's authentication-password contracts
       hash: 9db2814bceafd6fb0857845f6540c969be604bb1
       body: ""
