@@ -3,7 +3,10 @@ import { v4 as uuid } from 'uuid';
 import { INDEX_TABLE, PostgresBackend } from '../../../../lib/backend/postgres';
 import { Context } from '../../../../lib/context';
 import { TABLE as CONTRACTS_TABLE } from '../../../../lib/backend/postgres/cards';
-import { version as packageVersion } from '../../../../package.json';
+import {
+	name as packageName,
+	version as packageVersion,
+} from '../../../../package.json';
 import * as helpers from '../helpers';
 
 let ctx: helpers.BackendContext;
@@ -21,7 +24,8 @@ describe('Setup', () => {
 	describe('after .connect()', () => {
 		it('should have run migrations and stored the version info', async () => {
 			const { version, updated_at } = await ctx.context.queryOne(
-				`SELECT id, version, updated_at FROM jf_db_migrations WHERE id=0`,
+				'SELECT version, updated_at FROM migrations WHERE name=$1',
+				[packageName],
 			);
 
 			expect(version).toEqual(packageVersion);

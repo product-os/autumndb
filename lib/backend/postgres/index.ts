@@ -9,7 +9,13 @@ import * as semver from 'semver';
 import * as skhema from 'skhema';
 import { setTimeout as delay } from 'timers/promises';
 import type { Cache } from '../../cache';
-import { Context, Database, Query, TransactionIsolation } from '../../context';
+import {
+	Context,
+	Database,
+	MixedContext,
+	Query,
+	TransactionIsolation,
+} from '../../context';
 import * as errors from '../../errors';
 import type { StreamOptions } from '../../kernel';
 import type {
@@ -31,8 +37,12 @@ import type {
 import * as utils from './utils';
 export type { StreamChange } from './streams';
 
-// tslint:disable-next-line: no-var-requires
-const { version: coreVersion } = require('../../../package.json');
+// Get package name and version for core migration execution
+// tslint:disable: no-var-requires
+const {
+	name: packageName,
+	version: packageVersion,
+} = require('../../../package.json');
 
 export const INDEX_TABLE = 'jf_indexes';
 
@@ -392,29 +402,45 @@ export class PostgresBackend implements Database {
 			return;
 		}
 
-		await this.runDbMigrations(context);
+		await this.runCoreMigrations(context);
 
 		this.hasInitializedOnce = true;
 	}
 
-	/*
-	 * This method first ensures that the migrations table exists, and then
-	 * executes the provided callback in a transaction if the installed version
-	 * of autumndb is newer than what is in the migrations table.
+	/**
+	 * First ensure that the migrations table exists. Then execute the provided
+	 * provided callback in a transaction if the provided version of the migration
+	 * is newer than what is in the migrations table. The optional "requires" argument
+	 * can be used to ensure that a migration is only ran if other migrations are at
+	 * or above the desired version(s).
+	 *
+	 * @param mixedContext - execution context
+	 * @param name - migration name
+	 * @param newVersion - migration version
+	 * @param callback - callback function to execute
+	 * @param requires - optional list of migrations that must be satisfied
+	 *
+	 * @example
+	 * await this.runMigration(context, 'foobar', '1.3.8', async () => { ... }, {
+	 *  'buzbaz': '1.0.1',
+	 * });
 	 */
-	private async executeIfDbSchemaIsOutdated(
-		context: Context,
-		migrationsCb: (context: Context) => Promise<any>,
+	public async runMigration(
+		mixedContext: MixedContext,
+		name: string,
+		newVersion: string,
+		callback: (context: Context) => Promise<any>,
+		requires?: { [key: string]: string },
 	) {
-		const migrationsTable = 'jf_db_migrations';
-		const migrationsId = 0;
+		const context = Context.fromMixed(mixedContext, this);
+		const migrationsTable = 'migrations';
 
 		// "IF NOT EXISTS" is unexpectedly not thread safe. This is only a problem on the first start and any real
 		// errors will be caught by subsequent SQL statements.
 		try {
 			await context.runQuery(`
 				CREATE TABLE IF NOT EXISTS ${migrationsTable} (
-					id INTEGER PRIMARY KEY NOT NULL,
+					name TEXT PRIMARY KEY NOT NULL,
 					version TEXT NOT NULL,
 					updated_at TIMESTAMP WITH TIME ZONE
 				)
@@ -424,32 +450,52 @@ export class PostgresBackend implements Database {
 		}
 		await context.runQuery(
 			`
-			INSERT INTO ${migrationsTable} (id, version, updated_at)
+			INSERT INTO ${migrationsTable} (name, version, updated_at)
 			VALUES ($1, $2, now())
-			ON CONFLICT (id) DO NOTHING
+			ON CONFLICT (name) DO NOTHING
 			`,
-			[migrationsId, '0.0.0'],
+			[name, '0.0.0'],
 		);
 		await context.withTransaction(
 			TransactionIsolation.Atomic,
 			async (transactionContext: Context) => {
-				const [{ version }] = await transactionContext.query(
+				let names: string[] = [name];
+				if (requires) {
+					names = names.concat(Object.keys(requires));
+				}
+
+				// Get current version information
+				const current = await transactionContext.query(
 					`
-					SELECT id, version, updated_at
+					SELECT name, version
 					FROM ${migrationsTable}
-					WHERE id=$1
+					WHERE name = ANY ($1)
 					FOR UPDATE
 					`,
-					[migrationsId],
+					[names],
 				);
 
 				// Checking for newer versions instead of just testing for inequality ensures that a restarting pod
 				// that is running an old version will not interfere with a new version being rolled out.
 				// We could do better than just checking for the version of course, but that is better left to a proper migration framework
-				const willRunMigrations = semver.compare(version, coreVersion) === -1;
+				const version = current.find((row) => row.name === name).version;
+				const willRunMigrations = semver.compare(version, newVersion) === -1;
+				if (willRunMigrations && requires) {
+					// Check that all required dependency versions are met
+					Object.keys(requires).forEach((key) => {
+						const cur = current.find((row) => row.name === key);
+						if (!cur || semver.compare(cur.version, requires[key]) === -1) {
+							throw new Error(
+								`Migration ${name} ${newVersion} requires ${key} ${requires[key]}`,
+							);
+						}
+					});
+				}
 				transactionContext.info('Preparing DB migrations', {
 					dbVersion: version,
-					coreVersion,
+					newVersion,
+					requires,
+					current,
 					willRunMigrations,
 				});
 				if (!willRunMigrations) {
@@ -458,14 +504,14 @@ export class PostgresBackend implements Database {
 					);
 					return;
 				}
-				await migrationsCb(transactionContext);
+				await callback(transactionContext);
 				await transactionContext.runQuery(
 					`
 					UPDATE ${migrationsTable}
 					SET version=$1, updated_at=now()
-					WHERE id=$2
+					WHERE name=$2
 					`,
-					[coreVersion, migrationsId],
+					[newVersion, name],
 				);
 			},
 		);
@@ -478,9 +524,11 @@ export class PostgresBackend implements Database {
 	 * are executed within a transaction ensuring that they are only
 	 * executed once by a single instance.
 	 */
-	private async runDbMigrations(context: Context) {
-		await this.executeIfDbSchemaIsOutdated(
+	private async runCoreMigrations(context: Context) {
+		await this.runMigration(
 			context,
+			packageName,
+			packageVersion,
 			async (childContext: Context) => {
 				try {
 					await cards.setup(childContext, this);

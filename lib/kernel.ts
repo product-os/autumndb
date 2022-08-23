@@ -513,6 +513,33 @@ export class Kernel {
 	}
 
 	/**
+	 * Run a named migration within a transaction.
+	 *
+	 * @param logContext - log context
+	 * @param name - migration name
+	 * @param version - version used to determine if migration should be ran
+	 * @param callback - migration callback function
+	 *
+	 * @example
+	 * await kernel.migrate(logContext, 'foobar', '1.0.1', async (context) => { ... });
+	 */
+	async runMigration(
+		logContext: LogContext,
+		name: string,
+		version: string,
+		callback: (context: Context) => Promise<any>,
+		requires?: { [key: string]: string },
+	): Promise<void> {
+		await this.backend.runMigration(
+			logContext,
+			name,
+			version,
+			callback,
+			requires,
+		);
+	}
+
+	/**
 	 * Set up relationships cache.
 	 * Relationship contracts are streamed from the DB, so this has the most up to date version of them.
 	 *

@@ -1,5 +1,6 @@
 export { PostgresBackendOptions, StreamChange } from './backend';
 export { Cache } from './cache';
+export { Context, MixedContext } from './context';
 export { CONTRACTS, CARDS, contracts } from './contracts';
 export * as contractMixins from './contracts/mixins';
 export * as errors from './errors';
