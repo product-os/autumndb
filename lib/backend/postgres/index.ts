@@ -396,6 +396,11 @@ export class PostgresBackend implements Database {
 		this.hasInitializedOnce = true;
 	}
 
+	/*
+	 * This method first ensures that the migrations table exists, and then
+	 * executes the provided callback in a transaction if the installed version
+	 * of autumndb is newer than what is in the migrations table.
+	 */
 	private async executeIfDbSchemaIsOutdated(
 		context: Context,
 		migrationsCb: (context: Context) => Promise<any>,
@@ -403,8 +408,8 @@ export class PostgresBackend implements Database {
 		const migrationsTable = 'jf_db_migrations';
 		const migrationsId = 0;
 
-		// "IF NOT EXISTS" is (unexpectedly) not thread safe. This is only a problem on the very first start and any "real"
-		// error will be catched by the subsequent SQL statements.
+		// "IF NOT EXISTS" is unexpectedly not thread safe. This is only a problem on the first start and any real
+		// errors will be caught by subsequent SQL statements.
 		try {
 			await context.runQuery(`
 				CREATE TABLE IF NOT EXISTS ${migrationsTable} (
@@ -466,6 +471,12 @@ export class PostgresBackend implements Database {
 		context.info('DB migrations finished');
 	}
 
+	/*
+	 * This method runs heavy setup operations after asserting
+	 * that executing the operations are necessary. The operations
+	 * are executed within a transaction ensuring that they are only
+	 * executed once by a single instance.
+	 */
 	private async runDbMigrations(context: Context) {
 		await this.executeIfDbSchemaIsOutdated(
 			context,
