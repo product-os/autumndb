@@ -361,7 +361,8 @@ export class Stream extends EventEmitter {
 
 			// TODO: since we're doing an early return here we miss the case
 			// where a contract is linked to another link contract. There is no
-			// reason for this to happen atm so it's a sensible simplification
+			// reason for this to happen atm so this is a sensible
+			// simplification
 			return;
 		}
 
@@ -380,13 +381,15 @@ export class Stream extends EventEmitter {
 					after: null,
 				});
 			} else {
-				// Root contracts were updated. We will emit an update event
-				// or an unmatch event
-				await this.contractsUpdated(rootIds, payload);
+				// Root contracts were upserted, including expanded links. We
+				// will emit an insert event, an update event or an unmatch
+				// event
+				await this.contractsUpdated(new Set(rootIds), payload);
 			}
 		} else if (payload.type !== DELETE_EVENT) {
-			// We haven't seen this contract yet. And if it's deleted we don't
-			// care regardless
+			// We haven't seen this contract yet. If it's deleted we don't
+			// care regardless. Otherwise, heuristically filter it and if
+			// necessary, emit an event
 			await this.filterContractUpdated(payload);
 		}
 	}
@@ -417,14 +420,22 @@ export class Stream extends EventEmitter {
 			).elements;
 
 			for (const contract of contracts) {
-				rootIds.delete(contract.id);
 				this.seeContractTree(contract);
-				this.emit('data', {
-					id: contract.id,
-					contractType: contract.cardType,
-					type: UPDATE_EVENT,
-					after: contract,
-				});
+				if (rootIds.delete(contract.id)) {
+					this.emit('data', {
+						id: contract.id,
+						contractType: contract.cardType,
+						type: UPDATE_EVENT,
+						after: contract,
+					});
+				} else {
+					this.emit('data', {
+						id: contract.id,
+						contractType: contract.cardType,
+						type: INSERT_EVENT,
+						after: contract,
+					});
+				}
 			}
 
 			if (rootIds.size > 0) {
