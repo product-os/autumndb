@@ -39,6 +39,12 @@ const UPDATE_EVENT = 'update';
 const DELETE_EVENT = 'delete';
 const UNMATCH_EVENT = 'unmatch';
 
+const getContractTypeSql = Context.prepareQuery(`
+	SELECT type
+	FROM cards
+	WHERE id = $1
+`);
+
 export const start = async (
 	context: Context,
 	table: string,
@@ -323,13 +329,14 @@ export class Stream extends EventEmitter {
 			backend.compileSchema(this.context, this.streamer.table, select, schema, {
 				...options,
 				limit: backend.MAXIMUM_QUERY_LIMIT,
-				extraFilter: `${this.streamer.table}.id IN $1`,
+				extraFilter: `${this.streamer.table}.id = ANY($1::uuid[])`,
 			}).query,
 		);
 		this.schema = schema;
 	}
 
 	public async push(payload: EventPayload) {
+		let rootIds: Set<string>;
 		if (payload.cardType === 'link@1.0.0') {
 			// Adding or removing links do not cause any changes to the linked
 			// contracts, so we have to look at link contracts to handle those
@@ -337,7 +344,7 @@ export class Stream extends EventEmitter {
 			// TODO: note that we don't hadle the case where a link contract is
 			// modified to point at different contracts. This shouldn't happen
 			// anyway so it shouldn't be a problem
-			const rootIds: Set<string> = new Set();
+			rootIds = new Set();
 			const fromRootSet = this.seenContractIds[payload.linkData!.from.id];
 			if (fromRootSet) {
 				for (const id of fromRootSet) {
@@ -350,7 +357,7 @@ export class Stream extends EventEmitter {
 					rootIds.add(id);
 				}
 			}
-			await this.contractsUpdated(rootIds);
+			await this.contractsUpdated(rootIds, payload);
 
 			// TODO: since we're doing an early return here we miss the case
 			// where a contract is linked to another link contract. There is no
@@ -358,7 +365,7 @@ export class Stream extends EventEmitter {
 			return;
 		}
 
-		const rootIds = this.seenContractIds[payload.id];
+		rootIds = this.seenContractIds[payload.id];
 		if (rootIds) {
 			// We've already seen this contract so no need to heuristically
 			// filter it
@@ -375,7 +382,7 @@ export class Stream extends EventEmitter {
 			} else {
 				// Root contracts were updated. We will emit an update event
 				// or an unmatch event
-				await this.contractsUpdated(rootIds);
+				await this.contractsUpdated(rootIds, payload);
 			}
 		} else if (payload.type !== DELETE_EVENT) {
 			// We haven't seen this contract yet. And if it's deleted we don't
@@ -398,12 +405,16 @@ export class Stream extends EventEmitter {
 			return;
 		}
 
-		await this.contractsUpdated(new Set([payload.id]));
+		await this.contractsUpdated(new Set([payload.id]), payload);
 	}
 
-	private async contractsUpdated(rootIds: Set<string>) {
+	private async contractsUpdated(rootIds: Set<string>, payload: EventPayload) {
 		try {
-			const contracts = (await backend.runQuery(this.context, this.schema, this.streamQuery!, [rootIds])).elements;
+			const contracts = (
+				await backend.runQuery(this.context, this.schema, this.streamQuery!, [
+					Array.from(rootIds),
+				])
+			).elements;
 
 			for (const contract of contracts) {
 				rootIds.delete(contract.id);
@@ -416,14 +427,8 @@ export class Stream extends EventEmitter {
 				});
 			}
 
-			for (const contractId of rootIds) {
-				this.unseeContractId(contractId);
-				this.emit('data', {
-					id: contractId,
-					contractType: contract.cardType,
-					type: UNMATCH_EVENT,
-					after: null,
-				});
+			if (rootIds.size > 0) {
+				await this.emitUnmatchFor(rootIds, payload);
 			}
 		} catch (error: unknown) {
 			metrics.markStreamError(
@@ -434,53 +439,35 @@ export class Stream extends EventEmitter {
 		}
 	}
 
-	private async tryEmitEvent(payload: EventPayload) {
-		if (this.constCardId && payload.id !== this.constCardId) {
-			return false;
-		}
-		if (this.constCardSlug && payload.slug !== this.constCardSlug) {
-			return false;
-		}
-		if (
-			this.cardTypes &&
-			!this.cardTypes.includes(payload.cardType.split('@')[0])
-		) {
-			return false;
-		}
-		if (payload.type === DELETE_EVENT) {
-			this.seenContractIds.delete(payload.id);
+	private async emitUnmatchFor(rootIds: Set<string>, payload: EventPayload) {
+		for (const contractId of rootIds) {
+			let contractType: string;
+			if (payload.id === contractId) {
+				contractType = payload.cardType;
+			} else if (payload.cardType === 'link@1.0.0') {
+				if (payload.linkData!.from.id === contractId) {
+					contractType = payload.linkData!.from.type;
+				} else if (payload.linkData!.to.id === contractId) {
+					contractType = payload.linkData!.to.type;
+				} else {
+					contractType = await this.getContractType(contractId);
+				}
+			} else {
+				contractType = await this.getContractType(contractId);
+			}
+
+			this.unseeContractId(contractId);
 			this.emit('data', {
-				id: payload.id,
-				contractType: payload.cardType,
-				type: payload.type,
+				id: contractId,
+				contractType,
+				type: UNMATCH_EVENT,
 				after: null,
 			});
-			return false;
 		}
-		try {
-			const result = (
-				await backend.runQuery(this.context, this.schema, this.streamQuery!, [
-					payload.id,
-				])
-			).elements;
-			if (result.length === 1) {
-				this.emit('data', {
-					id: payload.id,
-					contractType: payload.cardType,
-					type: payload.type,
-					after: result[0],
-				});
-			} else {
-				return false;
-			}
-		} catch (error) {
-			metrics.markStreamError(
-				this.context.getLogContext(),
-				this.streamer.table,
-			);
-			this.emit('error', error);
-		}
-		return true;
+	}
+
+	private async getContractType(contractId: string): Promise<string> {
+		return (await this.context.queryOne(getContractTypeSql, [contractId])).type;
 	}
 
 	private seeContractTree(contract: Contract, rootId: string = contract.id) {
@@ -511,7 +498,9 @@ export class Stream extends EventEmitter {
 			// everyone's root set (including its own). Note that we can't
 			// blindly delete `contractId`'s root set because it may also
 			// appear as a linked contract
-			for (const [seenContractId, seenRootSet] of Object.entries(this.seenContractIds)) {
+			for (const [seenContractId, seenRootSet] of Object.entries(
+				this.seenContractIds,
+			)) {
 				seenRootSet.delete(contractId);
 				if (seenRootSet.size === 0) {
 					Reflect.deleteProperty(this.seenContractIds, seenContractId);
