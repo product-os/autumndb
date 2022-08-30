@@ -4785,7 +4785,6 @@ describe('backend', () => {
 				]);
 			});
 
-			console.log(result);
 			expect(result.type).toBe('insert');
 			expect(result.after).toEqual({
 				id: result.id,
@@ -4920,8 +4919,6 @@ describe('backend', () => {
 					},
 				});
 			});
-
-			console.log(result);
 
 			expect(result.type).toBe('update');
 			expect(result.after).toEqual({
@@ -5143,7 +5140,6 @@ describe('backend', () => {
 				});
 			});
 
-			console.log(result);
 			expect(result.after).toEqual({
 				id: result.id,
 				slug,

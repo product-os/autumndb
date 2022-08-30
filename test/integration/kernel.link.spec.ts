@@ -2,11 +2,13 @@ import { strict as assert } from 'assert';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { errors, testUtils } from '../../lib';
+import { createRelationships } from './create-relationships';
 
 let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
+	await createRelationships(ctx);
 });
 
 afterAll(async () => {
@@ -234,27 +236,6 @@ describe('Kernel', () => {
 
 			const contract2 = await insertCardContract();
 
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `relationship-card-is-xxx-card-to-wildcard-xxx-to-card`,
-					type: 'relationship@1.0.0',
-					name: 'is xxx-card-to-wildcard-xxx to',
-					data: {
-						inverseName: 'has xxx-card-to-wildcard-xxx element',
-						title: 'Left',
-						inverseTitle: 'Right',
-						from: {
-							type: 'card',
-						},
-						to: {
-							type: '*',
-						},
-					},
-				},
-			);
-
 			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
@@ -290,27 +271,6 @@ describe('Kernel', () => {
 			const contract1 = await insertCardContract();
 
 			const contract2 = await insertCardContract();
-
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `relationship-card-is-xxx-wildcard-to-card-xxx-to-card`,
-					type: 'relationship@1.0.0',
-					name: 'is xxx-wildcard-to-card-xxx to',
-					data: {
-						inverseName: 'has xxx-wildcard-to-card-xxx element',
-						title: 'Left',
-						inverseTitle: 'Right',
-						from: {
-							type: '*',
-						},
-						to: {
-							type: 'card',
-						},
-					},
-				},
-			);
 
 			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,
@@ -348,27 +308,6 @@ describe('Kernel', () => {
 
 			const contract2 = await insertCardContract();
 
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `relationship-card-is-xxx-versioned-to-card-xxx-to-card`,
-					type: 'relationship@1.0.0',
-					name: 'is xxx-versioned-to-card-xxx to',
-					data: {
-						inverseName: 'has xxx-versioned-to-card-xxx element',
-						title: 'Left',
-						inverseTitle: 'Right',
-						from: {
-							type: 'card@1.0.0',
-						},
-						to: {
-							type: 'card',
-						},
-					},
-				},
-			);
-
 			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
@@ -404,27 +343,6 @@ describe('Kernel', () => {
 			const contract1 = await insertCardContract();
 
 			const contract2 = await insertCardContract();
-
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `relationship-card-is-xxx-forward-xxx-to-card`,
-					type: 'relationship@1.0.0',
-					name: 'is xxx-forward-xxx to',
-					data: {
-						inverseName: 'is xxx-reverse-xxx to',
-						title: 'Left',
-						inverseTitle: 'Right',
-						from: {
-							type: 'card',
-						},
-						to: {
-							type: 'card',
-						},
-					},
-				},
-			);
 
 			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,
@@ -476,30 +394,8 @@ describe('Kernel', () => {
 				},
 			);
 
-			const relationship = await ctx.kernel.replaceContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `relationship-card-forwards-to-any`,
-					type: 'relationship@1.0.0',
-					name: 'forwards to',
-					data: {
-						inverseName: 'is forwarded by',
-						title: 'Card',
-						inverseTitle: 'Destination',
-						from: {
-							type: 'card@1.0.0',
-						},
-						to: {
-							type: '*',
-						},
-					},
-				},
-			);
-
 			assert(createContract !== null);
 			assert(supportThreadContract !== null);
-			assert(relationship !== null);
 
 			const linkContract = await ctx.kernel.insertContract(
 				ctx.logContext,

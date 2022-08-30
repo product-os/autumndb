@@ -566,7 +566,7 @@ export class PostgresBackend implements Database {
 	async insertElement<T extends Contract = Contract>(
 		context: Context,
 		object: Omit<Contract, 'id'> & Partial<Pick<Contract, 'id'>>,
-	) {
+	): Promise<T> {
 		return this.upsertObject<T>(context, object, {
 			replace: false,
 		});
@@ -793,7 +793,10 @@ export class PostgresBackend implements Database {
 				);
 			}
 
-			if (userContract.data.oauth && userContract.data.oauth !== {}) {
+			if (
+				userContract.data.oauth &&
+				Object.keys(userContract.data.oauth).length > 1
+			) {
 				const authenticationContract = await this.upsertObject(
 					context,
 					{

@@ -226,6 +226,7 @@ export class Stream extends EventEmitter {
 	private cardTypes: null | string[] = null;
 	private streamQuery?: PreparedStatement;
 	private schema: JsonSchema = false;
+	private traversesLinks: boolean = false;
 
 	public constructor(
 		private context: Context,
@@ -326,17 +327,18 @@ export class Stream extends EventEmitter {
 				this.cardTypes = _.compact(deversionedTypes);
 			}
 		}
-		// We need to ensure that the select statement gets the id, so that unmatch events work as expected.
+		// We need to ensure that the select statement gets the id and type, so that unmatch events work as expected.
 		// This is because we use the contract id to check if a contract has been matched previously.
-		const selectWithId = {
+		const selectWithDefaults = {
 			id: {},
+			type: {},
 			...select,
 		};
 		this.streamQuery = Context.prepareQuery(
 			backend.compileSchema(
 				this.context,
 				this.streamer.table,
-				selectWithId,
+				selectWithDefaults,
 				schema,
 				{
 					...options,
@@ -346,30 +348,83 @@ export class Stream extends EventEmitter {
 			).query,
 		);
 		this.schema = schema;
+		this.traversesLinks =
+			typeof schema !== 'boolean' && schema.hasOwnProperty('$$links');
 	}
 
 	public async push(payload: EventPayload) {
 		let rootIds: Set<string>;
-		if (payload.cardType === 'link@1.0.0') {
-			// Adding or removing links do not cause any changes to the linked
-			// contracts, so we have to look at link contracts to handle those
-			// cases
-			// TODO: note that we don't hadle the case where a link contract is
-			// modified to point at different contracts. This shouldn't happen
-			// anyway so it shouldn't be a problem
+		if (
+			payload.cardType === 'link@1.0.0' &&
+			payload.linkData &&
+			this.traversesLinks
+		) {
+			/*
+			 * Adding or removing links do not cause any changes to the linked
+			 * contracts, so we have to look at link contracts to handle those
+			 * cases.
+			 * We need to use the id from the right direction of the link depending on the
+			 * link name in the stream schema.
+			 */
+
+			const schema = this.schema;
+			if (typeof schema === 'boolean' || !schema.$$links) {
+				return;
+			}
 			rootIds = new Set();
-			const fromRootSet = this.seenContractIds[payload.linkData!.from.id];
-			if (fromRootSet) {
-				for (const id of fromRootSet) {
-					rootIds.add(id);
-				}
+			const verb = Object.keys(schema.$$links)[0];
+
+			// If the link being inserted joins different types together
+			// than what is defined in the filter schema, we can use
+			// this as a heuristic to validate the trigger
+
+			// Get a list of types the filter link expansion queries against
+			const linkToTypeKeySchema = (schema.$$links[verb] as any)?.properties
+				?.type;
+			let linkToTypes: null | string[] = null;
+			if (linkToTypeKeySchema?.const) {
+				linkToTypes = [linkToTypeKeySchema.const];
+			} else if (linkToTypeKeySchema?.enum) {
+				linkToTypes = linkToTypeKeySchema.enum;
 			}
-			const toRootSet = this.seenContractIds[payload.linkData!.to.id];
-			if (toRootSet) {
-				for (const id of toRootSet) {
-					rootIds.add(id);
-				}
+
+			// Get a list of types the filter queries against
+			const linkFromTypeKeySchema = schema.properties?.type as any;
+			let linkFromTypes: null | string[] = null;
+			if (linkFromTypeKeySchema?.const) {
+				linkFromTypes = [linkFromTypeKeySchema.const];
+			} else if (linkFromTypeKeySchema?.enum) {
+				linkFromTypes = linkFromTypeKeySchema.enum;
 			}
+
+			// Check if the link contract references the same types as the filter
+			// The type testing heuristic needs to run the other way around if the verb
+			// in the filter is the inverse name
+			if (verb === payload.linkData.name) {
+				if (
+					(linkFromTypes &&
+						!linkFromTypes.includes(payload.linkData.from.type)) ||
+					(linkToTypes && !linkToTypes.includes(payload.linkData.to.type))
+				) {
+					return false;
+				}
+
+				rootIds.add(payload.linkData.from.id);
+			} else if (verb === payload.linkData.inverseName) {
+				if (
+					(linkToTypes && !linkToTypes.includes(payload.linkData.from.type)) ||
+					(linkFromTypes && !linkFromTypes.includes(payload.linkData.to.type))
+				) {
+					return false;
+				}
+
+				rootIds.add(payload.linkData.to.id);
+
+				// Abort if the link doesn't match.
+			} else {
+				return;
+			}
+
 			await this.contractsUpdated(rootIds, payload);
 
 			// TODO: since we're doing an early return here we miss the case
@@ -424,19 +479,32 @@ export class Stream extends EventEmitter {
 		await this.contractsUpdated(new Set([payload.id]), payload);
 	}
 
-	private async contractsUpdated(rootIds: Set<string>, payload: EventPayload) {
+	private async contractsUpdated(
+		rootIds: Set<string>,
+		payload: EventPayload,
+		retries = 1,
+	): Promise<void> {
 		try {
 			// TODO: This is an abomination, but it seems that you have to delay to make sure that
-			// row has updated, otherwise you'll get the prior state in the query results.
+			// row has updated, otherwise you'll get the prior state in the query results. Even with
+			// the delay you may still not get the expected result with a query on first insert,
+			// which is why we have a retry here. This also compensates for situations where the trigger
+			// the matched contract is a link and we need to allow a grace period for the links table
+			// to be updated, as the trigger only matches against the main contract table and will have
+			// run *before* the link tables have been updated..
 			// This needs to be fixed, most likely by switching to using the WAL feature of Postgres
 			// for streaming instead of TRIGGER/NOTIFY.
 			// see: https://github.com/supabase/realtime
-			await delay(5);
+			await delay(50);
 			const contracts = (
 				await backend.runQuery(this.context, this.schema, this.streamQuery!, [
 					Array.from(rootIds),
 				])
 			).elements;
+
+			if (!contracts.length && retries > 0) {
+				return this.contractsUpdated(rootIds, payload, retries - 1);
+			}
 
 			for (const contract of contracts) {
 				if (contract.id in this.seenContractIds) {
