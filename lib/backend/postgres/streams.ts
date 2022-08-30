@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 import * as _ from 'lodash';
 import { Notification } from 'pg';
 import * as pgFormat from 'pg-format';
+import { setTimeout as delay } from 'timers/promises';
 import { v4 as uuidv4 } from 'uuid';
 import * as backend from '.';
 import type { Contract, JsonSchema, LinkContract } from '../../types';
@@ -325,12 +326,24 @@ export class Stream extends EventEmitter {
 				this.cardTypes = _.compact(deversionedTypes);
 			}
 		}
+		// We need to ensure that the select statement gets the id, so that unmatch events work as expected.
+		// This is because we use the contract id to check if a contract has been matched previously.
+		const selectWithId = {
+			id: {},
+			...select,
+		};
 		this.streamQuery = Context.prepareQuery(
-			backend.compileSchema(this.context, this.streamer.table, select, schema, {
-				...options,
-				limit: backend.MAXIMUM_QUERY_LIMIT,
-				extraFilter: `${this.streamer.table}.id = ANY($1::uuid[])`,
-			}).query,
+			backend.compileSchema(
+				this.context,
+				this.streamer.table,
+				selectWithId,
+				schema,
+				{
+					...options,
+					limit: backend.MAXIMUM_QUERY_LIMIT,
+					extraFilter: `${this.streamer.table}.id = ANY($1::uuid[])`,
+				},
+			).query,
 		);
 		this.schema = schema;
 	}
@@ -413,6 +426,12 @@ export class Stream extends EventEmitter {
 
 	private async contractsUpdated(rootIds: Set<string>, payload: EventPayload) {
 		try {
+			// TODO: This is an abomination, but it seems that you have to delay to make sure that
+			// row has updated, otherwise you'll get the prior state in the query results.
+			// This needs to be fixed, most likely by switching to using the WAL feature of Postgres
+			// for streaming instead of TRIGGER/NOTIFY.
+			// see: https://github.com/supabase/realtime
+			await delay(5);
 			const contracts = (
 				await backend.runQuery(this.context, this.schema, this.streamQuery!, [
 					Array.from(rootIds),
@@ -420,25 +439,28 @@ export class Stream extends EventEmitter {
 			).elements;
 
 			for (const contract of contracts) {
-				this.seeContractTree(contract);
-				if (rootIds.delete(contract.id)) {
+				if (contract.id in this.seenContractIds) {
 					this.emit('data', {
 						id: contract.id,
-						contractType: contract.cardType,
+						contractType: contract.type,
 						type: UPDATE_EVENT,
 						after: contract,
 					});
 				} else {
 					this.emit('data', {
 						id: contract.id,
-						contractType: contract.cardType,
-						type: INSERT_EVENT,
+						contractType: contract.type,
+						type:
+							!payload.linkData && payload.type === 'update'
+								? UPDATE_EVENT
+								: INSERT_EVENT,
 						after: contract,
 					});
 				}
+				this.seeContractTree(contract);
 			}
 
-			if (rootIds.size > 0) {
+			if (contracts.length === 0) {
 				await this.emitUnmatchFor(rootIds, payload);
 			}
 		} catch (error: unknown) {
