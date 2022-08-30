@@ -793,7 +793,10 @@ export class PostgresBackend implements Database {
 				);
 			}
 
-			if (userContract.data.oauth && userContract.data.oauth !== {}) {
+			if (
+				userContract.data.oauth &&
+				Object.keys(userContract.data.oauth).length > 1
+			) {
 				const authenticationContract = await this.upsertObject(
 					context,
 					{

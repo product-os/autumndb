@@ -1,7 +1,7 @@
 import * as assert from '@balena/jellyfish-assert';
 import * as logger from '@balena/jellyfish-logger';
 import * as _ from 'lodash';
-import { Notification, PoolClient, QueryConfig } from 'pg';
+import { Notification, PoolClient, QueryConfig, QueryResultRow } from 'pg';
 import * as pgFormat from 'pg-format';
 import * as uuid from 'uuid';
 import * as errors from './errors';
@@ -323,7 +323,10 @@ export class Context {
 	/**
 	 * Run a query and return its results.
 	 */
-	public async query<T = any>(query: Query, parameters?: any[]): Promise<T[]> {
+	public async query<T extends QueryResultRow = any>(
+		query: Query,
+		parameters?: any[],
+	): Promise<T[]> {
 		return (
 			await this.withDatabaseConnection((context: Context) => {
 				let textOrConfig: any;
