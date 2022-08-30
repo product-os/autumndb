@@ -1,4 +1,40 @@
 - commits:
+    - subject: Improve typings
+      hash: eabe4d30718a2e839e9c47c39f16d0372472674d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: "Streams: Fix remaining edge cases"
+      hash: f0571f11c7b957de1ad35ecaf3c5ce831ad47ae7
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Allow streaming of modified linked contracts in addition to the root
+        contract
+      hash: 4405de1a2128c8a4ed41fa5185486305132638eb
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 22.2.0
+  title: "'Allow streaming of modified linked contracts in addition to the root
+    contract'"
+  date: 2022-08-30T15:05:56.875Z
+- commits:
     - subject: Add migrations table docs
       hash: a1ff3abcea331f0e11eff279f44e72b2e992ffc3
       body: ""
