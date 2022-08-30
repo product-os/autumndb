@@ -134,6 +134,7 @@ describe('Kernel', () => {
 				.then((emitter: Stream) => {
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
+							id: change.id,
 							type: 'card@1.0.0',
 							slug,
 							active: true,
@@ -266,11 +267,13 @@ describe('Kernel', () => {
 			await once(stream, 'closed');
 		});
 
-		it('should report back elements of a certain type', (done) => {
+		it('should report back elements of a certain type', async () => {
 			const slug = testUtils.generateRandomSlug();
 
-			ctx.kernel
-				.stream(ctx.logContext, ctx.kernel.adminSession()!, {
+			const emitter = await ctx.kernel.stream(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
 					type: 'object',
 					additionalProperties: false,
 					properties: {
@@ -292,45 +295,40 @@ describe('Kernel', () => {
 						},
 					},
 					required: ['type'],
-				})
-				.then((emitter: Stream) => {
-					emitter.on('data', (change) => {
-						expect(change.after).toEqual({
-							slug,
-							type: 'card@1.0.0',
-							data: {
-								email: 'johndoe@example.com',
-							},
-						});
+				},
+			);
 
-						emitter.close();
-					});
-
-					emitter.on('error', done);
-					emitter.on('closed', done);
-
-					ctx.kernel.insertContract(
-						ctx.logContext,
-						ctx.kernel.adminSession()!,
-						{
-							type: 'card@1.0.0',
-							data: {
-								test: 1,
-							},
-						},
-					);
-					ctx.kernel.insertContract(
-						ctx.logContext,
-						ctx.kernel.adminSession()!,
-						{
-							slug,
-							type: 'card@1.0.0',
-							data: {
-								email: 'johndoe@example.com',
-							},
-						},
-					);
+			const result = await new Promise<any>(async (resolve, reject) => {
+				emitter.on('data', (change) => {
+					emitter.close();
+					resolve(change);
 				});
+
+				emitter.on('error', reject);
+
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+					type: 'card@1.0.0',
+					data: {
+						test: 1,
+					},
+				});
+				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+					slug,
+					type: 'card@1.0.0',
+					data: {
+						email: 'johndoe@example.com',
+					},
+				});
+			});
+
+			expect(result.after).toEqual({
+				id: result.id,
+				slug,
+				type: 'card@1.0.0',
+				data: {
+					email: 'johndoe@example.com',
+				},
+			});
 		});
 
 		it('should be able to attach a large number of streams', async () => {
@@ -405,7 +403,7 @@ describe('Kernel', () => {
 
 			expect(
 				results.map((result: any) => {
-					return _.omit(result, ['id']);
+					return _.omit(result, ['id', 'after.id', 'after.slug']);
 				}),
 			).toEqual(
 				_.times(
@@ -414,7 +412,6 @@ describe('Kernel', () => {
 						type: 'insert',
 						contractType: 'card@1.0.0',
 						after: {
-							slug,
 							type: 'card@1.0.0',
 							data: {
 								email: 'johndoe@example.com',
@@ -466,6 +463,7 @@ describe('Kernel', () => {
 				.then((emitter: Stream) => {
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
+							id: change.id,
 							type: 'card@1.0.0',
 							slug,
 						});
@@ -570,6 +568,7 @@ describe('Kernel', () => {
 
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
+							id: change.id,
 							type: 'card@1.0.0',
 							slug,
 							links: {
@@ -659,6 +658,7 @@ describe('Kernel', () => {
 
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
+							id: change.id,
 							type: 'card@1.0.0',
 							slug,
 							links: {
@@ -926,6 +926,7 @@ describe('Kernel', () => {
 
 					emitter.on('data', (change) => {
 						expect(change.after).toEqual({
+							id: change.id,
 							slug,
 							type: 'card@1.0.0',
 							links: {
@@ -991,9 +992,11 @@ describe('Kernel', () => {
 						contractType: 'card@1.0.0',
 						after: {
 							slug,
+							id,
 							data: {
 								status: 'open',
 							},
+							type: 'card@1.0.0',
 						},
 					});
 

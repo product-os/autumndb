@@ -326,17 +326,18 @@ export class Stream extends EventEmitter {
 				this.cardTypes = _.compact(deversionedTypes);
 			}
 		}
-		// We need to ensure that the select statement gets the id, so that unmatch events work as expected.
+		// We need to ensure that the select statement gets the id and type, so that unmatch events work as expected.
 		// This is because we use the contract id to check if a contract has been matched previously.
-		const selectWithId = {
+		const selectWithDefaults = {
 			id: {},
+			type: {},
 			...select,
 		};
 		this.streamQuery = Context.prepareQuery(
 			backend.compileSchema(
 				this.context,
 				this.streamer.table,
-				selectWithId,
+				selectWithDefaults,
 				schema,
 				{
 					...options,
@@ -424,10 +425,16 @@ export class Stream extends EventEmitter {
 		await this.contractsUpdated(new Set([payload.id]), payload);
 	}
 
-	private async contractsUpdated(rootIds: Set<string>, payload: EventPayload) {
+	private async contractsUpdated(
+		rootIds: Set<string>,
+		payload: EventPayload,
+		retries = 1,
+	): Promise<void> {
 		try {
 			// TODO: This is an abomination, but it seems that you have to delay to make sure that
-			// row has updated, otherwise you'll get the prior state in the query results.
+			// row has updated, otherwise you'll get the prior state in the query results. Even with
+			// the delay you may still not get the expected result with a query on first insert,
+			// which is why we have a retry here.
 			// This needs to be fixed, most likely by switching to using the WAL feature of Postgres
 			// for streaming instead of TRIGGER/NOTIFY.
 			// see: https://github.com/supabase/realtime
@@ -437,6 +444,10 @@ export class Stream extends EventEmitter {
 					Array.from(rootIds),
 				])
 			).elements;
+
+			if (!contracts.length && retries > 0) {
+				return this.contractsUpdated(rootIds, payload, retries - 1);
+			}
 
 			for (const contract of contracts) {
 				if (contract.id in this.seenContractIds) {
