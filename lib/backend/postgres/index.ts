@@ -7,6 +7,7 @@ import { performance } from 'perf_hooks';
 import { Pool, PoolClient } from 'pg';
 import * as semver from 'semver';
 import * as skhema from 'skhema';
+import { setTimeout as delay } from 'timers/promises';
 import type { Cache } from '../../cache';
 import { Context, Database, Query, TransactionIsolation } from '../../context';
 import * as errors from '../../errors';
@@ -527,6 +528,9 @@ export class PostgresBackend implements Database {
 		 * Close the main connection pool.
 		 */
 		if (this.pool) {
+			// Allow a small grace period for ongoing transactions to finish before ending the pool.
+			// This is a hack and should be replaced with determinstic approach to draining the pool.
+			await delay(50);
 			context.debug('Disconnecting from database', {
 				databaseName: this.databaseName,
 			});

@@ -7,6 +7,7 @@ import { testUtils } from '../../lib';
 import type { JsonSchema } from '../../lib/types';
 import type { Stream } from '../../lib/backend/postgres/streams';
 import { createRelationships } from './create-relationships';
+import { setTimeout as delay } from 'timers/promises';
 
 let ctx: testUtils.TestContext;
 
@@ -1295,6 +1296,69 @@ describe('Kernel', () => {
 
 			expect(result.id).toEqual(contract1.id);
 			expect(result.type).toEqual('unmatch');
+		});
+
+		it('should gracefully handle disconnects', async () => {
+			const slug = testUtils.generateRandomSlug({
+				prefix: 'contract',
+			});
+
+			const emitter = await ctx.kernel.stream(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
+					type: 'object',
+					additionalProperties: false,
+					properties: {
+						type: {
+							type: 'string',
+						},
+						slug: {
+							type: 'string',
+							const: slug,
+						},
+						active: {
+							type: 'boolean',
+						},
+						links: {
+							type: 'object',
+						},
+						tags: {
+							type: 'array',
+						},
+						data: {
+							type: 'object',
+							properties: {
+								test: {
+									type: 'number',
+								},
+							},
+						},
+					},
+					required: ['slug'],
+				},
+			);
+
+			ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+				slug,
+				type: 'card@1.0.0',
+				version: '1.0.0',
+				data: {
+					test: 1,
+				},
+			});
+
+			ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+				type: 'card@1.0.0',
+				data: {
+					test: 2,
+				},
+			});
+
+			await delay(1);
+
+			await ctx.kernel.disconnect(ctx.logContext);
+			await emitter.close();
 		});
 	});
 });
