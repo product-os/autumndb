@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-assert from 1.2.54 to 1.2.57
+      hash: 22d4f52e21e141b0097022c303e9ccafc72f1a75
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.1
+  title: "'Update @balena/jellyfish-assert from 1.2.54 to 1.2.57'"
+  date: 2022-09-07T08:32:55.988Z
+- commits:
     - subject: Improve safety of Kernel disconnects
       hash: 10de8d65982788d8576e631eb95ee5ecc5062f7e
       body: |
