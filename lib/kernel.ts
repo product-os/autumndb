@@ -5,6 +5,7 @@ import * as jsonpatch from 'fast-json-patch';
 import * as _ from 'lodash';
 import { Pool } from 'pg';
 import * as stopword from 'stopword';
+import { setTimeout as delay } from 'timers/promises';
 import { v4 as uuidv4 } from 'uuid';
 import * as authorization from './authorization';
 import { PostgresBackend, PostgresBackendOptions } from './backend';
@@ -29,7 +30,7 @@ import type {
 	TypeContract,
 	ViewContract,
 } from './types';
-import { preprocessQuerySchema } from './utils';
+import { getSchemaTypes, preprocessQuerySchema } from './utils';
 
 export interface AutumnDBSession {
 	scope?: JsonSchema;
@@ -1375,40 +1376,207 @@ export class Kernel {
 
 		const { actor, scope } = session;
 
-		querySchema = await preprocessQuerySchema(querySchema);
+		const inverseSchemas = [];
 
-		if (options.mask) {
-			querySchema = jsonSchema.merge([
-				querySchema as any,
-				options.mask as any,
-			]) as JsonSchema;
+		const baseTypes = getSchemaTypes(querySchema);
+
+		// Create a schema that is the inverse of the link traversal, so that we can stream
+		// changes to the linked contracts.
+		if (typeof querySchema !== 'boolean' && querySchema.$$links) {
+			for (const verb of Object.keys(querySchema.$$links)) {
+				const schema = querySchema.$$links[verb];
+
+				if (typeof schema === 'boolean') {
+					continue;
+				}
+
+				const schemaTypes = getSchemaTypes(schema);
+
+				if (!schemaTypes.length) {
+					continue;
+				}
+
+				let inverseVerb: string | null = null;
+
+				for (const relationship of this.relationships) {
+					if (
+						relationship.name === verb &&
+						baseTypes.includes(relationship.data.from.type) &&
+						schemaTypes.includes(relationship.data.to.type)
+					) {
+						inverseVerb = relationship.data.inverseName;
+						break;
+					}
+					if (
+						relationship.data.inverseName === verb &&
+						baseTypes.includes(relationship.data.to.type) &&
+						schemaTypes.includes(relationship.data.from.type)
+					) {
+						inverseVerb = relationship.name!;
+						break;
+					}
+				}
+				if (inverseVerb) {
+					const inverseSchema = {
+						...schema,
+						$$links: {
+							...(schema.$$links || {}),
+							[inverseVerb!]: _.omit(querySchema, '$$links'),
+						},
+					};
+
+					inverseSchemas.push(inverseSchema);
+				}
+			}
 		}
 
-		const authorizedQuerySchema = await authorization.authorizeQuery(
-			context,
-			this.backend,
-			actor,
-			scope,
-			querySchema,
-		);
+		const setupStream = async (schema: JsonSchema) => {
+			let streamSchema = await preprocessQuerySchema(schema);
 
-		context.debug('Opening stream');
+			if (options.mask) {
+				streamSchema = jsonSchema.merge([
+					querySchema as any,
+					options.mask as any,
+				]) as JsonSchema;
+			}
 
-		const stream = await this.backend.stream(
-			getSelectObjectFromSchema(querySchema, authorizedQuerySchema),
-			authorizedQuerySchema,
-			options,
-		);
+			const authorizedQuerySchema = await authorization.authorizeQuery(
+				context,
+				this.backend,
+				actor,
+				scope,
+				streamSchema,
+			);
+
+			context.debug('Opening stream');
+
+			const stream = await this.backend.stream(
+				getSelectObjectFromSchema(streamSchema, authorizedQuerySchema),
+				authorizedQuerySchema,
+				options,
+			);
+
+			return stream;
+		};
+
+		const baseStream = await setupStream(querySchema);
 
 		await setupStreamEventHandlers(
 			context,
 			this.backend,
-			stream,
+			baseStream,
 			actor,
 			scope || {},
 		);
 
-		return stream;
+		for (const schema of inverseSchemas) {
+			const stream = await setupStream(schema);
+			baseStream.on('closed', () => {
+				stream.close();
+			});
+
+			// When a data update is emitted from the inverse streams,
+			// Reverse the query and emit the data update to the base stream.
+			// This will give us a stream update that matches the original schema
+			stream.on('data', async (change) => {
+				if (typeof querySchema === 'boolean') {
+					return;
+				}
+				await delay(50);
+				if (change.after) {
+					const verb = Object.keys((querySchema as any).$$links)[0]!;
+					const [result] = await this.query(
+						mixedContext,
+						session,
+						{
+							...querySchema,
+							// Always default to resolving the id, slug and type properties, so that event emission can function correctly
+							properties: {
+								id: {
+									type: 'string',
+								},
+								type: {
+									type: 'string',
+								},
+								slug: {
+									type: 'string',
+								},
+								...(querySchema.properties || {}),
+							},
+							$$links: {
+								[verb]: {
+									...(schema.$$links[verb] as any),
+									properties: {
+										...((schema.$$links[verb] as any).properties || {}),
+										id: {
+											const: change.after.id,
+										},
+									},
+								},
+							},
+						},
+						{ limit: 1 },
+					);
+
+					if (result) {
+						baseStream.emit('data', {
+							...change,
+							id: result.id,
+							contractType: result.type,
+							slug: result.slug,
+							after: result,
+						});
+					}
+				} else {
+					// In an unmatch event, we just need to find the ID, and emit it with the update
+					const verb = Object.keys((querySchema as any).$$links)[0]!;
+					const [result] = await this.query(
+						mixedContext,
+						session,
+						{
+							...querySchema,
+							// Always default to resolving the id, slug and type properties, so that event emission can function correctly
+							properties: {
+								id: {
+									type: 'string',
+								},
+								type: {
+									type: 'string',
+								},
+								slug: {
+									type: 'string',
+								},
+								...(querySchema.properties || {}),
+							},
+							$$links: {
+								[verb]: {
+									type: 'object',
+									// The linked data may no longer match, so we only query for the ID here, rather than the full schema
+									properties: {
+										id: {
+											type: 'string',
+											const: change.id,
+										},
+									},
+								},
+							},
+						},
+						{ limit: 1 },
+					);
+
+					if (result) {
+						baseStream.emit('data', {
+							...change,
+							id: result.id,
+							contractType: result.type,
+							slug: result.slug,
+						});
+					}
+				}
+			});
+		}
+
+		return baseStream;
 	}
 
 	/**

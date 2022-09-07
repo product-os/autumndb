@@ -3,9 +3,10 @@ import { EventEmitter } from 'events';
 import * as _ from 'lodash';
 import { Notification } from 'pg';
 import * as pgFormat from 'pg-format';
+import { setTimeout as delay } from 'timers/promises';
 import { v4 as uuidv4 } from 'uuid';
 import * as backend from '.';
-import type { Contract, JsonSchema } from '../../types';
+import type { Contract, JsonSchema, LinkContract } from '../../types';
 import {
 	Context,
 	DatabaseNotificationHandler,
@@ -22,16 +23,28 @@ export interface StreamChange {
 }
 
 interface EventPayload {
-	id: any;
-	slug: any;
-	cardType?: any;
-	type?: any;
+	id: string;
+	slug: string;
+	cardType: string;
+	type: 'update' | 'insert' | 'delete';
+	linkData: null | {
+		name: LinkContract['name'];
+		inverseName: LinkContract['data']['inverseName'];
+		from: LinkContract['data']['from'];
+		to: LinkContract['data']['to'];
+	};
 }
 
 const INSERT_EVENT = 'insert';
 const UPDATE_EVENT = 'update';
 const DELETE_EVENT = 'delete';
 const UNMATCH_EVENT = 'unmatch';
+
+const getContractTypeSql = Context.prepareQuery(`
+	SELECT type
+	FROM cards
+	WHERE id = $1
+`);
 
 export const start = async (
 	context: Context,
@@ -58,6 +71,7 @@ export const setupTrigger = async (
 			slug TEXT;
 			type TEXT;
 			changeType TEXT;
+			linkData JSON;
 		BEGIN
 			IF (TG_OP = 'INSERT') THEN
 				id := NEW.id;
@@ -76,6 +90,24 @@ export const setupTrigger = async (
 				changeType := '${DELETE_EVENT}';
 			END IF;
 
+			IF (type  = 'link@1.0.0') THEN
+				IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
+					linkData := json_build_object(
+						'name', NEW.name,
+						'inverseName', NEW.data->'inverseName',
+						'from', NEW.data->'from',
+						'to', NEW.data->'to'
+					);
+				ELSE
+					linkData := json_build_object(
+						'name', OLD.name,
+						'inverseName', OLD.data->'inverseName',
+						'from', OLD.data->'from',
+						'to', OLD.data->'to'
+					);
+				END IF;
+			END IF;
+
 			PERFORM pg_notify(
 				TG_ARGV[0],
 				json_build_object(
@@ -83,7 +115,8 @@ export const setupTrigger = async (
 					'cardType', type,
 					'slug', slug,
 					'type', changeType,
-					'table', TG_TABLE_NAME
+					'table', TG_TABLE_NAME,
+					'linkData', linkData
 				)::text
 			);
 
@@ -184,32 +217,27 @@ export class Streamer {
 }
 
 export class Stream extends EventEmitter {
-	seenCardIds: Set<unknown>;
-	streamer: Streamer;
-	id: string;
-	context: Context;
-	constCardId?: string;
-	constCardSlug?: string;
-	cardTypes: null | string[];
-	streamQuery?: PreparedStatement;
-	schema: JsonSchema = false;
+	// This is a map from contract IDs to a set of root contract IDs that link
+	// to it, directly or not. Root contracts reference themselves
+	private seenContractIds: { [key: string]: Set<string> } = {};
 
-	constructor(
-		context: Context,
-		streamer: Streamer,
-		id: string,
+	private constCardId?: string;
+	private constCardSlug?: string;
+	private cardTypes: null | string[] = null;
+	private streamQuery?: PreparedStatement;
+	private schema: JsonSchema = false;
+	private traversesLinks: boolean = false;
+
+	public constructor(
+		private context: Context,
+		private streamer: Streamer,
+		private id: string,
 		select: SelectObject,
 		schema: JsonSchema,
 		options: StreamOptions = {},
 	) {
 		super();
 		this.setMaxListeners(Infinity);
-
-		this.seenCardIds = new Set();
-		this.streamer = streamer;
-		this.id = id;
-		this.context = context;
-		this.cardTypes = null;
 
 		this.setSchema(select, schema, options);
 
@@ -234,13 +262,13 @@ export class Stream extends EventEmitter {
 		});
 	}
 
-	async query(
+	public async query(
 		select: SelectObject,
 		schema: JsonSchema,
 		options?: Partial<BackendQueryOptions>,
 	) {
 		// Query the cards with the IDs so we can add them to
-		// `this.seenCardIds`
+		// `this.seenContractIds`
 		const selectsId = 'id' in select;
 
 		if (!selectsId) {
@@ -257,7 +285,7 @@ export class Stream extends EventEmitter {
 		);
 
 		for (const contract of elements) {
-			this.seenCardIds.add(contract.id);
+			this.seeContractTree(contract);
 		}
 
 		// Remove the ID if that wasn't requested in the first place
@@ -270,7 +298,7 @@ export class Stream extends EventEmitter {
 		return elements;
 	}
 
-	setSchema(
+	public setSchema(
 		select: SelectObject,
 		schema: JsonSchema,
 		options: StreamOptions = {},
@@ -299,79 +327,294 @@ export class Stream extends EventEmitter {
 				this.cardTypes = _.compact(deversionedTypes);
 			}
 		}
+		// We need to ensure that the select statement gets the id and type, so that unmatch events work as expected.
+		// This is because we use the contract id to check if a contract has been matched previously.
+		const selectWithDefaults = {
+			id: {},
+			type: {},
+			...select,
+		};
 		this.streamQuery = Context.prepareQuery(
-			backend.compileSchema(this.context, this.streamer.table, select, schema, {
-				...options,
-				limit: 1,
-				extraFilter: `${this.streamer.table}.id = $1`,
-			}).query,
+			backend.compileSchema(
+				this.context,
+				this.streamer.table,
+				selectWithDefaults,
+				schema,
+				{
+					...options,
+					limit: backend.MAXIMUM_QUERY_LIMIT,
+					extraFilter: `${this.streamer.table}.id = ANY($1::uuid[])`,
+				},
+			).query,
 		);
 		this.schema = schema;
+		this.traversesLinks =
+			typeof schema !== 'boolean' && schema.hasOwnProperty('$$links');
 	}
 
-	async push(payload: EventPayload) {
-		if (await this.tryEmitEvent(payload)) {
-			this.seenCardIds.add(payload.id);
-		} else if (this.seenCardIds.delete(payload.id)) {
-			this.emit('data', {
-				id: payload.id,
-				contractType: payload.cardType,
-				type: UNMATCH_EVENT,
-				after: null,
-			});
+	public async push(payload: EventPayload) {
+		let rootIds: Set<string>;
+		if (
+			payload.cardType === 'link@1.0.0' &&
+			payload.linkData &&
+			this.traversesLinks
+		) {
+			/*
+			 * Adding or removing links do not cause any changes to the linked
+			 * contracts, so we have to look at link contracts to handle those
+			 * cases.
+			 * We need to use the id from the right direction of the link depending on the
+			 * link name in the stream schema.
+			 */
+
+			const schema = this.schema;
+			if (typeof schema === 'boolean' || !schema.$$links) {
+				return;
+			}
+			rootIds = new Set();
+			const verb = Object.keys(schema.$$links)[0];
+
+			// If the link being inserted joins different types together
+			// than what is defined in the filter schema, we can use
+			// this as a heuristic to validate the trigger
+
+			// Get a list of types the filter link expansion queries against
+			const linkToTypeKeySchema = (schema.$$links[verb] as any)?.properties
+				?.type;
+			let linkToTypes: null | string[] = null;
+			if (linkToTypeKeySchema?.const) {
+				linkToTypes = [linkToTypeKeySchema.const];
+			} else if (linkToTypeKeySchema?.enum) {
+				linkToTypes = linkToTypeKeySchema.enum;
+			}
+
+			// Get a list of types the filter queries against
+			const linkFromTypeKeySchema = schema.properties?.type as any;
+			let linkFromTypes: null | string[] = null;
+			if (linkFromTypeKeySchema?.const) {
+				linkFromTypes = [linkFromTypeKeySchema.const];
+			} else if (linkFromTypeKeySchema?.enum) {
+				linkFromTypes = linkFromTypeKeySchema.enum;
+			}
+
+			// Check if the link contract references the same types as the filter
+			// The type testing heuristic needs to run the other way around if the verb
+			// in the filter is the inverse name
+			if (verb === payload.linkData.name) {
+				if (
+					(linkFromTypes &&
+						!linkFromTypes.includes(payload.linkData.from.type)) ||
+					(linkToTypes && !linkToTypes.includes(payload.linkData.to.type))
+				) {
+					return false;
+				}
+
+				rootIds.add(payload.linkData.from.id);
+			} else if (verb === payload.linkData.inverseName) {
+				if (
+					(linkToTypes && !linkToTypes.includes(payload.linkData.from.type)) ||
+					(linkFromTypes && !linkFromTypes.includes(payload.linkData.to.type))
+				) {
+					return false;
+				}
+
+				rootIds.add(payload.linkData.to.id);
+
+				// Abort if the link doesn't match.
+			} else {
+				return;
+			}
+
+			await this.contractsUpdated(rootIds, payload);
+
+			// TODO: since we're doing an early return here we miss the case
+			// where a contract is linked to another link contract. There is no
+			// reason for this to happen atm so this is a sensible
+			// simplification
+			return;
+		}
+
+		rootIds = this.seenContractIds[payload.id];
+		if (rootIds) {
+			// We've already seen this contract so no need to heuristically
+			// filter it
+
+			if (payload.type === DELETE_EVENT && rootIds.has(payload.id)) {
+				// A root contract was deleted. Emit a delete event for it
+				this.unseeContractId(payload.id);
+				this.emit('data', {
+					id: payload.id,
+					contractType: payload.cardType,
+					type: DELETE_EVENT,
+					after: null,
+				});
+			} else {
+				// Root contracts were upserted, including expanded links. We
+				// will emit an insert event, an update event or an unmatch
+				// event
+				await this.contractsUpdated(new Set(rootIds), payload);
+			}
+		} else if (payload.type !== DELETE_EVENT) {
+			// We haven't seen this contract yet. If it's deleted we don't
+			// care regardless. Otherwise, heuristically filter it and if
+			// necessary, emit an event
+			await this.filterContractUpdated(payload);
 		}
 	}
 
-	async tryEmitEvent(payload: EventPayload) {
+	private async filterContractUpdated(payload: EventPayload) {
 		if (this.constCardId && payload.id !== this.constCardId) {
-			return false;
+			return;
 		}
 		if (this.constCardSlug && payload.slug !== this.constCardSlug) {
-			return false;
+			return;
 		}
 		if (
 			this.cardTypes &&
 			!this.cardTypes.includes(payload.cardType.split('@')[0])
 		) {
-			return false;
+			return;
 		}
-		if (payload.type === DELETE_EVENT) {
-			this.seenCardIds.delete(payload.id);
-			this.emit('data', {
-				id: payload.id,
-				contractType: payload.cardType,
-				type: payload.type,
-				after: null,
-			});
-			return false;
-		}
+
+		await this.contractsUpdated(new Set([payload.id]), payload);
+	}
+
+	private async contractsUpdated(
+		rootIds: Set<string>,
+		payload: EventPayload,
+		retries = 1,
+	): Promise<void> {
 		try {
-			const result = (
+			// TODO: This is an abomination, but it seems that you have to delay to make sure that
+			// row has updated, otherwise you'll get the prior state in the query results. Even with
+			// the delay you may still not get the expected result with a query on first insert,
+			// which is why we have a retry here. This also compensates for situations where the trigger
+			// the matched contract is a link and we need to allow a grace period for the links table
+			// to be updated, as the trigger only matches against the main contract table and will have
+			// run *before* the link tables have been updated..
+			// This needs to be fixed, most likely by switching to using the WAL feature of Postgres
+			// for streaming instead of TRIGGER/NOTIFY.
+			// see: https://github.com/supabase/realtime
+			await delay(50);
+			const contracts = (
 				await backend.runQuery(this.context, this.schema, this.streamQuery!, [
-					payload.id,
+					Array.from(rootIds),
 				])
 			).elements;
-			if (result.length === 1) {
-				this.emit('data', {
-					id: payload.id,
-					contractType: payload.cardType,
-					type: payload.type,
-					after: result[0],
-				});
-			} else {
-				return false;
+
+			if (!contracts.length && retries > 0) {
+				return this.contractsUpdated(rootIds, payload, retries - 1);
 			}
-		} catch (error) {
+
+			for (const contract of contracts) {
+				if (contract.id in this.seenContractIds) {
+					this.emit('data', {
+						id: contract.id,
+						contractType: contract.type,
+						type: UPDATE_EVENT,
+						after: contract,
+					});
+				} else {
+					this.emit('data', {
+						id: contract.id,
+						contractType: contract.type,
+						type:
+							!payload.linkData && payload.type === 'update'
+								? UPDATE_EVENT
+								: INSERT_EVENT,
+						after: contract,
+					});
+				}
+				this.seeContractTree(contract);
+			}
+
+			if (contracts.length === 0) {
+				await this.emitUnmatchFor(rootIds, payload);
+			}
+		} catch (error: unknown) {
 			metrics.markStreamError(
 				this.context.getLogContext(),
 				this.streamer.table,
 			);
 			this.emit('error', error);
 		}
-		return true;
 	}
 
-	close() {
+	private async emitUnmatchFor(rootIds: Set<string>, payload: EventPayload) {
+		for (const contractId of rootIds) {
+			let contractType: string;
+			if (payload.id === contractId) {
+				contractType = payload.cardType;
+			} else if (payload.cardType === 'link@1.0.0') {
+				if (payload.linkData!.from.id === contractId) {
+					contractType = payload.linkData!.from.type;
+				} else if (payload.linkData!.to.id === contractId) {
+					contractType = payload.linkData!.to.type;
+				} else {
+					contractType = await this.getContractType(contractId);
+				}
+			} else {
+				contractType = await this.getContractType(contractId);
+			}
+
+			this.unseeContractId(contractId);
+			this.emit('data', {
+				id: contractId,
+				contractType,
+				type: UNMATCH_EVENT,
+				after: null,
+			});
+		}
+	}
+
+	private async getContractType(contractId: string): Promise<string> {
+		return (await this.context.queryOne(getContractTypeSql, [contractId])).type;
+	}
+
+	private seeContractTree(contract: Contract, rootId: string = contract.id) {
+		if (contract.id in this.seenContractIds) {
+			this.seenContractIds[contract.id].add(rootId);
+		} else {
+			this.seenContractIds[contract.id] = new Set([rootId]);
+		}
+
+		if ('links' in contract) {
+			for (const linkTypeLinked of Object.values(contract.links!)) {
+				for (const linked of linkTypeLinked) {
+					this.seeContractTree(linked, rootId);
+				}
+			}
+		}
+	}
+
+	private unseeContractId(contractId: string) {
+		const contractRootSet = this.seenContractIds[contractId];
+		if (!contractRootSet) {
+			// ID never seen, nothing to do
+			return;
+		}
+
+		if (contractRootSet.has(contractId)) {
+			// `contractId` is the ID of a root contract so remove it from
+			// everyone's root set (including its own). Note that we can't
+			// blindly delete `contractId`'s root set because it may also
+			// appear as a linked contract
+			for (const [seenContractId, seenRootSet] of Object.entries(
+				this.seenContractIds,
+			)) {
+				seenRootSet.delete(contractId);
+				if (seenRootSet.size === 0) {
+					Reflect.deleteProperty(this.seenContractIds, seenContractId);
+				}
+			}
+		} else {
+			// `contractId` is not the ID of a root contract so we can just
+			// remove its root set
+			Reflect.deleteProperty(this.seenContractIds, contractId);
+		}
+	}
+
+	public close() {
 		this.context.info('Detaching stream', {
 			id: this.id,
 			table: this.streamer.table,

@@ -4708,345 +4708,331 @@ describe('backend', () => {
 	});
 
 	describe('.stream()', () => {
-		it('should report back new elements that match a certain type', (done) => {
+		it('should report back new elements that match a certain type', async () => {
 			const randString = ctx.generateRandomSlug();
-			ctx.backend
-				.stream(
-					{
-						type: {},
-						data: {},
-					},
-					{
-						type: 'object',
-						additionalProperties: false,
-						properties: {
-							type: {
-								type: 'string',
-								const: 'foo@1.0.0',
-							},
-							data: {
-								type: 'object',
-								required: ['test'],
-								properties: {
-									test: {
-										type: 'string',
-										const: randString,
-									},
+			const emitter = await ctx.backend.stream(
+				{
+					type: {},
+					data: {},
+				},
+				{
+					type: 'object',
+					additionalProperties: false,
+					properties: {
+						type: {
+							type: 'string',
+							const: 'foo@1.0.0',
+						},
+						data: {
+							type: 'object',
+							required: ['test'],
+							properties: {
+								test: {
+									type: 'string',
+									const: randString,
 								},
 							},
 						},
-						required: ['type'],
 					},
-				)
-				.then(async (emitter: Stream) => {
-					emitter.on('data', (change) => {
-						expect(change.type).toBe('insert');
-						expect(change.after).toEqual({
-							type: 'foo@1.0.0',
-							data: {
-								test: randString,
-							},
-						});
+					required: ['type'],
+				},
+			);
 
-						emitter.close();
-					});
-
-					emitter.on('error', done);
-					emitter.on('closed', done);
-
-					Bluebird.all([
-						ctx.backend.insertElement(ctx.context, {
-							type: 'foo@1.0.0',
-							version: '1.0.0',
-							tags: [],
-							loop: null,
-							links: {},
-							markers: [],
-							requires: [],
-							capabilities: [],
-							linked_at: {},
-							created_at: new Date().toISOString(),
-							updated_at: null,
-							active: true,
-							slug: ctx.generateRandomSlug(),
-							data: {
-								test: randString,
-							},
-						}),
-						ctx.backend.insertElement(ctx.context, {
-							type: 'bar@1.0.0',
-							version: '1.0.0',
-							tags: [],
-							loop: null,
-							links: {},
-							markers: [],
-							requires: [],
-							capabilities: [],
-							created_at: new Date().toISOString(),
-							updated_at: null,
-							linked_at: {},
-							active: true,
-							slug: ctx.generateRandomSlug(),
-							data: {
-								test: randString,
-							},
-						}),
-					]);
+			const result = await new Promise<any>(async (resolve, reject) => {
+				emitter.on('data', (change) => {
+					resolve(change);
 				});
+
+				emitter.on('error', reject);
+
+				Bluebird.all([
+					ctx.backend.insertElement(ctx.context, {
+						type: 'foo@1.0.0',
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						links: {},
+						markers: [],
+						requires: [],
+						capabilities: [],
+						linked_at: {},
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						active: true,
+						slug: ctx.generateRandomSlug(),
+						data: {
+							test: randString,
+						},
+					}),
+					ctx.backend.insertElement(ctx.context, {
+						type: 'bar@1.0.0',
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						links: {},
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
+						active: true,
+						slug: ctx.generateRandomSlug(),
+						data: {
+							test: randString,
+						},
+					}),
+				]);
+			});
+
+			expect(result.type).toBe('insert');
+			expect(result.after).toEqual({
+				id: result.id,
+				type: 'foo@1.0.0',
+				data: {
+					test: randString,
+				},
+			});
+
+			emitter.close();
 		});
 
-		it('should report back changes to certain elements', (done) => {
+		it('should report back changes to certain elements', async () => {
 			const slug1 = ctx.generateRandomSlug();
 			const slug2 = ctx.generateRandomSlug();
 
-			ctx.backend
-				.stream(
-					{
-						slug: {},
-						type: {},
-						data: {},
-					},
-					{
-						type: 'object',
-						additionalProperties: false,
-						properties: {
-							slug: {
-								type: 'string',
-								enum: [slug1, slug2],
-							},
-							type: {
-								type: 'string',
-								const: 'foo@1.0.0',
-							},
-							data: {
-								type: 'object',
-								required: ['test'],
-								properties: {
-									test: {
-										type: 'number',
-									},
+			const emitter = await ctx.backend.stream(
+				{
+					slug: {},
+					type: {},
+					data: {},
+				},
+				{
+					type: 'object',
+					additionalProperties: false,
+					properties: {
+						slug: {
+							type: 'string',
+							enum: [slug1, slug2],
+						},
+						type: {
+							type: 'string',
+							const: 'foo@1.0.0',
+						},
+						data: {
+							type: 'object',
+							required: ['test'],
+							properties: {
+								test: {
+									type: 'number',
 								},
 							},
 						},
-						required: ['type', 'slug'],
 					},
-				)
-				.then(async (emitter: Stream) => {
-					await ctx.backend.insertElement(ctx.context, {
-						type: 'foo@1.0.0',
-						version: '1.0.0',
-						links: {},
-						tags: [],
-						loop: null,
-						markers: [],
-						requires: [],
-						capabilities: [],
-						created_at: new Date().toISOString(),
-						updated_at: null,
-						linked_at: {},
-						active: true,
-						slug: slug1,
-						data: {
-							test: 1,
-						},
-					});
+					required: ['type', 'slug'],
+				},
+			);
 
-					await ctx.backend.insertElement(ctx.context, {
-						type: 'bar@1.0.0',
-						version: '1.0.0',
-						tags: [],
-						loop: null,
-						links: {},
-						markers: [],
-						requires: [],
-						capabilities: [],
-						created_at: new Date().toISOString(),
-						updated_at: null,
-						linked_at: {},
-						active: true,
-						slug: slug2,
-						data: {
-							test: 1,
-						},
-					});
+			const contract1 = await ctx.backend.insertElement(ctx.context, {
+				type: 'foo@1.0.0',
+				version: '1.0.0',
+				links: {},
+				tags: [],
+				loop: null,
+				markers: [],
+				requires: [],
+				capabilities: [],
+				created_at: new Date().toISOString(),
+				updated_at: null,
+				linked_at: {},
+				active: true,
+				slug: slug1,
+				data: {
+					test: 1,
+				},
+			});
 
-					emitter.on('data', (change) => {
-						if (change.type === 'insert') {
-							return;
-						}
+			await ctx.backend.insertElement(ctx.context, {
+				type: 'bar@1.0.0',
+				version: '1.0.0',
+				tags: [],
+				loop: null,
+				links: {},
+				markers: [],
+				requires: [],
+				capabilities: [],
+				created_at: new Date().toISOString(),
+				updated_at: null,
+				linked_at: {},
+				active: true,
+				slug: slug2,
+				data: {
+					test: 1,
+				},
+			});
 
-						expect(change.type).toBe('update');
-						expect(change.after).toEqual({
-							slug: slug1,
-							type: 'foo@1.0.0',
-							data: {
-								test: 2,
-							},
-						});
+			const result = await new Promise<any>(async (resolve, reject) => {
+				emitter.on('data', (change) => {
+					if (change.type === 'insert') {
+						return;
+					}
 
-						emitter.close();
-					});
-
-					emitter.on('error', (error) => {
-						done(error);
-					});
-
-					emitter.on('closed', () => {
-						done();
-					});
-
-					await ctx.backend.upsertElement(ctx.context, {
-						slug: slug1,
-						version: '1.0.0',
-						tags: [],
-						loop: null,
-						links: {},
-						markers: [],
-						requires: [],
-						capabilities: [],
-						created_at: new Date().toISOString(),
-						updated_at: null,
-						linked_at: {},
-						active: true,
-						type: 'foo@1.0.0',
-						data: {
-							test: 2,
-						},
-					});
-					await ctx.backend.upsertElement(ctx.context, {
-						slug: slug2,
-						active: true,
-						version: '1.0.0',
-						links: {},
-						tags: [],
-						loop: null,
-						markers: [],
-						requires: [],
-						capabilities: [],
-						created_at: new Date().toISOString(),
-						updated_at: null,
-						linked_at: {},
-						type: 'bar@1.0.0',
-						data: {
-							test: 2,
-						},
-					});
+					resolve(change);
 				});
+
+				emitter.on('error', reject);
+
+				await ctx.backend.upsertElement(ctx.context, {
+					slug: slug1,
+					version: '1.0.0',
+					tags: [],
+					loop: null,
+					links: {},
+					markers: [],
+					requires: [],
+					capabilities: [],
+					created_at: new Date().toISOString(),
+					updated_at: null,
+					linked_at: {},
+					active: true,
+					type: 'foo@1.0.0',
+					data: {
+						test: 2,
+					},
+				});
+				await ctx.backend.upsertElement(ctx.context, {
+					slug: slug2,
+					active: true,
+					version: '1.0.0',
+					links: {},
+					tags: [],
+					loop: null,
+					markers: [],
+					requires: [],
+					capabilities: [],
+					created_at: new Date().toISOString(),
+					updated_at: null,
+					linked_at: {},
+					type: 'bar@1.0.0',
+					data: {
+						test: 2,
+					},
+				});
+			});
+
+			expect(result.type).toBe('update');
+			expect(result.after).toEqual({
+				id: contract1.id,
+				slug: slug1,
+				type: 'foo@1.0.0',
+				data: {
+					test: 2,
+				},
+			});
+
+			emitter.close();
 		});
 
-		it('should report back changes to large elements', (done) => {
+		it('should report back changes to large elements', async () => {
 			const slug = ctx.generateRandomSlug();
 
-			ctx.backend
-				.stream(
-					{
-						slug: {},
-						type: {},
-						data: {},
-					},
-					{
-						type: 'object',
-						additionalProperties: false,
-						properties: {
-							slug: {
-								type: 'string',
-								const: slug,
-							},
-							type: {
-								type: 'string',
-								const: 'foo@1.0.0',
-							},
-							data: {
-								type: 'object',
-								required: ['test'],
-								properties: {
-									test: {
-										type: 'string',
-									},
+			const emitter = await ctx.backend.stream(
+				{
+					slug: {},
+					type: {},
+					data: {},
+				},
+				{
+					type: 'object',
+					additionalProperties: false,
+					properties: {
+						slug: {
+							type: 'string',
+							const: slug,
+						},
+						type: {
+							type: 'string',
+							const: 'foo@1.0.0',
+						},
+						data: {
+							type: 'object',
+							required: ['test'],
+							properties: {
+								test: {
+									type: 'string',
 								},
 							},
 						},
-						required: ['type', 'slug'],
 					},
-				)
-				.then(async (emitter: Stream) => {
-					await ctx.backend.insertElement(ctx.context, {
-						type: 'foo@1.0.0',
-						active: true,
-						links: {},
-						version: '1.0.0',
-						tags: [],
-						loop: null,
-						markers: [],
-						requires: [],
-						capabilities: [],
-						created_at: new Date().toISOString(),
-						updated_at: null,
-						linked_at: {},
-						slug,
-						data: {
-							test: new Array(5000).join('foobar'),
-						},
-					});
+					required: ['type', 'slug'],
+				},
+			);
 
-					emitter.on('data', (change) => {
-						// Livefeeds are asynchronous and can pick up a change a
-						// moment after the insertion, so there exist the
-						// possibility that we get the initial insert event here,
-						// and if so its fine to ignore, as it doesn't affect
-						// the semantics of the tests.
-						if (
-							change.type === 'insert' &&
-							_.isEqual(change.after, {
-								slug,
-								type: 'foo@1.0.0',
-								data: {
-									test: new Array(5000).join('foobar'),
-								},
-							})
-						) {
-							return;
-						}
+			await ctx.backend.insertElement(ctx.context, {
+				type: 'foo@1.0.0',
+				active: true,
+				links: {},
+				version: '1.0.0',
+				tags: [],
+				loop: null,
+				markers: [],
+				requires: [],
+				capabilities: [],
+				created_at: new Date().toISOString(),
+				updated_at: null,
+				linked_at: {},
+				slug,
+				data: {
+					test: new Array(5000).join('foobar'),
+				},
+			});
 
-						expect(change.type).toBe('update');
-						expect(change.after).toEqual({
-							slug,
-							type: 'foo@1.0.0',
-							data: {
-								test: new Array(5000).join('bazbuzz'),
-							},
-						});
+			const result = await new Promise<any>(async (resolve, reject) => {
+				emitter.on('data', (change) => {
+					// Livefeeds are asynchronous and can pick up a change a
+					// moment after the insertion, so there exist the
+					// possibility that we get the initial insert event here,
+					// and if so its fine to ignore, as it doesn't affect
+					// the semantics of the tests.
+					if (change.type === 'insert') {
+						return;
+					}
 
-						emitter.close();
-					});
-
-					emitter.on('error', (error) => {
-						done(error);
-					});
-
-					emitter.on('closed', () => {
-						done();
-					});
-
-					ctx.backend.upsertElement(ctx.context, {
-						slug,
-						active: true,
-						version: '1.0.0',
-						links: {},
-						tags: [],
-						loop: null,
-						markers: [],
-						requires: [],
-						capabilities: [],
-						linked_at: {},
-						created_at: new Date().toISOString(),
-						updated_at: null,
-						type: 'foo@1.0.0',
-						data: {
-							test: new Array(5000).join('bazbuzz'),
-						},
-					});
+					emitter.close();
+					resolve(change);
 				});
+
+				emitter.on('error', reject);
+
+				await ctx.backend.upsertElement(ctx.context, {
+					slug,
+					active: true,
+					version: '1.0.0',
+					links: {},
+					tags: [],
+					loop: null,
+					markers: [],
+					requires: [],
+					capabilities: [],
+					linked_at: {},
+					created_at: new Date().toISOString(),
+					updated_at: null,
+					type: 'foo@1.0.0',
+					data: {
+						test: new Array(5000).join('bazbuzz'),
+					},
+				});
+			});
+
+			expect(result.type).toBe('update');
+			expect(result.after).toEqual({
+				id: result.id,
+				slug,
+				type: 'foo@1.0.0',
+				data: {
+					test: new Array(5000).join('bazbuzz'),
+				},
+			});
 		});
 
 		it('should close without finding anything', (done) => {
@@ -5073,211 +5059,205 @@ describe('backend', () => {
 				});
 		});
 
-		it('should set "before" to null if it previously did not match the schema', (done) => {
+		it('should set "before" to null if it previously did not match the schema', async () => {
 			const slug = ctx.generateRandomSlug();
-			ctx.backend
-				.stream(
-					{
-						slug: {},
-						type: {},
-						data: {},
-					},
-					{
-						type: 'object',
-						additionalProperties: false,
-						properties: {
-							slug: {
-								type: 'string',
-								const: slug,
-							},
-							type: {
-								type: 'string',
-								const: 'foo@1.0.0',
-							},
-							data: {
-								type: 'object',
-								required: ['test'],
-								properties: {
-									test: {
-										type: 'number',
-									},
+			const emitter = await ctx.backend.stream(
+				{
+					slug: {},
+					type: {},
+					data: {},
+				},
+				{
+					type: 'object',
+					additionalProperties: false,
+					properties: {
+						slug: {
+							type: 'string',
+							const: slug,
+						},
+						type: {
+							type: 'string',
+							const: 'foo@1.0.0',
+						},
+						data: {
+							type: 'object',
+							required: ['test'],
+							properties: {
+								test: {
+									type: 'number',
 								},
 							},
 						},
-						required: ['slug', 'type', 'data'],
 					},
-				)
-				.then(async (emitter: Stream) => {
-					await ctx.backend.insertElement(ctx.context, {
-						slug,
-						active: true,
-						links: {},
-						version: '1.0.0',
-						tags: [],
-						loop: null,
-						markers: [],
-						requires: [],
-						capabilities: [],
-						created_at: new Date().toISOString(),
-						updated_at: null,
-						linked_at: {},
-						type: 'foo@1.0.0',
-						data: {
-							test: '1',
-						},
-					});
+					required: ['slug', 'type', 'data'],
+				},
+			);
 
-					emitter.on('data', (change) => {
-						expect(change.after).toEqual({
-							slug,
-							type: 'foo@1.0.0',
-							data: {
-								test: 1,
-							},
-						});
+			await ctx.backend.insertElement(ctx.context, {
+				slug,
+				active: true,
+				links: {},
+				version: '1.0.0',
+				tags: [],
+				loop: null,
+				markers: [],
+				requires: [],
+				capabilities: [],
+				created_at: new Date().toISOString(),
+				updated_at: null,
+				linked_at: {},
+				type: 'foo@1.0.0',
+				data: {
+					test: '1',
+				},
+			});
 
-						emitter.close();
-					});
-
-					emitter.on('error', done);
-					emitter.on('closed', done);
-
-					ctx.backend.upsertElement(ctx.context, {
-						slug,
-						active: true,
-						links: {},
-						version: '1.0.0',
-						tags: [],
-						loop: null,
-						markers: [],
-						requires: [],
-						capabilities: [],
-						linked_at: {},
-						created_at: new Date().toISOString(),
-						updated_at: null,
-						type: 'foo@1.0.0',
-						data: {
-							test: 1,
-						},
-					});
+			const result = await new Promise<any>(async (resolve, reject) => {
+				emitter.on('data', (change) => {
+					resolve(change);
+					emitter.close();
 				});
+
+				emitter.on('error', reject);
+
+				await ctx.backend.upsertElement(ctx.context, {
+					slug,
+					active: true,
+					links: {},
+					version: '1.0.0',
+					tags: [],
+					loop: null,
+					markers: [],
+					requires: [],
+					capabilities: [],
+					linked_at: {},
+					created_at: new Date().toISOString(),
+					updated_at: null,
+					type: 'foo@1.0.0',
+					data: {
+						test: 1,
+					},
+				});
+			});
+
+			expect(result.after).toEqual({
+				id: result.id,
+				slug,
+				type: 'foo@1.0.0',
+				data: {
+					test: 1,
+				},
+			});
 		});
 
-		it(
-			'should filter the "before" section of a change',
-			(done) => {
-				const slug = ctx.generateRandomSlug();
+		it('should filter the "before" section of a change', async () => {
+			const slug = ctx.generateRandomSlug();
 
-				ctx.backend
-					.stream(
-						{
-							slug: {},
-							type: {},
-							data: {},
+			const emitter = await ctx.backend.stream(
+				{
+					slug: {},
+					type: {},
+					data: {},
+				},
+				{
+					type: 'object',
+					additionalProperties: false,
+					properties: {
+						slug: {
+							type: 'string',
+							const: slug,
 						},
-						{
+						type: {
+							type: 'string',
+							const: 'foo@1.0.0',
+						},
+						data: {
 							type: 'object',
+							required: ['test'],
 							additionalProperties: false,
 							properties: {
-								slug: {
-									type: 'string',
-									const: slug,
-								},
-								type: {
-									type: 'string',
-									const: 'foo@1.0.0',
-								},
-								data: {
-									type: 'object',
-									required: ['test'],
-									additionalProperties: false,
-									properties: {
-										test: {
-											type: 'number',
-										},
-									},
+								test: {
+									type: 'number',
 								},
 							},
-							required: ['type', 'slug'],
 						},
-					)
-					.then(async (emitter: Stream) => {
-						await ctx.backend.insertElement(ctx.context, {
-							type: 'foo@1.0.0',
-							active: true,
-							links: {},
-							version: '1.0.0',
-							tags: [],
-							loop: null,
-							markers: [],
-							requires: [],
-							capabilities: [],
-							linked_at: {},
-							created_at: new Date().toISOString(),
-							updated_at: null,
-							slug,
-							data: {
-								test: 1,
-								extra: true,
-							},
-						});
+					},
+					required: ['type', 'slug'],
+				},
+			);
 
-						emitter.on('data', (change) => {
-							// Livefeeds are asynchronous and can pick up a change a
-							// moment after the insertion, so there exist the
-							// possibility that we get the initial insert event here,
-							// and if so its fine to ignore, as it doesn't affect
-							// the semantics of the tests.
-							if (
-								change.type === 'insert' &&
-								_.isEqual(change.after, {
-									type: 'foo@1.0.0',
-									slug,
-									data: {
-										test: 1,
-									},
-								})
-							) {
-								return;
-							}
+			const contract = await ctx.backend.insertElement(ctx.context, {
+				type: 'foo@1.0.0',
+				active: true,
+				links: {},
+				version: '1.0.0',
+				tags: [],
+				loop: null,
+				markers: [],
+				requires: [],
+				capabilities: [],
+				linked_at: {},
+				created_at: new Date().toISOString(),
+				updated_at: null,
+				slug,
+				data: {
+					test: 1,
+					extra: true,
+				},
+			});
 
-							expect(change.after).toEqual({
-								slug,
-								type: 'foo@1.0.0',
-								data: {
-									test: 2,
-								},
-							});
+			const result = await new Promise(async (resolve, reject) => {
+				emitter.on('data', (change) => {
+					// Livefeeds are asynchronous and can pick up a change a
+					// moment after the insertion, so there exist the
+					// possibility that we get the initial insert event here,
+					// and if so its fine to ignore, as it doesn't affect
+					// the semantics of the tests.
+					if (change.type === 'insert') {
+						return;
+					}
 
-							emitter.close();
-						});
+					emitter.close();
+					resolve(change);
+				});
 
-						emitter.on('error', done);
-						emitter.on('closed', done);
+				emitter.on('error', reject);
 
-						await ctx.backend.upsertElement(ctx.context, {
-							slug,
-							version: '1.0.0',
-							tags: [],
-							loop: null,
-							links: {},
-							markers: [],
-							requires: [],
-							capabilities: [],
-							created_at: new Date().toISOString(),
-							linked_at: {},
-							updated_at: null,
-							active: true,
-							type: 'foo@1.0.0',
-							data: {
-								test: 2,
-								extra: true,
-							},
-						});
-					});
-			},
-			10 * 1000,
-		);
+				await ctx.backend.upsertElement(ctx.context, {
+					slug,
+					version: '1.0.0',
+					tags: [],
+					loop: null,
+					links: {},
+					markers: [],
+					requires: [],
+					capabilities: [],
+					created_at: new Date().toISOString(),
+					linked_at: {},
+					updated_at: null,
+					active: true,
+					type: 'foo@1.0.0',
+					data: {
+						test: 2,
+						extra: true,
+					},
+				});
+			});
+
+			expect(result).toEqual({
+				id: contract.id,
+				contractType: contract.type,
+				type: 'update',
+				after: {
+					id: contract.id,
+					slug: contract.slug,
+					type: contract.type,
+					data: {
+						test: 2,
+					},
+				},
+			});
+		});
 
 		it('should throw if the schema is invalid', async () => {
 			await expect(

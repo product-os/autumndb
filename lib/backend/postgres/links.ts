@@ -19,7 +19,7 @@ export const setup = async (
 		// The name of the "cards" table that should be referenced
 		cards: string;
 	},
-) => {
+): Promise<void> => {
 	context.debug('Creating links table', {
 		table: LINK_TABLE,
 		databaseName,

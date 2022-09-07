@@ -34,7 +34,7 @@ export async function createRelationships(ctx: TestContext) {
 			fromVersionedType: 'card',
 			toVersionedType: 'card',
 			name: 'is linked to',
-			inverseName: 'has link',
+			inverseName: 'is linked to',
 			title: 'Link',
 			inverseTitle: 'Link',
 		},
@@ -86,11 +86,55 @@ export async function createRelationships(ctx: TestContext) {
 			title: 'Reporter',
 			inverseTitle: 'Manager',
 		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: '*',
+			name: 'is xxx-card-to-wildcard-xxx to',
+			inverseName: 'has xxx-card-to-wildcard-xxx element',
+			title: 'Left',
+			inverseTitle: 'Right',
+		},
+		{
+			fromVersionedType: '*',
+			toVersionedType: 'card',
+			name: 'is xxx-wildcard-to-card-xxx to',
+			inverseName: 'has xxx-wildcard-to-card-xxx element',
+			title: 'Left',
+			inverseTitle: 'Right',
+		},
+		{
+			fromVersionedType: 'card@1.0.0',
+			toVersionedType: 'card',
+			name: 'is xxx-versioned-to-card-xxx to',
+			inverseName: 'has xxx-versioned-to-card-xxx element',
+			title: 'Left',
+			inverseTitle: 'Right',
+		},
+		{
+			fromVersionedType: 'card',
+			toVersionedType: 'card',
+			name: 'is xxx-forward-xxx to',
+			inverseName: 'is xxx-reverse-xxx to',
+			title: 'Left',
+			inverseTitle: 'Right',
+		},
+		{
+			fromVersionedType: 'card@1.0.0',
+			toVersionedType: '*',
+			name: 'forwards to',
+			inverseName: 'is forwarded by',
+			title: 'Card',
+			inverseTitle: 'Destination',
+		},
 	];
 
 	const relContracts = relSpecs.map((spec) => {
-		const fromType = spec.fromVersionedType.split('@')[0];
-		const toType = spec.toVersionedType.split('@')[0];
+		const fromType =
+			spec.fromVersionedType === '*'
+				? 'any'
+				: spec.fromVersionedType.split('@')[0];
+		const toType =
+			spec.toVersionedType === '*' ? 'any' : spec.toVersionedType.split('@')[0];
 		const dashedName = _.kebabCase(spec.name);
 		return {
 			slug: `relationship-${fromType}-${dashedName}-${toType}`,
