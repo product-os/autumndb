@@ -1,4 +1,58 @@
 - commits:
+    - subject: Improve safety of Kernel disconnects
+      hash: 10de8d65982788d8576e631eb95ee5ecc5062f7e
+      body: |
+        This change mostly affects safe shutdown in test scenarios, but is also
+        relevant for handover during deployments in production.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Support streaming for linked contracts
+      hash: 72f6d3e7bf82ee5ab9173ffc958fd19aa4f5e8e9
+      body: |
+        This change multiplexes streams, creating additional streams that invert
+        the query to stream for linked data.
+        The query is introspected and if it traverse links, the corresponding
+        relationship is found and used to generate and inversion of the query,
+        which is then streamed.
+        When the inverse stream gets a result, the even is inverted again to
+        produce the expected event emission.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: "Streams: Fix remaining edge cases"
+      hash: f0571f11c7b957de1ad35ecaf3c5ce831ad47ae7
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Allow streaming of modified linked contracts in addition to the root
+        contract
+      hash: 4405de1a2128c8a4ed41fa5185486305132638eb
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 22.2.0
+  title: "'Lucianbuzzo/stream multiplexing'"
+  date: 2022-09-05T09:47:15.302Z
+- commits:
     - subject: Add migrations table docs
       hash: a1ff3abcea331f0e11eff279f44e72b2e992ffc3
       body: ""
