@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update pg from 8.7.3 to 8.8.0
+      hash: 2a6043d5902c98d7d00331eb506969d96d976af2
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.17
+  title: "'Update pg from 8.7.3 to 8.8.0'"
+  date: 2022-09-10T09:09:21.128Z
+- commits:
     - subject: Update stopword from 2.0.2 to 2.0.4
       hash: 642810a0dfd9dad850925da2fe5b2601359f0cc2
       body: ""
