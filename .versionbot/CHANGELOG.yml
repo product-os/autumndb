@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump external packages
+      hash: 3c22c45681906430eabbdbc888c25f6f5224c126
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.2.11
+  title: "'Bump external packages'"
+  date: 2022-09-10T06:54:34.211Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 13.0.9 to 13.0.10
       hash: 48a242212ada3344a8e450f05547d27ce93751b5
       body: ""
