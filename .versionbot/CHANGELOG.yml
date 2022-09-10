@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update stopword from 2.0.2 to 2.0.4
+      hash: 642810a0dfd9dad850925da2fe5b2601359f0cc2
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.16
+  title: "'Update stopword from 2.0.2 to 2.0.4'"
+  date: 2022-09-10T08:47:08.534Z
+- commits:
     - subject: Update fast-equals from 4.0.1 to 4.0.3
       hash: 443e5a30eb495f7dad8d562b5f810644bc1eedb7
       body: ""
