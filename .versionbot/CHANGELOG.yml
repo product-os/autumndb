@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update redis from 4.2.0 to 4.3.1
+      hash: 01f83baf0cb7ae98d069f588922a2201a1667d80
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.18
+  title: "'Update redis from 4.2.0 to 4.3.1'"
+  date: 2022-09-10T09:31:31.825Z
+- commits:
     - subject: Update pg from 8.7.3 to 8.8.0
       hash: 2a6043d5902c98d7d00331eb506969d96d976af2
       body: ""
