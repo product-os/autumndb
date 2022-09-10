@@ -1,4 +1,24 @@
 - commits:
+    - subject: Update jest from 29.0.2 to 29.0.3
+      hash: 9e02bbebd21175db6e0d076be5f7857bf07d6599
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+    - subject: Update @balena/jellyfish-metrics from 2.0.149 to 2.0.150
+      hash: 812db6c0a40de810d1c9d82a1136ec193d514c36
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.19
+  title: "'Update jest from 29.0.2 to 29.0.3'"
+  date: 2022-09-10T16:19:41.806Z
+- commits:
     - subject: Update redis from 4.2.0 to 4.3.1
       hash: 01f83baf0cb7ae98d069f588922a2201a1667d80
       body: ""
