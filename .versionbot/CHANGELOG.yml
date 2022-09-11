@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-metrics from 2.0.152 to 2.0.153
+      hash: 5e0c43716f96ef2dba816dea086fed39f835cd8c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.24
+  title: "'Update @balena/jellyfish-metrics from 2.0.152 to 2.0.153'"
+  date: 2022-09-11T02:41:13.920Z
+- commits:
     - subject: Update @balena/jellyfish-logger from 5.1.51 to 5.1.53
       hash: 69951331bbd6a26a59fea9eb4b957a6b783d830f
       body: ""
