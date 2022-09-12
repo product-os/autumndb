@@ -37,27 +37,7 @@ export type SendCommand = 'shift+enter' | 'ctrl+enter' | 'enter';
 export type DisableNotificationSound = boolean;
 
 export interface UserData {
-	status?:
-		| {
-				title?: 'Do Not Disturb';
-				value?: 'DoNotDisturb';
-				[k: string]: unknown;
-		  }
-		| {
-				title?: 'On Annual Leave';
-				value?: 'AnnualLeave';
-				[k: string]: unknown;
-		  }
-		| {
-				title?: 'In a Meeting';
-				value?: 'Meeting';
-				[k: string]: unknown;
-		  }
-		| {
-				title?: 'Available';
-				value?: 'Available';
-				[k: string]: unknown;
-		  };
+	status?: Available | DoNotDisturb | OnAnnualLeave | InAMeeting;
 	email?: Email;
 	hash: string;
 	avatar?: Avatar;
@@ -121,6 +101,26 @@ export interface UserData {
 		};
 		[k: string]: unknown;
 	};
+	[k: string]: unknown;
+}
+export interface Available {
+	title?: 'Available';
+	value?: 'Available';
+	[k: string]: unknown;
+}
+export interface DoNotDisturb {
+	title?: 'Do Not Disturb';
+	value?: 'DoNotDisturb';
+	[k: string]: unknown;
+}
+export interface OnAnnualLeave {
+	title?: 'On Annual Leave';
+	value?: 'AnnualLeave';
+	[k: string]: unknown;
+}
+export interface InAMeeting {
+	title?: 'In a Meeting';
+	value?: 'Meeting';
 	[k: string]: unknown;
 }
 

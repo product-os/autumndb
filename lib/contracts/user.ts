@@ -1,5 +1,64 @@
 import { uiSchemaDef } from './mixins/ui-schema-defs';
 
+const statusOptions = [
+	{
+		type: 'object',
+		title: 'Available',
+		properties: {
+			title: {
+				type: 'string',
+				const: 'Available',
+			},
+			value: {
+				type: 'string',
+				const: 'Available',
+			},
+		},
+	},
+	{
+		type: 'object',
+		title: 'Do Not Disturb',
+		properties: {
+			title: {
+				type: 'string',
+				const: 'Do Not Disturb',
+			},
+			value: {
+				type: 'string',
+				const: 'DoNotDisturb',
+			},
+		},
+	},
+	{
+		type: 'object',
+		title: 'On Annual Leave',
+		properties: {
+			title: {
+				type: 'string',
+				const: 'On Annual Leave',
+			},
+			value: {
+				type: 'string',
+				const: 'AnnualLeave',
+			},
+		},
+	},
+	{
+		type: 'object',
+		title: 'In a Meeting',
+		properties: {
+			title: {
+				type: 'string',
+				const: 'In a Meeting',
+			},
+			value: {
+				type: 'string',
+				const: 'Meeting',
+			},
+		},
+	},
+];
+
 export const user = {
 	slug: 'user',
 	type: 'type@1.0.0',
@@ -24,60 +83,11 @@ export const user = {
 					type: 'object',
 					properties: {
 						status: {
-							oneOf: [
-								{
-									type: 'object',
-									properties: {
-										title: {
-											type: 'string',
-											const: 'Do Not Disturb',
-										},
-										value: {
-											type: 'string',
-											const: 'DoNotDisturb',
-										},
-									},
-								},
-								{
-									type: 'object',
-									properties: {
-										title: {
-											type: 'string',
-											const: 'On Annual Leave',
-										},
-										value: {
-											type: 'string',
-											const: 'AnnualLeave',
-										},
-									},
-								},
-								{
-									type: 'object',
-									properties: {
-										title: {
-											type: 'string',
-											const: 'In a Meeting',
-										},
-										value: {
-											type: 'string',
-											const: 'Meeting',
-										},
-									},
-								},
-								{
-									type: 'object',
-									properties: {
-										title: {
-											type: 'string',
-											const: 'Available',
-										},
-										value: {
-											type: 'string',
-											const: 'Available',
-										},
-									},
-								},
-							],
+							oneOf: statusOptions,
+							default: {
+								title: statusOptions[0].properties.title.const,
+								value: statusOptions[0].properties.value.const,
+							},
 						},
 						email: {
 							title: 'Email',
@@ -104,6 +114,7 @@ export const user = {
 						hash: {
 							type: 'string',
 							minLength: 1,
+							default: 'PASSWORDLESS',
 						},
 						avatar: {
 							title: 'Avatar',
