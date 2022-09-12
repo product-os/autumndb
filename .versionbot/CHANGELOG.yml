@@ -1,4 +1,20 @@
 - commits:
+    - subject: Export migrations function
+      hash: eccd0c14e4a223a8dc425ad358662bdd6b198a5c
+      body: |
+        Export function to allow consumers to also execute migrations
+        within a transaction through autumndb.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.3.0
+  title: "'Export migrations function'"
+  date: 2022-09-12T01:14:25.947Z
+- commits:
     - subject: Update @balena/jellyfish-logger from 5.1.54 to 5.1.55
       hash: d0e9e2edf840ed2a74a5bbfea0309e297d6aeaeb
       body: ""
