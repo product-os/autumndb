@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add defaults for user contract
+      hash: b43bc43d11c1f6cda8a9df2409d46b31df1bc19a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.2.35
+  title: "'Add defaults for user contract'"
+  date: 2022-09-12T05:37:10.633Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 13.0.13 to 14.0.0
       hash: c15dac39e44e756a9f369e5ae53fc7ebf40077b3
       body: ""
