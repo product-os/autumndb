@@ -1507,7 +1507,7 @@ export class Kernel {
 								[verb]: {
 									...(schema.$$links[verb] as any),
 									properties: {
-										...((schema.$$links[verb] as any).properties || {}),
+										...((schema.$$links[verb] as any)?.properties || {}),
 										id: {
 											const: change.after.id,
 										},
