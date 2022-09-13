@@ -165,6 +165,8 @@ export class Context {
 			const result = await cbPromise;
 			return result;
 		} catch (error: unknown) {
+			// TODO convert the error into a JellyfishDatabaseError ( timeout etc)
+			// TODO log the query that failed
 			throw saneError(error);
 		} finally {
 			if (discardContext) {
@@ -324,6 +326,8 @@ export class Context {
 	/**
 	 * Run a query and return its results.
 	 */
+	// TODO either here or on withDatabaseConnection, convert the error to a JellyfishError
+	// note that await this.withDatabaseConnection doesn't have a try/catch wrapping it
 	public async query<T extends QueryResultRow = any>(
 		query: Query,
 		parameters?: any[],
