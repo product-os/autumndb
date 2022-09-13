@@ -6,7 +6,7 @@
     "url": "https://github.com/product-os/autumndb.git"
   },
   "engines": {
-    "node": ">=14.2.0"
+    "node": "^16.0.0"
   },
   "description": "A JSON schema based graph database, based on Postgres",
   "main": "build/index.js",
