@@ -1,4 +1,19 @@
 - commits:
+    - subject: Throw errors.JellyfishDatabaseTimeoutError on all timeouts
+      hash: 8a720c31280286a91e60dafda2bf67624f6b0176
+      body: |
+        Patch db options usage.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+        signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+      author: Ramiro González Maciel
+      nested: []
+  version: 22.2.45
+  title: ""
+  date: 2022-09-16T03:57:09.796Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.159 to 2.0.162
       hash: ec05394a879aa635ef6e4f89fd9f2c7448a64432
       body: ""
