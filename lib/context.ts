@@ -165,8 +165,6 @@ export class Context {
 			const result = await cbPromise;
 			return result;
 		} catch (error: unknown) {
-			// TODO convert the error into a JellyfishDatabaseError ( timeout etc)
-			// TODO log the query that failed
 			throw saneError(error);
 		} finally {
 			if (discardContext) {
@@ -326,29 +324,53 @@ export class Context {
 	/**
 	 * Run a query and return its results.
 	 */
-	// TODO either here or on withDatabaseConnection, convert the error to a JellyfishError
-	// note that await this.withDatabaseConnection doesn't have a try/catch wrapping it
 	public async query<T extends QueryResultRow = any>(
 		query: Query,
 		parameters?: any[],
 	): Promise<T[]> {
-		return (
-			await this.withDatabaseConnection((context: Context) => {
-				let textOrConfig: any;
-				if (query instanceof PgPreparedStatement) {
-					textOrConfig = query.asQueryConfig(parameters);
-				} else {
-					textOrConfig = query;
-				}
+		try {
+			return (
+				await this.withDatabaseConnection((context: Context) => {
+					let textOrConfig: any;
+					if (query instanceof PgPreparedStatement) {
+						textOrConfig = query.asQueryConfig(parameters);
+					} else {
+						textOrConfig = query;
+					}
 
-				try {
-					return context.connection!.query<T>(textOrConfig, parameters);
-				} catch (err: unknown) {
-					context.error('Postgres error', { err, query, parameters });
-					throw err;
-				}
-			})
-		).rows;
+					try {
+						return context.connection!.query<T>(textOrConfig, parameters);
+					} catch (error: unknown) {
+						context.error('Postgres error', { error, query, parameters });
+						throw error;
+					}
+				})
+			).rows;
+		} catch (error: any) {
+			console.error(error);
+			this.assertUser(
+				!error.message.startsWith('Query read timeout') &&
+					!error.message.startsWith(
+						'canceling statement due to statement timeout',
+					) &&
+					!error.message.startsWith(
+						'canceling statement due to user request',
+					) &&
+					!error.message.includes('statement timeout'),
+				errors.JellyfishDatabaseTimeoutError,
+				() => {
+					return `Query timeout: query: ${JSON.stringify(query)}`;
+				},
+			);
+			this.assertUser(
+				!error.message.startsWith('invalid regular expression:'),
+				errors.JellyfishInvalidRegularExpression,
+				() => {
+					return `Invalid pattern in schema: ${JSON.stringify(query)}`;
+				},
+			);
+			throw error;
+		}
 	}
 
 	/**

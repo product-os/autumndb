@@ -5276,4 +5276,53 @@ describe('backend', () => {
 			).rejects.toThrow();
 		});
 	});
+
+	describe('timeouts', () => {
+		it('should throw a specific timeout error', async () => {
+			await ctx.context.runQuery(`SET statement_timeout = 100`);
+
+			await expect(ctx.context.runQuery(`SELECT pg_sleep(65)`)).rejects.toThrow(
+				errors.JellyfishDatabaseTimeoutError,
+			);
+
+			// Create a long query
+			const generate = (
+				times: number,
+				seeds: string[],
+				index = 0,
+			): JsonSchema => {
+				if (times === 0) {
+					return {
+						type: 'string',
+						const: 'hello',
+					};
+				}
+
+				const next = seeds[index % seeds.length];
+
+				return {
+					type: 'object',
+					required: ['data'],
+					properties: {
+						data: {
+							type: 'object',
+							required: ['other', 'next'],
+							properties: {
+								other: {
+									type: ['string', 'number'],
+								},
+								[next]: generate(times - 1, seeds, index + 1),
+							},
+						},
+					},
+				};
+			};
+
+			// make sure the query will timeout
+			await ctx.context.runQuery(`SET statement_timeout = 1`);
+			await expect(
+				ctx.backend.query(ctx.context, {}, generate(200, ['foo', 'bar'])),
+			).rejects.toThrow(errors.JellyfishDatabaseTimeoutError);
+		});
+	});
 });

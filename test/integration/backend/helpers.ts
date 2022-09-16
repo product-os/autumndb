@@ -45,12 +45,11 @@ export const before = async (
 		await ctx.cache.connect();
 	}
 
-	ctx.backend = new PostgresBackend(
-		ctx.cache,
-		Object.assign({}, environment.database.options, {
-			database: dbName,
-		}),
-	);
+	const dbOptions = Object.assign({}, environment.database.options, {
+		database: dbName,
+	});
+
+	ctx.backend = new PostgresBackend(ctx.cache, dbOptions);
 
 	ctx.context = new Context({ id: `CORE-TEST-${uuid()}` }, ctx.backend);
 

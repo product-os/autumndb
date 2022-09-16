@@ -126,10 +126,19 @@ export const runQuery = async (
 		.query(query, values)
 		.catch((error: { message: string }) => {
 			context.assertUser(
-				!error.message.includes('statement timeout'),
+				!error.message.startsWith('Query read timeout') &&
+					!error.message.startsWith(
+						'canceling statement due to statement timeout',
+					) &&
+					!error.message.startsWith(
+						'canceling statement due to user request',
+					) &&
+					!error.message.includes('statement timeout'),
 				errors.JellyfishDatabaseTimeoutError,
 				() => {
-					return `Schema query timeout: ${JSON.stringify(schema)}`;
+					return `Query timeout: query: ${JSON.stringify(
+						query,
+					)} schema: ${JSON.stringify(schema)}`;
 				},
 			);
 			context.assertUser(
@@ -138,6 +147,11 @@ export const runQuery = async (
 				() => {
 					return `Invalid pattern in schema: ${JSON.stringify(schema)}`;
 				},
+			);
+			context.error(
+				`Error ${error.message} running query: ${JSON.stringify(
+					query,
+				)} schema: ${JSON.stringify(schema)}`,
 			);
 			throw error;
 		});
@@ -201,8 +215,8 @@ export interface PostgresBackendOptions {
 }
 
 const defaultPgOptions: Partial<PostgresBackendOptions> = {
-	statement_timeout: 30 * 1000,
-	query_timeout: 30 * 1000,
+	statement_timeout: 30 * 1000, // pg timeout : canceling statement due to statement timeout
+	query_timeout: 30 * 1000, // this is a node-postgres parameter; throws Query read timeout
 	idleTimeoutMillis: 60 * 1000,
 	connectionTimeoutMillis: 30 * 1000,
 	keepAlive: true,
@@ -236,9 +250,12 @@ export class PostgresBackend implements Database {
 	) {
 		this.cache = cache;
 		/*
-		 * Omit the options that are falsy, like empty strings.
+		 * Omit the options that are empty strings; keep numbers as they are
 		 */
-		this.options = _.omitBy(options, _.isEmpty) as any;
+		this.options = _.omitBy(
+			options,
+			(param) => _.isString(param) && _.isEmpty(param),
+		) as any;
 		/*
 		 * The PostgreSQL database name that we will connect to.
 		 * We don't hardcode it as we want to be able to target
@@ -365,12 +382,17 @@ export class PostgresBackend implements Database {
 		 * connect to the one we're interested in.
 		 */
 		await this.disconnect(context);
-		this.pool = new Pool({
+		const dbOptions = {
 			...defaultPgOptions,
 			...this.options,
 			database: this.databaseName,
 			port: Number(this.options.port),
-		});
+		};
+		context.info(
+			'Connecting with dbOptions',
+			_.omit(dbOptions, ['user', 'password']),
+		);
+		this.pool = new Pool(dbOptions);
 
 		/*
 		 * Add an error handler.
