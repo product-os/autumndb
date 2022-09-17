@@ -53,7 +53,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.69",
-    "@balena/jellyfish-environment": "^14.0.3",
+    "@balena/jellyfish-environment": "^14.0.5",
     "@balena/jellyfish-logger": "^5.1.65",
     "@balena/jellyfish-metrics": "^2.0.162",
     "bluebird": "^3.7.2",
