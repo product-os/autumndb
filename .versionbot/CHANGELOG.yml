@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-assert from 1.2.67 to 1.2.69
+      hash: d2975dbbbe5ed2afc1b038c819b383d71a9da286
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.46
+  title: ""
+  date: 2022-09-17T02:17:54.204Z
+- commits:
     - subject: Throw errors.JellyfishDatabaseTimeoutError on all timeouts
       hash: 8a720c31280286a91e60dafda2bf67624f6b0176
       body: |
