@@ -256,12 +256,12 @@ Requests for individual contracts by id or slug are cached, reducing DB load and
 ### Contract interface generation
 
 TypeScript interfaces derived from contract definitions can be generated using the CLI:
-```
+```bash
 npx autumndb generate-contract-interfaces
 ```
 
 For more information:
-```
+```bash
 npx autumndb --help
 ```
 
@@ -269,22 +269,14 @@ npx autumndb --help
 
 Unit tests can be easily run with the command `npm test`.
 
-The integration tests require Postgres and Redis instances. The simplest way to run the tests locally is with `docker-compose`.
-
-```
-$ npm run test:compose
-```
-
-You can also run tests locally against Postgres and Redis instances running in `docker-compose`:
-
-```
-$ npm run compose
-$ REDIS_HOST=localhost POSTGRES_HOST=localhost npx jest test/integration/permission-filter.spec.ts
+You can run integration tests locally against Postgres and Redis instances running in `docker-compose`:
+```bash
+npm run compose
+REDIS_HOST=localhost POSTGRES_HOST=localhost npx jest test/integration/permission-filter.spec.ts
 ```
 
 You can also access these Postgres and Redis instances:
-
-```
-$ PGPASSWORD=docker psql -hlocalhost -Udocker
-$ redis-cli -h localhost
+```bash
+PGPASSWORD=docker psql -hlocalhost -Udocker
+redis-cli -h localhost
 ```

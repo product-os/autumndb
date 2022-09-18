@@ -1,8 +1,7 @@
-version: '2.1'
+version: '3.9'
 
 services:
   sut:
-    image: balena/jellyfish-sut:latest
     build:
       context: .
       dockerfile: Dockerfile

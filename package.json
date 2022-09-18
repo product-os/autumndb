@@ -26,7 +26,6 @@
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest test/unit",
     "test:integration": "jest test/integration",
-    "test:compose": "docker build -t balena/jellyfish-sut:latest . && docker-compose -f docker-compose.test.yml -f docker-compose.yml up --exit-code-from=sut",
     "doc": "typedoc lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
     "compose": "docker-compose up",
