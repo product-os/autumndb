@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 14.0.5 to 14.0.6
+      hash: c9c15f2e3076e71831d269db7f06e9ea6c26d938
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.54
+  title: ""
+  date: 2022-09-18T20:31:04.461Z
+- commits:
     - subject: Drop test:compose script, update compose version
       hash: e028949fc459ff0e820e31480e60cd3e86f700d8
       body: ""
