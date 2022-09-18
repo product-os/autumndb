@@ -1,4 +1,18 @@
 - commits:
+    - subject: Drop test:compose script, update compose version
+      hash: e028949fc459ff0e820e31480e60cd3e86f700d8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.2.53
+  title: ""
+  date: 2022-09-18T15:16:47.508Z
+- commits:
     - subject: Update ts-jest from 29.0.0 to 29.0.1
       hash: 8d19f4e124aa3795ecb62629b54fef450af2d8b6
       body: ""
