@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-assert from 1.2.70 to 1.2.71
+      hash: d3ef3a3242d13676633886b2b5ebf371695ec7d8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.61
+  title: ""
+  date: 2022-09-19T04:46:27.927Z
+- commits:
     - subject: "Dev: Add .nvmrc"
       hash: ffc59da8ecf2140c2d0dbc295084ad0d420d95f7
       body: ""
