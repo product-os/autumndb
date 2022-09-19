@@ -1,5 +1,5 @@
-import * as assert from '@balena/jellyfish-assert';
 import * as logger from '@balena/jellyfish-logger';
+import { strict } from 'assert';
 import * as _ from 'lodash';
 import { Notification, PoolClient, QueryConfig, QueryResultRow } from 'pg';
 import * as pgFormat from 'pg-format';
@@ -7,6 +7,14 @@ import * as uuid from 'uuid';
 import * as errors from './errors';
 
 const LOGGER = logger.getLogger('autumndb');
+
+/**
+ * An assertion error class.
+ */
+interface AssertErrorConstructor {
+	new (message: string): Error;
+	readonly prototype: Error;
+}
 
 /**
  * Context object encapsulating the current execution context.
@@ -89,23 +97,12 @@ export class Context {
 	/**
 	 * Assert an expression.
 	 */
-	public assertInternal(
-		expression: assert.AssertExpression,
-		error: assert.AssertErrorConstructor,
-		message: assert.AssertMessage,
+	public assert(
+		expression: boolean,
+		error: AssertErrorConstructor,
+		message: string | (() => string),
 	) {
-		assert.INTERNAL(this.logContext, expression, error, message);
-	}
-
-	/**
-	 * Assert an expression.
-	 */
-	public assertUser(
-		expression: assert.AssertExpression,
-		error: assert.AssertErrorConstructor,
-		message: assert.AssertMessage,
-	) {
-		assert.USER(this.logContext, expression, error, message);
+		strict(expression, new error(_.isFunction(message) ? message() : message));
 	}
 
 	/**
@@ -118,7 +115,7 @@ export class Context {
 		cb: (context: Context) => Promise<T>,
 		options?: { forceNew: true },
 	): Promise<T> {
-		this.assertUser(
+		this.assert(
 			!this.queryBlockReason,
 			errors.JellyfishTransactionError,
 			this.queryBlockReason!,
@@ -186,7 +183,7 @@ export class Context {
 		isolation: TransactionIsolation,
 		cb: (context: Context) => Promise<T>,
 	): Promise<T> {
-		this.assertUser(
+		this.assert(
 			!this.transactionData || this.transactionData.isolation === isolation,
 			errors.JellyfishInvalidTransactionNesting,
 			'Cannot nest transactions with different isolation levels',
@@ -202,7 +199,7 @@ export class Context {
 		} else if (isolation === TransactionIsolation.Serialized) {
 			pgIsolation = 'SERIALIZABLE';
 		} else {
-			this.assertInternal(
+			this.assert(
 				false,
 				errors.JellyfishInvalidTransactionIsolation,
 				`Invalid transaction isolation: ${isolation}`,
@@ -348,7 +345,7 @@ export class Context {
 			).rows;
 		} catch (error: any) {
 			console.error(error);
-			this.assertUser(
+			this.assert(
 				!error.message.startsWith('Query read timeout') &&
 					!error.message.startsWith(
 						'canceling statement due to statement timeout',
@@ -362,7 +359,7 @@ export class Context {
 					return `Query timeout: query: ${JSON.stringify(query)}`;
 				},
 			);
-			this.assertUser(
+			this.assert(
 				!error.message.startsWith('invalid regular expression:'),
 				errors.JellyfishInvalidRegularExpression,
 				() => {
@@ -382,7 +379,7 @@ export class Context {
 		parameters?: any[],
 	): Promise<T | null> {
 		const results = await this.query(query, parameters);
-		this.assertUser(
+		this.assert(
 			results.length <= 1,
 			errors.JellyfishBadResultSetSize,
 			`Expected no more than one result, got ${results.length}`,
@@ -397,7 +394,7 @@ export class Context {
 	 */
 	public async queryOne<T = any>(query: Query, parameters?: any[]): Promise<T> {
 		const results = await this.query(query, parameters);
-		this.assertUser(
+		this.assert(
 			results.length === 1,
 			errors.JellyfishBadResultSetSize,
 			`Expected a single result, got ${results.length}`,
