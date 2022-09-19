@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-logger from 5.1.71 to 5.1.80
+      hash: 3dce5ccb7d6ecd4aa0e6e02a90d953fdb57eb522
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.70
+  title: ""
+  date: 2022-09-19T09:24:44.795Z
+- commits:
     - subject: "Dev: Remove unenforceable .editorconfig"
       hash: a1bda8f519de0fdcc42330687c0230225bb2d241
       body: ""
