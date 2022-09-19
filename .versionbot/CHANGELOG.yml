@@ -1,4 +1,18 @@
 - commits:
+    - subject: "Dev: Remove unenforceable .editorconfig"
+      hash: a1bda8f519de0fdcc42330687c0230225bb2d241
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.2.69
+  title: ""
+  date: 2022-09-19T09:13:06.982Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 14.0.8 to 14.0.11
       hash: 0c3637ed5a9a48114a418a5ae4126623168080eb
       body: ""
