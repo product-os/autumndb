@@ -22,8 +22,7 @@ export const roleUserOperator: RoleContractDefinition = {
 				},
 				{
 					type: 'object',
-					description:
-						"User can see other user's roles (except for user-admin and user-guest)",
+					description: 'User can see other users (except for admin and guest)',
 					additionalProperties: true,
 					required: ['data', 'type', 'slug'],
 					properties: {
@@ -37,13 +36,48 @@ export const roleUserOperator: RoleContractDefinition = {
 							type: 'string',
 							const: 'user@1.0.0',
 						},
+					},
+				},
+				{
+					type: 'object',
+					description:
+						'User can view create contracts that create users, overrides user-community restriction',
+					additionalProperties: true,
+					required: ['type', 'data'],
+					properties: {
+						type: {
+							const: 'create@1.0.0',
+						},
 						data: {
 							type: 'object',
 							properties: {
-								roles: {
-									type: 'array',
-									items: {
-										type: 'string',
+								payload: {
+									type: 'object',
+									if: {
+										properties: {
+											type: {
+												const: 'user@1.0.0',
+											},
+										},
+										required: ['type'],
+									},
+									then: {
+										properties: {
+											data: {
+												required: ['roles'],
+												properties: {
+													roles: {
+														type: 'array',
+														not: {
+															contains: {
+																enum: ['user-guest', 'user-admin'],
+															},
+														},
+													},
+												},
+											},
+										},
+										required: ['data'],
 									},
 								},
 							},
