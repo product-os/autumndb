@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 14.0.11 to 14.0.12
+      hash: 27c389b9df9467ea2ca10ed9ebd2745cfd90ec84
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.74
+  title: ""
+  date: 2022-09-23T12:30:56.754Z
+- commits:
     - subject: Allow operator role to manage other users
       hash: 65d7e3110d706f4532cd459caacc0823cfdb3409
       body: ""
