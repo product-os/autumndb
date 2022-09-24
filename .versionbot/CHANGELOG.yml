@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update ts-jest from 29.0.1 to 29.0.2
+      hash: 88edd380ac5d5c1230a5e54f6d60e30267cb687b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.84
+  title: ""
+  date: 2022-09-24T16:28:19.947Z
+- commits:
     - subject: Update stopword from 2.0.4 to 2.0.5
       hash: 4e6960f5f7e615e4ee401afb2a177748e2a288a1
       body: ""
