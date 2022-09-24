@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/bluebird from 3.5.36 to 3.5.37
+      hash: e93015948846f3d1a6794a06d66ccf49defb19ab
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.78
+  title: ""
+  date: 2022-09-24T03:57:13.502Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.188 to 2.0.189
       hash: a55bc1f25a4322eef9b4beab1218577e03520157
       body: ""
