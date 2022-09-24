@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-assert from 1.2.73 to 1.2.74
+      hash: a055149262a063501749fa9e549a40092574bb1e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.79
+  title: ""
+  date: 2022-09-24T12:29:53.451Z
+- commits:
     - subject: Update @types/bluebird from 3.5.36 to 3.5.37
       hash: e93015948846f3d1a6794a06d66ccf49defb19ab
       body: ""
