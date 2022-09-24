@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update stopword from 2.0.4 to 2.0.5
+      hash: 4e6960f5f7e615e4ee401afb2a177748e2a288a1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.83
+  title: ""
+  date: 2022-09-24T16:14:58.342Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.189 to 2.0.192
       hash: 60c6be3391b3cb4fc9f454d4941581016e4e2aa3
       body: ""
