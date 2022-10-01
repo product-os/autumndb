@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update commander from 9.4.0 to 9.4.1
+      hash: 5eb66d614997501e0745f91f206b698d43568a48
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.111
+  title: ""
+  date: 2022-10-01T18:19:45.735Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.209 to 2.0.213
       hash: 5403049f476efa60c5fa2faa39f8c0112b3861e2
       body: ""
