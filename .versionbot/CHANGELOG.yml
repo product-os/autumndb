@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-metrics from 2.0.213 to 2.0.214
+      hash: c627a7fcbef7de01e8e69b07f1d06d54f7efbef1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.115
+  title: ""
+  date: 2022-10-02T21:48:47.435Z
+- commits:
     - subject: Update jest monorepo
       hash: a8075a642dd3a5949956995b5ccc554331827feb
       body: ""
