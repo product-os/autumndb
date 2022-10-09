@@ -44,7 +44,7 @@
       "npm run types",
       "git add lib/types/contracts/*"
     ],
-    "*.{ts,tsx}": [
+    "*.ts": [
       "balena-lint --fix"
     ],
     "*.{json,yml}": [
