@@ -1,4 +1,18 @@
 - commits:
+    - subject: "Dev: Use prettier for json/yml"
+      hash: 17166d3e9550b9669633c109b75002bbe5370a97
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.2.131
+  title: ""
+  date: 2022-10-09T11:41:52.531Z
+- commits:
     - subject: Update semver from 7.3.7 to 7.3.8
       hash: 0d10fbc721d9de2e4bbe6dc21a5486225ccbfc47
       body: ""
