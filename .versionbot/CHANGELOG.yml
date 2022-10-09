@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update semver from 7.3.7 to 7.3.8
+      hash: 0d10fbc721d9de2e4bbe6dc21a5486225ccbfc47
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.130
+  title: ""
+  date: 2022-10-09T04:04:41.313Z
+- commits:
     - subject: Update @types/jest from 29.1.1 to 29.1.2
       hash: 4eb911b41dd0b9c846fc31a18a3843cf838a7f9c
       body: ""
