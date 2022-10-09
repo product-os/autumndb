@@ -19,9 +19,5 @@
     "gitRevision": "master",
     "out": "docs"
   },
-  "include": [
-    "lib/**/*.ts",
-    "test/**/*.ts",
-    "@types/**/*.d.ts"
-  ]
+  "include": ["lib/**/*.ts", "test/**/*.ts", "@types/**/*.d.ts"]
 }
