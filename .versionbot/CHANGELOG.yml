@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-logger from 5.1.111 to 5.1.112
+      hash: 004af6ff12b531e76b2f8b10ac7d53f79c43c08b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.134
+  title: ""
+  date: 2022-10-09T18:22:51.166Z
+- commits:
     - subject: Update @balena/jellyfish-assert from 1.2.84 to 1.2.85
       hash: d37ef7af2caf84a843f6cfbab7f2cc6a87b10277
       body: ""
