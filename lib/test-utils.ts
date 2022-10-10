@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { Cache } from './cache';
 import { AutumnDBSession, Kernel } from './kernel';
 import type {
+	AuthenticationPasswordContract,
 	Contract,
 	LinkContract,
 	OrgContract,
@@ -84,17 +85,17 @@ export const newContext = async (
 
 	const createUser = async (
 		username: string,
-		hash = 'foobar',
+		hash: string | undefined = undefined,
 		roles = ['user-community'],
 	) => {
 		// Create the user, only if it doesn't exist yet
-		const userContract =
-			(await kernel.getContractBySlug<UserContract>(
-				logContext,
-				kernel.adminSession()!,
-				`user-${username}@latest`,
-			)) ||
-			(await kernel.insertContract<UserContract>(
+		let userContract = await kernel.getContractBySlug<UserContract>(
+			logContext,
+			kernel.adminSession()!,
+			`user-${username}@latest`,
+		);
+		if (!userContract) {
+			userContract = await kernel.insertContract<UserContract>(
 				logContext,
 				kernel.adminSession()!,
 				{
@@ -102,11 +103,48 @@ export const newContext = async (
 					slug: `user-${username}`,
 					data: {
 						email: `${username}@example.com`,
-						hash,
 						roles,
 					},
 				},
-			));
+			);
+			if (hash) {
+				const passwordContract =
+					await kernel.insertContract<AuthenticationPasswordContract>(
+						logContext,
+						kernel.adminSession()!,
+						{
+							type: 'authentication-password@1.0.0',
+							slug: 'authentication-password-' + userContract.slug,
+							data: {
+								actorId: userContract.id,
+								hash,
+							},
+						},
+					);
+				await kernel.insertContract<LinkContract>(
+					logContext,
+					kernel.adminSession()!,
+					{
+						slug: 'link-' + userContract.id + '-' + passwordContract.id,
+						type: 'link@1.0.0',
+						name: 'is authenticated with',
+						created_at: userContract.created_at,
+						markers: userContract.markers,
+						data: {
+							from: {
+								id: userContract.id,
+								type: 'user@1.0.0',
+							},
+							to: {
+								id: passwordContract.id,
+								type: 'authentication-password@1.0.0',
+							},
+							inverseName: 'authenticates',
+						},
+					},
+				);
+			}
+		}
 		assert(userContract);
 
 		return userContract;

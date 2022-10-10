@@ -111,11 +111,6 @@ export const user = {
 								},
 							],
 						},
-						hash: {
-							type: 'string',
-							minLength: 1,
-							default: 'PASSWORDLESS',
-						},
 						avatar: {
 							title: 'Avatar',
 							type: ['string', 'null'],
@@ -130,10 +125,6 @@ export const user = {
 								},
 							},
 						},
-						oauth: {
-							description: 'Linked accounts',
-							type: 'object',
-						},
 						profile: {
 							description: 'Configuration options for your account',
 							type: 'object',
@@ -145,9 +136,6 @@ export const user = {
 									title: 'Started at the company',
 									type: 'string',
 									format: 'date',
-								},
-								type: {
-									type: 'string',
 								},
 								title: {
 									type: 'string',
@@ -215,78 +203,10 @@ export const user = {
 										},
 									},
 								},
-								homeView: {
-									description:
-										'The default view that is loaded after you login',
-									type: 'string',
-									format: 'uuid',
-								},
-								activeLoop: {
-									// TODO: Add pattern regex once it is finalized
-									description: 'The loop that the user is currently working on',
-									type: ['string', 'null'],
-								},
-								sendCommand: {
-									title: 'Send command',
-									description: 'Command to send a message',
-									type: 'string',
-									default: 'shift+enter',
-									enum: ['shift+enter', 'ctrl+enter', 'enter'],
-								},
-								disableNotificationSound: {
-									title: 'Disable notification sound',
-									description:
-										'Do not play a sound when displaying notifications',
-									type: 'boolean',
-									default: false,
-								},
-								starredViews: {
-									description: 'List of view slugs that are starred',
-									type: 'array',
-									items: {
-										type: 'string',
-									},
-								},
-								viewSettings: {
-									description:
-										'A map of settings for view contracts, keyed by the view id',
-									type: 'object',
-									patternProperties: {
-										'^.*$': {
-											lens: {
-												type: 'string',
-											},
-											slice: {
-												type: 'string',
-											},
-											notifications: {
-												type: 'object',
-												properties: {
-													web: {
-														title: 'Web',
-														description: 'Alert me with desktop notifications',
-														type: 'object',
-														properties: {
-															update: {
-																type: 'boolean',
-															},
-															mention: {
-																type: 'boolean',
-															},
-															alert: {
-																type: 'boolean',
-															},
-														},
-													},
-												},
-											},
-										},
-									},
-								},
 							},
 						},
 					},
-					required: ['roles', 'hash'],
+					required: ['roles'],
 				},
 			},
 			required: ['slug', 'data'],
@@ -294,7 +214,6 @@ export const user = {
 		uiSchema: {
 			fields: {
 				data: {
-					hash: null,
 					email: uiSchemaDef('email'),
 					status: {
 						'ui:title': null,
@@ -317,20 +236,6 @@ export const user = {
 					},
 					profile: {
 						'ui:description': null,
-						viewSettings: null,
-						homeView: uiSchemaDef('idOrSlugLink'),
-						sendCommand: {
-							'ui:widget': 'Markdown',
-							'ui:value': {
-								$if: 'source',
-								then: '`${source}`',
-								else: null,
-							},
-						},
-						disableNotificationSound: {
-							'ui:widget': 'Checkbox',
-						},
-						starredViews: uiSchemaDef('idOrSlugList'),
 						name: {
 							'ui:title': null,
 						},

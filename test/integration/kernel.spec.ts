@@ -495,18 +495,7 @@ describe('Kernel', () => {
 		});
 
 		it('should not break the type schema', async () => {
-			const contract = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					type: 'user@1.0.0',
-					data: {
-						email: 'johndoe@example.com',
-						hash: 'PASSWORDLESS',
-						roles: [],
-					},
-				},
-			);
+			const contract = await ctx.createUser('johndoe', undefined, []);
 
 			await expect(
 				ctx.kernel.patchContractBySlug(
@@ -684,7 +673,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: 'johndoe@example.com',
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				},
@@ -793,7 +781,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: 'johndoe@example.com',
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				},
@@ -904,7 +891,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: 'johndoe@example.com',
-						hash: 'secret',
 						roles: [],
 					},
 				},
@@ -945,7 +931,6 @@ describe('Kernel', () => {
 
 			expect(result!.data).toEqual({
 				email: 'johndoe@gmail.com',
-				hash: 'secret',
 				roles: [],
 			});
 		});
@@ -1012,7 +997,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: 'johndoe@example.com',
-						hash: 'secret',
 						roles: [],
 					},
 				},
@@ -1060,226 +1044,6 @@ describe('Kernel', () => {
 			);
 
 			expect(result).toEqual(randomContract);
-		});
-
-		it('should not remove inaccessible fields', async () => {
-			const slug = testUtils.generateRandomSlug({
-				prefix: 'user-johndoe',
-			});
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `role-${slug}`,
-					type: 'role@1.0.0',
-					version: '1.0.0',
-					data: {
-						read: {
-							type: 'object',
-							anyOf: [
-								{
-									required: ['slug', 'type', 'data'],
-									properties: {
-										slug: {
-											type: 'string',
-										},
-										type: {
-											type: 'string',
-											const: 'user@1.0.0',
-										},
-										data: {
-											type: 'object',
-											required: ['email'],
-											additionalProperties: false,
-											properties: {
-												email: {
-													type: 'string',
-												},
-											},
-										},
-									},
-								},
-								{
-									required: ['slug', 'type', 'data'],
-									properties: {
-										slug: {
-											type: 'string',
-											enum: ['user', 'type'],
-										},
-										type: {
-											type: 'string',
-											const: 'type@1.0.0',
-										},
-										data: {
-											type: 'object',
-											additionalProperties: true,
-										},
-									},
-								},
-							],
-						},
-					},
-				},
-			);
-
-			const userContract = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug,
-					type: 'user@1.0.0',
-					data: {
-						email: 'johndoe@example.com',
-						hash: 'secret',
-						roles: [],
-					},
-				},
-			);
-
-			const filteredUser = await ctx.kernel.getContractBySlug(
-				ctx.logContext,
-				{ actor: userContract },
-				`${userContract.slug}@${userContract.version}`,
-			);
-
-			expect(filteredUser!.data).toEqual({
-				email: 'johndoe@example.com',
-			});
-
-			await expect(
-				ctx.kernel.patchContractBySlug(
-					ctx.logContext,
-					{ actor: userContract },
-					`${userContract.slug}@${userContract.version}`,
-					[
-						{
-							op: 'remove',
-							path: '/data/hash',
-						},
-					],
-				),
-			).rejects.toThrow(errors.JellyfishSchemaMismatch);
-
-			const result = await ctx.kernel.getContractBySlug(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				`${userContract.slug}@${userContract.version}`,
-			);
-			if (result !== null) {
-				result.linked_at = userContract.linked_at;
-			}
-
-			expect(result).toEqual(userContract);
-		});
-
-		it('should not add an inaccesible field', async () => {
-			const slug = testUtils.generateRandomSlug({
-				prefix: 'user-johndoe',
-			});
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug: `role-${slug}`,
-					type: 'role@1.0.0',
-					data: {
-						read: {
-							type: 'object',
-							anyOf: [
-								{
-									required: ['slug', 'type', 'data'],
-									properties: {
-										slug: {
-											type: 'string',
-										},
-										type: {
-											type: 'string',
-											const: 'user@1.0.0',
-										},
-										data: {
-											type: 'object',
-											required: ['email'],
-											additionalProperties: false,
-											properties: {
-												email: {
-													type: 'string',
-												},
-											},
-										},
-									},
-								},
-								{
-									required: ['slug', 'type', 'data'],
-									properties: {
-										slug: {
-											type: 'string',
-											enum: ['user', 'type'],
-										},
-										type: {
-											type: 'string',
-											const: 'type@1.0.0',
-										},
-										data: {
-											type: 'object',
-											additionalProperties: true,
-										},
-									},
-								},
-							],
-						},
-					},
-				},
-			);
-
-			const userContract = await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
-					slug,
-					type: 'user@1.0.0',
-					data: {
-						email: 'johndoe@example.com',
-						hash: 'secret',
-						roles: [],
-					},
-				},
-			);
-
-			const filteredUser = await ctx.kernel.getContractBySlug(
-				ctx.logContext,
-				{ actor: userContract },
-				`${userContract.slug}@${userContract.version}`,
-			);
-
-			expect(filteredUser!.data).toEqual({
-				email: 'johndoe@example.com',
-			});
-
-			await expect(
-				ctx.kernel.patchContractBySlug(
-					ctx.logContext,
-					{ actor: userContract },
-					`${userContract.slug}@${userContract.version}`,
-					[
-						{
-							op: 'add',
-							path: '/data/special',
-							value: 7,
-						},
-					],
-				),
-			).rejects.toThrow(errors.JellyfishSchemaMismatch);
-
-			const result = await ctx.kernel.getContractBySlug(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				`${userContract.slug}@${userContract.version}`,
-			);
-			if (result !== null) {
-				result.linked_at = userContract.linked_at;
-			}
-
-			expect(result).toEqual(userContract);
 		});
 
 		it('should not throw when adding a loop field referencing a loop that does exist', async () => {
@@ -1716,7 +1480,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'johndoe@gmail.com'],
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				},
@@ -1734,7 +1497,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: [],
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				}),
@@ -1747,7 +1509,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: ['foo'],
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				}),
@@ -1760,7 +1521,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'foo'],
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				}),
@@ -1773,7 +1533,6 @@ describe('Kernel', () => {
 					type: 'user@1.0.0',
 					data: {
 						email: ['johndoe@example.com', 'johndoe@example.com'],
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				}),
@@ -2230,7 +1989,6 @@ describe('Kernel', () => {
 					version: '1.0.0',
 					data: {
 						email: 'johndoe@example.com',
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				},
@@ -2247,7 +2005,6 @@ describe('Kernel', () => {
 					version: '1.0.0',
 					data: {
 						email: 'janedoe@example.com',
-						hash: 'PASSWORDLESS',
 						roles: [],
 					},
 				},
@@ -2264,7 +2021,6 @@ describe('Kernel', () => {
 						version: '1.0.0',
 						data: {
 							email: 'pwned@example.com',
-							hash: 'PASSWORDLESS',
 							roles: [],
 						},
 					},

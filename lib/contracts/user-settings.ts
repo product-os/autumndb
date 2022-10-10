@@ -1,3 +1,5 @@
+import { uiSchemaDef } from './mixins/ui-schema-defs';
+
 export const userSettings = {
 	slug: 'user-settings',
 	type: 'type@1.0.0',
@@ -88,6 +90,26 @@ export const userSettings = {
 							},
 						},
 					},
+				},
+			},
+		},
+		uiSchema: {
+			fields: {
+				data: {
+					viewSettings: null,
+					homeView: uiSchemaDef('idOrSlugLink'),
+					sendCommand: {
+						'ui:widget': 'Markdown',
+						'ui:value': {
+							$if: 'source',
+							then: '`${source}`',
+							else: null,
+						},
+					},
+					disableNotificationSound: {
+						'ui:widget': 'Checkbox',
+					},
+					starredViews: uiSchemaDef('idOrSlugList'),
 				},
 			},
 		},

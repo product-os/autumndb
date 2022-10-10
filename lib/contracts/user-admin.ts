@@ -4,7 +4,6 @@ export const userAdmin = {
 	name: 'The admin user',
 	data: {
 		email: 'accounts+jellyfish@resin.io',
-		hash: 'PASSWORDLESS',
 		roles: [],
 	},
 };

@@ -130,9 +130,6 @@ export const roleUserCommunity: RoleContractDefinition = {
 								email: {
 									type: ['string', 'array'],
 								},
-								hash: {
-									type: 'string',
-								},
 								avatar: {
 									type: ['string', 'null'],
 								},

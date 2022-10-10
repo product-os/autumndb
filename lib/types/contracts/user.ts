@@ -27,34 +27,18 @@ export type Birthday = string;
 export type AboutMe = string;
 export type AskMeAbout = string[];
 export type Links = string[];
-/**
- * Command to send a message
- */
-export type SendCommand = 'shift+enter' | 'ctrl+enter' | 'enter';
-/**
- * Do not play a sound when displaying notifications
- */
-export type DisableNotificationSound = boolean;
 
 export interface UserData {
 	status?: Available | DoNotDisturb | OnAnnualLeave | InAMeeting;
 	email?: Email;
-	hash: string;
 	avatar?: Avatar;
 	roles: string[];
-	/**
-	 * Linked accounts
-	 */
-	oauth?: {
-		[k: string]: unknown;
-	};
 	/**
 	 * Configuration options for your account
 	 */
 	profile?: {
 		company?: string;
 		startDate?: StartedAtTheCompany;
-		type?: string;
 		title?: string;
 		country?: Country;
 		city?: City;
@@ -72,32 +56,6 @@ export interface UserData {
 			askMeAbout?: AskMeAbout;
 			externalLinks?: Links;
 			[k: string]: unknown;
-		};
-		/**
-		 * The default view that is loaded after you login
-		 */
-		homeView?: string;
-		/**
-		 * The loop that the user is currently working on
-		 */
-		activeLoop?: string | null;
-		sendCommand?: SendCommand;
-		disableNotificationSound?: DisableNotificationSound;
-		/**
-		 * List of view slugs that are starred
-		 */
-		starredViews?: string[];
-		/**
-		 * A map of settings for view contracts, keyed by the view id
-		 */
-		viewSettings?: {
-			/**
-			 * This interface was referenced by `undefined`'s JSON-Schema definition
-			 * via the `patternProperty` "^.*$".
-			 */
-			[k: string]: {
-				[k: string]: unknown;
-			};
 		};
 		[k: string]: unknown;
 	};

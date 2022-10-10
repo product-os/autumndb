@@ -66,7 +66,6 @@ const start = async () => {
 			name: 'Test User',
 			data: {
 				email: 'test@example.com',
-				hash: 'PASSWORDLESS',
 				roles: ['user-community'],
 			},
 		},
