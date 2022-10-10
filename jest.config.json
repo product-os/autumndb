@@ -1,0 +1,8 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "roots": ["test"],
+  "testTimeout": 20000,
+  "maxWorkers": 1,
+  "forceExit": true
+}
