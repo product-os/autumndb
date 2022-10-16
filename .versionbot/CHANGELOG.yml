@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update traverse from 0.6.6 to 0.6.7
+      hash: 41d5f9aba45637ad4b32042fedda36bd173d924c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.147
+  title: ""
+  date: 2022-10-16T08:29:53.703Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.242 to 2.0.244
       hash: bd0754b3019278147a01bbb213115a7ae30ede1b
       body: ""
@@ -4179,8 +4191,8 @@
     - subject: Rename project to AutumnDB
       hash: 67ca9e1c172b8e16359657c6ab6ab7eba1ca4b06
       body: >
-        Renaming the project helps define it as a standalone product, with a
-        clear interface and purpose.
+        Renaming the project helps define it as a standalone product, with a clear
+        interface and purpose.
       footer:
         Change-type: major
         change-type: major
@@ -7548,8 +7560,8 @@
     - subject: Safely handle simultaneous creation of identical indexes
       hash: 48400d6992e96e9146e1d9e2cfa6e57045c0252d
       body: >
-        If two instances run this function simultaneously, it's possible to
-        enter a race condition
+        If two instances run this function simultaneously, it's possible to enter
+        a race condition
 
         where the index creation will fail with an error, as one instance will create the index
 
@@ -9278,8 +9290,8 @@
     - subject: Add support for a query mask
       hash: a2b11a083444e50043e290cb8c4e4fe8a7e4ed62
       body: >
-        When querying at the kernel level, we now support passing an optional
-        JSON schema `mask` in the `options` argument. If set, this mask will be
+        When querying at the kernel level, we now support passing an optional JSON
+        schema `mask` in the `options` argument. If set, this mask will be
         merged with the original query before the DB is queried.
       footer:
         Change-type: minor
@@ -12953,8 +12965,8 @@
     - subject: Use JellyfishLink widget for usernames and slugs/ids
       hash: 0d722de501182049612e639adb40ed555836580c
       body: >
-        Also refactored slightly to expose a `username` UI schema (which should
-        be used by `brainstorm-topic.data.reporter`).
+        Also refactored slightly to expose a `username` UI schema (which should be
+        used by `brainstorm-topic.data.reporter`).
       footer:
         Change-type: minor
         change-type: minor
@@ -13201,8 +13213,8 @@
     - subject: Remove fullTextSearch index on user slug
       hash: 6afc2f4eca1f9825f4fdbc52d085713d17c38562
       body: >
-        This index was added recently to facilitate searching for users by slug
-        in a full text search query. But this isn't very sensible as it requires
+        This index was added recently to facilitate searching for users by slug in
+        a full text search query. But this isn't very sensible as it requires
         the user to include the `user-` prefix in the search term - which they
         will never (want to) do! So I'm removing the fullTextSearch index and
         the CreateView lens will manually search for the user by slug using a
