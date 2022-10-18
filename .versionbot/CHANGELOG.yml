@@ -1,4 +1,20 @@
 - commits:
+    - subject: "CI: Use older flowzone tag"
+      hash: 8f638d0343cacf8f00b87c9fbd84c46f8c7375f6
+      body: |
+        Temporarily downgrading to older version of flowzone as CI is
+        consistently failing due to problems in more recent version
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.2.148
+  title: ""
+  date: 2022-10-18T05:22:16.319Z
+- commits:
     - subject: Update traverse from 0.6.6 to 0.6.7
       hash: 41d5f9aba45637ad4b32042fedda36bd173d924c
       body: ""
