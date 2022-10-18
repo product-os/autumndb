@@ -54,7 +54,7 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.2.86",
+    "@balena/jellyfish-assert": "^1.2.88",
     "@balena/jellyfish-environment": "^14.3.12",
     "@balena/jellyfish-logger": "^5.1.117",
     "@balena/jellyfish-metrics": "^2.0.244",
