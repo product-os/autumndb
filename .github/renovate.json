@@ -1,5 +1,6 @@
 {
   "extends": ["github>product-os/renovate-config"],
+  "ignoreDeps": ["postgres"],
   "packageRules": [
     {
       "matchDepTypes": ["devDependencies", "peerDependencies"],
