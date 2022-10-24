@@ -54,10 +54,10 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.2.90",
-    "@balena/jellyfish-environment": "^14.4.1",
+    "@balena/jellyfish-assert": "^1.2.91",
+    "@balena/jellyfish-environment": "^14.4.5",
     "@balena/jellyfish-logger": "^5.1.125",
-    "@balena/jellyfish-metrics": "^2.0.254",
+    "@balena/jellyfish-metrics": "^2.0.262",
     "bluebird": "^3.7.2",
     "commander": "^9.4.1",
     "fast-equals": "^4.0.3",
@@ -76,7 +76,7 @@
     "stopword": "^2.0.5",
     "traverse": "^0.6.7",
     "typed-error": "^3.2.1",
-    "uuid": "^8.3.2",
+    "uuid": "^9.0.0",
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
@@ -100,7 +100,7 @@
     "simple-git-hooks": "^2.8.1",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.23.17",
+    "typedoc": "^0.23.18",
     "typescript": "^4.8.4"
   },
   "simple-git-hooks": {
