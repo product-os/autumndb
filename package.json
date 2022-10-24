@@ -76,7 +76,7 @@
     "stopword": "^2.0.5",
     "traverse": "^0.6.7",
     "typed-error": "^3.2.1",
-    "uuid": "^8.3.2",
+    "uuid": "^9.0.0",
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
