@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump dependencies
+      hash: d4d3e74f4ca971383dff81482adafa58313f74b6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.2.160
+  title: ""
+  date: 2022-10-24T02:02:26.593Z
+- commits:
     - subject: "Renovate: Ignore postgres bumps"
       hash: 5ab964202b3769605a853b81d91fe0f688d12721
       body: ""
