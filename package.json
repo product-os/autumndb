@@ -1,6 +1,6 @@
 {
   "name": "autumndb",
-  "version": "22.2.161",
+  "version": "22.2.162",
   "repository": {
     "type": "git",
     "url": "https://github.com/product-os/autumndb.git"
@@ -107,6 +107,6 @@
     "pre-commit": "npx lint-staged"
   },
   "versionist": {
-    "publishedAt": "2022-10-24T04:35:23.514Z"
+    "publishedAt": "2022-10-24T04:44:19.118Z"
   }
 }
