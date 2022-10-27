@@ -1257,6 +1257,12 @@ export class PostgresBackend implements Database {
 			options,
 		);
 
+		if (process.env.AUTUMNDB_DEBUG_SQL) {
+			context[mode]('Compiled Query', {
+				query,
+			});
+		}
+
 		const { elements, queryTime, postProcessTime } = await runQuery(
 			context,
 			schema,
