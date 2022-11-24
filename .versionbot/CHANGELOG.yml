@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typedoc from 0.23.18 to 0.23.21
+      hash: 50b514384d2f0af2bb1031d403a9f43dfe081107
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.172
+  title: ""
+  date: 2022-11-24T05:14:37.258Z
+- commits:
     - subject: Update @balena/lint from 6.2.0 to 6.2.1
       hash: a1d2c284c05d14812b137d8979f5cac41e11b23c
       body: ""
