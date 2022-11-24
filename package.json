@@ -80,7 +80,7 @@
     "uuid-v4-regex": "^1.0.2"
   },
   "devDependencies": {
-    "@balena/lint": "^6.2.0",
+    "@balena/lint": "^6.2.1",
     "@json-schema-org/tests": "^2.0.0",
     "@types/bluebird": "^3.5.37",
     "@types/jest": "^29.2.0",
