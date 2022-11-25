@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update product-os/flowzone action from v0.36.4 to v0.39.9
+      hash: bc2d1ffd452d27d756c3a3e7f56a2d238f142ff8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.173
+  title: ""
+  date: 2022-11-25T02:06:03.315Z
+- commits:
     - subject: Update typedoc from 0.23.18 to 0.23.21
       hash: 50b514384d2f0af2bb1031d403a9f43dfe081107
       body: ""
