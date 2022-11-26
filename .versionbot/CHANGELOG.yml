@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update product-os/flowzone action from v0.39.9 to v0.39.11
+      hash: 8a523ce8785f26e7482fab0359e06f1c234bbead
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.174
+  title: ""
+  date: 2022-11-26T00:17:29.537Z
+- commits:
     - subject: Update product-os/flowzone action from v0.36.4 to v0.39.9
       hash: bc2d1ffd452d27d756c3a3e7f56a2d238f142ff8
       body: ""
