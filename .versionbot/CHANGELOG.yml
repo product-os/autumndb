@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typescript from 4.8.4 to 4.9.3
+      hash: 78e1f04a90d6e588364b897a749ac9be455d4d5f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.186
+  title: ""
+  date: 2022-11-26T15:22:00.354Z
+- commits:
     - subject: Update redis from 4.3.1 to 4.5.1
       hash: 96a53b6c0e47390b81b01f0aa9a6581e7c086bcf
       body: ""
