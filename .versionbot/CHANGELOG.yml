@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/node from 18.0.6 to 18.11.9
+      hash: f27991546751a22ad07df76a5e7b0f7309029300
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.183
+  title: ""
+  date: 2022-11-26T12:15:53.969Z
+- commits:
     - subject: Update lint-staged from 13.0.3 to 13.0.4
       hash: e8f84feac3834d05a0bf624aa8b2fbbd7fe6fd7d
       body: ""
