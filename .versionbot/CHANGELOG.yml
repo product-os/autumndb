@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update lint-staged from 13.0.3 to 13.0.4
+      hash: e8f84feac3834d05a0bf624aa8b2fbbd7fe6fd7d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.182
+  title: ""
+  date: 2022-11-26T09:41:56.916Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.292 to 2.0.297
       hash: 1e0b60851c2932182144116b5ae9a64440e76c07
       body: ""
