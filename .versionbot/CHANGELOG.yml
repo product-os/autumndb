@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update prettier from 2.7.1 to 2.8.0
+      hash: a3009f5a0202eadbc0f0226326350fdbbcb63673
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.184
+  title: ""
+  date: 2022-11-26T12:23:30.973Z
+- commits:
     - subject: Update @types/node from 18.0.6 to 18.11.9
       hash: f27991546751a22ad07df76a5e7b0f7309029300
       body: ""
