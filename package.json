@@ -89,7 +89,7 @@
     "@types/pg": "^8.6.5",
     "@types/pg-format": "^1.0.2",
     "@types/redis-mock": "^0.17.1",
-    "@types/semver": "^7.3.12",
+    "@types/semver": "^7.3.13",
     "@types/traverse": "^0.6.32",
     "@types/uuid": "^8.3.4",
     "deplint": "^1.1.3",
