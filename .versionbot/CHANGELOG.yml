@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update jest monorepo
+      hash: 03f43c4d544998257d4b509be53c8190689e60a8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.176
+  title: ""
+  date: 2022-11-26T00:34:46.559Z
+- commits:
     - subject: Update @types/semver from 7.3.12 to 7.3.13
       hash: 5a108a3bf8c1519493a1caca073f8363fa844745
       body: ""
