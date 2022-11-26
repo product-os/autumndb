@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update redis from 4.3.1 to 4.5.1
+      hash: 96a53b6c0e47390b81b01f0aa9a6581e7c086bcf
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.185
+  title: ""
+  date: 2022-11-26T15:14:19.680Z
+- commits:
     - subject: Update prettier from 2.7.1 to 2.8.0
       hash: a3009f5a0202eadbc0f0226326350fdbbcb63673
       body: ""
