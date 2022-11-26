@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/semver from 7.3.12 to 7.3.13
+      hash: 5a108a3bf8c1519493a1caca073f8363fa844745
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 22.2.175
+  title: ""
+  date: 2022-11-26T00:25:59.287Z
+- commits:
     - subject: Update product-os/flowzone action from v0.39.9 to v0.39.11
       hash: 8a523ce8785f26e7482fab0359e06f1c234bbead
       body: ""
