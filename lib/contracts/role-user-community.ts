@@ -278,6 +278,9 @@ export const roleUserCommunity: RoleContractDefinition = {
 										timezone: {
 											type: 'string',
 										},
+										company: {
+											type: 'string',
+										},
 									},
 								},
 								avatar: {
