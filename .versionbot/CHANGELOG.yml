@@ -1,4 +1,18 @@
 - commits:
+    - subject: Allow community role to read company
+      hash: d32ea035a0112478e8e663de6c0dcab6693bd9fa
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 22.2.187
+  title: ""
+  date: 2022-12-02T02:16:44.794Z
+- commits:
     - subject: Update typescript from 4.8.4 to 4.9.3
       hash: 78e1f04a90d6e588364b897a749ac9be455d4d5f
       body: ""
