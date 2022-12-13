@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:16
+FROM node:19
 
 WORKDIR /usr/src/jellyfish
 
