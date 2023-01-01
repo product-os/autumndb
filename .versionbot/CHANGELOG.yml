@@ -1,4 +1,16 @@
 - commits:
+    - subject: Drop uuid
+      hash: a38b7203898b097fc5fd9e4fc0ab80e781e826d6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 22.5.2
+  title: ""
+  date: 2023-01-01T06:54:32.886Z
+- commits:
     - subject: Update dependency @types/uuid to 9.0.0
       hash: 40f5a2e5f791c15987a6bbf86637c91d5b4e3b1a
       body: |
