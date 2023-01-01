@@ -1,8 +1,8 @@
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
+import { randomUUID } from 'node:crypto';
 import { Pool, PoolClient } from 'pg';
-import { v4 as uuid } from 'uuid';
 import * as streams from '../../../../../lib/backend/postgres/streams';
 import { Context } from '../../../../../lib/context';
 
@@ -20,7 +20,7 @@ const destroyDatabaseConnection = async (pool: Pool) => {
 };
 
 beforeEach(async () => {
-	const id = uuid();
+	const id = randomUUID();
 	const database = `test_streams_${id.replace(/-/g, '')}`;
 
 	const table = 'test_table';

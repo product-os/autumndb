@@ -1,5 +1,5 @@
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { INDEX_TABLE, PostgresBackend } from '../../../../lib/backend/postgres';
 import { Context } from '../../../../lib/context';
 import { TABLE as CONTRACTS_TABLE } from '../../../../lib/backend/postgres/cards';
@@ -42,7 +42,7 @@ describe('Setup', () => {
 
 	describe('.connect()', () => {
 		it('should safely handle multiple backend instances connecting to the same DB simultaneously', async () => {
-			const dbName = `test_${uuid().replace(/-/g, '_')}`;
+			const dbName = `test_${randomUUID().replace(/-/g, '_')}`;
 			const makeBackend = () => {
 				const backend = new PostgresBackend(
 					null,
@@ -50,7 +50,9 @@ describe('Setup', () => {
 						databaseName: dbName,
 					}),
 				);
-				return backend.connect(new Context({ id: `CORE-DB-TEST-${uuid()}` }));
+				return backend.connect(
+					new Context({ id: `CORE-DB-TEST-${randomUUID()}` }),
+				);
 			};
 			const result = await Promise.all([
 				makeBackend(),
@@ -66,7 +68,7 @@ describe('Setup', () => {
 
 	describe('.createTypeIndex()', () => {
 		it('should safely multiple backend instances creating the same index simultaneously', async () => {
-			const dbName = `test_${uuid().replace(/-/g, '_')}`;
+			const dbName = `test_${randomUUID().replace(/-/g, '_')}`;
 			const fields = ['data.status'];
 			const contract = {
 				type: 'type@1.0.0',
@@ -99,7 +101,9 @@ describe('Setup', () => {
 						database: dbName,
 					}),
 				);
-				await backend.connect(new Context({ id: `CORE-DB-TEST-${uuid()}` }));
+				await backend.connect(
+					new Context({ id: `CORE-DB-TEST-${randomUUID()}` }),
+				);
 
 				return backend;
 			};
@@ -124,7 +128,7 @@ describe('Setup', () => {
 
 	describe('.createFullTextSearchIndex()', () => {
 		it('should safely multiple backend instances creating the same index simultaneously', async () => {
-			const dbName = `test_${uuid().replace(/-/g, '_')}`;
+			const dbName = `test_${randomUUID().replace(/-/g, '_')}`;
 			const type = 'test@1.0.0';
 			const fields = [
 				{
@@ -140,7 +144,9 @@ describe('Setup', () => {
 						database: dbName,
 					}),
 				);
-				await backend.connect(new Context({ id: `CORE-DB-TEST-${uuid()}` }));
+				await backend.connect(
+					new Context({ id: `CORE-DB-TEST-${randomUUID()}` }),
+				);
 
 				return backend;
 			};
@@ -167,7 +173,7 @@ describe('Setup', () => {
 describe('.createIndex()', () => {
 	it('should create an index', async () => {
 		const tableName = 'cards';
-		const indexName = `foobar_${uuid().split('-')[0]}_idx`;
+		const indexName = `foobar_${randomUUID().split('-')[0]}_idx`;
 		const predicate = 'USING btree (loop)';
 		const version = '1.0.0';
 		await ctx.backend.createIndex(
@@ -210,7 +216,7 @@ describe('.createIndex()', () => {
 
 	it('should create indexes with unique flag', async () => {
 		const tableName = CONTRACTS_TABLE;
-		const indexName = `foobar_${uuid().split('-')[0]}_idx`;
+		const indexName = `foobar_${randomUUID().split('-')[0]}_idx`;
 		const predicate = 'USING btree (loop)';
 		const version = '1.0.0';
 		await ctx.backend.createIndex(

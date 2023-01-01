@@ -1,8 +1,8 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import type { LogContext } from '@balena/jellyfish-logger';
 import { strict as assert } from 'assert';
+import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
-import { v4 as uuid } from 'uuid';
 import { Cache } from './cache';
 import { AutumnDBSession, Kernel } from './kernel';
 import type {
@@ -49,7 +49,7 @@ export interface TestContext {
 export const newContext = async (
 	options: NewContextOptions = {},
 ): Promise<TestContext> => {
-	const suffix = options.suffix || uuid();
+	const suffix = options.suffix || randomUUID();
 	const dbName = `test_${suffix.replace(/-/g, '_')}`;
 
 	const cache = new Cache(
@@ -58,7 +58,7 @@ export const newContext = async (
 	);
 	await cache.connect();
 
-	const logContext: LogContext = { id: `CORE-TEST-${uuid()}` };
+	const logContext: LogContext = { id: `CORE-TEST-${randomUUID()}` };
 
 	const { kernel, pool } = await Kernel.withPostgres(
 		logContext,
@@ -231,7 +231,7 @@ export interface RandomSlugOptions {
  * Generate a random contract ID.
  */
 export const generateRandomId = (): string => {
-	return uuid();
+	return randomUUID();
 };
 
 /**

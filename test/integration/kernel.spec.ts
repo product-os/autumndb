@@ -1,7 +1,7 @@
 /* tslint:disable no-floating-promises */
 import { strict as assert } from 'assert';
 import * as _ from 'lodash';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import {
 	AutumnDBSession,
 	CONTRACTS,
@@ -2817,7 +2817,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to limit the results', async () => {
-			const ref = uuid();
+			const ref = randomUUID();
 			const result1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
@@ -2887,7 +2887,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to skip the results', async () => {
-			const ref = uuid();
+			const ref = randomUUID();
 
 			await ctx.kernel.insertContract(
 				ctx.logContext,
@@ -2958,7 +2958,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to limit and skip the results', async () => {
-			const ref = uuid();
+			const ref = randomUUID();
 
 			await ctx.kernel.insertContract(
 				ctx.logContext,
@@ -4497,7 +4497,7 @@ describe('Kernel', () => {
 		});
 
 		it('should be able to query using links', async () => {
-			const ref = uuid();
+			const ref = randomUUID();
 			const parent1 = await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.kernel.adminSession()!,

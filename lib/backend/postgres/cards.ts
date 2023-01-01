@@ -1,9 +1,9 @@
 import * as metrics from '@balena/jellyfish-metrics';
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
+import { randomUUID } from 'node:crypto';
 import * as pgFormat from 'pg-format';
 import * as traverse from 'traverse';
-import { v4 as uuidv4 } from 'uuid';
 import type { PostgresBackend } from '.';
 import { errors } from '../../';
 import type { Context } from '../../context';
@@ -382,7 +382,7 @@ export const upsert = async <T extends Contract = Contract>(
 	);
 	const insertedObject = Object.assign({}, object);
 	insertedObject.links = {};
-	const elementId = options.id || insertedObject.id || uuidv4();
+	const elementId = options.id || insertedObject.id || randomUUID();
 	if (options.replace) {
 		insertedObject.updated_at = new Date().toISOString();
 		context.debug('Upserting element', {

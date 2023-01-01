@@ -3,10 +3,10 @@ import * as metrics from '@balena/jellyfish-metrics';
 import * as fastEquals from 'fast-equals';
 import * as jsonpatch from 'fast-json-patch';
 import * as _ from 'lodash';
+import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 import * as stopword from 'stopword';
 import { setTimeout as delay } from 'timers/promises';
-import { v4 as uuidv4 } from 'uuid';
 import * as authorization from './authorization';
 import { PostgresBackend, PostgresBackendOptions } from './backend';
 import { Stream, StreamChange } from './backend/postgres/streams';
@@ -115,14 +115,14 @@ export const generateSlug = (
 		const name = stopword
 			.removeStopwords(contract.name.split(' '), stopword.en)
 			.join(' ');
-		const shortUUID = uuidv4().slice(0, 7);
+		const shortUUID = randomUUID().slice(0, 7);
 
 		// Lowercase the name and replace all non-digit, non-alpha characters with a hyphen
 		const sluggedName = name.toLowerCase().replace(/[^a-z\d]+/g, '-');
 
 		return `${baseType}-${sluggedName}-${shortUUID}`;
 	} else {
-		return `${baseType}-${uuidv4()}`;
+		return `${baseType}-${randomUUID()}`;
 	}
 };
 
