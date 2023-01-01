@@ -1,8 +1,8 @@
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import * as cards from '../../../../lib/backend/postgres/cards';
 import { Context } from '../../../../lib/context';
 
-const TEST_CONTEXT = new Context({ id: `UNIT-TEST-${uuid()}` });
+const TEST_CONTEXT = new Context({ id: `UNIT-TEST-${randomUUID()}` });
 
 describe('cards', () => {
 	describe('.fromTypePath()', () => {

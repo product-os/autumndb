@@ -1,5 +1,5 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
-import * as uuid from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { PostgresBackend } from '../../lib/backend';
 import { Context, TransactionIsolation } from '../../lib/context';
 
@@ -27,8 +27,8 @@ afterAll(async () => {
 describe('Context', () => {
 	describe('transactions', () => {
 		it('should be able to perform an atomic transaction', async () => {
-			const id1 = uuid.v4();
-			const id2 = uuid.v4();
+			const id1 = randomUUID();
+			const id2 = randomUUID();
 			await context.withTransaction(
 				TransactionIsolation.Atomic,
 				async (transactionContext: Context) => {
@@ -64,8 +64,8 @@ describe('Context', () => {
 		});
 
 		it('should be able to perform a snapshot transaction', async () => {
-			const id1 = uuid.v4();
-			const id2 = uuid.v4();
+			const id1 = randomUUID();
+			const id2 = randomUUID();
 			await context.withTransaction(
 				TransactionIsolation.Snapshot,
 				async (transactionContext: Context) => {
@@ -110,7 +110,7 @@ describe('Context', () => {
 		});
 
 		it('should rollback if an exception is thrown inside the callback', async () => {
-			const id = uuid.v4();
+			const id = randomUUID();
 			try {
 				await context.withTransaction(
 					TransactionIsolation.Snapshot,
@@ -142,8 +142,8 @@ describe('Context', () => {
 		});
 
 		it('should correctly deal with nested transactions', async () => {
-			const id1 = uuid.v4();
-			const id2 = uuid.v4();
+			const id1 = randomUUID();
+			const id2 = randomUUID();
 			await context.withTransaction(
 				TransactionIsolation.Snapshot,
 				async (transactionContext1: Context) => {
@@ -182,8 +182,8 @@ describe('Context', () => {
 		});
 
 		it('should correctly rollback a nested transaction', async () => {
-			const id1 = uuid.v4();
-			const id2 = uuid.v4();
+			const id1 = randomUUID();
+			const id2 = randomUUID();
 			await context.withTransaction(
 				TransactionIsolation.Snapshot,
 				async (transactionContext1: Context) => {
@@ -227,8 +227,8 @@ describe('Context', () => {
 		});
 
 		it.skip('should serialize unawaited queries', async () => {
-			const id1 = uuid.v4();
-			const id2 = uuid.v4();
+			const id1 = randomUUID();
+			const id2 = randomUUID();
 			context.runQuery(
 				`
                 INSERT INTO test

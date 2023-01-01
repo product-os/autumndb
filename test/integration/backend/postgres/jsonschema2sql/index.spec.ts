@@ -2,8 +2,8 @@ import { defaultEnvironment as environment } from '@balena/jellyfish-environment
 
 import * as _ from 'lodash';
 import jsonSchemaTestSuite = require('@json-schema-org/tests');
+import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
-import { v4 as uuid } from 'uuid';
 import { PostgresBackend } from '../../../../../lib/backend/postgres';
 import * as cards from '../../../../../lib/backend/postgres/cards';
 import * as jsonschema2sql from '../../../../../lib/backend/postgres/jsonschema2sql';
@@ -129,7 +129,7 @@ const runner = async ({
 		await cards.upsert(
 			context,
 			{
-				slug: item.slug || `test-${uuid()}`,
+				slug: item.slug || `test-${randomUUID()}`,
 				type: item.type,
 				active: _.isBoolean(item.active) ? item.active : true,
 				version: item.version || '1.0.0',
@@ -215,7 +215,7 @@ beforeAll(async () => {
 	 * test tables will be scoped. This ensures that can repeately
 	 * run the test suite without conflicts.
 	 */
-	const database = `test_${uuid().replace(/-/g, '')}`;
+	const database = `test_${randomUUID().replace(/-/g, '')}`;
 
 	/*
 	 * Connect to the default postgres database and use that
@@ -793,7 +793,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 
 			const elements = [
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.0-beta',
 					type: 'contract',
 					data: {
@@ -801,7 +801,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.0',
 					type: 'contract',
 					data: {
@@ -809,7 +809,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.0-alpha+001',
 					type: 'contract',
 					data: {
@@ -817,7 +817,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.0-beta+001',
 					type: 'contract',
 					data: {
@@ -825,7 +825,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.1',
 					type: 'contract',
 					data: {
@@ -833,7 +833,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.1.0',
 					type: 'contract',
 					data: {
@@ -894,7 +894,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 
 			const elements = [
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.0-beta',
 					type: 'contract',
 					data: {
@@ -902,7 +902,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.0',
 					type: 'contract',
 					data: {
@@ -910,7 +910,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.0-alpha+001',
 					type: 'contract',
 					data: {
@@ -918,7 +918,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.0-beta+001',
 					type: 'contract',
 					data: {
@@ -926,7 +926,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.0.1',
 					type: 'contract',
 					data: {
@@ -934,7 +934,7 @@ describe('jsonschema2sql: Postgres specific', () => {
 					},
 				},
 				{
-					slug: `contract-${uuid()}`,
+					slug: `contract-${randomUUID()}`,
 					version: '1.1.0',
 					type: 'contract',
 					data: {

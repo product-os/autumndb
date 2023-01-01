@@ -2,7 +2,7 @@
 import * as Bluebird from 'bluebird';
 import { once } from 'events';
 import * as _ from 'lodash';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { testUtils } from '../../lib';
 import type { JsonSchema } from '../../lib/types';
 import type { Stream } from '../../lib/backend/postgres/streams';
@@ -179,7 +179,7 @@ describe('Kernel', () => {
 		});
 
 		it('should filter contracts by the options.mask schema if set', async () => {
-			const scope = uuid();
+			const scope = randomUUID();
 			const schema: JsonSchema = {
 				required: ['data'],
 				properties: {
@@ -226,8 +226,8 @@ describe('Kernel', () => {
 				schema,
 			);
 
-			const queryWithoutMaskId = uuid();
-			const queryWithMaskId = uuid();
+			const queryWithoutMaskId = randomUUID();
+			const queryWithMaskId = randomUUID();
 
 			stream.on('dataset', async (payload) => {
 				if (payload.id === queryWithoutMaskId) {
@@ -1092,7 +1092,7 @@ describe('Kernel', () => {
 			);
 
 			let stage = 0;
-			const queryId = uuid();
+			const queryId = randomUUID();
 
 			stream.on('dataset', async (payload) => {
 				expect(stage).toEqual(0);

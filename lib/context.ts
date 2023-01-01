@@ -1,9 +1,9 @@
 import * as assert from '@balena/jellyfish-assert';
 import * as logger from '@balena/jellyfish-logger';
 import * as _ from 'lodash';
+import { randomUUID } from 'node:crypto';
 import { Notification, PoolClient, QueryConfig, QueryResultRow } from 'pg';
 import * as pgFormat from 'pg-format';
-import * as uuid from 'uuid';
 import * as errors from './errors';
 
 const LOGGER = logger.getLogger('autumndb');
@@ -519,7 +519,7 @@ export enum TransactionIsolation {
 export interface PreparedStatement {}
 
 class PgPreparedStatement implements PreparedStatement {
-	private name: string = uuid.v4();
+	private name: string = randomUUID();
 
 	public constructor(private query: string) {}
 

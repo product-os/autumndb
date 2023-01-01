@@ -1,10 +1,10 @@
 import * as metrics from '@balena/jellyfish-metrics';
 import { EventEmitter } from 'events';
 import * as _ from 'lodash';
+import { randomUUID } from 'node:crypto';
 import { Notification } from 'pg';
 import * as pgFormat from 'pg-format';
 import { setTimeout as delay } from 'timers/promises';
-import { v4 as uuidv4 } from 'uuid';
 import * as backend from '.';
 import type { Contract, JsonSchema, LinkContract } from '../../types';
 import {
@@ -202,7 +202,14 @@ export class Streamer {
 		schema: JsonSchema,
 		options: StreamOptions = {},
 	) {
-		return new Stream(this.context, this, uuidv4(), select, schema, options);
+		return new Stream(
+			this.context,
+			this,
+			randomUUID(),
+			select,
+			schema,
+			options,
+		);
 	}
 
 	register(id: string, stream: Stream) {

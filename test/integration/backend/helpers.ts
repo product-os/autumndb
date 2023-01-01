@@ -1,5 +1,5 @@
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { PostgresBackend } from '../../../lib/backend';
 import type { DatabaseBackend } from '../../../lib/backend/postgres/types';
 import { Cache } from '../../../lib/cache';
@@ -14,7 +14,7 @@ export interface BackendContext {
 }
 
 export const generateRandomID = () => {
-	return uuid();
+	return randomUUID();
 };
 
 export const generateRandomSlug = (options: { prefix?: string } = {}) => {
@@ -31,7 +31,7 @@ export const before = async (
 ): Promise<BackendContext> => {
 	const ctx: Partial<BackendContext> = {};
 
-	const suffix = options.suffix || uuid();
+	const suffix = options.suffix || randomUUID();
 	const dbName = `test_${suffix.replace(/-/g, '_')}`;
 
 	ctx.cache = new Cache(
@@ -51,7 +51,7 @@ export const before = async (
 
 	ctx.backend = new PostgresBackend(ctx.cache, dbOptions);
 
-	ctx.context = new Context({ id: `CORE-TEST-${uuid()}` }, ctx.backend);
+	ctx.context = new Context({ id: `CORE-TEST-${randomUUID()}` }, ctx.backend);
 
 	ctx.generateRandomSlug = generateRandomSlug;
 	ctx.generateRandomID = generateRandomID;

@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import * as _ from 'lodash';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { errors, testUtils } from '../../lib';
 import { createRelationships } from './create-relationships';
 
@@ -380,7 +380,7 @@ describe('Kernel', () => {
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
-					id: uuid(),
+					id: randomUUID(),
 					type: 'card@1.0.0',
 				},
 			);
@@ -389,7 +389,7 @@ describe('Kernel', () => {
 				ctx.logContext,
 				ctx.kernel.adminSession()!,
 				{
-					id: uuid(),
+					id: randomUUID(),
 					type: 'card@1.0.0',
 				},
 			);
