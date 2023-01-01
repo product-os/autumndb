@@ -1,4 +1,16 @@
 - commits:
+    - subject: "Dev: Add .editorconfig"
+      hash: 0e4210a05a360e727c466191b2bd3fd9e2a34a53
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 22.5.3
+  title: ""
+  date: 2023-01-01T09:16:57.533Z
+- commits:
     - subject: Drop uuid
       hash: a38b7203898b097fc5fd9e4fc0ab80e781e826d6
       body: ""
