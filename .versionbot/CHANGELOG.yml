@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update dependency @balena/jellyfish-environment to 15.0.1
+      hash: 24bfaf6d4800b92861048e582426836f80edec52
+      body: |
+        Update @balena/jellyfish-environment to 15.0.1
+
+        Update @balena/jellyfish-environment from 14.9.1 to 15.0.1
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 22.6.0
+  title: ""
+  date: 2023-01-04T08:52:12.640Z
+- commits:
     - subject: "Dev: Add .editorconfig"
       hash: 0e4210a05a360e727c466191b2bd3fd9e2a34a53
       body: ""
