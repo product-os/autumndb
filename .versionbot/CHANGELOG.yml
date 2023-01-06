@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update Node.js to 18.13.0
+      hash: 2ee123fade5ed5e890cce95b5103556517a285bf
+      body: |
+        Update node to 18.13.0
+
+        Update node from 18.12.1 to 18.13.0
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 22.8.0
+  title: ""
+  date: 2023-01-06T02:11:04.319Z
+- commits:
     - subject: Update actions/checkout digest to ac59398
       hash: 12a9e5ead00f0eab0bb2144d6c18f2e9e5e8f99b
       body: |
