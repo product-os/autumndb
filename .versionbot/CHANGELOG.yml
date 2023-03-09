@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update to postgres 15
+      hash: 21cf91dc97d834c2f42167db455c84d40c16bcb0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 22.8.1
+  title: ""
+  date: 2023-03-09T00:22:46.211Z
+- commits:
     - subject: Update Node.js to 18.13.0
       hash: 2ee123fade5ed5e890cce95b5103556517a285bf
       body: |
