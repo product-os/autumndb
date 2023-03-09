@@ -94,8 +94,8 @@ const UNSUPPORTED_TEST_CASES: { [key: string]: [string] } = {
 
 interface RunnerOptions {
 	context: Context;
-	backend: typeof ctx['backend'];
-	database: typeof ctx['database'];
+	backend: (typeof ctx)['backend'];
+	database: (typeof ctx)['database'];
 	elements: Array<Partial<Contract>>;
 	schema: JsonSchema;
 	table: string;
