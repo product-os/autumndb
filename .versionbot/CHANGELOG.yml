@@ -1,4 +1,25 @@
 - commits:
+    - subject: Fix removeLink typing issue
+      hash: f61953f55526e9fd045187e125fd9ac316d50e73
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+    - subject: Update Node.js to 18.15
+      hash: 26e4b49a839d683e1757289ffe0b269b13291f04
+      body: |
+        Update node from 18.13.0 to 18.15.0
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 22.9.0
+  title: ""
+  date: 2023-03-31T13:33:47.243Z
+- commits:
     - subject: Update to postgres 15
       hash: 21cf91dc97d834c2f42167db455c84d40c16bcb0
       body: ""
