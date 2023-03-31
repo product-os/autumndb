@@ -113,7 +113,7 @@ export const generateSlug = (
 
 	if (contract.name) {
 		const name = stopword
-			.removeStopwords(contract.name.split(' '), stopword.en)
+			.removeStopwords(contract.name.split(' '), stopword.eng)
 			.join(' ');
 		const shortUUID = randomUUID().slice(0, 7);
 
