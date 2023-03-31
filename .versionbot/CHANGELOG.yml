@@ -1,4 +1,16 @@
 - commits:
+    - subject: Bump dev deps
+      hash: 9732fcaf4a2285bc64cfb733189a3b91d465c60b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 23.0.2
+  title: ""
+  date: 2023-03-31T22:05:42.772Z
+- commits:
     - subject: Update github/codeql-action digest to 04df126
       hash: a9458ef13b13903335269bbf45de5b58d2a24e9b
       body: |
