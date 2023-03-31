@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update stopword, fix typings
+      hash: b988ad89c7b9acfbea31808c797436d988a7838a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 23.0.3
+  title: ""
+  date: 2023-03-31T23:17:06.762Z
+- commits:
     - subject: Bump dev deps
       hash: 9732fcaf4a2285bc64cfb733189a3b91d465c60b
       body: ""
