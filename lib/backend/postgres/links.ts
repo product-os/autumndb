@@ -6,7 +6,6 @@ import type { Contract, LinkContract } from '../../types';
 // tslint:disable-next-line: no-var-requires
 const { version: coreVersion } = require('../../../package.json');
 
-const LINK_ORIGIN_PROPERTY = '$link';
 const LINK_TABLE = 'links2';
 const STRING_TABLE = 'strings';
 
@@ -250,14 +249,17 @@ export const addLink = (
  *
  * console.log(card.links)
  */
-export const removeLink = (linkCard: LinkContract, card: Contract) => {
+export const removeLink = (
+	linkCard: LinkContract,
+	card: Contract,
+): Contract => {
 	const result = parseCard(linkCard, card);
 	if (!result || !card.links || !card.links[result.name]) {
 		return card;
 	}
-	card.links[result.name] = _.reject(card.links[result.name], [
-		LINK_ORIGIN_PROPERTY,
-		linkCard.id,
-	]);
+	const links = card.links[result.name];
+	card.links[result.name] = links.filter(
+		(contract) => contract.id !== linkCard.id,
+	);
 	return card;
 };
