@@ -59,7 +59,7 @@
     "@balena/jellyfish-logger": "^5.1.126",
     "@balena/jellyfish-metrics": "^2.0.297",
     "bluebird": "^3.7.2",
-    "commander": "^9.4.1",
+    "commander": "^10.0.0",
     "fast-equals": "^4.0.3",
     "fast-json-patch": "^3.1.1",
     "json-e": "^4.4.3",
