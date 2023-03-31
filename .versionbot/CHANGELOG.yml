@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency redis to v4.6.5
+      hash: 50f296cecb5fd1a56a0be2619ad656a022543d62
+      body: |
+        Update redis from 4.5.1 to 4.6.5
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 22.10.0
+  title: ""
+  date: 2023-03-31T13:51:24.267Z
+- commits:
     - subject: Fix removeLink typing issue
       hash: f61953f55526e9fd045187e125fd9ac316d50e73
       body: ""
