@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update github/codeql-action digest to 04df126
+      hash: a9458ef13b13903335269bbf45de5b58d2a24e9b
+      body: |
+        Update github/codeql-action
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 23.0.1
+  title: ""
+  date: 2023-03-31T21:36:28.992Z
+- commits:
     - subject: Update dependency commander to v10
       hash: 641336159a5c3e0759d59d622c1e2014dea04c35
       body: |
