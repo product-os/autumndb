@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency rimraf to v4
+      hash: 97868184d6600797977372ec6685a77c898d89c8
+      body: |
+        Update rimraf from 3.0.2 to 4.4.1
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 22.10.1
+  title: ""
+  date: 2023-03-31T14:10:44.983Z
+- commits:
     - subject: Update dependency redis to v4.6.5
       hash: 50f296cecb5fd1a56a0be2619ad656a022543d62
       body: |
