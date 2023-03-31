@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove old docs action link from readme
+      hash: 289b311f19848d73eb02d1c8234536f28d1733f8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 23.0.4
+  title: ""
+  date: 2023-03-31T23:32:50.288Z
+- commits:
     - subject: Update stopword, fix typings
       hash: b988ad89c7b9acfbea31808c797436d988a7838a
       body: ""
