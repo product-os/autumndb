@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update fast-equals from 4.0.3 to 5.0.1
+      hash: b5f1ce9f23298b04051938c4a49ca561dee89057
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 24.0.2
+  title: ""
+  date: 2023-04-01T01:39:26.402Z
+- commits:
     - subject: Bump internal deps
       hash: e916ab4a21eb1df0c675478eb2e6db41289af000
       body: ""
