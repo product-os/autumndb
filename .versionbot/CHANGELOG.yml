@@ -1,4 +1,16 @@
 - commits:
+    - subject: Bump internal deps
+      hash: e916ab4a21eb1df0c675478eb2e6db41289af000
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 24.0.1
+  title: ""
+  date: 2023-04-01T01:07:10.076Z
+- commits:
     - subject: Remove jellyfish-metrics
       hash: 683a16e1ff449887240a43c1bd222c563b7b8e8e
       body: ""
