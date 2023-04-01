@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove jellyfish-metrics
+      hash: 683a16e1ff449887240a43c1bd222c563b7b8e8e
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 24.0.0
+  title: ""
+  date: 2023-04-01T00:51:10.134Z
+- commits:
     - subject: Remove old docs action link from readme
       hash: 289b311f19848d73eb02d1c8234536f28d1733f8
       body: ""
