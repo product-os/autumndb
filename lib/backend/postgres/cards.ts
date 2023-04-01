@@ -1,4 +1,3 @@
-import * as metrics from '@balena/jellyfish-metrics';
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { randomUUID } from 'node:crypto';
@@ -256,9 +255,6 @@ export const getById = async (
 		`,
 		[id],
 	);
-	if (results[0]) {
-		metrics.markContractReadFromDatabase(results[0]);
-	}
 	return results[0] || null;
 };
 
@@ -323,9 +319,6 @@ export const getBySlug = async (
 		);
 	}
 	_.forEach(results, utils.convertDatesToISOString);
-	_.forEach(results, (result) => {
-		metrics.markContractReadFromDatabase(result);
-	});
 	return results[0] || null;
 };
 
@@ -351,9 +344,6 @@ export const getManyById = async (
 		[ids],
 	);
 	_.forEach(results, utils.convertDatesToISOString);
-	_.forEach(results, (result) => {
-		metrics.markContractReadFromDatabase(result);
-	});
 	return results;
 };
 
@@ -588,9 +578,6 @@ export const upsert = async <T extends Contract = Contract>(
 	insertedObject.linked_at = results[0].linked_at;
 	insertedObject.version = results[0].version;
 	utils.convertDatesToISOString(insertedObject);
-	options.replace
-		? metrics.markContractUpsert(insertedObject as Contract)
-		: metrics.markContractInsert(insertedObject as Contract);
 	return insertedObject as T;
 };
 

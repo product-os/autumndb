@@ -1,4 +1,3 @@
-import * as metrics from '@balena/jellyfish-metrics';
 import { EventEmitter } from 'events';
 import * as _ from 'lodash';
 import { randomUUID } from 'node:crypto';
@@ -254,8 +253,6 @@ export class Stream extends EventEmitter {
 			attachedStreams: streamer.getAttachedStreamCount(),
 		});
 		streamer.register(id, this);
-		// TODO: `markStreamOpened` need to be fixed to use the correct type
-		metrics.markStreamOpened(context.getLogContext(), streamer.table);
 		// If an EventEmitter does not have at least one listener for the `error` event
 		// an exception will be raised and the nodeJS process will exit. To avoid
 		// this we always add an error listener that will log a warning.
@@ -539,10 +536,6 @@ export class Stream extends EventEmitter {
 				await this.emitUnmatchFor(rootIds, payload);
 			}
 		} catch (error: unknown) {
-			metrics.markStreamError(
-				this.context.getLogContext(),
-				this.streamer.table,
-			);
 			this.emit('error', error);
 		}
 	}
@@ -628,8 +621,6 @@ export class Stream extends EventEmitter {
 			attachedStreams: this.streamer.getAttachedStreamCount(),
 		});
 		this.streamer.unregister(this.id);
-		// TODO: `markStreamClosed` need to be fixed to use the correct type
-		metrics.markStreamClosed(this.context.getLogContext(), this.streamer.table);
 		this.emit('closed');
 	}
 }
