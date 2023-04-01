@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update json-schema-to-typescript to 12.0.0
+      hash: 85784405a958f5e79a61c55fbb00281f1678490b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 24.0.4
+  title: ""
+  date: 2023-04-01T02:48:25.538Z
+- commits:
     - subject: Update actions/checkout digest to 8f4b7f8
       hash: ebd5bed1ac57267d7c38f0a6e4d24a28b15316ac
       body: |
