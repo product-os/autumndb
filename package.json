@@ -57,7 +57,6 @@
     "@balena/jellyfish-assert": "^1.2.106",
     "@balena/jellyfish-environment": "^15.0.0",
     "@balena/jellyfish-logger": "^5.1.126",
-    "@balena/jellyfish-metrics": "^2.0.297",
     "bluebird": "^3.7.2",
     "commander": "^10.0.0",
     "fast-equals": "^4.0.3",

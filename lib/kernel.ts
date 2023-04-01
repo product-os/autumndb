@@ -1,5 +1,4 @@
 import type { LogContext } from '@balena/jellyfish-logger';
-import * as metrics from '@balena/jellyfish-metrics';
 import * as fastEquals from 'fast-equals';
 import * as jsonpatch from 'fast-json-patch';
 import * as _ from 'lodash';
@@ -1013,7 +1012,7 @@ export class Kernel {
 	 * @description
 	 * See https://tools.ietf.org/html/rfc6902
 	 *
-	 * @param {MixedContext} context - execution context
+	 * @param {MixedContext} mixedContext - execution context
 	 * @param {AutumnDBSession} session - session id
 	 * @param {String} slug - contract slug
 	 * @param {Object[]} patch - JSON Patch operations
@@ -1036,171 +1035,167 @@ export class Kernel {
 			scope,
 		);
 
-		const result = await metrics.measureContractPatch(async () => {
-			return context.withTransaction(
-				TransactionIsolation.Atomic,
-				async (transactionContext: Context) => {
-					// Set options to ensure subsequent queries are a part of the transaction
-					const options = {
-						skipCache: true,
-					};
+		const result = await context.withTransaction(
+			TransactionIsolation.Atomic,
+			async (transactionContext: Context) => {
+				// Set options to ensure subsequent queries are a part of the transaction
+				const options = {
+					skipCache: true,
+				};
 
-					// Fetch necessary data from database
-					const fullContract = await this.backend.getElementBySlug(
-						transactionContext,
-						slug,
-						{
-							...options,
-							lock: true,
-						},
-					);
+				// Fetch necessary data from database
+				const fullContract = await this.backend.getElementBySlug(
+					transactionContext,
+					slug,
+					{
+						...options,
+						lock: true,
+					},
+				);
 
-					transactionContext.assertInternal(
-						fullContract,
-						errors.JellyfishNoElement,
-						`No such card: ${slug}`,
-					);
+				transactionContext.assertInternal(
+					fullContract,
+					errors.JellyfishNoElement,
+					`No such card: ${slug}`,
+				);
 
-					// TODO: Remove this log once we understand why we are having link contract patch requests.
-					if (fullContract.type === 'link@1.0.0') {
-						transactionContext.info('Received request to patch a link card', {
-							card: fullContract,
-							patch,
-						});
-					}
-
-					const filteredContract = await this.getContractBySlug(
-						transactionContext,
-						session,
-						`${fullContract.slug}@${fullContract.version}`,
-					);
-
-					if (patch.length === 0) {
-						return filteredContract;
-					}
-
-					const typeContract = await this.getContractBySlug<TypeContract>(
-						transactionContext,
-						session,
-						fullContract.type,
-					);
-
-					transactionContext.assertInternal(
-						filteredContract,
-						errors.JellyfishNoElement,
-						`No such contract: ${slug}`,
-					);
-
-					const schema =
-						typeContract && typeContract.data && typeContract.data.schema;
-
-					transactionContext.assertInternal(
-						schema,
-						errors.JellyfishUnknownCardType,
-						`Unknown type: ${fullContract.type}`,
-					);
-
-					/*
-					 * The idea of this algorithm is that we get the full contract
-					 * as stored in the database and the contract as the current actor
-					 * can see it. Then we apply the patch to both the full and
-					 * the filtered contract, aborting if it fails on any. If it succeeds
-					 * then we upsert the full contract to the database, but only
-					 * if the resulting filtered contract still matches the permissions
-					 * filter.
-					 */
-					// TS-TODO: "filteredContract" might be null here, and we should account for this
-					const patchedFilteredContract = patchContract(
-						filteredContract!,
+				// TODO: Remove this log once we understand why we are having link contract patch requests.
+				if (fullContract.type === 'link@1.0.0') {
+					transactionContext.info('Received request to patch a link card', {
+						card: fullContract,
 						patch,
-						{
-							mutate: true,
-						},
-					);
-
-					try {
-						jsonSchema.validate(
-							authorizationSchema as any,
-							patchedFilteredContract,
-						);
-					} catch (error: any) {
-						if (error instanceof jsonSchema.SchemaMismatch) {
-							const newError = new errors.JellyfishSchemaMismatch(
-								error.message,
-							);
-							throw newError;
-						}
-
-						throw error;
-					}
-
-					const patchedFullContract = patchContract(fullContract, patch, {
-						mutate: false,
 					});
+				}
 
-					try {
-						jsonSchema.validate(schema as any, patchedFullContract);
-					} catch (error: any) {
-						if (error instanceof jsonSchema.SchemaMismatch) {
-							// Because the "full" unrestricted card is being validated there is
-							// potential for an error message to leak private data. To prevent this,
-							// override the detailed error message with a generic one.
-							const newError = new errors.JellyfishSchemaMismatch(
-								'The updated card is invalid',
-							);
-							newError.expected = true;
-							throw newError;
-						}
+				const filteredContract = await this.getContractBySlug(
+					transactionContext,
+					session,
+					`${fullContract.slug}@${fullContract.version}`,
+				);
 
-						throw error;
-					}
+				if (patch.length === 0) {
+					return filteredContract;
+				}
 
-					// Don't do a pointless update
-					if (fastEquals.deepEqual(patchedFullContract, fullContract)) {
-						return fullContract;
-					}
+				const typeContract = await this.getContractBySlug<TypeContract>(
+					transactionContext,
+					session,
+					fullContract.type,
+				);
 
-					// TODO: Remove this log once we understand why we are having link contract patch requests.
-					if (fullContract.type === 'link@1.0.0') {
-						transactionContext.info('Upserting link contract after patch', {
-							card: patchedFullContract,
-							patch,
-						});
-					}
+				transactionContext.assertInternal(
+					filteredContract,
+					errors.JellyfishNoElement,
+					`No such contract: ${slug}`,
+				);
 
-					// If the loop field is changing, check that it points to an actual loop contract
-					if (
-						patchedFullContract.loop &&
-						patchedFullContract.loop !== fullContract.loop
-					) {
-						const loopContract = await this.backend.getElementBySlug(
-							transactionContext,
-							patchedFullContract.loop,
-						);
-						transactionContext.assertInternal(
-							loopContract && loopContract.type.split('@')[0] === 'loop',
-							errors.JellyfishNoElement,
-							`No such loop: ${patchedFullContract.loop}`,
-						);
-					}
+				const schema =
+					typeContract && typeContract.data && typeContract.data.schema;
 
-					const upsertedCard = await this.backend.upsertElement(
-						transactionContext,
-						patchedFullContract,
+				transactionContext.assertInternal(
+					schema,
+					errors.JellyfishUnknownCardType,
+					`Unknown type: ${fullContract.type}`,
+				);
+
+				/*
+				 * The idea of this algorithm is that we get the full contract
+				 * as stored in the database and the contract as the current actor
+				 * can see it. Then we apply the patch to both the full and
+				 * the filtered contract, aborting if it fails on any. If it succeeds
+				 * then we upsert the full contract to the database, but only
+				 * if the resulting filtered contract still matches the permissions
+				 * filter.
+				 */
+				// TS-TODO: "filteredContract" might be null here, and we should account for this
+				const patchedFilteredContract = patchContract(
+					filteredContract!,
+					patch,
+					{
+						mutate: true,
+					},
+				);
+
+				try {
+					jsonSchema.validate(
+						authorizationSchema as any,
+						patchedFilteredContract,
 					);
+				} catch (error: any) {
+					if (error instanceof jsonSchema.SchemaMismatch) {
+						const newError = new errors.JellyfishSchemaMismatch(error.message);
+						throw newError;
+					}
 
-					// Otherwise a person that patches a card gets
-					// to see the full card, but we also need to get back the stuff, the kernel
-					// update on the root of the card
-					// This will get removed once we get rid of field-level permissions.
-					return {
-						...patchedFilteredContract,
-						created_at: upsertedCard.created_at,
-						updated_at: upsertedCard.updated_at,
-					};
-				},
-			);
-		});
+					throw error;
+				}
+
+				const patchedFullContract = patchContract(fullContract, patch, {
+					mutate: false,
+				});
+
+				try {
+					jsonSchema.validate(schema as any, patchedFullContract);
+				} catch (error: any) {
+					if (error instanceof jsonSchema.SchemaMismatch) {
+						// Because the "full" unrestricted card is being validated there is
+						// potential for an error message to leak private data. To prevent this,
+						// override the detailed error message with a generic one.
+						const newError = new errors.JellyfishSchemaMismatch(
+							'The updated card is invalid',
+						);
+						newError.expected = true;
+						throw newError;
+					}
+
+					throw error;
+				}
+
+				// Don't do a pointless update
+				if (fastEquals.deepEqual(patchedFullContract, fullContract)) {
+					return fullContract;
+				}
+
+				// TODO: Remove this log once we understand why we are having link contract patch requests.
+				if (fullContract.type === 'link@1.0.0') {
+					transactionContext.info('Upserting link contract after patch', {
+						card: patchedFullContract,
+						patch,
+					});
+				}
+
+				// If the loop field is changing, check that it points to an actual loop contract
+				if (
+					patchedFullContract.loop &&
+					patchedFullContract.loop !== fullContract.loop
+				) {
+					const loopContract = await this.backend.getElementBySlug(
+						transactionContext,
+						patchedFullContract.loop,
+					);
+					transactionContext.assertInternal(
+						loopContract && loopContract.type.split('@')[0] === 'loop',
+						errors.JellyfishNoElement,
+						`No such loop: ${patchedFullContract.loop}`,
+					);
+				}
+
+				const upsertedCard = await this.backend.upsertElement(
+					transactionContext,
+					patchedFullContract,
+				);
+
+				// Otherwise a person that patches a card gets
+				// to see the full card, but we also need to get back the stuff, the kernel
+				// update on the root of the card
+				// This will get removed once we get rid of field-level permissions.
+				return {
+					...patchedFilteredContract,
+					created_at: upsertedCard.created_at,
+					updated_at: upsertedCard.updated_at,
+				};
+			},
+		);
 
 		return result;
 	}

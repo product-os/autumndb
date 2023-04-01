@@ -6,7 +6,5 @@ upstream:
     url: "https://github.com/product-os/jellyfish-environment"
   - repo: "jellyfish-logger"
     url: "https://github.com/product-os/jellyfish-logger"
-  - repo: "jellyfish-metrics"
-    url: "https://github.com/product-os/jellyfish-metrics"
   - repo: "jellyfish-jellyscript"
     url: "https://github.com/product-os/jellyfish-jellyscript"

@@ -1,4 +1,3 @@
-import * as metrics from '@balena/jellyfish-metrics';
 import { strict as nativeAssert } from 'assert';
 import * as Bluebird from 'bluebird';
 import * as fastEquals from 'fast-equals';
@@ -108,7 +107,6 @@ export const compileSchema = (
 	}
 	const queryGenEnd = performance.now();
 	const queryGenTime = queryGenEnd - queryGenStart;
-	metrics.markSqlGenTime(queryGenTime);
 	return {
 		query,
 		queryGenTime,
@@ -158,7 +156,6 @@ export const runQuery = async (
 
 	const queryEnd = performance.now();
 	const queryTime = queryEnd - queryStart;
-	metrics.markQueryTime(queryTime);
 
 	const { elements, postProcessTime } = postProcessResults(results);
 
@@ -1220,10 +1217,6 @@ export class PostgresBackend implements Database {
 			options as BackendQueryOptions,
 		);
 
-		// Mark card read metric.
-		_.forEach(results, (result) => {
-			metrics.markContractReadFromDatabase(result);
-		});
 		return results;
 	}
 

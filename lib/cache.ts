@@ -1,8 +1,5 @@
-import * as metrics from '@balena/jellyfish-metrics';
 import * as redis from 'redis';
 import * as redismock from 'redis-mock';
-// TODO: This violates encapsulation of the backend
-import { TABLE as CONTRACTS_TABLE } from './backend/postgres/cards';
 import * as errors from './errors';
 import type { Contract } from './types';
 
@@ -276,9 +273,6 @@ export class Cache {
 				hit: true,
 				element: JSON.parse(result),
 			};
-			if (table === CONTRACTS_TABLE) {
-				metrics.markContractReadFromCache(data.element);
-			}
 			return data;
 		}
 
