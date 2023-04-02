@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency @balena/jellyfish-logger to v6
+      hash: 4b816e38f6c81722d8269dcb14498ae37917011c
+      body: |
+        Update @balena/jellyfish-logger from 5.11.1 to 6.0.1
+      footer:
+        Change-type: major
+        change-type: major
+      author: Renovate Bot
+      nested: []
+  version: 26.0.0
+  title: ""
+  date: 2023-04-02T04:40:34.645Z
+- commits:
     - subject: Update dependency @balena/jellyfish-environment to v20
       hash: cf76f5dab1b276836d0d68febc405514657c23b2
       body: |
