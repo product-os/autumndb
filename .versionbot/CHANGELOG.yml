@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency @balena/jellyfish-environment to v21
+      hash: f44bc114a61d6884b8141830783d7a9121cc17ee
+      body: |
+        Update @balena/jellyfish-environment from 20.0.0 to 21.0.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 26.0.1
+  title: ""
+  date: 2023-04-02T04:54:38.094Z
+- commits:
     - subject: Update dependency @balena/jellyfish-logger to v6
       hash: 4b816e38f6c81722d8269dcb14498ae37917011c
       body: |
