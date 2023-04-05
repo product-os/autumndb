@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update github/codeql-action digest to 8c8d71d
+      hash: 65ec748a3b28bf05d493efd6a17b870c1783e254
+      body: |
+        Update github/codeql-action
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 26.0.3
+  title: ""
+  date: 2023-04-05T17:02:31.878Z
+- commits:
     - subject: Bump deps
       hash: c0fa92c18e88482d4729278ec86a897fc85a154b
       body: ""
