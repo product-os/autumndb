@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update github/codeql-action digest to d186a2a
+      hash: 49761be9ad4c4295b319f1c9d98d510bcd48316b
+      body: |
+        Update github/codeql-action
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 26.0.5
+  title: ""
+  date: 2023-04-06T17:55:37.201Z
+- commits:
     - subject: Fix link type string replace
       hash: c6765d961a2e643b165859196e710b888a371341
       body: ""
