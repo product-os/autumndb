@@ -1,4 +1,16 @@
 - commits:
+    - subject: Fix link type string replace
+      hash: c6765d961a2e643b165859196e710b888a371341
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 26.0.4
+  title: ""
+  date: 2023-04-06T01:06:54.103Z
+- commits:
     - subject: Update github/codeql-action digest to 8c8d71d
       hash: 65ec748a3b28bf05d493efd6a17b870c1783e254
       body: |
