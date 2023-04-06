@@ -101,7 +101,7 @@ export class BuilderContext {
 
 		const idx = variants.length;
 		this.linkTypeStack.push([
-			linkType.replace('\\', '\\\\').replace('/', '\\/'),
+			linkType.replace(/\\/g, '\\\\').replace(/\//g, '\\/'),
 			idx,
 		]);
 
