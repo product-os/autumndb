@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency rimraf to v5
+      hash: 105109a53514e188869186552454fc3273f769b9
+      body: |
+        Update rimraf from 4.4.1 to 5.0.0
+      footer:
+        Change-type: major
+        change-type: major
+      author: Renovate Bot
+      nested: []
+  version: 27.0.0
+  title: ""
+  date: 2023-05-01T08:10:47.857Z
+- commits:
     - subject: Update github/codeql-action digest to d186a2a
       hash: 49761be9ad4c4295b319f1c9d98d510bcd48316b
       body: |
@@ -5109,8 +5122,8 @@
     - subject: Rename project to AutumnDB
       hash: 67ca9e1c172b8e16359657c6ab6ab7eba1ca4b06
       body: >
-        Renaming the project helps define it as a standalone product, with a clear
-        interface and purpose.
+        Renaming the project helps define it as a standalone product, with a
+        clear interface and purpose.
       footer:
         Change-type: major
         change-type: major
@@ -8478,8 +8491,8 @@
     - subject: Safely handle simultaneous creation of identical indexes
       hash: 48400d6992e96e9146e1d9e2cfa6e57045c0252d
       body: >
-        If two instances run this function simultaneously, it's possible to enter
-        a race condition
+        If two instances run this function simultaneously, it's possible to
+        enter a race condition
 
         where the index creation will fail with an error, as one instance will create the index
 
@@ -10208,8 +10221,8 @@
     - subject: Add support for a query mask
       hash: a2b11a083444e50043e290cb8c4e4fe8a7e4ed62
       body: >
-        When querying at the kernel level, we now support passing an optional JSON
-        schema `mask` in the `options` argument. If set, this mask will be
+        When querying at the kernel level, we now support passing an optional
+        JSON schema `mask` in the `options` argument. If set, this mask will be
         merged with the original query before the DB is queried.
       footer:
         Change-type: minor
@@ -13883,8 +13896,8 @@
     - subject: Use JellyfishLink widget for usernames and slugs/ids
       hash: 0d722de501182049612e639adb40ed555836580c
       body: >
-        Also refactored slightly to expose a `username` UI schema (which should be
-        used by `brainstorm-topic.data.reporter`).
+        Also refactored slightly to expose a `username` UI schema (which should
+        be used by `brainstorm-topic.data.reporter`).
       footer:
         Change-type: minor
         change-type: minor
@@ -14131,8 +14144,8 @@
     - subject: Remove fullTextSearch index on user slug
       hash: 6afc2f4eca1f9825f4fdbc52d085713d17c38562
       body: >
-        This index was added recently to facilitate searching for users by slug in
-        a full text search query. But this isn't very sensible as it requires
+        This index was added recently to facilitate searching for users by slug
+        in a full text search query. But this isn't very sensible as it requires
         the user to include the `user-` prefix in the search term - which they
         will never (want to) do! So I'm removing the fullTextSearch index and
         the CreateView lens will manually search for the user by slug using a
