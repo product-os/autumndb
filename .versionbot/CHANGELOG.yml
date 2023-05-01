@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update github/codeql-action digest to f3feb00
+      hash: 856f2954f8406bb8d4e03ae6b288de5adbbe0142
+      body: |
+        Update github/codeql-action
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 28.0.1
+  title: ""
+  date: 2023-05-01T08:50:16.739Z
+- commits:
     - subject: Update dependency typedoc to ^0.24.0
       hash: f81e1d9fadb223f0fc8825601a5710a5bfcee460
       body: |
