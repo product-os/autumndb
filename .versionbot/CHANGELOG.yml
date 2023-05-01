@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency typedoc to ^0.24.0
+      hash: f81e1d9fadb223f0fc8825601a5710a5bfcee460
+      body: |
+        Update typedoc from 0.23.28 to 0.24.0
+      footer:
+        Change-type: major
+        change-type: major
+      author: Renovate Bot
+      nested: []
+  version: 28.0.0
+  title: ""
+  date: 2023-05-01T08:21:48.506Z
+- commits:
     - subject: Update dependency rimraf to v5
       hash: 105109a53514e188869186552454fc3273f769b9
       body: |
