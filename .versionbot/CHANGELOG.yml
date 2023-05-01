@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/checkout digest to 8e5e7e5
+      hash: 59edc519245e639f6ab1354d188d2f04bf239eb9
+      body: |
+        Update actions/checkout
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 28.0.2
+  title: ""
+  date: 2023-05-01T09:50:07.689Z
+- commits:
     - subject: Update github/codeql-action digest to f3feb00
       hash: 856f2954f8406bb8d4e03ae6b288de5adbbe0142
       body: |
