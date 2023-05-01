@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency redis to v4.6.6
+      hash: b8dd08cbd7538cc96ed875978c307ad4702d1faa
+      body: |
+        Update redis from 4.6.5 to 4.6.6
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 28.0.3
+  title: ""
+  date: 2023-05-01T10:51:08.064Z
+- commits:
     - subject: Update actions/checkout digest to 8e5e7e5
       hash: 59edc519245e639f6ab1354d188d2f04bf239eb9
       body: |
