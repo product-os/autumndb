@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Node.js to 18.16
+      hash: ad8f0515366f970d8762df759e750f10ddf51be5
+      body: |
+        Update node from 18.15.0 to 18.16.0
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 28.1.0
+  title: ""
+  date: 2023-05-30T15:50:19.241Z
+- commits:
     - subject: Update dependency redis to v4.6.6
       hash: b8dd08cbd7538cc96ed875978c307ad4702d1faa
       body: |
