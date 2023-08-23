@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/checkout digest to c85c95e
+      hash: 0ff867e0793c77623231783470648142a638d65b
+      body: |
+        Update actions/checkout
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.1
+  title: ""
+  date: 2023-08-23T21:50:33.422Z
+- commits:
     - subject: Update Node.js to v20
       hash: 7915dca37727a3632444552c5a45ad6d894a43f7
       body: |
