@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Node.js to v20
+      hash: 7915dca37727a3632444552c5a45ad6d894a43f7
+      body: |
+        Update node from 19 to 20
+      footer:
+        Change-type: major
+        change-type: major
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.0
+  title: ""
+  date: 2023-08-23T20:44:30.649Z
+- commits:
     - subject: Update github/codeql-action digest to 0225834
       hash: d5e73b6c6565c32c1e59e539cc767b0c651a69a6
       body: |
