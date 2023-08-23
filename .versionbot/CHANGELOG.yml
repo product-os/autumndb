@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency json-schema-to-typescript to v13
+      hash: c34b1043bf508acef850f925e72af5213512cc3f
+      body: |
+        Update json-schema-to-typescript from 12.0.0 to 13.0.2
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.3
+  title: ""
+  date: 2023-08-23T23:50:06.715Z
+- commits:
     - subject: Update github/codeql-action digest to a09933a
       hash: 4bfa933902ad4b807d25867bfc32f541a6a87774
       body: |
