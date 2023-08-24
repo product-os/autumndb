@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency node to 18.17
+      hash: b1a6c9642307893ec1a14c69684bc039f94690c6
+      body: |
+        Update node from 18.16.1 to 18.17.1
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.5
+  title: ""
+  date: 2023-08-24T02:02:12.277Z
+- commits:
     - subject: Update dependency redis to v4.6.7
       hash: 23db6810f1303ac817515e237dfbbc2590756daf
       body: |
