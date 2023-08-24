@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency redis to v4.6.7
+      hash: 23db6810f1303ac817515e237dfbbc2590756daf
+      body: |
+        Update redis from 4.6.6 to 4.6.7
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.4
+  title: ""
+  date: 2023-08-24T01:08:46.898Z
+- commits:
     - subject: Update dependency json-schema-to-typescript to v13
       hash: c34b1043bf508acef850f925e72af5213512cc3f
       body: |
