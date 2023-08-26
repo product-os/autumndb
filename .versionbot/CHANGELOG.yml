@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/checkout digest to f43a0e5
+      hash: 0d96233bf48fbe3e368aef783aac17b8415f02f3
+      body: |
+        Update actions/checkout
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.14
+  title: ""
+  date: 2023-08-26T14:51:02.308Z
+- commits:
     - subject: Update rimraf to 5.0.1
       hash: e01b0a4e87d4e1087687bb9c41bd983ac3119515
       body: ""
