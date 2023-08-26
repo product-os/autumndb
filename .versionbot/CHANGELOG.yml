@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typed-error to 3.2.2
+      hash: cceef92d85b8aa6cc70b57448387d178002e5915
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 29.0.8
+  title: ""
+  date: 2023-08-26T11:39:32.180Z
+- commits:
     - subject: Update semver to 7.5.4
       hash: 10c283601b984938f5c505257b30e35f986eab88
       body: ""
