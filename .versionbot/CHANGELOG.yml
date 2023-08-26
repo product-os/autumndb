@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update lint-staged to 14.0.1
+      hash: 89eebcd68c975cb7004860650fe7c517e49af8fb
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 29.0.9
+  title: ""
+  date: 2023-08-26T11:54:24.881Z
+- commits:
     - subject: Update typed-error to 3.2.2
       hash: cceef92d85b8aa6cc70b57448387d178002e5915
       body: ""
