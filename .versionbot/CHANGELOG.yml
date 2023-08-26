@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update json-e from 4.5.1 to 4.5.3
+      hash: ba09b8b00cea15dce94dd2fcc79d96c60329ef73
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 29.0.6
+  title: ""
+  date: 2023-08-26T11:16:33.196Z
+- commits:
     - subject: Update dependency node to 18.17
       hash: b1a6c9642307893ec1a14c69684bc039f94690c6
       body: |
