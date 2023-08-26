@@ -61,7 +61,7 @@
     "commander": "^10.0.0",
     "fast-equals": "^5.0.1",
     "fast-json-patch": "^3.1.1",
-    "json-e": "^4.5.1",
+    "json-e": "^4.5.3",
     "json-schema": "^0.4.0",
     "json-schema-deref-sync": "^0.14.0",
     "json-schema-to-typescript": "^13.0.0",
