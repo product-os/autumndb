@@ -91,10 +91,6 @@ const start = async () => {
 start();
 ```
 
-## Documentation
-
-Visit the website for complete documentation: https://product-os.github.io/autumndb
-
 ## Features
 
 AutumnDB provides the following features
