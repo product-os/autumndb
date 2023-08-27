@@ -1,5 +1,4 @@
 import { strict as assert } from 'assert';
-import * as _ from 'lodash';
 import { randomUUID } from 'node:crypto';
 import { errors, testUtils } from '../../lib';
 import { createRelationships } from './create-relationships';

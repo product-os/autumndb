@@ -12,6 +12,6 @@ export interface CardData {
 	[k: string]: unknown;
 }
 
-export interface CardContractDefinition extends ContractDefinition<CardData> {}
+export type CardContractDefinition = ContractDefinition<CardData>;
 
-export interface CardContract extends Contract<CardData> {}
+export type CardContract = Contract<CardData>;

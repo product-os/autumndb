@@ -14,8 +14,8 @@ export interface AuthenticationPasswordData {
 	[k: string]: unknown;
 }
 
-export interface AuthenticationPasswordContractDefinition
-	extends ContractDefinition<AuthenticationPasswordData> {}
+export type AuthenticationPasswordContractDefinition =
+	ContractDefinition<AuthenticationPasswordData>;
 
-export interface AuthenticationPasswordContract
-	extends Contract<AuthenticationPasswordData> {}
+export type AuthenticationPasswordContract =
+	Contract<AuthenticationPasswordData>;

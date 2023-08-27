@@ -18,11 +18,11 @@ const requireFromString = (code: string, filename: string = '') => {
 	const m = new Module(filename, parent);
 	m.filename = filename;
 
-	// @ts-expect-error
+	// @ts-expect-error - We have to reference the private _nodeModulePaths here
 	const paths: string[] = Module._nodeModulePaths(path.dirname(filename));
 	m.paths = paths;
 
-	// @ts-expect-error
+	// @ts-expect-error - We have to reference the private _compile here
 	m._compile(code, filename);
 
 	return m.exports;
@@ -57,11 +57,11 @@ export async function generateContractInterfaces(
 
 	const baseContractImports = `
 // tslint:disable: array-type
-	
+
 import type { Contract, ContractDefinition } from '${
 		packageJson && packageJson.name === 'autumndb' ? '../' : 'autumndb'
 	}';
-	
+
 `;
 
 	// Compile TypeScript and read in contract definitions

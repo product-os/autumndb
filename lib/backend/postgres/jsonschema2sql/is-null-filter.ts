@@ -13,7 +13,10 @@ export class IsNullFilter extends SqlFilter {
 	 * @param {Boolean} isNull - Whether `path` must be `NULL`, or must not be
 	 *        `NULL`.
 	 */
-	constructor(public path: SqlPath, public isNull: boolean) {
+	constructor(
+		public path: SqlPath,
+		public isNull: boolean,
+	) {
 		super();
 
 		this.path = path.cloned();

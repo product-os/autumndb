@@ -13,7 +13,7 @@ import * as textSearch from './jsonschema2sql/text-search';
 import type { SearchFieldDef } from './types';
 import * as utils from './utils';
 
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: coreVersion } = require('../../../package.json');
 
 const CARDS_TABLE = 'cards';
@@ -749,7 +749,7 @@ export const parseFullTextSearchFields = (
 ) => {
 	const fields: SearchFieldDef[] = [];
 	const combinators = ['anyOf', 'allOf', 'oneOf'];
-	traverse(schema).forEach(function (_node) {
+	traverse(schema).forEach(function () {
 		if (
 			this.key === 'fullTextSearch' &&
 			this.node === true &&

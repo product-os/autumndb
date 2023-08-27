@@ -19,8 +19,7 @@ export interface AuthenticationOauthData {
 	[k: string]: unknown;
 }
 
-export interface AuthenticationOauthContractDefinition
-	extends ContractDefinition<AuthenticationOauthData> {}
+export type AuthenticationOauthContractDefinition =
+	ContractDefinition<AuthenticationOauthData>;
 
-export interface AuthenticationOauthContract
-	extends Contract<AuthenticationOauthData> {}
+export type AuthenticationOauthContract = Contract<AuthenticationOauthData>;

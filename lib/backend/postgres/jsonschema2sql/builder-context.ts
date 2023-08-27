@@ -126,6 +126,7 @@ export class BuilderContext {
 		});
 
 		// The `require` is here to break load-time circular dependencies
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const { SqlFragmentBuilder } = require('./fragment-builder');
 		const linkCountStart = (this as any).linkCount;
 		this.pushTable(joinAlias);

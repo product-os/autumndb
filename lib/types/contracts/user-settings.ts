@@ -49,7 +49,7 @@ export interface UserSettingsData {
 	[k: string]: unknown;
 }
 
-export interface UserSettingsContractDefinition
-	extends ContractDefinition<UserSettingsData> {}
+export type UserSettingsContractDefinition =
+	ContractDefinition<UserSettingsData>;
 
-export interface UserSettingsContract extends Contract<UserSettingsData> {}
+export type UserSettingsContract = Contract<UserSettingsData>;

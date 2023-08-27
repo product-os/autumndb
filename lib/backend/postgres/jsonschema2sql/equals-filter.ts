@@ -17,7 +17,10 @@ export class EqualsFilter extends SqlFilter {
 	 * @param {SqlPath} path - Path to be tested.
 	 * @param {Array} values - Array of values to test `path` against.
 	 */
-	constructor(public path: SqlPath, public values: any[]) {
+	constructor(
+		public path: SqlPath,
+		public values: any[],
+	) {
 		super();
 
 		this.path = path.cloned();
@@ -66,7 +69,11 @@ export class EqualsFilter extends SqlFilter {
 }
 
 class IsEqualFilter extends SqlFilter {
-	constructor(public path: SqlPath, public asText: boolean, public value: any) {
+	constructor(
+		public path: SqlPath,
+		public asText: boolean,
+		public value: any,
+	) {
 		super();
 
 		this.path = path;

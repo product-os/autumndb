@@ -81,17 +81,20 @@ describe('Kernel', () => {
 						emitter.close();
 					});
 
-					ctx.kernel.insertContract(
-						ctx.logContext,
-						ctx.kernel.adminSession()!,
-						{
+					ctx.kernel
+						.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 							slug,
 							type: 'card@1.0.0',
 							data: {
 								test: 1,
 							},
-						},
-					);
+						})
+						.catch((err) => {
+							throw err;
+						});
+				})
+				.catch((err) => {
+					throw err;
 				});
 		});
 
@@ -152,29 +155,32 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertContract(
-						ctx.logContext,
-						ctx.kernel.adminSession()!,
-						{
+					ctx.kernel
+						.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 							slug,
 							type: 'card@1.0.0',
 							version: '1.0.0',
 							data: {
 								test: 1,
 							},
-						},
-					);
+						})
+						.catch((err) => {
+							throw err;
+						});
 
-					ctx.kernel.insertContract(
-						ctx.logContext,
-						ctx.kernel.adminSession()!,
-						{
+					ctx.kernel
+						.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 							type: 'card@1.0.0',
 							data: {
 								test: 2,
 							},
-						},
-					);
+						})
+						.catch((err) => {
+							throw err;
+						});
+				})
+				.catch((err) => {
+					throw err;
 				});
 		});
 
@@ -299,7 +305,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const result = await new Promise<any>(async (resolve, reject) => {
+			const result = await new Promise<any>((resolve, reject) => {
 				emitter.on('data', (change) => {
 					emitter.close();
 					resolve(change);
@@ -307,19 +313,27 @@ describe('Kernel', () => {
 
 				emitter.on('error', reject);
 
-				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
-					type: 'card@1.0.0',
-					data: {
-						test: 1,
-					},
-				});
-				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
-					slug,
-					type: 'card@1.0.0',
-					data: {
-						email: 'johndoe@example.com',
-					},
-				});
+				ctx.kernel
+					.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+						type: 'card@1.0.0',
+						data: {
+							test: 1,
+						},
+					})
+					.catch((err) => {
+						throw err;
+					});
+				ctx.kernel
+					.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+						slug,
+						type: 'card@1.0.0',
+						data: {
+							email: 'johndoe@example.com',
+						},
+					})
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			expect(result.after).toEqual({
@@ -439,6 +453,9 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 					emitter.close();
+				})
+				.catch((err) => {
+					throw err;
 				});
 		});
 
@@ -475,18 +492,21 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.insertContract(
-						ctx.logContext,
-						ctx.kernel.adminSession()!,
-						{
+					ctx.kernel
+						.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 							slug,
 							active: false,
 							type: 'card@1.0.0',
 							data: {
 								test: 2,
 							},
-						},
-					);
+						})
+						.catch((err) => {
+							throw err;
+						});
+				})
+				.catch((err) => {
+					throw err;
 				});
 		});
 
@@ -569,7 +589,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const result = await new Promise<any>(async (resolve, reject) => {
+			const result = await new Promise<any>((resolve, reject) => {
 				emitter.on('data', (change) => {
 					emitter.close();
 					resolve(change);
@@ -577,18 +597,22 @@ describe('Kernel', () => {
 
 				emitter.on('error', reject);
 
-				await ctx.kernel.patchContractBySlug(
-					ctx.logContext,
-					ctx.kernel.adminSession()!,
-					`${contract1.slug}@${contract1.version}`,
-					[
-						{
-							op: 'replace',
-							path: '/data/test',
-							value: 3,
-						},
-					],
-				);
+				ctx.kernel
+					.patchContractBySlug(
+						ctx.logContext,
+						ctx.kernel.adminSession()!,
+						`${contract1.slug}@${contract1.version}`,
+						[
+							{
+								op: 'replace',
+								path: '/data/test',
+								value: 3,
+							},
+						],
+					)
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			expect(result.after).toEqual({
@@ -670,22 +694,26 @@ describe('Kernel', () => {
 
 				emitter.on('error', reject);
 
-				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
-					slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
-					type: 'link@1.0.0',
-					name: 'is attached to',
-					data: {
-						inverseName: 'has attached element',
-						from: {
-							id: contract1.id,
-							type: contract1.type,
+				ctx.kernel
+					.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+						slug: `link-${contract1.slug}-is-attached-to-${contract2.slug}`,
+						type: 'link@1.0.0',
+						name: 'is attached to',
+						data: {
+							inverseName: 'has attached element',
+							from: {
+								id: contract1.id,
+								type: contract1.type,
+							},
+							to: {
+								id: contract2.id,
+								type: contract2.type,
+							},
 						},
-						to: {
-							id: contract2.id,
-							type: contract2.type,
-						},
-					},
-				});
+					})
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			expect(result.after).toEqual({
@@ -814,7 +842,7 @@ describe('Kernel', () => {
 				},
 			);
 
-			const result = await new Promise<any>(async (resolve, reject) => {
+			const result = await new Promise<any>((resolve, reject) => {
 				emitter.on('data', (change) => {
 					resolve(change.after);
 				});
@@ -822,21 +850,25 @@ describe('Kernel', () => {
 				emitter.on('error', reject);
 
 				// Insert a second link between contract 1 and contract 3 - this should trigger a stream update
-				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
-					type: 'link@1.0.0',
-					name: 'is attached to',
-					data: {
-						inverseName: 'has attached element',
-						from: {
-							id: contract1.id,
-							type: contract1.type,
+				ctx.kernel
+					.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+						type: 'link@1.0.0',
+						name: 'is attached to',
+						data: {
+							inverseName: 'has attached element',
+							from: {
+								id: contract1.id,
+								type: contract1.type,
+							},
+							to: {
+								id: contract3.id,
+								type: contract3.type,
+							},
 						},
-						to: {
-							id: contract3.id,
-							type: contract3.type,
-						},
-					},
-				});
+					})
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			// Link data can come in an indeterminate sort order, so we sort it here for convenience
@@ -959,18 +991,25 @@ describe('Kernel', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 
-					ctx.kernel.patchContractBySlug(
-						ctx.logContext,
-						ctx.kernel.adminSession()!,
-						`${contract2.slug}@${contract1.version}`,
-						[
-							{
-								op: 'replace',
-								path: '/data/test',
-								value: 3,
-							},
-						],
-					);
+					ctx.kernel
+						.patchContractBySlug(
+							ctx.logContext,
+							ctx.kernel.adminSession()!,
+							`${contract2.slug}@${contract1.version}`,
+							[
+								{
+									op: 'replace',
+									path: '/data/test',
+									value: 3,
+								},
+							],
+						)
+						.catch((err) => {
+							throw err;
+						});
+				})
+				.catch((err) => {
+					throw err;
 				});
 		});
 
@@ -1273,25 +1312,29 @@ describe('Kernel', () => {
 				},
 			);
 
-			const result: any = await new Promise(async (resolve, reject) => {
+			const result: any = await new Promise((resolve, reject) => {
 				stream.on('data', (change) => {
 					resolve(change);
 				});
 
 				stream.on('error', reject);
 
-				ctx.kernel.patchContractBySlug(
-					ctx.logContext,
-					ctx.kernel.adminSession()!,
-					`${contract2.slug}@${contract2.version}`,
-					[
-						{
-							op: 'replace',
-							path: '/data/test',
-							value: 3,
-						},
-					],
-				);
+				ctx.kernel
+					.patchContractBySlug(
+						ctx.logContext,
+						ctx.kernel.adminSession()!,
+						`${contract2.slug}@${contract2.version}`,
+						[
+							{
+								op: 'replace',
+								path: '/data/test',
+								value: 3,
+							},
+						],
+					)
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			expect(result.id).toEqual(contract1.id);
@@ -1339,26 +1382,34 @@ describe('Kernel', () => {
 				},
 			);
 
-			ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
-				slug,
-				type: 'card@1.0.0',
-				version: '1.0.0',
-				data: {
-					test: 1,
-				},
-			});
+			ctx.kernel
+				.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+					slug,
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						test: 1,
+					},
+				})
+				.catch((err) => {
+					throw err;
+				});
 
-			ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
-				type: 'card@1.0.0',
-				data: {
-					test: 2,
-				},
-			});
+			ctx.kernel
+				.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+					type: 'card@1.0.0',
+					data: {
+						test: 2,
+					},
+				})
+				.catch((err) => {
+					throw err;
+				});
 
 			await delay(1);
 
 			await ctx.kernel.disconnect(ctx.logContext);
-			await emitter.close();
+			emitter.close();
 		});
 	});
 });

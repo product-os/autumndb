@@ -164,33 +164,4 @@ describe('streams', () => {
 			})(),
 		).resolves.not.toThrow();
 	});
-
-	// TODO: this is not done in the stream code anymore
-	/*it('should automatically reconnect on disconnect', async () => {
-		// Set up backend, which comes with its own stream client
-		const testBackend = new PostgresBackend(
-			null,
-			{
-				user: environment.postgres.user,
-				database: ctx.database,
-				password: environment.postgres.password,
-				host: environment.postgres.host,
-				port: environment.postgres.port,
-			},
-		);
-
-		await testBackend.connect(ctx.context);
-
-		// Disconnect client from database without using streams.disconnect(),
-		// simulating an unexpected client end event.
-		await testBackend.streamClient!.connection!.done(true);
-
-		// Use the stream client to query database, after giving a little time to reconnect.
-		await Bluebird.delay(backend.connectRetryDelay);
-		const result = await testBackend.streamClient!.connection!.client.query(
-			`SELECT id FROM ${ctx.table} LIMIT 1`,
-		);
-
-		expect(result).toBeTruthy();
-	});*/
 });

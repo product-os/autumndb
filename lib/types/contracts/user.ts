@@ -124,6 +124,6 @@ export interface InAMeeting {
 	[k: string]: unknown;
 }
 
-export interface UserContractDefinition extends ContractDefinition<UserData> {}
+export type UserContractDefinition = ContractDefinition<UserData>;
 
-export interface UserContract extends Contract<UserData> {}
+export type UserContract = Contract<UserData>;

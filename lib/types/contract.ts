@@ -89,11 +89,12 @@ export interface Contract<
 /**
  * A summary of a contract, containing just the key fields.
  */
-export interface ContractSummary<TData = ContractData>
-	extends Pick<Contract<TData>, 'id' | 'slug' | 'version' | 'type'> {}
+export type ContractSummary<TData = ContractData> = Pick<
+	Contract<TData>,
+	'id' | 'slug' | 'version' | 'type'
+>;
 
-interface OptionalContract<TData = ContractData>
-	extends Partial<Contract<TData>> {}
+export type OptionalContract<TData = ContractData> = Partial<Contract<TData>>;
 
 /**
  * Contracts are defined with certain required properties and various other optional properties.

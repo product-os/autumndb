@@ -442,7 +442,9 @@ export class Context {
 		const options = { drop: true };
 		const endListener = () => {
 			options.drop = false;
-			end();
+			end().catch((err) => {
+				this.exception('Error while ending database listender:', err);
+			});
 		};
 		connection.on('end', endListener);
 
@@ -515,7 +517,7 @@ export enum TransactionIsolation {
  * other modules so this is interface is empty and only useful for type
  * checking.
  */
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface PreparedStatement {}
 
 class PgPreparedStatement implements PreparedStatement {

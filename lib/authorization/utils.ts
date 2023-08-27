@@ -73,7 +73,6 @@ export const evaluateSchemaWithContext = (
 
 	for (const key of Object.keys(schema)) {
 		// For performance reasons
-		// eslint-disable-next-line lodash/prefer-lodash-typecheck
 		if (typeof schema[key] !== 'object') {
 			continue;
 		}

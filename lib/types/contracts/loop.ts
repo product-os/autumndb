@@ -12,6 +12,6 @@ export interface LoopData {
 	[k: string]: unknown;
 }
 
-export interface LoopContractDefinition extends ContractDefinition<LoopData> {}
+export type LoopContractDefinition = ContractDefinition<LoopData>;
 
-export interface LoopContract extends Contract<LoopData> {}
+export type LoopContract = Contract<LoopData>;

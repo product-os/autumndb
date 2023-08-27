@@ -16,6 +16,6 @@ export interface OrgData {
 	[k: string]: unknown;
 }
 
-export interface OrgContractDefinition extends ContractDefinition<OrgData> {}
+export type OrgContractDefinition = ContractDefinition<OrgData>;
 
-export interface OrgContract extends Contract<OrgData> {}
+export type OrgContract = Contract<OrgData>;

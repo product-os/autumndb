@@ -346,7 +346,10 @@ class BranchMap {
 	filter: ExpressionFilter;
 	seen: Set<string>;
 
-	constructor(map: { [key: string]: any }, public parent: SelectMap) {
+	constructor(
+		map: { [key: string]: any },
+		public parent: SelectMap,
+	) {
 		// We need this for `this.newBranch()`
 		this.parent = parent;
 		// Defaults to true as per the JSON schema spec

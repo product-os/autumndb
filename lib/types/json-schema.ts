@@ -64,14 +64,6 @@ export type JsonSchema =
 				[key: string]: JsonSchema;
 			};
 			additionalProperties?: JsonSchema;
-			// These are not supported currently
-			/*patternProperties?: {
-				[key: string]: JsonSchema;
-			};*/
-			/*dependencies?: {
-				[key: string]: JSONSchema | string[];
-			};*/
-			// propertyNames?: JsonSchema;
 
 			/**
 			 * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.6
@@ -99,14 +91,6 @@ export type JsonSchema =
 			// These are not supported currently
 			// contentMediaType?: string;
 			// contentEncoding?: string;
-
-			/**
-			 * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-9
-			 */
-			// This is not supported currently
-			/*definitions?: {
-				[key: string]: JsonSchema;
-			};*/
 
 			/**
 			 * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-10

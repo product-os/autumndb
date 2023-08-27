@@ -21,7 +21,6 @@ export interface SessionData {
 	[k: string]: unknown;
 }
 
-export interface SessionContractDefinition
-	extends ContractDefinition<SessionData> {}
+export type SessionContractDefinition = ContractDefinition<SessionData>;
 
-export interface SessionContract extends Contract<SessionData> {}
+export type SessionContract = Contract<SessionData>;

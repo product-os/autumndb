@@ -39,7 +39,7 @@ export class SqlFilter {
 	 *
 	 * @param {Array} _list - Array to be filled with links, if any.
 	 */
-	// tslint:disable-next-line:no-empty
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 	scrapLinksInto(_list: any) {}
 
 	/**
@@ -47,6 +47,7 @@ export class SqlFilter {
 	 *
 	 * @param {SqlFragmentBuilder} _builder - Builder for the final SQL string.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	toSqlInto(_builder: any) {
 		throw new Error();
 	}
