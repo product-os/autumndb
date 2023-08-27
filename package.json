@@ -26,7 +26,6 @@
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest test/unit",
     "test:integration": "jest test/integration",
-    "doc": "typedoc lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
     "compose": "docker-compose up",
     "types": "npm run build && ts-node lib/cli/index.ts generate-contract-interfaces && balena-lint --fix lib/types/contracts"
@@ -98,7 +97,6 @@
     "simple-git-hooks": "^2.9.0",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.24.0",
     "typescript": "^5.0.3"
   },
   "simple-git-hooks": {

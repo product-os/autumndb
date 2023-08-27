@@ -12,12 +12,5 @@
     "declaration": true,
     "skipLibCheck": true
   },
-  "typedocOptions": {
-    "excludePrivate": true,
-    "excludeProtected": true,
-    "excludeExternals": true,
-    "gitRevision": "master",
-    "out": "docs"
-  },
   "include": ["lib/**/*.ts", "test/**/*.ts", "@types/**/*.d.ts"]
 }
