@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typescript and balena-lint
+      hash: b78a382ee0b4022d8a66c14b2d56e3191972abfc
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 29.0.16
+  title: ""
+  date: 2023-09-02T15:03:12.778Z
+- commits:
     - subject: Remove typedoc
       hash: a600c7772980361714844046725751efaed59b3c
       body: ""
