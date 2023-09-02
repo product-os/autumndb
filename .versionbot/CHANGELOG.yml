@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update github/codeql-action digest to 00e563e
+      hash: e202ddda51033b4d30f9af780f86c51a79b007ac
+      body: |
+        Update github/codeql-action
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.17
+  title: ""
+  date: 2023-09-02T15:50:35.363Z
+- commits:
     - subject: Update typescript and balena-lint
       hash: b78a382ee0b4022d8a66c14b2d56e3191972abfc
       body: ""
