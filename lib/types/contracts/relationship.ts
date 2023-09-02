@@ -23,7 +23,7 @@ export interface RelationshipData {
 	[k: string]: unknown;
 }
 
-export interface RelationshipContractDefinition
-	extends ContractDefinition<RelationshipData> {}
+export type RelationshipContractDefinition =
+	ContractDefinition<RelationshipData>;
 
-export interface RelationshipContract extends Contract<RelationshipData> {}
+export type RelationshipContract = Contract<RelationshipData>;

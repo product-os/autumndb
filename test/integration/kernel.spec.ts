@@ -1,4 +1,3 @@
-/* tslint:disable no-floating-promises */
 import { strict as assert } from 'assert';
 import * as _ from 'lodash';
 import { randomUUID } from 'node:crypto';
@@ -4141,7 +4140,7 @@ describe('Kernel', () => {
 					type: 'card@1.0.0',
 					tags: ['foo'],
 					data: {
-						number: 1,
+						bar: 1,
 					},
 				},
 			);
@@ -4152,7 +4151,7 @@ describe('Kernel', () => {
 				{
 					type: 'card@1.0.0',
 					data: {
-						number: 1,
+						bar: 1,
 					},
 				},
 			);
@@ -4172,12 +4171,12 @@ describe('Kernel', () => {
 										data: {
 											type: 'object',
 											properties: {
-												number: {
+												bar: {
 													type: 'number',
 													const: 1,
 												},
 											},
-											required: ['number'],
+											required: ['bar'],
 										},
 									},
 									required: ['data'],
@@ -4212,7 +4211,7 @@ describe('Kernel', () => {
 				{
 					tags: ['foo'],
 					data: {
-						number: 1,
+						bar: 1,
 					},
 				},
 			]);
@@ -4226,7 +4225,7 @@ describe('Kernel', () => {
 					type: 'card@1.0.0',
 					data: {
 						thread: true,
-						number: 1,
+						bar: 1,
 					},
 				},
 			);
@@ -4337,7 +4336,7 @@ describe('Kernel', () => {
 					type: 'card@1.0.0',
 					data: {
 						thread: true,
-						number: 1,
+						bar: 1,
 					},
 				},
 			);
@@ -4349,7 +4348,7 @@ describe('Kernel', () => {
 					type: 'card@1.0.0',
 					data: {
 						thread: true,
-						number: 2,
+						bar: 2,
 					},
 				},
 			);
@@ -4505,7 +4504,7 @@ describe('Kernel', () => {
 					type: 'card@1.0.0',
 					data: {
 						thread: true,
-						number: 1,
+						bar: 1,
 					},
 				},
 			);
@@ -4517,7 +4516,7 @@ describe('Kernel', () => {
 					type: 'card@1.0.0',
 					data: {
 						thread: true,
-						number: 2,
+						bar: 2,
 					},
 				},
 			);
@@ -4529,7 +4528,7 @@ describe('Kernel', () => {
 					type: 'card@1.0.0',
 					data: {
 						thread: true,
-						number: 3,
+						bar: 3,
 					},
 				},
 			);

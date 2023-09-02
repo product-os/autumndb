@@ -14,20 +14,20 @@ export interface ViewData {
 	schema?: {
 		[k: string]: unknown;
 	};
-	anyOf?: {
+	anyOf?: Array<{
 		name: string;
 		schema: {
 			type: 'object';
 			[k: string]: unknown;
 		};
-	}[];
-	allOf?: {
+	}>;
+	allOf?: Array<{
 		name: string;
 		schema: {
 			type: 'object';
 			[k: string]: unknown;
 		};
-	}[];
+	}>;
 	/**
 	 * A list of data types this view can return
 	 */
@@ -35,6 +35,6 @@ export interface ViewData {
 	[k: string]: unknown;
 }
 
-export interface ViewContractDefinition extends ContractDefinition<ViewData> {}
+export type ViewContractDefinition = ContractDefinition<ViewData>;
 
-export interface ViewContract extends Contract<ViewData> {}
+export type ViewContract = Contract<ViewData>;

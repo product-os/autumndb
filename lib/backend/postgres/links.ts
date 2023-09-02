@@ -1,9 +1,8 @@
-import * as _ from 'lodash';
 import type { PostgresBackend } from '.';
 import { Context } from '../../context';
 import type { Contract, LinkContract } from '../../types';
 
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: coreVersion } = require('../../../package.json');
 
 const LINK_TABLE = 'links2';

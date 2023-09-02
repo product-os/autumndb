@@ -40,7 +40,6 @@ export const parseVersion = (version: string) => {
 			latest: true,
 		};
 	}
-	// eslint-disable-next-line max-len
 	const versionPattern =
 		/(?<major>\d+)(\.(?<minor>\d+))?(\.(?<patch>\d+))?(-(?<prerelease>[0-9A-Za-z-]+))?(\+(?<build>[0-9A-Za-z-]+))?|(?<latest>latest)/;
 

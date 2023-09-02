@@ -1,7 +1,8 @@
-import { strict as nativeAssert } from 'assert';
 import * as Bluebird from 'bluebird';
 import * as fastEquals from 'fast-equals';
 import * as _ from 'lodash';
+import { strict as nativeAssert } from 'node:assert';
+import { setTimeout } from 'node:timers/promises';
 import { performance } from 'perf_hooks';
 import { Pool, PoolClient } from 'pg';
 import * as semver from 'semver';
@@ -30,7 +31,7 @@ import type {
 import * as utils from './utils';
 export type { StreamChange } from './streams';
 
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: coreVersion } = require('../../../package.json');
 
 export const INDEX_TABLE = 'jf_indexes';
@@ -284,17 +285,17 @@ export class PostgresBackend implements Database {
 	 */
 	async connect(context: Context) {
 		const ourContext = new Context(context.getLogContext(), this);
-		while (true) {
+		let connected = false;
+		while (connected === false) {
 			try {
 				await this.tryConnect(ourContext);
-
-				return;
+				connected = true;
 			} catch (error: unknown) {
 				context.warn(
 					`Connection to database failed. Retrying in ${this.connectRetryDelay} milliseconds`,
 					{ error },
 				);
-				await Bluebird.delay(this.connectRetryDelay);
+				await setTimeout(this.connectRetryDelay);
 			}
 		}
 	}

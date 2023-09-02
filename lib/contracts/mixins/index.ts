@@ -5,7 +5,7 @@ import { baseUiSchema } from './with-ui-schema';
 
 export { uiSchemaDef } from './ui-schema-defs';
 
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const deref = require('json-schema-deref-sync');
 
 export const mergeWithUniqConcatArrays = (objValue: any, srcValue: any) => {

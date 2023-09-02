@@ -104,11 +104,6 @@ describe('Context', () => {
 			).toEqual([{ id: id1 }]);
 		});
 
-		it.skip('should be able to perform a serialized transaction', async () => {
-			// TODO: not sure how to reliably force a serialization error with
-			// the `Context`'s interface
-		});
-
 		it('should rollback if an exception is thrown inside the callback', async () => {
 			const id = randomUUID();
 			try {
@@ -122,7 +117,7 @@ describe('Context', () => {
                             `,
 							[id],
 						);
-						throw 0;
+						throw new Error('Dummy error for test');
 					},
 				);
 			} catch {
@@ -187,25 +182,18 @@ describe('Context', () => {
 			await context.withTransaction(
 				TransactionIsolation.Snapshot,
 				async (transactionContext1: Context) => {
-					await transactionContext1.runQuery(
-						`
-                        INSERT INTO test
-                        VALUES ($1)
-                        `,
-						[id1],
-					);
+					await transactionContext1.runQuery('INSERT INTO test VALUES ($1)', [
+						id1,
+					]);
 					try {
 						await transactionContext1.withTransaction(
 							TransactionIsolation.Snapshot,
 							async (transactionContext2: Context) => {
 								await transactionContext2.runQuery(
-									`
-                                    INSERT INTO test
-                                    VALUES ($1)
-                                    `,
+									'INSERT INTO test VALUES ($1)',
 									[id2],
 								);
-								throw 0;
+								throw new Error('Test error');
 							},
 						);
 					} catch {
@@ -215,51 +203,10 @@ describe('Context', () => {
 			);
 
 			expect(
-				await context.query(
-					`
-                    SELECT id
-                    FROM test
-                    WHERE id IN ($1, $2)
-                    `,
-					[id1, id2],
-				),
-			).toEqual([{ id: id1 }]);
-		});
-
-		it.skip('should serialize unawaited queries', async () => {
-			const id1 = randomUUID();
-			const id2 = randomUUID();
-			context.runQuery(
-				`
-                INSERT INTO test
-                VALUES ($1)
-                `,
-				[id1],
-			);
-			context.runQuery(
-				`
-                INSERT INTO test
-                VALUES ($1)
-                `,
-				[id2],
-			);
-			await context.runQuery(
-				`
-                DELETE FROM test
-                WHERE id = $1
-                `,
-				[id2],
-			);
-
-			expect(
-				await context.query(
-					`
-                    SELECT id
-                    FROM test
-                    WHERE id IN ($1, $2)
-                    `,
-					[id1, id2],
-				),
+				await context.query('SELECT id FROM test WHERE id IN ($1, $2)', [
+					id1,
+					id2,
+				]),
 			).toEqual([{ id: id1 }]);
 		});
 	});

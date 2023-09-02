@@ -14,7 +14,10 @@ export class IsOfJsonTypesFilter extends SqlFilter {
 	 * @param {SqlPath} path - Path to be tested.
 	 * @param {Array} types - Array of accepted JSON types.
 	 */
-	constructor(public path: SqlPath, public types: string[]) {
+	constructor(
+		public path: SqlPath,
+		public types: string[],
+	) {
 		super();
 
 		this.path = path.cloned();

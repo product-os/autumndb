@@ -12,7 +12,10 @@ export class MultipleOfFilter extends SqlFilter {
 	 * @param {SqlPath} path - Path to be tested.
 	 * @param {Number} multiple - A constant that `path` must be a multiple of.
 	 */
-	constructor(public path: SqlPath, public multiple: number) {
+	constructor(
+		public path: SqlPath,
+		public multiple: number,
+	) {
 		super();
 
 		this.path = path.cloned();

@@ -1886,59 +1886,53 @@ describe('jsonschema2sql: Postgres specific', () => {
 
 		for (const [name, testCases] of Object.entries(reqoptTestCases)) {
 			for (const [idx, testCase] of testCases.cases.entries()) {
-				testFn(
-					`schema ${name} - ${testCase.required.desc}`,
-					/* eslint-disable no-loop-func */
-					async () => {
-						const table = ['reqopt', name, idx]
-							.join('_')
-							.replace(/ /g, '_')
-							.replace(/`/g, '');
+				testFn(`schema ${name} - ${testCase.required.desc}`, async () => {
+					const table = ['reqopt', name, idx]
+						.join('_')
+						.replace(/ /g, '_')
+						.replace(/`/g, '');
 
-						const schema: JsonSchema = {
-							properties: {
-								data: {
-									properties: {},
-								},
+					const schema: JsonSchema = {
+						properties: {
+							data: {
+								properties: {},
 							},
-						};
-						const required = testCase.required.value;
-						if (required.length > 0) {
-							// TS-TODO: Its weird that `data` has to be cast to "any" here
-							(schema.properties!.data as any).required = required;
-						}
-						if ('actor' in testCases) {
-							(schema.properties!.data as any).properties.actor =
-								testCases.actor;
-						}
-						if ('other' in testCases) {
-							(schema.properties!.data as any).properties.other =
-								testCases.other;
-						}
+						},
+					};
+					const required = testCase.required.value;
+					if (required.length > 0) {
+						// TS-TODO: Its weird that `data` has to be cast to "any" here
+						(schema.properties!.data as any).required = required;
+					}
+					if ('actor' in testCases) {
+						(schema.properties!.data as any).properties.actor = testCases.actor;
+					}
+					if ('other' in testCases) {
+						(schema.properties!.data as any).properties.other = testCases.other;
+					}
 
-						const elements = [
-							{
-								slug: 'test-1',
-								type: 'contract',
-								data: {
-									actor: actorContents,
-								},
+					const elements = [
+						{
+							slug: 'test-1',
+							type: 'contract',
+							data: {
+								actor: actorContents,
 							},
-						];
+						},
+					];
 
-						const results = await runner({
-							context: ctx.context,
-							backend: ctx.backend,
-							database: ctx.database,
-							table,
-							elements,
-							schema,
-						});
+					const results = await runner({
+						context: ctx.context,
+						backend: ctx.backend,
+						database: ctx.database,
+						table,
+						elements,
+						schema,
+					});
 
-						// TODO: This check is vulnerable to errors where the results length is greater than 1
-						expect(results.length === 1).toBe(testCase.valid);
-					},
-				);
+					// TODO: This check is vulnerable to errors where the results length is greater than 1
+					expect(results.length === 1).toBe(testCase.valid);
+				});
 			}
 		}
 

@@ -140,7 +140,10 @@ export class Streamer {
 	private streams: { [id: string]: Stream } = {};
 	private notificationHandler: DatabaseNotificationHandler | null = null;
 
-	constructor(private context: Context, public table: string) {
+	constructor(
+		private context: Context,
+		public table: string,
+	) {
 		this.channel = `stream-${table}`;
 		this.notificationListener = this.notificationListener.bind(this);
 	}
@@ -353,7 +356,8 @@ export class Stream extends EventEmitter {
 		);
 		this.schema = schema;
 		this.traversesLinks =
-			typeof schema !== 'boolean' && schema.hasOwnProperty('$$links');
+			typeof schema !== 'boolean' &&
+			Object.prototype.hasOwnProperty.call(schema, '$$links');
 	}
 
 	public async push(payload: EventPayload) {

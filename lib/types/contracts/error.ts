@@ -18,7 +18,6 @@ export interface ErrorData {
 	[k: string]: unknown;
 }
 
-export interface ErrorContractDefinition
-	extends ContractDefinition<ErrorData> {}
+export type ErrorContractDefinition = ContractDefinition<ErrorData>;
 
-export interface ErrorContract extends Contract<ErrorData> {}
+export type ErrorContract = Contract<ErrorData>;

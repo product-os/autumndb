@@ -25,6 +25,6 @@ export interface LinkData {
 	[k: string]: unknown;
 }
 
-export interface LinkContractDefinition extends ContractDefinition<LinkData> {}
+export type LinkContractDefinition = ContractDefinition<LinkData>;
 
-export interface LinkContract extends Contract<LinkData> {}
+export type LinkContract = Contract<LinkData>;

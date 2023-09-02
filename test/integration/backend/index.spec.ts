@@ -1109,19 +1109,19 @@ describe('backend', () => {
 			const expected = [
 				{
 					indexname: `${typeContract.slug}__name__idx`,
-					indexdef: `CREATE INDEX \"${typeContract.slug}__name__idx\" ON public.${CONTRACTS_TABLE} USING btree (name) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+					indexdef: `CREATE INDEX "${typeContract.slug}__name__idx" ON public.${CONTRACTS_TABLE} USING btree (name) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
 					indexname: `${typeContract.slug}__data_payload_message__idx`,
-					indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_message__idx\" ON public.${CONTRACTS_TABLE} USING btree (((data #>> '{payload,message}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+					indexdef: `CREATE INDEX "${typeContract.slug}__data_payload_message__idx" ON public.${CONTRACTS_TABLE} USING btree (((data #>> '{payload,message}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
 					indexname: `${typeContract.slug}__data_payload_mentionsUser__idx`,
-					indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_mentionsUser__idx\" ON public.${CONTRACTS_TABLE} USING gin (((data #> '{payload,mentionsUser}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+					indexdef: `CREATE INDEX "${typeContract.slug}__data_payload_mentionsUser__idx" ON public.${CONTRACTS_TABLE} USING gin (((data #> '{payload,mentionsUser}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 				{
 					indexname: `${typeContract.slug}__data_from_id__name__data_to_id__idx`,
-					indexdef: `CREATE INDEX \"test-link__data_from_id__name__data_to_id__idx\" ON public.${CONTRACTS_TABLE} USING btree (((data #>> '{from,id}'::text[])), name, ((data #>> '{to,id}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+					indexdef: `CREATE INDEX "test-link__data_from_id__name__data_to_id__idx" ON public.${CONTRACTS_TABLE} USING btree (((data #>> '{from,id}'::text[])), name, ((data #>> '{to,id}'::text[]))) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 				},
 			];
 
@@ -1194,11 +1194,11 @@ describe('backend', () => {
 		const expected = [
 			{
 				indexname: `${typeContract.slug}__name__search_idx`,
-				indexdef: `CREATE INDEX \"${typeContract.slug}__name__search_idx\" ON public.${CONTRACTS_TABLE} USING gin (to_tsvector('english'::regconfig, name)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+				indexdef: `CREATE INDEX "${typeContract.slug}__name__search_idx" ON public.${CONTRACTS_TABLE} USING gin (to_tsvector('english'::regconfig, name)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 			},
 			{
 				indexname: `${typeContract.slug}__data_payload_message__search_idx`,
-				indexdef: `CREATE INDEX \"${typeContract.slug}__data_payload_message__search_idx\" ON public.${CONTRACTS_TABLE} USING gin (jsonb_to_tsvector('english'::regconfig, (data #> '{payload,message}'::text[]), '["string"]'::jsonb)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
+				indexdef: `CREATE INDEX "${typeContract.slug}__data_payload_message__search_idx" ON public.${CONTRACTS_TABLE} USING gin (jsonb_to_tsvector('english'::regconfig, (data #> '{payload,message}'::text[]), '["string"]'::jsonb)) WHERE (type = '${typeContract.slug}@${typeContract.version}'::text)`,
 			},
 		];
 
@@ -4738,14 +4738,14 @@ describe('backend', () => {
 				},
 			);
 
-			const result = await new Promise<any>(async (resolve, reject) => {
+			const result = await new Promise<any>((resolve, reject) => {
 				emitter.on('data', (change) => {
 					resolve(change);
 				});
 
 				emitter.on('error', reject);
 
-				Bluebird.all([
+				Promise.all([
 					ctx.backend.insertElement(ctx.context, {
 						type: 'foo@1.0.0',
 						version: '1.0.0',
@@ -4782,7 +4782,9 @@ describe('backend', () => {
 							test: randString,
 						},
 					}),
-				]);
+				]).catch((err) => {
+					throw err;
+				});
 			});
 
 			expect(result.type).toBe('insert');
@@ -4871,7 +4873,7 @@ describe('backend', () => {
 				},
 			});
 
-			const result = await new Promise<any>(async (resolve, reject) => {
+			const result = await new Promise<any>((resolve, reject) => {
 				emitter.on('data', (change) => {
 					if (change.type === 'insert') {
 						return;
@@ -4882,42 +4884,50 @@ describe('backend', () => {
 
 				emitter.on('error', reject);
 
-				await ctx.backend.upsertElement(ctx.context, {
-					slug: slug1,
-					version: '1.0.0',
-					tags: [],
-					loop: null,
-					links: {},
-					markers: [],
-					requires: [],
-					capabilities: [],
-					created_at: new Date().toISOString(),
-					updated_at: null,
-					linked_at: {},
-					active: true,
-					type: 'foo@1.0.0',
-					data: {
-						test: 2,
-					},
-				});
-				await ctx.backend.upsertElement(ctx.context, {
-					slug: slug2,
-					active: true,
-					version: '1.0.0',
-					links: {},
-					tags: [],
-					loop: null,
-					markers: [],
-					requires: [],
-					capabilities: [],
-					created_at: new Date().toISOString(),
-					updated_at: null,
-					linked_at: {},
-					type: 'bar@1.0.0',
-					data: {
-						test: 2,
-					},
-				});
+				ctx.backend
+					.upsertElement(ctx.context, {
+						slug: slug1,
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						links: {},
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
+						active: true,
+						type: 'foo@1.0.0',
+						data: {
+							test: 2,
+						},
+					})
+					.catch((err) => {
+						throw err;
+					});
+				ctx.backend
+					.upsertElement(ctx.context, {
+						slug: slug2,
+						active: true,
+						version: '1.0.0',
+						links: {},
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						linked_at: {},
+						type: 'bar@1.0.0',
+						data: {
+							test: 2,
+						},
+					})
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			expect(result.type).toBe('update');
@@ -4987,7 +4997,7 @@ describe('backend', () => {
 				},
 			});
 
-			const result = await new Promise<any>(async (resolve, reject) => {
+			const result = await new Promise<any>((resolve, reject) => {
 				emitter.on('data', (change) => {
 					// Livefeeds are asynchronous and can pick up a change a
 					// moment after the insertion, so there exist the
@@ -5004,24 +5014,28 @@ describe('backend', () => {
 
 				emitter.on('error', reject);
 
-				await ctx.backend.upsertElement(ctx.context, {
-					slug,
-					active: true,
-					version: '1.0.0',
-					links: {},
-					tags: [],
-					loop: null,
-					markers: [],
-					requires: [],
-					capabilities: [],
-					linked_at: {},
-					created_at: new Date().toISOString(),
-					updated_at: null,
-					type: 'foo@1.0.0',
-					data: {
-						test: new Array(5000).join('bazbuzz'),
-					},
-				});
+				ctx.backend
+					.upsertElement(ctx.context, {
+						slug,
+						active: true,
+						version: '1.0.0',
+						links: {},
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						linked_at: {},
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						type: 'foo@1.0.0',
+						data: {
+							test: new Array(5000).join('bazbuzz'),
+						},
+					})
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			expect(result.type).toBe('update');
@@ -5056,6 +5070,9 @@ describe('backend', () => {
 					emitter.on('error', done);
 					emitter.on('closed', done);
 					emitter.close();
+				})
+				.catch((err) => {
+					throw err;
 				});
 		});
 
@@ -5112,7 +5129,7 @@ describe('backend', () => {
 				},
 			});
 
-			const result = await new Promise<any>(async (resolve, reject) => {
+			const result = await new Promise<any>((resolve, reject) => {
 				emitter.on('data', (change) => {
 					resolve(change);
 					emitter.close();
@@ -5120,24 +5137,28 @@ describe('backend', () => {
 
 				emitter.on('error', reject);
 
-				await ctx.backend.upsertElement(ctx.context, {
-					slug,
-					active: true,
-					links: {},
-					version: '1.0.0',
-					tags: [],
-					loop: null,
-					markers: [],
-					requires: [],
-					capabilities: [],
-					linked_at: {},
-					created_at: new Date().toISOString(),
-					updated_at: null,
-					type: 'foo@1.0.0',
-					data: {
-						test: 1,
-					},
-				});
+				ctx.backend
+					.upsertElement(ctx.context, {
+						slug,
+						active: true,
+						links: {},
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						markers: [],
+						requires: [],
+						capabilities: [],
+						linked_at: {},
+						created_at: new Date().toISOString(),
+						updated_at: null,
+						type: 'foo@1.0.0',
+						data: {
+							test: 1,
+						},
+					})
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			expect(result.after).toEqual({
@@ -5206,7 +5227,7 @@ describe('backend', () => {
 				},
 			});
 
-			const result = await new Promise(async (resolve, reject) => {
+			const result = await new Promise((resolve, reject) => {
 				emitter.on('data', (change) => {
 					// Livefeeds are asynchronous and can pick up a change a
 					// moment after the insertion, so there exist the
@@ -5223,25 +5244,29 @@ describe('backend', () => {
 
 				emitter.on('error', reject);
 
-				await ctx.backend.upsertElement(ctx.context, {
-					slug,
-					version: '1.0.0',
-					tags: [],
-					loop: null,
-					links: {},
-					markers: [],
-					requires: [],
-					capabilities: [],
-					created_at: new Date().toISOString(),
-					linked_at: {},
-					updated_at: null,
-					active: true,
-					type: 'foo@1.0.0',
-					data: {
-						test: 2,
-						extra: true,
-					},
-				});
+				ctx.backend
+					.upsertElement(ctx.context, {
+						slug,
+						version: '1.0.0',
+						tags: [],
+						loop: null,
+						links: {},
+						markers: [],
+						requires: [],
+						capabilities: [],
+						created_at: new Date().toISOString(),
+						linked_at: {},
+						updated_at: null,
+						active: true,
+						type: 'foo@1.0.0',
+						data: {
+							test: 2,
+							extra: true,
+						},
+					})
+					.catch((err) => {
+						throw err;
+					});
 			});
 
 			expect(result).toEqual({

@@ -23,6 +23,6 @@ export interface TypeData {
 	[k: string]: unknown;
 }
 
-export interface TypeContractDefinition extends ContractDefinition<TypeData> {}
+export type TypeContractDefinition = ContractDefinition<TypeData>;
 
-export interface TypeContract extends Contract<TypeData> {}
+export type TypeContract = Contract<TypeData>;

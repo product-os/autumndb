@@ -12,7 +12,10 @@ export class LinkFilter extends SqlFilter {
 	 * @param {String} linkType - The link type.
 	 * @param {SqlFilter} filter - Filter for the link.
 	 */
-	constructor(public linkType: string, public filter: SqlFilter) {
+	constructor(
+		public linkType: string,
+		public filter: SqlFilter,
+	) {
 		super();
 
 		this.linkType = linkType;

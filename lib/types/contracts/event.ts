@@ -18,7 +18,6 @@ export interface EventData {
 	[k: string]: unknown;
 }
 
-export interface EventContractDefinition
-	extends ContractDefinition<EventData> {}
+export type EventContractDefinition = ContractDefinition<EventData>;
 
-export interface EventContract extends Contract<EventData> {}
+export type EventContract = Contract<EventData>;

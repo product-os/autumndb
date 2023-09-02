@@ -15,6 +15,6 @@ export interface RoleData {
 	[k: string]: unknown;
 }
 
-export interface RoleContractDefinition extends ContractDefinition<RoleData> {}
+export type RoleContractDefinition = ContractDefinition<RoleData>;
 
-export interface RoleContract extends Contract<RoleData> {}
+export type RoleContract = Contract<RoleData>;

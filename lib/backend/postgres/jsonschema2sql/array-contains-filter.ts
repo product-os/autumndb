@@ -14,7 +14,10 @@ export class ArrayContainsFilter extends SqlFilter {
 	 * @param {SqlPath} path - Path to be tested.
 	 * @param {SqlFilter} filter - Filter to test elements against.
 	 */
-	constructor(public path: SqlPath, public filter: SqlFilter) {
+	constructor(
+		public path: SqlPath,
+		public filter: SqlFilter,
+	) {
 		super();
 
 		this.path = path.cloned();

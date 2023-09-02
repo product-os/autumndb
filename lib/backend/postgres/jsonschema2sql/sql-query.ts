@@ -745,7 +745,6 @@ export class SqlQuery {
 				filter = new ValueIsFilter(this.path, '@>', value);
 			} else if (keyCount === 2 && 'type' in schema) {
 				const type = schema.type;
-				// eslint-disable-next-line valid-typeof
 				if (
 					typeof value === type ||
 					(type === 'integer' && _.isNumber(value))
@@ -1166,9 +1165,10 @@ export class SqlQuery {
 			schema,
 			this.options,
 		);
-		// tslint:disable-next-line: prefer-for-of
-		for (const _item of suffix) {
-			this.parentState.jsonPath?.pop();
+		if (Array.isArray(suffix) && suffix.length) {
+			suffix.forEach(() => {
+				this.parentState.jsonPath?.pop();
+			});
 		}
 		return query;
 	}
@@ -1198,8 +1198,10 @@ export class SqlQuery {
 				path: parentPath,
 			},
 		);
-		for (const _item of suffix) {
-			this.parentState.jsonPath?.pop();
+		if (Array.isArray(suffix) && suffix.length) {
+			suffix.forEach(() => {
+				this.parentState.jsonPath?.pop();
+			});
 		}
 		return query;
 	}
@@ -1223,8 +1225,10 @@ export class SqlQuery {
 				jsonPath: this.parentState.jsonPath,
 			},
 		);
-		for (const _item of suffix) {
-			this.parentState.jsonPath?.pop();
+		if (Array.isArray(suffix) && suffix.length) {
+			suffix.forEach(() => {
+				this.parentState.jsonPath?.pop();
+			});
 		}
 		return query;
 	}
