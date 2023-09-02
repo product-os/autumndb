@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency redis to v4.6.8
+      hash: c78be074f4451cce9bac48b681a62870798a6aa8
+      body: |
+        Update redis from 4.6.7 to 4.6.8
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.18
+  title: ""
+  date: 2023-09-02T16:54:05.058Z
+- commits:
     - subject: Update github/codeql-action digest to 00e563e
       hash: e202ddda51033b4d30f9af780f86c51a79b007ac
       body: |
