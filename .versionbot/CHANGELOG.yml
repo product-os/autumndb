@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update dependency node to 18.18
+      hash: ae12379d4960319c1fa4e3cde3f7e01de649eeee
+      body: |
+        Update node from 18.17.1 to 18.18.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.21
+  title: ""
+  date: 2023-09-18T21:51:10.869Z
+- commits:
     - subject: Update github/codeql-action digest to 04daf01
       hash: 939da1b5987524e9b2c0c12ca819a74ad1f66c02
       body: |
