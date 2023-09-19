@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update github/codeql-action digest to 6a28655
+      hash: 7971ae9e6b2cdd647ddd76feb17a75cd08a82379
+      body: |
+        Update github/codeql-action
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.22
+  title: ""
+  date: 2023-09-19T10:50:38.099Z
+- commits:
     - subject: Update dependency node to 18.18
       hash: ae12379d4960319c1fa4e3cde3f7e01de649eeee
       body: |
