@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update github/codeql-action digest to 2cb752a
+      hash: 179d9f2c96721c37fab5cc610723beaa31627f38
+      body: |
+        Update github/codeql-action
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 29.0.24
+  title: ""
+  date: 2023-10-06T11:53:45.678Z
+- commits:
     - subject: Update dependency redis to v4.6.10
       hash: a93d5e1394e0b5dc962e9885a1b0bff0bd31a392
       body: |
